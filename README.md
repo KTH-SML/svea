@@ -67,7 +67,7 @@ If you do not want to install Ubuntu onto your computer, consider installing a
 Some may need to install some additional python tools (install the **Python 2.7**
 versions):
 
-1. [numpy](https://scipy.org/install.html) **(You may need to update your version of numpy to the newest)**
+1. [numpy](https://scipy.org/install.html) **(You may need to update your version of numpy to the newest)** You can do this with `pip install numpy`
 2. [matplotlib](https://matplotlib.org/users/installing.html)
 
 The installation instructions later on will use `catkin build` instead of
