@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+    Launch odometry and slam toolbox
+-->
+
+<launch>
+  <!-- Start default odometry -->
+  
+  <arg name="xavier" default="false"/>
+  <arg name="use_rs" default="false"/>
+  
+  <group unless="$(arg use_rs)">
+    <include file="$(find svea_sensors)/launch/default_odometry.launch">
+      <arg name="xavier" value="$(arg xavier)"/>
+    </include>            
+  </group>
+  <group if="$(arg use_rs)">
+    <include file="$(find svea_sensors)/launch/rs_odometry.launch">
+      <arg name="xavier" value="$(arg xavier)"/>
+    </include>
+  </group>
+  
+  <arg name="rviz" default="false"/>
+  <group if="$(arg rviz)">
+    <include file="$(find svea_sensors)/launch/rviz.launch" />
+  </group>
+  
+  <arg name="slam_delay" default="5"/> <!-- Delay before starting SLAM node -->
+  <node pkg="slam_toolbox" type="sync_slam_toolbox_node" name="slam_toolbox" output="screen" launch-prefix="bash -c 'sleep $(arg slam_delay); $0 $@' ">
+    <rosparam command="load" file="$(find svea_sensors)/params/slam_toolbox/slam_sync.yaml" />
+  </node>
+
+</launch>
+

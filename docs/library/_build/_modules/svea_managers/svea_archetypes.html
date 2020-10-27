@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>svea_managers.svea_archetypes &#8212; SVEA API 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          SVEA Doc</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">GOTO <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#svea-managers">SVEA Managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-states">State Representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-localizers">Localizers Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-actuation">Actuation Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-data">Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#simulators">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#sensor-interfaces">Sensor Interfaces</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Sections <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for svea_managers.svea_archetypes</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module containing archetypal SVEA manager classes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">import</span> <span class="nn">rospy</span>
+<span class="kn">from</span> <span class="nn">svea.actuation</span> <span class="kn">import</span> <span class="n">ActuationInterface</span>
+<span class="kn">from</span> <span class="nn">svea.data</span> <span class="kn">import</span> <span class="n">BasicDataHandler</span>
+
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Frank Jiang&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;frankji@kth.se &quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<div class="viewcode-block" id="SVEAManager"><a class="viewcode-back" href="../../api.html#svea_managers.svea_archetypes.SVEAManager">[docs]</a><span class="k">class</span> <span class="nc">SVEAManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Container for the different software module of a SVEA</span>
+<span class="sd">    vehicle. Additionally, this manager is used to provide clean</span>
+<span class="sd">    interfaces to each module of a SVEA vehicle. In general, every SVEA</span>
+<span class="sd">    consists of the following modules:</span>
+<span class="sd">    1. Localization Interface</span>
+<span class="sd">    2. Controller</span>
+<span class="sd">    3. Actuation Interface</span>
+<span class="sd">    4. Data Handler</span>
+<span class="sd">    Note, we use the term &quot;Interface&quot; carefully. They are called</span>
+<span class="sd">    interfaces since the main functionality is performed elsewhere in</span>
+<span class="sd">    another ROS node.</span>
+
+<span class="sd">    :param vehicle_name: Name of vehicle; used to initialize each</span>
+<span class="sd">                         software module.</span>
+<span class="sd">    :type vehicle_name: str</span>
+<span class="sd">    :param localizer: A chosen localization interface class constructor</span>
+<span class="sd">    :type localizer: class</span>
+<span class="sd">    :param controller: A chosen controller class constructor</span>
+<span class="sd">    :type controller: class</span>
+<span class="sd">    :param actuation: A chosen actuation interface class constructor,</span>
+<span class="sd">                      defaults to ActuationInterface</span>
+<span class="sd">    :type actuation: class</span>
+<span class="sd">    :param data_handler: A chosen data handler class constructor,</span>
+<span class="sd">                         defaults to BasicDataHandler</span>
+<span class="sd">    :type data_handler: class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">MAX_WAIT</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="mf">10.0</span> <span class="c1"># no slower than 10Hz</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vehicle_name</span><span class="p">,</span> <span class="n">localizer</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span>
+                       <span class="n">actuation</span><span class="o">=</span><span class="n">ActuationInterface</span><span class="p">,</span>
+                       <span class="n">data_handler</span><span class="o">=</span><span class="n">BasicDataHandler</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span> <span class="o">=</span> <span class="n">vehicle_name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">localizer</span> <span class="o">=</span> <span class="n">localizer</span><span class="p">(</span><span class="n">vehicle_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">controller</span><span class="p">(</span><span class="n">vehicle_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actuation</span> <span class="o">=</span> <span class="n">actuation</span><span class="p">(</span><span class="n">vehicle_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span> <span class="o">=</span> <span class="n">data_handler</span><span class="p">(</span><span class="n">vehicle_name</span><span class="p">)</span>
+
+        <span class="c1"># bring localizer state out into manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">localizer</span><span class="o">.</span><span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_state_time</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># set up automatic state logging</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">localizer</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">log_state</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SVEAManager.start"><a class="viewcode-back" href="../../api.html#svea_managers.svea_archetypes.SVEAManager.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Start interface objects</span>
+
+<span class="sd">        :param wait: Flag deciding whether to wait for actuation</span>
+<span class="sd">                     interface to be ready or not</span>
+<span class="sd">        :type wait: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">localizer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actuation</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SVEAManager.wait_for_state"><a class="viewcode-back" href="../../api.html#svea_managers.svea_archetypes.SVEAManager.wait_for_state">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Wait for a new state to arrive, or until a maximum time</span>
+<span class="sd">        has passed since the last state arrived.</span>
+
+<span class="sd">        :return: New state when it arrvies, if it arrives before max</span>
+<span class="sd">                 waiting time, otherwise None</span>
+<span class="sd">        :rtype: VehicleState, or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_state_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">timeout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_WAIT</span> <span class="o">-</span> <span class="p">(</span><span class="n">time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_state_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timeout</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">localizer</span><span class="o">.</span><span class="n">ready_event</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="n">wait</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time</span>
+        <span class="k">if</span> <span class="n">wait</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_WAIT</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="SVEAManager.compute_control"><a class="viewcode-back" href="../../api.html#svea_managers.svea_archetypes.SVEAManager.compute_control">[docs]</a>    <span class="k">def</span> <span class="nf">compute_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute control using chosen controller object</span>
+
+<span class="sd">        :param state: State used to compute control; if no state is</span>
+<span class="sd">                      given as an argument, self.state is automatically</span>
+<span class="sd">                      used instead, defaults to None</span>
+<span class="sd">        :type state: VehicleState, or None</span>
+<span class="sd">        :return: Computed control input; format depends on return type</span>
+<span class="sd">                 of controller object&#39;s own compute_control() method;</span>
+<span class="sd">                 typically this should return a steering angle and a</span>
+<span class="sd">                 velocity</span>
+<span class="sd">        :rtype: Some return type as self.controller.compute_control()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">compute_control</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">compute_control</span><span class="p">(</span><span class="n">state</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SVEAManager.send_control"><a class="viewcode-back" href="../../api.html#svea_managers.svea_archetypes.SVEAManager.send_control">[docs]</a>    <span class="k">def</span> <span class="nf">send_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steering</span><span class="p">,</span> <span class="n">velocity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send control input off to low-level controller and actuate</span>
+<span class="sd">        SVEA. This method also auto-logs the control input.</span>
+
+<span class="sd">        :param steering: Steering angle request in [rad]</span>
+<span class="sd">        :type steering: float</span>
+<span class="sd">        :param velocity: Velocity request in [m/s]</span>
+<span class="sd">        :type velocity: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actuation</span><span class="o">.</span><span class="n">send_control</span><span class="p">(</span><span class="n">steering</span><span class="p">,</span> <span class="n">velocity</span><span class="p">)</span>
+        <span class="c1"># log control as soon as it&#39;s actually sent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">log_ctrl</span><span class="p">(</span><span class="n">steering</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_time</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">_log_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">log_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SVEAManager.visualize_data"><a class="viewcode-back" href="../../api.html#svea_managers.svea_archetypes.SVEAManager.visualize_data">[docs]</a>    <span class="k">def</span> <span class="nf">visualize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Visualize data using the visualize_data() method of the</span>
+<span class="sd">        chosen data handler object&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_handler</span><span class="o">.</span><span class="n">visualize_data</span><span class="p">()</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, Smart Mobility Lab.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

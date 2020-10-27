@@ -1,0 +1,10 @@
+<launch>
+
+    <arg name="is_sim" default="true"/>
+
+    <node pkg="svea_core" type="keyboard.py" name="SVEA_keyteleop" output="screen">
+        <param name="is_sim" value="$(arg is_sim)"/>
+    </node>
+    <!--key teleop-->
+    <node pkg="key_teleop" type="key_teleop.py" name="teleop" output="screen"/>
+</launch>

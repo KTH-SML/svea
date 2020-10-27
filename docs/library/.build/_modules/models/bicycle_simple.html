@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>models.bicycle_simple &#8212; SVEA API 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          SVEA Doc</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">GOTO <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-models.bicycle_simple">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-simulators.sim_SVEA_simple">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-sensors.lidars">Sensor Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-localizers.qualisys_localizers">Localizers Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-controllers.control_interfaces">Control Interfaces</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Sections <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for models.bicycle_simple</h1><div class="highlight"><pre>
+<span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Simple bicycle model with params set for SVEA cars.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Frank Jiang&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;frankji@kth.se&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<div class="viewcode-block" id="SimpleBicycleState"><a class="viewcode-back" href="../../api.html#models.bicycle_simple.SimpleBicycleState">[docs]</a><span class="k">class</span> <span class="nc">SimpleBicycleState</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extended from PythonRobotics for compatibility. State-space</span>
+<span class="sd">    equation is:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \\dot{x}     &amp;= v\\cos(\\phi), \\\\</span>
+<span class="sd">            \\dot{y}     &amp;= v\\sin(\\phi), \\\\</span>
+<span class="sd">            \\dot{\\phi}  &amp;= \\frac{v}{L} \\tan(\\delta), \\\\</span>
+<span class="sd">            \\dot{v}     &amp;= a.</span>
+
+<span class="sd">    where :math:`x, y, \phi, v` are x position, y position, yaw,</span>
+<span class="sd">    and velocity, :math:`\delta, a` are the steering angle and</span>
+<span class="sd">    acceleration inputs, and :math:`L` is the wheel</span>
+<span class="sd">    base length. Object also includes method for dynamics updates based</span>
+<span class="sd">    on set sampling time the embedded bicycle model. Units are</span>
+<span class="sd">    [m, rad, s, m/s]</span>
+
+<span class="sd">    :param x: Initial x position, defaults to 0.0</span>
+<span class="sd">    :type x: float</span>
+<span class="sd">    :param y: Initial y position, defaults to 0.0</span>
+<span class="sd">    :type y: float</span>
+<span class="sd">    :param yaw: Initial yaw, defaults to 0.0</span>
+<span class="sd">    :type yaw: float</span>
+<span class="sd">    :param v: Initial velocity, defaults to 0.0</span>
+<span class="sd">    :type v: float</span>
+<span class="sd">    :param dt: Sampling time for dynamics update, defaults to 0.1</span>
+<span class="sd">    :type dt: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="mf">0.32</span>
+    <span class="n">DELTA_MAX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mf">30.0</span><span class="p">)</span>  <span class="c1"># max steering angle [rad]</span>
+
+    <span class="n">TAU</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1"># gain for simulating SVEA&#39;s ESC</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">yaw</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialize state. &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="n">yaw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+
+    <span class="k">def</span> <span class="nf">_normalize_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Normalize an angle to [-pi, pi]. &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="n">angle</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
+            <span class="n">angle</span> <span class="o">-=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="k">while</span> <span class="n">angle</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
+            <span class="n">angle</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+        <span class="k">return</span> <span class="n">angle</span>
+
+    <span class="k">def</span> <span class="nf">_build_param_printout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;## Simple Bicycle State:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;  - x: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;  - y: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;  - yaw: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;  - v: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;  - dt: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_param_printout</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_param_printout</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_sim_esc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_velocity</span><span class="p">):</span>
+        <span class="c1"># simulates esc dynamics</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">TAU</span> <span class="o">*</span> <span class="p">(</span><span class="n">target_velocity</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">accel</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="c1"># update state using simple bicycle model dynamics</span>
+
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">DELTA_MAX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DELTA_MAX</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_angle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">+=</span> <span class="n">accel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
+
+<div class="viewcode-block" id="SimpleBicycleState.update"><a class="viewcode-back" href="../../api.html#models.bicycle_simple.SimpleBicycleState.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steering</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span>
+                     <span class="n">transmission</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">differential_front</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">differential_rear</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">ctrl_code</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates state using set sampling time, dt, and embedded bicycle</span>
+<span class="sd">        dynamics. Designed to take same inputs as SVEA vehicle&#39;s</span>
+<span class="sd">        low-level interface.</span>
+
+<span class="sd">        :param steering: input steering angle for the car in radians</span>
+<span class="sd">        :type steering: float</span>
+<span class="sd">        :param velocity: input velocity for the car in m/s</span>
+<span class="sd">        :type velocity: float</span>
+<span class="sd">        :param transmission: [deprecated]</span>
+<span class="sd">        :param differential_front: [deprecated]</span>
+<span class="sd">        :param differential_rear: [deprecated]</span>
+<span class="sd">        :param ctrl_code: [deprecated]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">accel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sim_esc</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">steering</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">accel</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimpleBicycleState.get_state"><a class="viewcode-back" href="../../api.html#models.bicycle_simple.SimpleBicycleState.get_state">[docs]</a>    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (will be updated to use properties)</span>
+
+<span class="sd">        :return: State as numpy array [x, y, yaw, v]</span>
+<span class="sd">        :rtype: numpy.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">state</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimpleBicycleState.get_readable_state"><a class="viewcode-back" href="../../api.html#models.bicycle_simple.SimpleBicycleState.get_readable_state">[docs]</a>    <span class="k">def</span> <span class="nf">get_readable_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns state as self-sufficiently readable state</span>
+<span class="sd">        (will be updated to use properties)</span>
+
+<span class="sd">        :return: State as readable dict {x: __, y: __, yaw: __, v: __}</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                 <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                 <span class="s2">&quot;yaw&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">,</span>
+                 <span class="s2">&quot;v&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+<div class="viewcode-block" id="SimpleBicycleState.get_state_dim"><a class="viewcode-back" href="../../api.html#models.bicycle_simple.SimpleBicycleState.get_state_dim">[docs]</a>    <span class="k">def</span> <span class="nf">get_state_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (will be updated to use properties)</span>
+
+<span class="sd">        :return: Dimension of state space</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_state</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="SimpleBicycleState.set_dt"><a class="viewcode-back" href="../../api.html#models.bicycle_simple.SimpleBicycleState.set_dt">[docs]</a>    <span class="k">def</span> <span class="nf">set_dt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter for sampling time used in dynamics update</span>
+<span class="sd">        (will be updated to use properties)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span></div>
+
+<div class="viewcode-block" id="SimpleBicycleState.get_dt"><a class="viewcode-back" href="../../api.html#models.bicycle_simple.SimpleBicycleState.get_dt">[docs]</a>    <span class="k">def</span> <span class="nf">get_dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (will be updated to use properties)</span>
+
+<span class="sd">        :return: Currently set sampling time</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Smart Mobility Lab.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

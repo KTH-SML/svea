@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>API Documentation &#8212; SVEA API 1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome!" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          SVEA Doc</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">GOTO <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#svea-managers">SVEA Managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-states">State Representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-localizers">Localizers Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-actuation">Actuation Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-data">Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulators">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sensor-interfaces">Sensor Interfaces</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Sections <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">API Documentation</a><ul>
+<li><a class="reference internal" href="#svea-managers">SVEA Managers</a><ul>
+<li><a class="reference internal" href="#module-svea_managers.svea_archetypes">Archetypal (standard)</a></li>
+<li><a class="reference internal" href="#module-svea_managers.path_following_sveas">Path Following</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-states">State Representation</a></li>
+<li><a class="reference internal" href="#models">Models</a><ul>
+<li><a class="reference internal" href="#module-models.bicycle">Bicycle</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-localizers">Localizers Interfaces</a></li>
+<li><a class="reference internal" href="#module-actuation">Actuation Interfaces</a></li>
+<li><a class="reference internal" href="#module-data">Data Handlers</a></li>
+<li><a class="reference internal" href="#simulators">Simulators</a><ul>
+<li><a class="reference internal" href="#module-simulators.sim_SVEA">Simple SVEA Simulator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sensor-interfaces">Sensor Interfaces</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="api-documentation">
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="svea-managers">
+<h2>SVEA Managers<a class="headerlink" href="#svea-managers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-svea_managers.svea_archetypes">
+<span id="archetypal-standard"></span><h3>Archetypal (standard)<a class="headerlink" href="#module-svea_managers.svea_archetypes" title="Permalink to this headline">¶</a></h3>
+<p>Module containing archetypal SVEA manager classes.</p>
+<dl class="class">
+<dt id="svea_managers.svea_archetypes.SVEAManager">
+<em class="property">class </em><code class="descclassname">svea_managers.svea_archetypes.</code><code class="descname">SVEAManager</code><span class="sig-paren">(</span><em>vehicle_name</em>, <em>localizer</em>, <em>controller</em>, <em>actuation=&lt;class 'svea.actuation.ActuationInterface'&gt;</em>, <em>data_handler=&lt;class 'svea.data.BasicDataHandler'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/svea_managers/svea_archetypes.html#SVEAManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#svea_managers.svea_archetypes.SVEAManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container for the different software module of a SVEA
+vehicle. Additionally, this manager is used to provide clean
+interfaces to each module of a SVEA vehicle. In general, every SVEA
+consists of the following modules:
+1. Localization Interface
+2. Controller
+3. Actuation Interface
+4. Data Handler
+Note, we use the term “Interface” carefully. They are called
+interfaces since the main functionality is performed elsewhere in
+another ROS node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of vehicle; used to initialize each
+software module.</li>
+<li><strong>localizer</strong> (<em>class</em>) – A chosen localization interface class constructor</li>
+<li><strong>controller</strong> (<em>class</em>) – A chosen controller class constructor</li>
+<li><strong>actuation</strong> (<em>class</em>) – A chosen actuation interface class constructor,
+defaults to ActuationInterface</li>
+<li><strong>data_handler</strong> (<em>class</em>) – A chosen data handler class constructor,
+defaults to BasicDataHandler</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="svea_managers.svea_archetypes.SVEAManager.compute_control">
+<code class="descname">compute_control</code><span class="sig-paren">(</span><em>state=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/svea_managers/svea_archetypes.html#SVEAManager.compute_control"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#svea_managers.svea_archetypes.SVEAManager.compute_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute control using chosen controller object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state</strong> (<a class="reference internal" href="#states.VehicleState" title="states.VehicleState"><em>VehicleState</em></a><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – State used to compute control; if no state is
+given as an argument, self.state is automatically
+used instead, defaults to None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Computed control input; format depends on return type
+of controller object’s own compute_control() method;
+typically this should return a steering angle and a
+velocity</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Some return type as self.controller.compute_control()</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="svea_managers.svea_archetypes.SVEAManager.send_control">
+<code class="descname">send_control</code><span class="sig-paren">(</span><em>steering</em>, <em>velocity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/svea_managers/svea_archetypes.html#SVEAManager.send_control"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#svea_managers.svea_archetypes.SVEAManager.send_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send control input off to low-level controller and actuate
+SVEA. This method also auto-logs the control input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>steering</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Steering angle request in [rad]</li>
+<li><strong>velocity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Velocity request in [m/s]</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="svea_managers.svea_archetypes.SVEAManager.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>wait=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/svea_managers/svea_archetypes.html#SVEAManager.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#svea_managers.svea_archetypes.SVEAManager.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start interface objects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>wait</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Flag deciding whether to wait for actuation
+interface to be ready or not</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="svea_managers.svea_archetypes.SVEAManager.visualize_data">
+<code class="descname">visualize_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/svea_managers/svea_archetypes.html#SVEAManager.visualize_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#svea_managers.svea_archetypes.SVEAManager.visualize_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize data using the visualize_data() method of the
+chosen data handler object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="svea_managers.svea_archetypes.SVEAManager.wait_for_state">
+<code class="descname">wait_for_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/svea_managers/svea_archetypes.html#SVEAManager.wait_for_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#svea_managers.svea_archetypes.SVEAManager.wait_for_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for a new state to arrive, or until a maximum time
+has passed since the last state arrived.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">New state when it arrvies, if it arrives before max
+waiting time, otherwise None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#states.VehicleState" title="states.VehicleState">VehicleState</a>, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-svea_managers.path_following_sveas">
+<span id="path-following"></span><h3>Path Following<a class="headerlink" href="#module-svea_managers.path_following_sveas" title="Permalink to this headline">¶</a></h3>
+<p>Module containing path following SVEA managers</p>
+<dl class="class">
+<dt id="svea_managers.path_following_sveas.SVEAPurePursuit">
+<em class="property">class </em><code class="descclassname">svea_managers.path_following_sveas.</code><code class="descname">SVEAPurePursuit</code><span class="sig-paren">(</span><em>vehicle_name</em>, <em>localizer</em>, <em>controller</em>, <em>traj_x</em>, <em>traj_y</em>, <em>data_handler=&lt;class 'svea.data.TrajDataHandler'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/svea_managers/path_following_sveas.html#SVEAPurePursuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#svea_managers.path_following_sveas.SVEAPurePursuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container for the different software module of a SVEA
+vehicle that is performing path following using a pure-pursuit
+algorithm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of vehicle; used to initialize each
+software module.</li>
+<li><strong>localizer</strong> (<em>class</em>) – A chosen localization interface class constructor</li>
+<li><strong>controller</strong> (<em>class</em>) – A chosen controller class constructor</li>
+<li><strong>traj_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – X coordinates of trajectory</li>
+<li><strong>traj_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Y coordinates of trajectory</li>
+<li><strong>data_handler</strong> (<em>class</em>) – A chosen data handler class constructor,
+defaults to TrajDataHandler</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="svea_managers.path_following_sveas.SVEAPurePursuit.compute_control">
+<code class="descname">compute_control</code><span class="sig-paren">(</span><em>state=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/svea_managers/path_following_sveas.html#SVEAPurePursuit.compute_control"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#svea_managers.path_following_sveas.SVEAPurePursuit.compute_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute control for path-following using pure-pursuit</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state</strong> (<a class="reference internal" href="#states.VehicleState" title="states.VehicleState"><em>VehicleState</em></a><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – State used to compute control; if no state is
+given as an argument, self.state is automatically
+used instead, defaults to None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Computed steering and velocity inputs from pure-pursuit
+algorithm</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="svea_managers.path_following_sveas.SVEAPurePursuit.goto_pt">
+<code class="descname">goto_pt</code><span class="sig-paren">(</span><em>pt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/svea_managers/path_following_sveas.html#SVEAPurePursuit.goto_pt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#svea_managers.path_following_sveas.SVEAPurePursuit.goto_pt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute control to go to single point, taking advantage of
+the pure-pursuit controller</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – Point to go to</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Computed steering and velocity inputs from pure-pursuit
+algorithm</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="svea_managers.path_following_sveas.SVEAPurePursuit.is_finished">
+<code class="descname">is_finished</code><a class="headerlink" href="#svea_managers.path_following_sveas.SVEAPurePursuit.is_finished" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if pure-pursuit controller is finished or not</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="svea_managers.path_following_sveas.SVEAPurePursuit.update_traj">
+<code class="descname">update_traj</code><span class="sig-paren">(</span><em>traj_x</em>, <em>traj_y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/svea_managers/path_following_sveas.html#SVEAPurePursuit.update_traj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#svea_managers.path_following_sveas.SVEAPurePursuit.update_traj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update trajectory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>traj_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – X coordinates of trajectory, defaults to []</li>
+<li><strong>traj_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Y coordinates of trajectory, defaults to []</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-states">
+<span id="state-representation"></span><h2>State Representation<a class="headerlink" href="#module-states" title="Permalink to this headline">¶</a></h2>
+<p>Classes for representing the state of a ground vehicle.</p>
+<dl class="docutils">
+<dt>TODO:</dt>
+<dd><ul class="first last simple">
+<li>Implement handling of covaraiances</li>
+<li>Handling of state messages</li>
+</ul>
+</dd>
+</dl>
+<dl class="class">
+<dt id="states.SVEAControlValues">
+<em class="property">class </em><code class="descclassname">states.</code><code class="descname">SVEAControlValues</code><span class="sig-paren">(</span><em>steering=-128</em>, <em>velocity=-128</em>, <em>gear=None</em>, <em>front_diff_locked=None</em>, <em>rear_diff_locked=None</em>, <em>control_flags=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/states.html#SVEAControlValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#states.SVEAControlValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience class for representing SVEA control values in a human readable format.</p>
+<p>The default values corresponds to the do not care values for the LLI.
+That is: if a ctrl_lli message is generated from a <cite>SVEAControlValues</cite> instance
+that was initiated without arguments nothing will change if it is sent to the LLI.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>steering</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Steering, defaults to -128</li>
+<li><strong>velocity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Velocity, defaults to -128</li>
+<li><strong>gear</strong> – Gear, range 0 or 1, defaults to None</li>
+<li><strong>front_diff_locked</strong> – Gear, defaults to None</li>
+<li><strong>rear_diff_locked</strong> – Gear, defaults to None</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="states.SVEAControlValues.control_msg">
+<code class="descname">control_msg</code><a class="headerlink" href="#states.SVEAControlValues.control_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>The control value interpreted as a lli_ctrl message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">A lli_ctrl message representing the current values</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set the current values from a lli_ctr message</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class: <cite>svea_msg.msgs.lli_ctrl</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.SVEAControlValues.ctrl_msg">
+<code class="descname">ctrl_msg</code><a class="headerlink" href="#states.SVEAControlValues.ctrl_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>The control value interpreted as a lli_ctrl message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">A lli_ctrl message representing the current values</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set the current values from a lli_ctr message</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class: <cite>svea_msg.msgs.lli_ctrl</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.SVEAControlValues.gear">
+<code class="descname">gear</code><a class="headerlink" href="#states.SVEAControlValues.gear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gear of the vehicle. Can be either 0 (low) or 1 (high)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Return the current gear</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set the current gear (0 or 1)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.SVEAControlValues.steering">
+<code class="descname">steering</code><a class="headerlink" href="#states.SVEAControlValues.steering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Steering actuation value.</p>
+<p>The valid range is [-127, 127].
+Anything else will be interpreted as a Do Not Care</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Return the steering value.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set the current steering value.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="states.SVEAControlValues.update_from_msg">
+<code class="descname">update_from_msg</code><span class="sig-paren">(</span><em>ctrl_msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/states.html#SVEAControlValues.update_from_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#states.SVEAControlValues.update_from_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>“Update the class from a control message.</p>
+<p>Unlike setting the control message directly this method
+respects the don not care rules according to the same logic as the LLI.
+Usefull for interpretting incoming control messages</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ctrl_msg</strong> (class: <cite>svea_msg.msgs.lli_ctrl</cite>) – Yaw of the vehicle in radians</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the control message changed anything, False otherwise</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.SVEAControlValues.velocity">
+<code class="descname">velocity</code><a class="headerlink" href="#states.SVEAControlValues.velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity actuation value.</p>
+<p>The valid range is [-127, 127].
+Anything else will be interpreted as a Do Not Care</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Return the velocity value.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set the current velocity value.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="states.VehicleState">
+<em class="property">class </em><code class="descclassname">states.</code><code class="descname">VehicleState</code><span class="sig-paren">(</span><em>x=0.0, y=0.0, yaw=0.0, v=0.0, frame_id='map', child_frame='base_link', covariance=None, time_stamp=rospy.Time[0]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/states.html#VehicleState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#states.VehicleState" title="Permalink to this definition">¶</a></dt>
+<dd><p>A 2D state for vehicles
+Units are [m, rad, s, m/s]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Initial x position, defaults to 0.0</li>
+<li><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Initial y position, defaults to 0.0</li>
+<li><strong>yaw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Initial yaw, defaults to 0.0</li>
+<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Initial velocity, defaults to 0.0</li>
+<li><strong>gear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Initial gear, can be 0 (low) or 1 (high), defaults to 0</li>
+<li><strong>front_diff_lock</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Initial front differential lock status, defaults to <cite>False</cite></li>
+<li><strong>rear_diff_lock</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Initial rear differential lock status, defaults to <cite>False</cite></li>
+<li><strong>frame_id</strong> (<em>string</em><em>, </em><em>optional</em>) – Reference frame for the state, defaults to <cite>map</cite></li>
+<li><strong>child_frame</strong> (<em>string</em><em>, </em><em>optional</em>) – Child frame for the state, defaults to <cite>base_link</cite></li>
+<li><strong>covariance</strong> (<em>numpy.array</em><em>, </em><em>optional</em>) – Covariance matrix 4x4, defaults to a unity matrix</li>
+<li><strong>time_stamp</strong> (<em>rospy.Time</em><em>, </em><em>optional</em>) – Time stamp for the state, defaults to <cite>rospy.Time.now()</cite></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="states.VehicleState.array">
+<code class="descname">array</code><a class="headerlink" href="#states.VehicleState.array" title="Permalink to this definition">¶</a></dt>
+<dd><p>An array representing the continous state [x, y, yaw, v] of the vehicle.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">A numpy array with the state of the vehicle [x, y, yaw, v].</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set the current state [x, y, yaw, v] from an array.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">numpy.array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.VehicleState.covariance">
+<code class="descname">covariance</code><a class="headerlink" href="#states.VehicleState.covariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covariance of the state, should be a 4x4 matrix</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.VehicleState.dict">
+<code class="descname">dict</code><a class="headerlink" href="#states.VehicleState.dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>The state represented by a dictionary</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.VehicleState.odometry_msg">
+<code class="descname">odometry_msg</code><a class="headerlink" href="#states.VehicleState.odometry_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Odometry msg representing the state</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.VehicleState.pose_msg">
+<code class="descname">pose_msg</code><a class="headerlink" href="#states.VehicleState.pose_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pose msg representing the state</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.VehicleState.state_msg">
+<code class="descname">state_msg</code><a class="headerlink" href="#states.VehicleState.state_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>SVEAState msg representing the state of the vehicle</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.VehicleState.twist_msg">
+<code class="descname">twist_msg</code><a class="headerlink" href="#states.VehicleState.twist_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Twist msg representing the state</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.VehicleState.v">
+<code class="descname">v</code><a class="headerlink" href="#states.VehicleState.v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity of the vehicle in [m/s] with respect to <cite>frame_id</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Return the current velocity in [m/s]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set the current velocity in [m/s]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.VehicleState.x">
+<code class="descname">x</code><a class="headerlink" href="#states.VehicleState.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>X position of the vehicle in [m] with respect to <cite>frame_id</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Return the current x position in [m]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set the current x position in [m]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.VehicleState.y">
+<code class="descname">y</code><a class="headerlink" href="#states.VehicleState.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Y position of the vehicle in [m] with respect to <cite>frame_id</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Return the current y position in [m]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set the current y position in [m]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="states.VehicleState.yaw">
+<code class="descname">yaw</code><a class="headerlink" href="#states.VehicleState.yaw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yaw of the vehicle in [rad] with respect to <cite>frame_id</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Return the current yaw in [rad]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set the current yaw in [rad]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="states.extract_pose">
+<code class="descclassname">states.</code><code class="descname">extract_pose</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/states.html#extract_pose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#states.extract_pose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the pose from a message
+:param msg: An Odometry, Subject, Transform or any variation of Pose message
+:return: The Pose contained in msg
+:rtype: class:<cite>geometry_msgs.msg.Pose</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="states.extract_pose_covariance">
+<code class="descclassname">states.</code><code class="descname">extract_pose_covariance</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/states.html#extract_pose_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#states.extract_pose_covariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the covariance from a message
+:param msg: An Odometry, Subject, Transform or any variation of Pose message
+:return: The Covariance contained in msg
+:rtype: class:<cite>numpy.array</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="states.quaternion_cov_to_yaw_cov">
+<code class="descclassname">states.</code><code class="descname">quaternion_cov_to_yaw_cov</code><span class="sig-paren">(</span><em>quat</em>, <em>quat_covariance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/states.html#quaternion_cov_to_yaw_cov"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#states.quaternion_cov_to_yaw_cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the quaternion covariance based on the yaw and yaw covariance.</p>
+<p>Perform the operation <span class="math notranslate nohighlight">\(C_q = R C_{\theta} R^T\)</span>
+where <span class="math notranslate nohighlight">\(C_q\)</span> is the quaternion covariance,
+<span class="math notranslate nohighlight">\(C_{\theta}\)</span> is the yaw covariance and <span class="math notranslate nohighlight">\(R\)</span> is
+the Jacobian of the transform from a quaternion into yaw.
+<span class="math notranslate nohighlight">\(R\)</span> will be a row vector defined by:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}R = \\
+\frac{\partial \theta}{\partial x}     &amp;= ay + bx, \\
+\frac{\partial \theta}{\partial y}     &amp;= ax - by, \\
+\frac{\partial \theta}{\partial z}     &amp;= aw - bz, \\
+\frac{\partial \theta}{\partial w}     &amp;= az + bw, \\\end{split}\]</div>
+</div></blockquote>
+<p>The transform from yaw to quaternion is <span class="math notranslate nohighlight">\(\theta = arctan2(g, h)\)</span>,
+with <span class="math notranslate nohighlight">\(g = 2zw + 2xy\)</span> and <span class="math notranslate nohighlight">\(h = x^2 + y^2 + z^2 + w^2\)</span>.
+The partial derivatives of  <span class="math notranslate nohighlight">\(\arctan2(g, h)\)</span> in terms of
+<span class="math notranslate nohighlight">\(g\)</span> and <cite>h</cite> are</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\frac{\partial}{\partial g}    &amp;= \frac{g}{g^2+h^2}, \\
+\frac{\partial}{\partial h}    &amp;= \frac{h}{g^2+h^2}, \\\end{split}\]</div>
+</div></blockquote>
+<p>With <span class="math notranslate nohighlight">\(a = 2frac{\partial}{\partial g}\)</span> and <cite>b = 2frac{partial}{partial h}</cite>,
+the chain rule yields the expression for <span class="math notranslate nohighlight">\(R\)</span> above.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>quat</strong> (<em>Any container that has numerical values in index 0</em><em>, </em><em>1</em><em>, </em><em>2 and 3</em>) – Heading of the vehicle represented by a quaternion.</li>
+<li><strong>quat_covariance</strong> (<em>4x4 numpy array</em>) – Covariance matrix for the quaternion</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The quaternion covariance transformed to yaw coordinates.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="states.xy_yaw_from_quaternion">
+<code class="descclassname">states.</code><code class="descname">xy_yaw_from_quaternion</code><span class="sig-paren">(</span><em>quat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/states.html#xy_yaw_from_quaternion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#states.xy_yaw_from_quaternion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the yaw angle in the xy plane from a rotation quaternion.
+:param quat: A unit quaternion representing the
+:type quat: Any container that has numerical values in index 0, 1, 2 and 3
+:return: The yaw angle in radians projected on the xy plane
+:rtype: float</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="states.yaw_cov_to_quaternion_cov">
+<code class="descclassname">states.</code><code class="descname">yaw_cov_to_quaternion_cov</code><span class="sig-paren">(</span><em>yaw</em>, <em>yaw_covariance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/states.html#yaw_cov_to_quaternion_cov"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#states.yaw_cov_to_quaternion_cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the quaternion covariance based on the yaw and yaw covariance.</p>
+<p>Perform the operation <span class="math notranslate nohighlight">\(C_{\theta} = R C_q R^T\)</span>
+where <span class="math notranslate nohighlight">\(C_{\theta}\)</span> is the yaw covariance,
+<span class="math notranslate nohighlight">\(C_q\)</span> is the quaternion covariance and <span class="math notranslate nohighlight">\(R\)</span> is
+the Jacobian of the transform from yaw to a quaternion.
+<span class="math notranslate nohighlight">\(R\)</span> will be a collumn vector defined by:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}R = \\
+\frac{dx}{d\theta}     &amp;= 0, \\
+\frac{dy}{d\theta}     &amp;= 0, \\
+\frac{dz}{d\theta}     &amp;= \frac{1}{2} \cos \frac{1}{2} \theta, \\
+\frac{dw}{d\theta}     &amp;= -\frac{1}{2} \sin \frac{1}{2} \theta, \\\end{split}\]</div>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yaw</strong> – Yaw of the vehicle in radians</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The yaw covariance transformed to quaternion coordinates.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">4x4 numpy array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-models.bicycle">
+<span id="bicycle"></span><h3>Bicycle<a class="headerlink" href="#module-models.bicycle" title="Permalink to this headline">¶</a></h3>
+<p>Module for bicycle models with params set for SVEA cars.</p>
+<dl class="class">
+<dt id="models.bicycle.SimpleBicycleModel">
+<em class="property">class </em><code class="descclassname">models.bicycle.</code><code class="descname">SimpleBicycleModel</code><span class="sig-paren">(</span><em>state=## Vehicle State:   -   x: 0.0   -   y: 0.0   - yaw: 0.0   -   v: 0.0   -  frame_id   - map   -  child_frame- base_link   -  covariance - array([[1.0000, 0.0000, 0.0000, 0.0000],        [0.0000, 1.0000, 0.0000, 0.0000],        [0.0000, 0.0000, 1.0000, 0.0000],        [0.0000, 0.0000, 0.0000, 1.0000]])   -  time stamp: 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/bicycle.html#SimpleBicycleModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.bicycle.SimpleBicycleModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple Bicycle Model
+State-space equation is:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\dot{x}     &amp;= v\cos(\phi), \\
+\dot{y}     &amp;= v\sin(\phi), \\
+\dot{\phi}  &amp;= \frac{v}{L} \tan(\delta), \\
+\dot{v}     &amp;= a.\end{split}\]</div>
+</div></blockquote>
+<p>where <span class="math notranslate nohighlight">\(x, y, \phi, v\)</span> are x position, y position, yaw,
+and velocity; <span class="math notranslate nohighlight">\(\delta, a\)</span> are the steering angle and
+acceleration inputs; and <span class="math notranslate nohighlight">\(L\)</span> is the wheel
+base length. This object also includes a method for dynamics updates
+based on the set sampling time and the embedded bicycle model.
+Units are [m, rad, s, m/s]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Initial x position, defaults to 0.0</li>
+<li><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Initial y position, defaults to 0.0</li>
+<li><strong>yaw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Initial yaw, defaults to 0.0</li>
+<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Initial velocity, defaults to 0.0</li>
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Sampling time for dynamics update, defaults to 0.1</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="models.bicycle.SimpleBicycleModel.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>steering</em>, <em>velocity</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/bicycle.html#SimpleBicycleModel.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.bicycle.SimpleBicycleModel.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates state using set sampling time, dt, and embedded bicycle
+dynamics. Designed to take same inputs as SVEA vehicle’s
+low-level interface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>steering</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – input steering angle for the car</li>
+<li><strong>velocity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – input velocity for the car</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-localizers">
+<span id="localizers-interfaces"></span><h2>Localizers Interfaces<a class="headerlink" href="#module-localizers" title="Permalink to this headline">¶</a></h2>
+<p>Module containing localization interfaces for motion capture, indoor
+localization, etc.</p>
+<dl class="class">
+<dt id="localizers.LocalizationInterface">
+<em class="property">class </em><code class="descclassname">localizers.</code><code class="descname">LocalizationInterface</code><span class="sig-paren">(</span><em>vehicle_name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/localizers.html#LocalizationInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#localizers.LocalizationInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface handling the reception of state information from the
+localization stack. This object can take on several callback
+functions and execute them as soon as state information is
+available.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Name of vehicle being controlled;
+The name will be effectively be added as a
+namespace to the topics used by the
+corresponding localization node i.e
+<cite>namespace/vehicle_name/state</cite>, defaults to
+‘’</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="localizers.LocalizationInterface.add_callback">
+<code class="descname">add_callback</code><span class="sig-paren">(</span><em>cb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/localizers.html#LocalizationInterface.add_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#localizers.LocalizationInterface.add_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add state callback. Every function passed into this method
+will be called whenever new state information comes in from the
+localization stack.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cb</strong> (<em>function</em>) – A callback function intended for responding to the
+reception of state info</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="localizers.LocalizationInterface.remove_callback">
+<code class="descname">remove_callback</code><span class="sig-paren">(</span><em>cb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/localizers.html#LocalizationInterface.remove_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#localizers.LocalizationInterface.remove_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove callback so it will no longer be called when state
+information is received</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cb</strong> (<em>function</em>) – A callback function that should be no longer used
+in response to the reception of state info</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="localizers.LocalizationInterface.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/localizers.html#LocalizationInterface.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#localizers.LocalizationInterface.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spins up ROS background thread; must be called to start
+receiving data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">itself</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#localizers.LocalizationInterface" title="localizers.LocalizationInterface">LocalizationInterface</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-actuation">
+<span id="actuation-interfaces"></span><h2>Actuation Interfaces<a class="headerlink" href="#module-actuation" title="Permalink to this headline">¶</a></h2>
+<p>ROS interface objects for sending actuation commands to the SVEA car’s
+low-level controller. The low-level controller expects unit-less
+steering and velocity values from [-127, 127] that correspond to the
+minimum and maximum steering angles and velocities. We implement the
+interfaces for two reasons:
+(1) our models typically expect steering angles in [rads] and velocities
+in [m/s], and
+(2) we would like to add some features on top of just sending the
+control inputs.</p>
+<dl class="class">
+<dt id="actuation.ActuationInterface">
+<em class="property">class </em><code class="descclassname">actuation.</code><code class="descname">ActuationInterface</code><span class="sig-paren">(</span><em>vehicle_name=''</em>, <em>log_length=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/actuation.html#ActuationInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#actuation.ActuationInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard actuation interface. Make it easy to input steering
+angles in radians and velocities in m/s. Assumes very simplistic
+models of the low-level actuation. It assumes a linear steering
+model and a linear velocity model. The control interface assumes
+that the ESC is in the default Sports mode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Name of vehicle being controlled;
+The name will be effectively be added as a
+namespace to the topics used by the
+corresponding low lever interface i.e
+<cite>namespace/vehicle_name/lli/topic</cite>, defaults to
+‘’</li>
+<li><strong>log_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Number of messages from control requests,
+control actuated and the remote that should be
+stored in the internal log. Set to <cite>None</cite> for
+unlimited logging, defaults to 100</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="actuation.ActuationInterface.differential_front">
+<code class="descname">differential_front</code><a class="headerlink" href="#actuation.ActuationInterface.differential_front" title="Permalink to this definition">¶</a></dt>
+<dd><p>Status of the front differential lock</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>0</cite> if unlocked <cite>1</cite> if locked,
+<cite>None</cite> if no information has been received.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="actuation.ActuationInterface.differential_rear">
+<code class="descname">differential_rear</code><a class="headerlink" href="#actuation.ActuationInterface.differential_rear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Status of the rear differential lock</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>0</cite> if unlocked <cite>1</cite> if locked,
+<cite>None</cite> if no information has been received.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="actuation.ActuationInterface.emergency">
+<code class="descname">emergency</code><a class="headerlink" href="#actuation.ActuationInterface.emergency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the emergency flag is set. If the emergency flag can
+not be cleared from ROS it is also possible to clear it by not
+sending any control requests for at least 5 seconds, and setting
+the remote to override.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>True</cite> if emergency flag is set, <cite>False</cite> otherwise,
+<cite>None</cite> if no information has been received.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="actuation.ActuationInterface.gear">
+<code class="descname">gear</code><a class="headerlink" href="#actuation.ActuationInterface.gear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current gear</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>0</cite> if low gear <cite>1</cite> if high gear,
+<cite>None</cite> if no information has been received.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="actuation.ActuationInterface.max_speed">
+<code class="descname">max_speed</code><a class="headerlink" href="#actuation.ActuationInterface.max_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the maximum speed, dependent on gear</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the maximum speed, independent of direction</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="actuation.ActuationInterface.max_speed_signal">
+<code class="descname">max_speed_signal</code><a class="headerlink" href="#actuation.ActuationInterface.max_speed_signal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the maximal velocity that the controller will actually
+attempt to actuate for the current gear</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the maximum actuated speed, independent of direction</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="actuation.ActuationInterface.remote_idle">
+<code class="descname">remote_idle</code><a class="headerlink" href="#actuation.ActuationInterface.remote_idle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the remote is considered idle by the low level
+interface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>True</cite> if idle, <cite>False</cite> if active,
+<cite>None</cite> if no information has been received.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="actuation.ActuationInterface.remote_override">
+<code class="descname">remote_override</code><a class="headerlink" href="#actuation.ActuationInterface.remote_override" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the remote override is active. If the override is
+active the control requests will be ignored by the low level
+interface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>True</cite> if override is engaged, <cite>False</cite> otherwise,
+<cite>None</cite> if no information has been received.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="actuation.ActuationInterface.send_control">
+<code class="descname">send_control</code><span class="sig-paren">(</span><em>steering=nan</em>, <em>velocity=nan</em>, <em>brake_force=0</em>, <em>transmission=-1</em>, <em>differential_front=-1</em>, <em>differential_rear=-1</em>, <em>ctrl_code=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/actuation.html#ActuationInterface.send_control"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#actuation.ActuationInterface.send_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for taking control inputs and implementing features
+over the control inputs. This method converts steering angles
+and velocities from radians and m/s to unit-less values that the
+low level system expects, saturates the unit-less values,
+implements a stopping feature for blocking control inputs (note,
+this is not necessarily a braking feature, it only blocks inputs
+from being published, thus it should not be used for emergency
+braking), and sends/publishes inputs to the low level interface.</p>
+<p>If an argument is left empty the low level interface will be
+told to use the last sent value. The same is true if the gear or
+differential arguments have any other values than 0 or 1. If you
+do <em>not</em> call send_control then the car will <em>not</em> do anything.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>steering</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – input steering angle for the car in [rad], if
+argument left empty the low level system will
+use the last sent valid value, defaults to
+float(‘nan’).</li>
+<li><strong>velocity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – input velocity for the car [m/s], if argument
+left empty the low level system will implement
+the last sent valid value, defaults to
+float(‘nan’)</li>
+<li><strong>brake_force</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – brake force as a percentage [0, 100] of
+maximum braking force, defaults to 0</li>
+<li><strong>transmission</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – 0 means low gear, 1 means high gear, -1
+means keep the currently set gear, defaults
+to -1</li>
+<li><strong>differential_front</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – 0 means unlocked, 1 means locked, -1
+means keep the currently set lock
+state, defaults to -1</li>
+<li><strong>differential_rear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – 0 means unlocked, 1 means locked, -1
+means keep the currently set lock
+state, defaults to -1</li>
+<li><strong>ctrl_code</strong> – [deprecated]</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="actuation.ActuationInterface.software_idle">
+<code class="descname">software_idle</code><a class="headerlink" href="#actuation.ActuationInterface.software_idle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the computer is considered idle by the low level
+interface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>True</cite> if idle, <cite>False</cite> if active,
+<cite>None</cite> if no information has been received.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="actuation.ActuationInterface.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>wait=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/actuation.html#ActuationInterface.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#actuation.ActuationInterface.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spins up ROS background thread; must be called to start
+receiving and sending data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>wait</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – <cite>True</cite> if the interface should call
+<cite>wait_until_ready</cite> before returning, defaults to <cite>False</cite></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">itself</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ControlInterface</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="actuation.ActuationInterface.wait_until_ready">
+<code class="descname">wait_until_ready</code><span class="sig-paren">(</span><em>timeout=10.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/actuation.html#ActuationInterface.wait_until_ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#actuation.ActuationInterface.wait_until_ready" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait until the Control Interface is ready. Will also return
+after <cite>timeout</cite> seconds or if rospy is shutdown.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Number of seconds to wait for a response
+from the low level interface, defaults to <cite>10</cite></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><cite>False</cite> if timed out or rospy is shutdown, <cite>True</cite> otherwise</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-data">
+<span id="data-handlers"></span><h2>Data Handlers<a class="headerlink" href="#module-data" title="Permalink to this headline">¶</a></h2>
+<p>Module containing all the handy data handlers for simplifying and
+standardizing all things data. Data handlers handle data logging, data
+accessing, data visualizing, and saving data.</p>
+<dl class="class">
+<dt id="data.BasicDataHandler">
+<em class="property">class </em><code class="descclassname">data.</code><code class="descname">BasicDataHandler</code><span class="sig-paren">(</span><em>vehicle_name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#BasicDataHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.BasicDataHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler for the basic data-related tasks, including logging, plotting,
+and saving data. Also a good class to inherit from to standardize the names
+of common tasks such as <cite>visualize_data</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Name of vehicle being controlled; unused in this
+class, but included as a standard, defaults to ‘’</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="data.BasicDataHandler.curr_state">
+<code class="descname">curr_state</code><a class="headerlink" href="#data.BasicDataHandler.curr_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Most recent state of the vehicle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Last logged state of vehicle</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#states.VehicleState" title="states.VehicleState">VehicleState</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="data.BasicDataHandler.curr_steer">
+<code class="descname">curr_steer</code><a class="headerlink" href="#data.BasicDataHandler.curr_steer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Most recent steering input of the vehicle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Last logged steering of vehicle</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.BasicDataHandler.log_ctrl">
+<code class="descname">log_ctrl</code><span class="sig-paren">(</span><em>steering</em>, <em>v</em>, <em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#BasicDataHandler.log_ctrl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.BasicDataHandler.log_ctrl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log control input and time of control</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>steering</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Steering input</li>
+<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Velocity input</li>
+<li><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Ttamp of control input</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.BasicDataHandler.log_state">
+<code class="descname">log_state</code><span class="sig-paren">(</span><em>state</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#BasicDataHandler.log_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.BasicDataHandler.log_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log state</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state</strong> – New state to log</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.BasicDataHandler.plot_data">
+<code class="descname">plot_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#BasicDataHandler.plot_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.BasicDataHandler.plot_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot data collected so far</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.BasicDataHandler.save_data">
+<code class="descname">save_data</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#BasicDataHandler.save_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.BasicDataHandler.save_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save logged data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to desired save location</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.BasicDataHandler.update_animation">
+<code class="descname">update_animation</code><span class="sig-paren">(</span><em>only_plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#BasicDataHandler.update_animation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.BasicDataHandler.update_animation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear and update animation between each frame</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>only_plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Flag used when several processes want to plot
+on same figure. If set to True, other processes will
+not be able to plot. If set to False, other processes
+can plot in figure without being cleared out,
+defaults to True.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.BasicDataHandler.visualize_data">
+<code class="descname">visualize_data</code><span class="sig-paren">(</span><em>only_plot=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#BasicDataHandler.visualize_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.BasicDataHandler.visualize_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize logged data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>only_plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Flag used when several processes want to plot
+on same figure. If set to True, other processes will
+not be able to plot. If set to False, other processes
+can plot in figure without being cleared out,
+defaults to True</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="data.RVIZPathHandler">
+<em class="property">class </em><code class="descclassname">data.</code><code class="descname">RVIZPathHandler</code><span class="sig-paren">(</span><em>vehicle_name=''</em>, <em>traj_x=[]</em>, <em>traj_y=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#RVIZPathHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.RVIZPathHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler with additional features for handling visualization to
+RVIZ.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Name of vehicle being controlled; unused in this
+class, but included as a standard, defaults to ‘’</li>
+<li><strong>traj_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – X coordinates of trajectory, defaults to []</li>
+<li><strong>traj_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Y coordinates of trajectory, defaults to []</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="data.RVIZPathHandler.pub_car_poly">
+<code class="descname">pub_car_poly</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#RVIZPathHandler.pub_car_poly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.RVIZPathHandler.pub_car_poly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish car polygon</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.RVIZPathHandler.pub_path">
+<code class="descname">pub_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#RVIZPathHandler.pub_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.RVIZPathHandler.pub_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish path</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.RVIZPathHandler.pub_target">
+<code class="descname">pub_target</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#RVIZPathHandler.pub_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.RVIZPathHandler.pub_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish target</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.RVIZPathHandler.update_traj">
+<code class="descname">update_traj</code><span class="sig-paren">(</span><em>traj_x</em>, <em>traj_y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#RVIZPathHandler.update_traj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.RVIZPathHandler.update_traj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update trajectory, but here updated path is also published
+to RVIZ.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>traj_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – X coordinates of trajectory, defaults to []</li>
+<li><strong>traj_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Y coordinates of trajectory, defaults to []</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.RVIZPathHandler.visualize_data">
+<code class="descname">visualize_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#RVIZPathHandler.visualize_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.RVIZPathHandler.visualize_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize data only after data has been logged and only
+publish path when the distance traveled criteria has been met</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="data.TrajDataHandler">
+<em class="property">class </em><code class="descclassname">data.</code><code class="descname">TrajDataHandler</code><span class="sig-paren">(</span><em>vehicle_name=''</em>, <em>traj_x=[]</em>, <em>traj_y=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#TrajDataHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.TrajDataHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler with additional features for handling trajectories. Role of
+class is primarily for handling trajectory plotting.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Name of vehicle being controlled; unused in this
+class, but included as a standard, defaults to ‘’</li>
+<li><strong>traj_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – X coordinates of trajectory, defaults to []</li>
+<li><strong>traj_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Y coordinates of trajectory, defaults to []</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="data.TrajDataHandler.plot_data">
+<code class="descname">plot_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#TrajDataHandler.plot_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.TrajDataHandler.plot_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot data collected so far, with addition of trajectories.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.TrajDataHandler.save_data">
+<code class="descname">save_data</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#TrajDataHandler.save_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.TrajDataHandler.save_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save logged data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to desired save location</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.TrajDataHandler.update_target">
+<code class="descname">update_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#TrajDataHandler.update_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.TrajDataHandler.update_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update target</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – tuple containing XY coordinate of vehicle’s target</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="data.TrajDataHandler.update_traj">
+<code class="descname">update_traj</code><span class="sig-paren">(</span><em>traj_x</em>, <em>traj_y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data.html#TrajDataHandler.update_traj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data.TrajDataHandler.update_traj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update trajectory</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>traj_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – X coordinates of trajectory, defaults to []</li>
+<li><strong>traj_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Y coordinates of trajectory, defaults to []</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="simulators">
+<h2>Simulators<a class="headerlink" href="#simulators" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-simulators.sim_SVEA">
+<span id="simple-svea-simulator"></span><h3>Simple SVEA Simulator<a class="headerlink" href="#module-simulators.sim_SVEA" title="Permalink to this headline">¶</a></h3>
+<p>Simulation module for the SVEA platform. Creates fake ROS
+subscriptions and publications that match the real car platform.
+Intended for debugging code BEFORE running on a real car.</p>
+<dl class="class">
+<dt id="simulators.sim_SVEA.SimSVEA">
+<em class="property">class </em><code class="descclassname">simulators.sim_SVEA.</code><code class="descname">SimSVEA</code><span class="sig-paren">(</span><em>vehicle_name</em>, <em>initialized_model</em>, <em>dt=0.02</em>, <em>start_paused=False</em>, <em>publish_pose=False</em>, <em>publish_odometry=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulators/sim_SVEA.html#SimSVEA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulators.sim_SVEA.SimSVEA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles simulation of a SVEA vehicle. The object takes in a model
+and pretends to be the low-level of a SVEA vehicle. It will spin up
+a continuous loop that updates the state of the fake vehicle using
+the model dynamics at a fixed rate and takes control inputs by
+subscribing to the same low-level interface ROS topic the actual
+SVEA low-level system uses and even publishes actuated control to
+the same topic as the low-level system.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of vehicle, etc. SVEA0, used for creating
+ROS topic names</li>
+<li><strong>initialized_model</strong> (<em>Model</em>) – Model to use as pretend SVEA vehicle. The
+only requirements on the model is that it
+has an ‘update’ method that takes a
+steering angle and a velocity as inputs</li>
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Sampling time in [s]</li>
+<li><strong>start_paused</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Start simulation paused</li>
+<li><strong>publish_pose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Publish the simulated vehicles pose if <cite>True</cite>
+Default: <cite>False</cite></li>
+<li><strong>publish_odometry</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Publish the simulated vehicles odometry if <cite>True</cite>
+Default: <cite>False</cite></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simulators.sim_SVEA.SimSVEA.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulators/sim_SVEA.html#SimSVEA.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulators.sim_SVEA.SimSVEA.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spins up ROS background thread; must be called to start
+receiving and sending data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">itself</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#simulators.sim_SVEA.SimSVEA" title="simulators.sim_SVEA.SimSVEA">SimSVEA</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulators.sim_SVEA.SimSVEA.toggle_pause_simulation">
+<code class="descname">toggle_pause_simulation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulators/sim_SVEA.html#SimSVEA.toggle_pause_simulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulators.sim_SVEA.SimSVEA.toggle_pause_simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggle between pause and play simulation</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="sensor-interfaces">
+<h2>Sensor Interfaces<a class="headerlink" href="#sensor-interfaces" title="Permalink to this headline">¶</a></h2>
+<p><em>Coming Soon</em></p>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, Smart Mobility Lab.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

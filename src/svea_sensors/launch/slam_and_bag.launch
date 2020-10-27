@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+    Launch default odometry and 2d mrpt icp slam
+-->
+
+<launch>
+  <!-- <param name="use_sim_time" value="true"/> -->
+  <!-- Start default odometryand SLAM -->
+  <arg name="xavier" default="false"/>
+  <arg name="use_rs" default="false"/>
+  <arg name="rviz" default="false"/>
+  <arg name="slam_delay" default="5"/> <!-- Delay before starting SLAM node -->
+  <include file="$(find svea_sensors)/launch/slam.launch">
+    <arg name="xavier" value="$(arg xavier)"/>
+    <arg name="use_rs" value="$(arg use_rs)"/>
+    <arg name="rviz" value="$(arg rviz)"/>
+    <arg name="slam_delay" value="$(arg slam_delay)" /> <!-- Delay before starting SLAM node -->
+  </include>
+  
+  <!-- ROS bag -->
+    <node pkg="rosbag" type="record" name="record" output="screen" args="-o /home/$(env USER)/bagfiles/ /rs/t265_camera/odom/sample
+ /zed/zed_node/odom /scan /rosout /laser_status /imu/data /imu/raw/ /imu/status /imu/temp /Hokyoulidar/parameter_descriptions /Hokyoulidar/parameter_updates"/>
+  
+</launch>
+

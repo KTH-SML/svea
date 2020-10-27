@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>controllers.control_interfaces &#8212; SVEA API 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          SVEA Doc</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">GOTO <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#simulators">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#sensor-interfaces">Sensor Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#localizers-interfaces">Localizers Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-controllers.control_interfaces">Control Interfaces</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Sections <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for controllers.control_interfaces</h1><div class="highlight"><pre>
+<span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ROS interface objects for sending control to the SVEA car&#39;s low-level</span>
+<span class="sd">controller. The low-level controller expects unit-less steering and</span>
+<span class="sd">velocity values from [-127, 127] that correspond to the minimum and</span>
+<span class="sd">maximum steering angles and velocities. We implement the interfaces</span>
+<span class="sd">for two reasons:</span>
+<span class="sd">(1) our models typically expect steering angles in [rads] and velocities</span>
+<span class="sd">in [m/s], and</span>
+<span class="sd">(2) we would like to add some features on top of just sending the</span>
+<span class="sd">control inputs, like persistent control or control blending.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Thread</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">radians</span><span class="p">,</span> <span class="n">degrees</span><span class="p">,</span> <span class="n">isnan</span>
+
+<span class="kn">import</span> <span class="nn">rospy</span>
+<span class="kn">from</span> <span class="nn">geometry_msgs.msg</span> <span class="k">import</span> <span class="n">Twist</span>
+<span class="kn">from</span> <span class="nn">low_level_interface.msg</span> <span class="k">import</span> <span class="n">lli_ctrl_request</span>
+<span class="kn">from</span> <span class="nn">svea_arduino.msg</span> <span class="k">import</span> <span class="n">lli_ctrl</span>
+
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Frank Jiang&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;frankji@kth.se&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<div class="viewcode-block" id="ControlInterface"><a class="viewcode-back" href="../../api.html#controllers.control_interfaces.ControlInterface">[docs]</a><span class="k">class</span> <span class="nc">ControlInterface</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Standard control interface. Make it easy to input steering</span>
+<span class="sd">    angles in radians and velocities in m/s. Assumes very simplistic</span>
+<span class="sd">    models of the low-level actuation. It assumes a quadratic steering</span>
+<span class="sd">    model and a linear velocity model.</span>
+
+<span class="sd">    :param vehicle_name: Name of vehicle being controlled; used to</span>
+<span class="sd">                         create ROS topic names for subscription and</span>
+<span class="sd">                         publications, defaults to empty string</span>
+<span class="sd">    :type vehicle_name: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># arduino&#39;s expected input frequency</span>
+    <span class="n">OPERATING_FREQ</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1"># [Hz]</span>
+    <span class="c1"># saturation input limits to keep hardware healthy</span>
+    <span class="n">MAX_STEER_PERCENT</span> <span class="o">=</span> <span class="mi">80</span> <span class="c1"># [%]</span>
+    <span class="n">MAX_VELOCITY_PERCENT</span> <span class="o">=</span> <span class="mi">90</span> <span class="c1"># [%]</span>
+    <span class="c1"># assumed max velocity, probably wrong</span>
+    <span class="n">MAX_VELOCITY</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># [m/s]</span>
+    <span class="c1"># scaling factor, percentage to lli actuation</span>
+    <span class="n">PERC_TO_LLI_COEFF</span> <span class="o">=</span> <span class="mf">1.27</span>
+    <span class="c1"># binary masks</span>
+    <span class="n">TRANS_MASK</span> <span class="o">=</span> <span class="mb">0b00000001</span>
+    <span class="n">FDIFF_MASK</span> <span class="o">=</span> <span class="mb">0b00000010</span>
+    <span class="n">RDIFF_MASK</span> <span class="o">=</span> <span class="mb">0b00000100</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vehicle_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span> <span class="o">=</span> <span class="n">vehicle_name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span> <span class="o">=</span> <span class="n">lli_ctrl_request</span><span class="p">()</span> <span class="c1"># Stores the last controls sent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span> <span class="o">=</span> <span class="n">lli_ctrl</span><span class="p">()</span>  <span class="c1"># Message to send to ROS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_ctrl_update</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_emergency</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_reverse</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_ready</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># log of control requests and control actuated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_log</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_actuated_log</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_log</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="ControlInterface.start"><a class="viewcode-back" href="../../api.html#controllers.control_interfaces.ControlInterface.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spins up ROS background thread; must be called to start</span>
+<span class="sd">        receiving and sending data</span>
+
+<span class="sd">        :return: itself</span>
+<span class="sd">        :rtype: ControlInterface</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_and_spin_ros</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    <span class="k">def</span> <span class="nf">_init_and_spin_ros</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span>
+                <span class="s1">&#39;Starting Controller Interface Node: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span> <span class="o">+</span> <span class="s1">&#39;_control_interface&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_publish</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_listen</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_ready</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_start_listen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">Subscriber</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span><span class="o">+</span><span class="s1">&#39;/lli/ctrl_actuated&#39;</span><span class="p">,</span> <span class="n">lli_ctrl</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">_read_ctrl_actuated</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">Subscriber</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span><span class="o">+</span><span class="s1">&#39;/lli/remote&#39;</span><span class="p">,</span> <span class="n">lli_ctrl</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">_read_remote</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span>
+                <span class="s2">&quot;Controller Interface successfully initialized&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_start_publish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_pub</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Publisher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span><span class="o">+</span><span class="s1">&#39;/lli/ctrl_request&#39;</span><span class="p">,</span>
+                                                <span class="n">lli_ctrl</span><span class="p">,</span>
+                                                <span class="n">queue_size</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_read_ctrl_actuated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="n">dead_zone</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># velocities with abs values &lt;= than this = 0 to ESC</span>
+        <span class="n">velocity</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">velocity</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">prev_velocity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_actuated_log</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">velocity</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_reverse</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_actuated_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">reverse_detected</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">velocity</span> <span class="o">&gt;</span> <span class="n">dead_zone</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_reverse</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">prev_velocity</span> <span class="o">&lt;</span> <span class="n">dead_zone</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">dead_zone</span><span class="p">:</span>
+            <span class="n">reverse_detected</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_reverse</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1">#rospy.loginfo(&quot;act velocity: {}, prev vel: {}, reverse: {}, reverse detect: {}&quot;.format(velocity, prev_velocity, self.is_reverse, reverse_detected))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_actuated_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_read_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_build_param_printout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># collect important params</span>
+        <span class="n">steering</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">steering</span>
+        <span class="n">velocity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">velocity</span>
+        <span class="n">transmission</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">transmission</span>
+        <span class="n">differential_front</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">differential_front</span>
+        <span class="n">differential_rear</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">differential_rear</span>
+        <span class="n">ctrl_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">ctrl_code</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;## Vehicle: {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;  -ctrl request:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="o">+</span><span class="s2">&quot;      steering   - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;      velocity   - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;      trans      - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transmission</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;      diff_front - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">differential_front</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;      diff_rear  - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">differential_rear</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;      ctrl_code  - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctrl_code</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;  -Is stopped: {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;  -In reverse: {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_reverse</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_param_printout</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_param_printout</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_steer_to_percent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steering</span><span class="p">):</span>
+        <span class="n">steering</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">degrees</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">steer_PWM</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1495</span> <span class="o">-</span> <span class="mf">5.016</span> <span class="o">*</span> <span class="n">degrees</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span>
+                         <span class="o">-</span> <span class="mf">0.2384</span> <span class="o">*</span> <span class="n">degrees</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">steer_percent</span> <span class="o">=</span> <span class="p">(</span><span class="n">steer_PWM</span><span class="o">-</span><span class="mi">1500</span><span class="p">)</span><span class="o">/</span><span class="mi">600</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">steer_PWM</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1495</span> <span class="o">-</span> <span class="mf">5.016</span> <span class="o">*</span> <span class="n">degrees</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span>
+                          <span class="o">+</span> <span class="mf">0.2384</span> <span class="o">*</span> <span class="n">degrees</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">steer_percent</span> <span class="o">=</span> <span class="p">(</span><span class="n">steer_PWM</span><span class="o">-</span><span class="mi">1500</span><span class="p">)</span><span class="o">/</span><span class="mi">600</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="n">steer_percent</span> <span class="o">=</span> <span class="o">-</span><span class="n">steer_percent</span> <span class="c1"># steering flipped</span>
+
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">steer_percent</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_vel_to_percent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">velocity</span><span class="p">):</span>
+        <span class="n">velocity</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
+        <span class="n">vel_percent</span> <span class="o">=</span> <span class="n">velocity</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_VELOCITY</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">vel_percent</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_clip_ctrl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steer_percent</span><span class="p">,</span> <span class="n">vel_percent</span><span class="p">):</span>
+        <span class="n">clipped_steering</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clip_steering</span><span class="p">(</span><span class="n">steer_percent</span><span class="p">)</span>
+        <span class="n">clipped_velocity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clip_velocity</span><span class="p">(</span><span class="n">vel_percent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">clipped_steering</span><span class="p">,</span> <span class="n">clipped_velocity</span>
+
+    <span class="k">def</span> <span class="nf">_clip_steering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steer_percent</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_STEER_PERCENT</span><span class="p">,</span>
+                               <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_STEER_PERCENT</span><span class="p">,</span> <span class="n">steer_percent</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_clip_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vel_percent</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_VELOCITY_PERCENT</span><span class="p">,</span>
+                               <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_VELOCITY_PERCENT</span><span class="p">,</span> <span class="n">vel_percent</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_set_reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reverse</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_reverse</span> <span class="o">==</span> <span class="n">reverse</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">current_velocity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_actuated_log</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="n">current_velocity</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">reverse_msg</span> <span class="o">=</span> <span class="n">lli_ctrl</span><span class="p">()</span>
+        <span class="n">reverse_msg</span><span class="o">.</span><span class="n">steering</span> <span class="o">=</span> <span class="o">-</span><span class="mi">128</span>
+        <span class="k">if</span> <span class="n">reverse</span><span class="p">:</span>
+            <span class="n">reverse_msg</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">reverse_msg</span><span class="p">)</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="n">reverse_msg</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">reverse_msg</span><span class="p">)</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reverse_msg</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="mi">10</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">reverse_msg</span><span class="p">)</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="n">reverse_msg</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">current_velocity</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_reverse</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="ControlInterface.send_control"><a class="viewcode-back" href="../../api.html#controllers.control_interfaces.ControlInterface.send_control">[docs]</a>    <span class="k">def</span> <span class="nf">send_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">steering</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">),</span>
+                     <span class="n">velocity</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">),</span>
+                     <span class="n">brake_force</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                     <span class="n">transmission</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                     <span class="n">differential_front</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                     <span class="n">differential_rear</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                     <span class="n">ctrl_code</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Method for taking control inputs and implementing features</span>
+<span class="sd">        over the control inputs. This method converts steering angles</span>
+<span class="sd">        and velocities from radians and m/s to unit-less values that the</span>
+<span class="sd">        low level system expects, saturates the unit-less values,</span>
+<span class="sd">        implements a stopping feature for blocking control inputs (note,</span>
+<span class="sd">        this is not necessarily a braking feature, it only blocks inputs</span>
+<span class="sd">        from being published, thus it should not be used for emergency</span>
+<span class="sd">        braking), and sends/publishes inputs to the low level interface.</span>
+
+<span class="sd">        If an argument is left empty the low level interface will be</span>
+<span class="sd">        told to use the last sent value. The same is true if the gear or</span>
+<span class="sd">        differential arguments have any other values than 0 or 1. If you</span>
+<span class="sd">        do *not* call send_control then the car will *not* do anything.</span>
+
+<span class="sd">        :param steering: input steering angle for the car in [rad], if</span>
+<span class="sd">                         argument left empty the low level system will</span>
+<span class="sd">                         implement the last sent valid value, default</span>
+<span class="sd">                         nan.</span>
+<span class="sd">        :type steering: float</span>
+<span class="sd">        :param velocity: input velocity for the car [m/s], if argument</span>
+<span class="sd">                         left empty the low level system will implement</span>
+<span class="sd">                         the last sent valid value, default nan</span>
+<span class="sd">        :type velocity: float</span>
+<span class="sd">        :param brake_force: brake force as a percentage [0, 100] of</span>
+<span class="sd">                            maximum braking force, defaults to 0</span>
+<span class="sd">        :type brake_force: float</span>
+<span class="sd">        :param transmission: 0 means low gear, 1 means high gear, -1</span>
+<span class="sd">                             means keep the currently set gear, defaults</span>
+<span class="sd">                             to -1</span>
+<span class="sd">        :type transmission: int</span>
+<span class="sd">        :param differential_front: 0 means unlocked, 1 means locked, -1</span>
+<span class="sd">                                   means keep the currently set lock</span>
+<span class="sd">                                   state, defaults to -1</span>
+<span class="sd">        :type differential_front: int</span>
+<span class="sd">        :param differential_rear: 0 means unlocked, 1 means locked, -1</span>
+<span class="sd">                                  means keep the currently set lock</span>
+<span class="sd">                                  state, defaults to -1</span>
+<span class="sd">        :type differential_rear: int</span>
+<span class="sd">        :param ctrl_code: [deprecated]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">PERC_TO_LLI_COEFF</span> <span class="o">=</span> <span class="n">ControlInterface</span><span class="o">.</span><span class="n">PERC_TO_LLI_COEFF</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">isnan</span><span class="p">(</span><span class="n">steering</span><span class="p">):</span>
+            <span class="n">steer_percent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steer_to_percent</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span>
+            <span class="n">steer_percent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clip_steering</span><span class="p">(</span><span class="n">steer_percent</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">steering</span> <span class="o">=</span> <span class="n">steer_percent</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">steering</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">steer_percent</span> <span class="o">*</span> <span class="n">PERC_TO_LLI_COEFF</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">steering</span> <span class="o">=</span> <span class="o">-</span><span class="mi">128</span>
+
+        <span class="k">if</span> <span class="n">brake_force</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_reverse</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_reverse</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="o">-</span><span class="nb">round</span><span class="p">(</span><span class="n">brake_force</span> <span class="o">*</span> <span class="n">PERC_TO_LLI_COEFF</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">isnan</span><span class="p">(</span><span class="n">velocity</span><span class="p">):</span>
+            <span class="n">vel_percent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vel_to_percent</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
+            <span class="n">vel_percent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clip_velocity</span><span class="p">(</span><span class="n">vel_percent</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">vel_percent</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">vel_percent</span> <span class="o">*</span> <span class="n">PERC_TO_LLI_COEFF</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">velocity</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_reverse</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_reverse</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="o">-</span><span class="mi">128</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">trans_diff</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">transmission</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">transmission</span> <span class="o">=</span> <span class="n">transmission</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">trans_diff</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span> <span class="o">^</span> <span class="n">transmission</span> <span class="o">&lt;&lt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">differential_front</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">differential_front</span> <span class="o">=</span> <span class="n">differential_front</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">trans_diff</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span> <span class="o">^</span> <span class="n">differential_front</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">differential_front</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">differential_rear</span> <span class="o">=</span> <span class="n">differential_rear</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">trans_diff</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">5</span> <span class="o">^</span> <span class="n">differential_rear</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">ctrl</span> <span class="o">=</span> <span class="n">ctrl_code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">ctrl_code</span> <span class="o">=</span> <span class="n">ctrl_code</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl_msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlInterface.set_is_stop"><a class="viewcode-back" href="../../api.html#controllers.control_interfaces.ControlInterface.set_is_stop">[docs]</a>    <span class="k">def</span> <span class="nf">set_is_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_stop</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setter function for stopping the car. **This is not the same</span>
+<span class="sd">        as emergency braking.**</span>
+<span class="sd">        (will be updated to use properties)</span>
+
+<span class="sd">        :param is_stop: flag for blocking or unblocking the control</span>
+<span class="sd">                        inputs to the car, defaults to True.</span>
+<span class="sd">        :type is_stop: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span> <span class="o">=</span> <span class="n">is_stop</span></div></div>
+
+
+<div class="viewcode-block" id="ControlInterfaceWTeleop"><a class="viewcode-back" href="../../api.html#controllers.control_interfaces.ControlInterfaceWTeleop">[docs]</a><span class="k">class</span> <span class="nc">ControlInterfaceWTeleop</span><span class="p">(</span><span class="n">ControlInterface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inherits from standard control interface but layers functions for</span>
+<span class="sd">    receiving and implementing remote teleop control inputs from WebRTC</span>
+<span class="sd">    app. This control interface is designed to handle two input sources</span>
+<span class="sd">    and blend the inputs into one input; in particular, this is useful</span>
+<span class="sd">    when there is a remote operator and on-board automation sending</span>
+<span class="sd">    control inputs at the same time.</span>
+
+<span class="sd">    :param vehicle_name: Name of vehicle being controlled; used to</span>
+<span class="sd">                         create ROS topic names for subscription and</span>
+<span class="sd">                         publications, defaults to empty string</span>
+<span class="sd">    :type vehicle_name: str</span>
+<span class="sd">    :param percent_teleop: percent from [0, 100], defaults to 100</span>
+<span class="sd">    :type percent_teleop: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vehicle_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">percent_teleop</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+        <span class="n">ControlInterface</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vehicle_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">teleop_cmd</span> <span class="o">=</span> <span class="n">Twist</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">percent_teleop</span> <span class="o">=</span> <span class="n">percent_teleop</span>
+
+    <span class="k">def</span> <span class="nf">_start_listen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">Subscriber</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span><span class="o">+</span><span class="s1">&#39;/lli/ctrl_actuated&#39;</span><span class="p">,</span> <span class="n">lli_ctrl_actuated</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">_read_ctrl_actuated</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">Subscriber</span><span class="p">(</span><span class="s1">&#39;/teleop_cmd&#39;</span><span class="p">,</span> <span class="n">Twist</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">_read_ctrl_teleop</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span>
+                <span class="s2">&quot;Controller Interface successfully initialized&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_read_ctrl_teleop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teleop_cmd</span> <span class="o">=</span> <span class="n">msg</span>
+
+    <span class="k">def</span> <span class="nf">_build_param_printout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># collect important params</span>
+        <span class="n">steering</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">steering</span>
+        <span class="n">velocity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">velocity</span>
+        <span class="n">transmission</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">transmission</span>
+        <span class="n">differential_front</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">differential_front</span>
+        <span class="n">differential_rear</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">differential_rear</span>
+        <span class="n">ctrl_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">ctrl_code</span>
+
+
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;## Vehicle: {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;  -ctrl request:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="o">+</span><span class="s2">&quot;      steering   - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;      velocity   - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;      trans      - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transmission</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;      diff_front - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">differential_front</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;      diff_rear  - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">differential_rear</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;      ctrl_code  - {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctrl_code</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;  -% teleop: {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">percent_teleop</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;  -Is stopped: {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span><span class="p">)</span>
+                <span class="o">+</span><span class="s2">&quot;  -Is emergency: {0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_emergency</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auto_steering</span><span class="p">,</span> <span class="n">auto_velocity</span><span class="p">):</span>
+        <span class="n">teleop_steering</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teleop_cmd</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span>
+        <span class="n">teleop_velocity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teleop_cmd</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">x</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">percent_teleop</span> <span class="o">/</span> <span class="mi">100</span>
+        <span class="n">steering</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">teleop_steering</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">)</span> <span class="o">*</span> <span class="n">auto_steering</span>
+        <span class="n">velocity</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">teleop_velocity</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">)</span> <span class="o">*</span> <span class="n">auto_velocity</span>
+
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">steering</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ControlInterfaceWTeleop.send_control"><a class="viewcode-back" href="../../api.html#controllers.control_interfaces.ControlInterfaceWTeleop.send_control">[docs]</a>    <span class="k">def</span> <span class="nf">send_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steering</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">velocity</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">transmission</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">differential_front</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">differential_rear</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">ctrl_code</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Triggers control input to be sent over low-level-interface,</span>
+<span class="sd">        computes linear combination of teleop control input and control</span>
+<span class="sd">        inputs given as arguments to this function based on the set</span>
+<span class="sd">        blending percent.</span>
+
+<span class="sd">        :param steering: input steering angle for the car in [rad],</span>
+<span class="sd">                         defaults to 0</span>
+<span class="sd">        :type steering: float</span>
+<span class="sd">        :param velocity: input velocity for the car in [m/s], defaults to</span>
+<span class="sd">                         0</span>
+<span class="sd">        :type velocity: float</span>
+<span class="sd">        :param transmission: [deprecated]</span>
+<span class="sd">        :param differential_front: [deprecated]</span>
+<span class="sd">        :param differential_rear: [deprecated]</span>
+<span class="sd">        :param ctrl_code: [deprecated]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">steer_percent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steer_to_percent</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span>
+        <span class="n">vel_percent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vel_to_percent</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
+
+        <span class="c1"># bound input</span>
+        <span class="n">steer_percent</span><span class="p">,</span> <span class="n">vel_percent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clip_ctrl</span><span class="p">(</span><span class="n">steer_percent</span><span class="p">,</span> <span class="n">vel_percent</span><span class="p">)</span>
+        <span class="c1"># fuse automation and teleop inputs</span>
+        <span class="n">steer_percent</span><span class="p">,</span> <span class="n">vel_percent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="n">steer_percent</span><span class="p">,</span> <span class="n">vel_percent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">steering</span> <span class="o">=</span> <span class="n">steer_percent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">vel_percent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">transmission</span> <span class="o">=</span> <span class="n">transmission</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">differential_front</span> <span class="o">=</span> <span class="n">differential_front</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">differential_rear</span> <span class="o">=</span> <span class="n">differential_rear</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">ctrl_code</span> <span class="o">=</span> <span class="n">ctrl_code</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_emergency</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_persistent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlInterfaceWTeleop.set_ctrl_blend"><a class="viewcode-back" href="../../api.html#controllers.control_interfaces.ControlInterfaceWTeleop.set_ctrl_blend">[docs]</a>    <span class="k">def</span> <span class="nf">set_ctrl_blend</span><span class="p">(</span><span class="n">percent_teleop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter function for percent blend between remote control input</span>
+<span class="sd">        and automated control input. Implemented as</span>
+<span class="sd">        :math:`u = p u_h + (1-p) u_a`, where :math:`u_h, u_a, p` are</span>
+<span class="sd">        the teleop input, automated input, and the percent/100.</span>
+<span class="sd">        (will be updated to use properties)</span>
+
+<span class="sd">        :param percent_teleop: perentage from [0, 100]</span>
+<span class="sd">        :type percent_teleop: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">percent_teleop</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">percent_teleop</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">percent_teleop</span> <span class="o">=</span> <span class="n">percent_teleop</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s2">&quot;Value not between [0, 1]. Not setting control blend&quot;</span>
+                          <span class="o">+</span> <span class="s2">&quot;ratio&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="OldControlInterface"><a class="viewcode-back" href="../../api.html#controllers.control_interfaces.OldControlInterface">[docs]</a><span class="k">class</span> <span class="nc">OldControlInterface</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    [Deprecated] Control interface compliant with old arduino firmware</span>
+<span class="sd">    where low level control is set by raw PWM values from 900-2100.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">MAX_STEER_ANGLE</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span> <span class="c1">#radians</span>
+    <span class="n">MAX_VELOCITY</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#[m/s]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vehicle_name</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span> <span class="o">=</span> <span class="n">vehicle_name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span> <span class="o">=</span> <span class="n">Twist</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brake_request</span> <span class="o">=</span> <span class="n">Twist</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_ctrl_update</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_time</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_emergency</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># log of control requests and control actuated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_log</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_actuated_log</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_and_spin_ros</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">_init_and_spin_ros</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span>
+                <span class="s1">&#39;Starting Old Controller Interface Node: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vehicle_name</span> <span class="o">+</span> <span class="s1">&#39;_old_control_interface&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_listen</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_publish</span><span class="p">()</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_start_listen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># nothing to subscribe to</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span>
+                <span class="s2">&quot;Old Controller Interface successfully initialized&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_start_publish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_pub</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Publisher</span><span class="p">(</span><span class="s1">&#39;/cmd_vel&#39;</span><span class="p">,</span> <span class="n">Twist</span><span class="p">,</span> <span class="n">queue_size</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># rospy.get_param(&#39;/blah&#39;)</span>
+        <span class="k">return</span> <span class="s2">&quot;* &lt;params should be here&gt; *&quot;</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># rospy.get_param(&#39;/blah&#39;)</span>
+        <span class="k">return</span> <span class="s2">&quot;* &lt;params should be here&gt; *&quot;</span>
+
+    <span class="k">def</span> <span class="nf">brake</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#TODO add timed braking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brake_request</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">brake_request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">brake_request</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">send_PWM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steer_PWM</span><span class="p">,</span> <span class="n">vel_PWM</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">angular</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">steer_PWM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">vel_PWM</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_emergency</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">brake</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_pub</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl_request</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_steer_to_PWM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steering</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">degrees</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">steer_PWM</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1495</span> <span class="o">-</span> <span class="mf">5.016</span> <span class="o">*</span> <span class="n">degrees</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span>
+                            <span class="o">-</span> <span class="mf">0.2384</span> <span class="o">*</span> <span class="n">degrees</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">steer_PWM</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1495</span> <span class="o">-</span> <span class="mf">5.016</span> <span class="o">*</span> <span class="n">degrees</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="mf">0.2384</span> <span class="o">*</span> <span class="n">degrees</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">steer_PWM</span>
+
+    <span class="k">def</span> <span class="nf">_vel_to_PWM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">velocity</span><span class="p">):</span>
+        <span class="n">vel_PWM</span> <span class="o">=</span> <span class="mi">1630</span>
+        <span class="k">return</span> <span class="n">vel_PWM</span>
+
+    <span class="k">def</span> <span class="nf">_clip_ctrl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steering</span><span class="p">,</span> <span class="n">velocity</span><span class="p">):</span>
+        <span class="n">clipped_steering</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_STEER_ANGLE</span><span class="p">,</span>
+                               <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_STEER_ANGLE</span><span class="p">,</span> <span class="n">steering</span><span class="p">))</span>
+        <span class="c1">#TODO add this in after finding velocity model</span>
+        <span class="n">clipped_velocity</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_VELOCITY</span><span class="p">,</span>
+                               <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_VELOCITY</span><span class="p">,</span> <span class="n">steering</span><span class="p">))</span>
+        <span class="n">clipped_velocity</span> <span class="o">=</span> <span class="n">velocity</span>
+
+        <span class="k">return</span> <span class="n">clipped_steering</span><span class="p">,</span> <span class="n">clipped_velocity</span>
+
+    <span class="k">def</span> <span class="nf">send_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steering</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span>
+                     <span class="n">gear</span><span class="p">,</span> <span class="n">transmission</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">differential_front</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">differential_rear</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">ctrl_code</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+
+        <span class="n">steering</span><span class="p">,</span> <span class="n">velocity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clip_ctrl</span><span class="p">(</span><span class="n">steering</span><span class="p">,</span> <span class="n">velocity</span><span class="p">)</span>
+
+        <span class="n">steer_PWM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steer_to_PWM</span><span class="p">(</span><span class="n">steering</span><span class="p">)</span>
+        <span class="n">vel_PWM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vel_to_PWM</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_PWM</span><span class="p">(</span><span class="n">steer_PWM</span><span class="p">,</span> <span class="n">vel_PWM</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_is_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_stop</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span> <span class="o">=</span> <span class="n">is_stop</span>
+
+    <span class="k">def</span> <span class="nf">set_is_emergency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_emergency</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_emergency</span> <span class="o">=</span> <span class="n">is_emergency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_stop</span> <span class="o">=</span> <span class="n">is_emergency</span>
+        <span class="k">if</span> <span class="n">is_emergency</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s2">&quot;Blocking {0} for emergency&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_name</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s2">&quot;Unblocking {0} after emergency&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_name</span><span class="p">))</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Smart Mobility Lab.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

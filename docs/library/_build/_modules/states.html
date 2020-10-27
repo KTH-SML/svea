@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>states &#8212; SVEA API 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          SVEA Doc</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">GOTO <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#svea-managers">SVEA Managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-states">State Representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-localizers">Localizers Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-actuation">Actuation Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-data">Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#simulators">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#sensor-interfaces">Sensor Interfaces</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Sections <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for states</h1><div class="highlight"><pre>
+<span></span>
+<span class="sd">&quot;&quot;&quot;Classes for representing the state of a ground vehicle.</span>
+
+<span class="sd">TODO:</span>
+<span class="sd">    * Implement handling of covaraiances</span>
+<span class="sd">    * Handling of state messages</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">rospy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tf.transformations</span> <span class="kn">import</span> <span class="n">quaternion_from_euler</span>
+<span class="kn">from</span> <span class="nn">geometry_msgs.msg</span> <span class="kn">import</span> <span class="n">Pose</span><span class="p">,</span> <span class="n">PoseWithCovarianceStamped</span>
+<span class="kn">from</span> <span class="nn">geometry_msgs.msg</span> <span class="kn">import</span> <span class="n">PoseWithCovariance</span><span class="p">,</span> <span class="n">PoseStamped</span>
+<span class="kn">from</span> <span class="nn">geometry_msgs.msg</span> <span class="kn">import</span> <span class="n">TwistWithCovarianceStamped</span>
+<span class="kn">from</span> <span class="nn">nav_msgs.msg</span> <span class="kn">import</span> <span class="n">Odometry</span>
+<span class="kn">import</span> <span class="nn">svea_msgs.msg</span>
+<span class="kn">from</span> <span class="nn">svea_msgs.msg</span> <span class="kn">import</span> <span class="n">lli_ctrl</span>
+
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Tobias Bolin&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;tbolin@kth.se&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<div class="viewcode-block" id="VehicleState"><a class="viewcode-back" href="../api.html#states.VehicleState">[docs]</a><span class="k">class</span> <span class="nc">VehicleState</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A 2D state for vehicles</span>
+<span class="sd">    Units are [m, rad, s, m/s]</span>
+
+<span class="sd">    :param x: Initial x position, defaults to 0.0</span>
+<span class="sd">    :type x: float, optional</span>
+<span class="sd">    :param y: Initial y position, defaults to 0.0</span>
+<span class="sd">    :type y: float, optional</span>
+<span class="sd">    :param yaw: Initial yaw, defaults to 0.0</span>
+<span class="sd">    :type yaw: float, optional</span>
+<span class="sd">    :param v: Initial velocity, defaults to 0.0</span>
+<span class="sd">    :type v: float, optional</span>
+<span class="sd">    :param gear: Initial gear, can be 0 (low) or 1 (high), defaults to 0</span>
+<span class="sd">    :type gear: int, optional</span>
+<span class="sd">    :param front_diff_lock: Initial front differential lock status, defaults to `False`</span>
+<span class="sd">    :type front_diff_lock: bool, optional</span>
+<span class="sd">    :param rear_diff_lock: Initial rear differential lock status, defaults to `False`</span>
+<span class="sd">    :type rear_diff_lock: bool, optional</span>
+<span class="sd">    :param frame_id: Reference frame for the state, defaults to `map`</span>
+<span class="sd">    :type frame_id: string, optional</span>
+<span class="sd">    :param child_frame: Child frame for the state, defaults to `base_link`</span>
+<span class="sd">    :type child_frame: string, optional</span>
+<span class="sd">    :param covariance: Covariance matrix 4x4, defaults to a unity matrix</span>
+<span class="sd">    :type covariance: numpy.array, optional</span>
+<span class="sd">    :param time_stamp: Time stamp for the state, defaults to `rospy.Time.now()`</span>
+<span class="sd">    :type time_stamp: rospy.Time, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_NUMBER_OF_STATES</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">X_IX</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">Y_IX</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">YAW_IX</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">V_IX</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">yaw</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">frame_id</span><span class="o">=</span><span class="s1">&#39;map&#39;</span><span class="p">,</span>
+                 <span class="n">child_frame</span><span class="o">=</span><span class="s1">&#39;base_link&#39;</span><span class="p">,</span>
+                 <span class="n">covariance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">time_stamp</span><span class="o">=</span><span class="n">rospy</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">from_sec</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">VehicleState</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_yaw</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="n">yaw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="n">frame_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">child_frame</span> <span class="o">=</span> <span class="n">child_frame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_covariance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NUMBER_OF_STATES</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covariance</span> <span class="o">=</span> <span class="n">covariance</span> <span class="c1"># Set through property</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_stamp</span> <span class="o">=</span> <span class="n">time_stamp</span>
+        <span class="c1"># Lazy message initialization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_msgs_are_initialized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_msgs_are_updated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_covariance_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_msg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_twist_msg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_odometry_msg</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_printable_covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a print friendly string representation of the covariance&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                             <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">formatter</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;float&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{:0.4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">},</span>
+                             <span class="n">linewidth</span><span class="o">=</span><span class="mi">80</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">covariance</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_build_param_printout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a string representation of the state suitable for printing&quot;&quot;&quot;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">yaw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">,</span>
+            <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">,</span>
+            <span class="n">printable_covariance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_printable_covariance</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">status</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="n">param_str</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;  -   x: </span><span class="si">{x}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -   y: </span><span class="si">{y}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  - yaw: </span><span class="si">{yaw}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -   v: </span><span class="si">{v}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -  frame_id   - </span><span class="si">{frame_id}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -  child_frame- </span><span class="si">{child_frame}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -  covariance - </span><span class="si">{printable_covariance}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -  time stamp: </span><span class="si">{time_stamp}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">status</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">param_str</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;## Vehicle State:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_param_printout</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_param_printout</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        X position of the vehicle in [m] with respect to `frame_id`</span>
+
+<span class="sd">        :getter: Return the current x position in [m]</span>
+<span class="sd">        :setter: Set the current x position in [m]</span>
+<span class="sd">        :type: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
+
+    <span class="nd">@x</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_x</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">new_x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Y position of the vehicle in [m] with respect to `frame_id`</span>
+
+<span class="sd">        :getter: Return the current y position in [m]</span>
+<span class="sd">        :setter: Set the current y position in [m]</span>
+<span class="sd">        :type: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span>
+
+    <span class="nd">@y</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_y</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">new_y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">yaw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yaw of the vehicle in [rad] with respect to `frame_id`</span>
+
+<span class="sd">        :getter: Return the current yaw in [rad]</span>
+<span class="sd">        :setter: Set the current yaw in [rad]</span>
+<span class="sd">        :type: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_yaw</span>
+
+    <span class="nd">@yaw</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">yaw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_yaw</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_yaw</span> <span class="o">=</span> <span class="n">_normalize_angle</span><span class="p">(</span><span class="n">new_yaw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">v</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Velocity of the vehicle in [m/s] with respect to `frame_id`</span>
+
+<span class="sd">        :getter: Return the current velocity in [m/s]</span>
+<span class="sd">        :setter: Set the current velocity in [m/s]</span>
+<span class="sd">        :type: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v</span>
+
+    <span class="nd">@v</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_v</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_v</span> <span class="o">=</span> <span class="n">new_v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_twist_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Covariance of the state, should be a 4x4 matrix&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_covariance</span>
+
+    <span class="nd">@covariance</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_covariance</span><span class="p">):</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NUMBER_OF_STATES</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_NUMBER_OF_STATES</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_covariance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_covariance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NUMBER_OF_STATES</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_covariance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_covariance</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_covariance</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Covaraince have to be a </span><span class="si">{0}</span><span class="s1">x</span><span class="si">{0}</span><span class="s1"> matrix, is </span><span class="si">{1}</span><span class="s1">&#39;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NUMBER_OF_STATES</span><span class="p">,</span> <span class="n">new_covariance</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_covariance</span> <span class="o">=</span> <span class="n">new_covariance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_covariance_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_msgs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize messages when they are needed&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span> <span class="o">=</span> <span class="n">svea_msgs</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">VehicleState</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_odometry_msg</span> <span class="o">=</span> <span class="n">Odometry</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_msg</span> <span class="o">=</span> <span class="n">PoseWithCovarianceStamped</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_msg</span><span class="o">.</span><span class="n">pose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_odometry_msg</span><span class="o">.</span><span class="n">pose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_msg</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span><span class="o">.</span><span class="n">header</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span><span class="o">.</span><span class="n">child_frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_frame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_odometry_msg</span><span class="o">.</span><span class="n">child_frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_frame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_odometry_msg</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span><span class="o">.</span><span class="n">header</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_twist_msg</span> <span class="o">=</span> <span class="n">TwistWithCovarianceStamped</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_twist_msg</span><span class="o">.</span><span class="n">twist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_odometry_msg</span><span class="o">.</span><span class="n">twist</span>
+        <span class="n">_set_placehoder_covariance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_twist_msg</span><span class="o">.</span><span class="n">twist</span><span class="o">.</span><span class="n">covariance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_msgs_are_initialized</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># self._msgs_are_updated = False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_twist_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_covariance_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_build_msg_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update a message header&quot;&quot;&quot;</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_stamp</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_id</span>
+
+    <span class="k">def</span> <span class="nf">_build_state_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the odometry, pose and twist messages&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_msgs_are_initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_msgs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_msg_header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span><span class="o">.</span><span class="n">covariance</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covariance</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span>
+
+    <span class="k">def</span> <span class="nf">_build_covariances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">position_cov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">X_IX</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">Y_IX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_IX</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">Y_IX</span><span class="p">]</span>
+        <span class="n">pose_cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="c1"># 6 states in a ROS pose covariance</span>
+        <span class="n">pose_cov</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">X_IX</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">Y_IX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_IX</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">Y_IX</span><span class="p">]</span> <span class="o">=</span> <span class="n">position_cov</span>
+        <span class="n">yaw_cov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">YAW_IX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">YAW_IX</span><span class="p">]</span>
+        <span class="n">pose_cov</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">yaw_cov</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pose_msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">covariance</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pose_cov</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_twist_msg</span><span class="o">.</span><span class="n">twist</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">V_IX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_IX</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_covariance_is_updated</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_build_pose_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the pose message&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_msgs_are_initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_msgs</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose_is_updated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_build_msg_header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pose_msg</span><span class="p">)</span>
+            <span class="n">pose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose_msg</span><span class="o">.</span><span class="n">pose</span>
+            <span class="n">pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+            <span class="n">pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+            <span class="n">q_x</span><span class="p">,</span> <span class="n">q_y</span><span class="p">,</span> <span class="n">q_z</span><span class="p">,</span> <span class="n">q_w</span> <span class="o">=</span> <span class="n">quaternion_from_euler</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">)</span>
+            <span class="n">pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">q_x</span>
+            <span class="n">pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">q_y</span>
+            <span class="n">pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">q_z</span>
+            <span class="n">pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">q_w</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pose_is_updated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_covariance_is_updated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_build_covariances</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose_msg</span>
+
+    <span class="k">def</span> <span class="nf">_build_twist_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the twist message&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_msgs_are_initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_msgs</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_twist_is_updated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_twist_msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_stamp</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_twist_msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_frame</span>
+            <span class="n">twist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_twist_msg</span><span class="o">.</span><span class="n">twist</span>
+            <span class="n">twist</span><span class="o">.</span><span class="n">twist</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_twist_is_updated</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_covariance_is_updated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_build_covariances</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_twist_msg</span>
+
+    <span class="k">def</span> <span class="nf">_build_odometry_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the odometry, pose and twist messages&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_msgs_are_initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_msgs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_msg_header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_odometry_msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_odometry_msg</span><span class="o">.</span><span class="n">child_frame_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_frame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_pose_msg</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_twist_msg</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_odometry_msg</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pose_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Pose msg representing the state&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_pose_msg</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pose_msg</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">twist_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Twist msg representing the state&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_twist_msg</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_twist_msg</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">odometry_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Odometry msg representing the state&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_odometry_msg</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_odometry_msg</span>
+
+    <span class="nd">@odometry_msg</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">odometry_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_odom</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_msgs_are_initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_msgs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_stamp</span> <span class="o">=</span> <span class="n">new_odom</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="n">new_odom</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">child_frame</span> <span class="o">=</span> <span class="n">new_odom</span><span class="o">.</span><span class="n">child_frame_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_from_pose_msg</span><span class="p">(</span><span class="n">new_odom</span><span class="o">.</span><span class="n">pose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_from_twist_msg</span><span class="p">(</span><span class="n">new_odom</span><span class="o">.</span><span class="n">twist</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_from_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_header</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="n">new_header</span><span class="o">.</span><span class="n">frame_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_stamp</span> <span class="o">=</span> <span class="n">new_header</span><span class="o">.</span><span class="n">stamp</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;SVEAState msg representing the state of the vehicle&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_state_msg</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_msg</span>
+
+    <span class="nd">@state_msg</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">state_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_from_header</span><span class="p">(</span><span class="n">new_state</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">new_state</span><span class="o">.</span><span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">new_state</span><span class="o">.</span><span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="n">new_state</span><span class="o">.</span><span class="n">yaw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">new_state</span><span class="o">.</span><span class="n">v</span>
+
+    <span class="k">def</span> <span class="nf">_update_from_pose_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose_msg</span><span class="p">):</span>
+        <span class="n">pose</span> <span class="o">=</span> <span class="n">extract_pose</span><span class="p">(</span><span class="n">pose_msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">quat</span> <span class="o">=</span> <span class="p">[</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                <span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                <span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
+                <span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">w</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="n">xy_yaw_from_quaternion</span><span class="p">(</span><span class="n">quat</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pose_cov</span> <span class="o">=</span> <span class="n">extract_pose_covariance</span><span class="p">(</span><span class="n">pose_msg</span><span class="p">)</span>
+            <span class="n">x_ix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_IX</span>
+            <span class="n">y_ix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_IX</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="n">x_ix</span><span class="p">:</span><span class="n">y_ix</span><span class="p">,</span> <span class="n">x_ix</span><span class="p">:</span><span class="n">y_ix</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose_cov</span><span class="p">[</span><span class="n">x_ix</span><span class="p">:</span><span class="n">y_ix</span><span class="p">,</span> <span class="n">x_ix</span><span class="p">:</span><span class="n">y_ix</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">YAW_IX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">YAW_IX</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose_cov</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_covariance_is_updated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_update_from_twist_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">twist_msg</span><span class="p">):</span>
+        <span class="n">twist</span> <span class="o">=</span> <span class="n">twist_msg</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">twist</span> <span class="o">=</span> <span class="n">twist</span><span class="o">.</span><span class="n">twist</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">twist</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">x</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">V_IX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_IX</span><span class="p">]</span> <span class="o">=</span> <span class="n">twist_msg</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">V_IX</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_IX</span><span class="p">]</span> <span class="o">=</span> <span class="n">twist_msg</span><span class="o">.</span><span class="n">twist</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; An array representing the continous state [x, y, yaw, v] of the vehicle.</span>
+
+<span class="sd">        :getter: A numpy array with the state of the vehicle [x, y, yaw, v].</span>
+<span class="sd">        :setter: Set the current state [x, y, yaw, v] from an array.</span>
+<span class="sd">        :type: numpy.array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">]</span>
+
+    <span class="nd">@array</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">array</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span> <span class="c1"># For nested arrays i.e. matrices</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The state represented by a dictionary&quot;&quot;&quot;</span>
+        <span class="n">state_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">yaw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">yaw</span><span class="p">,</span>
+            <span class="n">v</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">state_dict</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_NUMBER_OF_STATES</span></div>
+
+
+<div class="viewcode-block" id="SVEAControlValues"><a class="viewcode-back" href="../api.html#states.SVEAControlValues">[docs]</a><span class="k">class</span> <span class="nc">SVEAControlValues</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience class for representing SVEA control values in a human readable format.</span>
+
+<span class="sd">    The default values corresponds to the do not care values for the LLI.</span>
+<span class="sd">    That is: if a ctrl_lli message is generated from a `SVEAControlValues` instance</span>
+<span class="sd">    that was initiated without arguments nothing will change if it is sent to the LLI.</span>
+
+<span class="sd">    :param steering: Steering, defaults to -128</span>
+<span class="sd">    :type steering: int, optional</span>
+<span class="sd">    :param velocity: Velocity, defaults to -128</span>
+<span class="sd">    :type velocity: int, optional</span>
+<span class="sd">    :param gear: Gear, range 0 or 1, defaults to None</span>
+<span class="sd">    :type steering: int or None, optional</span>
+<span class="sd">    :param front_diff_locked: Gear, defaults to None</span>
+<span class="sd">    :type steering: bool or None, optional</span>
+<span class="sd">    :param rear_diff_locked: Gear, defaults to None</span>
+<span class="sd">    :type steering: bool or None, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">valid_range</span> <span class="o">=</span> <span class="mi">128</span>
+    <span class="n">gear_mask</span> <span class="o">=</span> <span class="mb">0b00000001</span>
+    <span class="n">gear_change_mask</span> <span class="o">=</span> <span class="mb">0b00001000</span>
+    <span class="n">fdiff_mask</span> <span class="o">=</span> <span class="mb">0b00000010</span>
+    <span class="n">fdiff_change_mask</span> <span class="o">=</span> <span class="mb">0b00010000</span>
+    <span class="n">rdiff_mask</span> <span class="o">=</span> <span class="mb">0b00000100</span>
+    <span class="n">rdiff_change_mask</span> <span class="o">=</span> <span class="mb">0b00100000</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">steering</span><span class="o">=-</span><span class="mi">128</span><span class="p">,</span> <span class="n">velocity</span><span class="o">=-</span><span class="mi">128</span><span class="p">,</span>
+                 <span class="n">gear</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">front_diff_locked</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rear_diff_locked</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">control_flags</span><span class="o">=</span><span class="mb">0b00000000</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_steering</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steering</span> <span class="o">=</span> <span class="n">steering</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">velocity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gear</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gear</span> <span class="o">=</span> <span class="n">gear</span> <span class="c1"># Set through property</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">front_diff_locked</span> <span class="o">=</span> <span class="n">front_diff_locked</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rear_diff_locked</span> <span class="o">=</span> <span class="n">rear_diff_locked</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_flags</span> <span class="o">=</span> <span class="n">control_flags</span>
+
+    <span class="k">def</span> <span class="nf">_diff_status_as_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff_status</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">diff_status</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;DNC&#39;</span>
+        <span class="k">if</span> <span class="n">diff_status</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;Locked&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;Unlocked&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_build_param_printout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a string representation of the state suitable for printing&quot;&quot;&quot;</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">steering</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">steering</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steering</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_range</span> <span class="k">else</span> <span class="s1">&#39;DNC&#39;</span><span class="p">,</span>
+            <span class="n">velocity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">velocity</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_range</span> <span class="k">else</span> <span class="s1">&#39;DNC&#39;</span><span class="p">,</span>
+            <span class="n">gear_status</span><span class="o">=</span><span class="s2">&quot;Low&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;High&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;DNC&#39;</span><span class="p">,</span>
+            <span class="n">front_diff_status</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_diff_status_as_text</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">front_diff_locked</span><span class="p">),</span>
+            <span class="n">rear_diff_status</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_diff_status_as_text</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">front_diff_locked</span><span class="p">),</span>
+            <span class="n">flags</span><span class="o">=</span><span class="s1">&#39;0b&#39;</span> <span class="o">+</span> <span class="s1">&#39;0&#39;</span><span class="o">*</span><span class="p">(</span><span class="mi">10</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="nb">bin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_flags</span><span class="p">)))</span> <span class="o">+</span> <span class="nb">bin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_flags</span><span class="p">)[</span><span class="mi">2</span><span class="p">:],</span>
+        <span class="p">)</span>   <span class="c1"># The flags hack just pads the flags string to 8 bits</span>
+        <span class="n">param_str</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;  -  steering: </span><span class="si">{steering}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -  velocity: </span><span class="si">{velocity}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -  gear       - </span><span class="si">{gear_status}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -  diff_front - </span><span class="si">{front_diff_status}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -  diff_rear  - </span><span class="si">{rear_diff_status}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot;  -  flags      - </span><span class="si">{flags}</span><span class="s2">&quot;</span>
+                     <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">status</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">param_str</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Control Values:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_param_printout</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_param_printout</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_interpret_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_range</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_range</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">steering</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Steering actuation value.</span>
+
+<span class="sd">        The valid range is [-127, 127].</span>
+<span class="sd">        Anything else will be interpreted as a Do Not Care</span>
+
+<span class="sd">        :getter: Return the steering value.</span>
+<span class="sd">        :setter: Set the current steering value.</span>
+<span class="sd">        :type: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steering</span>
+
+    <span class="nd">@steering</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">steering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_steering</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_steering</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interpret_value</span><span class="p">(</span><span class="n">new_steering</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Velocity actuation value.</span>
+
+<span class="sd">        The valid range is [-127, 127].</span>
+<span class="sd">        Anything else will be interpreted as a Do Not Care</span>
+
+<span class="sd">        :getter: Return the velocity value.</span>
+<span class="sd">        :setter: Set the current velocity value.</span>
+<span class="sd">        :type: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span>
+
+    <span class="nd">@velocity</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_velocity</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpret_value</span><span class="p">(</span><span class="n">new_velocity</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">gear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Gear of the vehicle. Can be either 0 (low) or 1 (high)</span>
+
+<span class="sd">        :getter: Return the current gear</span>
+<span class="sd">        :setter: Set the current gear (0 or 1)</span>
+<span class="sd">        :type: int or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gear</span>
+
+    <span class="nd">@gear</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">gear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gear_number</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">gear_number</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="n">gear_number</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gear</span> <span class="o">=</span> <span class="n">gear_number</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Gear should only be 0, 1 or None, not </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gear_number</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">control_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The control value interpreted as a lli_ctrl message.</span>
+
+<span class="sd">        :getter: A lli_ctrl message representing the current values</span>
+<span class="sd">        :setter: Set the current values from a lli_ctr message</span>
+<span class="sd">        :type: class: `svea_msg.msgs.lli_ctrl`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ctrl_msg</span> <span class="o">=</span> <span class="n">lli_ctrl</span><span class="p">()</span>
+        <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">steering</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpret_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steering</span><span class="p">)</span>
+        <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpret_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">)</span>
+        <span class="n">trans_diff</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">statuses</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gear</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">front_diff_locked</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rear_diff_locked</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">status</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">statuses</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">trans_diff</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="o">+</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">trans_diff</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">if</span> <span class="n">status</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">trans_diff</span> <span class="o">=</span> <span class="n">trans_diff</span>
+        <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">ctrl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_flags</span>
+        <span class="k">return</span> <span class="n">ctrl_msg</span>
+
+    <span class="nd">@control_msg</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ctrl_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctrl_msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steering</span> <span class="o">=</span> <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">steering</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">velocity</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">trans_diff</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear_change_mask</span><span class="p">:</span>
+            <span class="n">gear_is_high</span> <span class="o">=</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear_mask</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gear</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">gear_is_high</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gear</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdiff_change_mask</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">front_diff_locked</span> <span class="o">=</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdiff_mask</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">front_diff_locked</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdiff_change_mask</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rear_diff_locked</span> <span class="o">=</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdiff_mask</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rear_diff_locked</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_flags</span> <span class="o">=</span> <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">ctrl</span>
+
+<div class="viewcode-block" id="SVEAControlValues.update_from_msg"><a class="viewcode-back" href="../api.html#states.SVEAControlValues.update_from_msg">[docs]</a>    <span class="k">def</span> <span class="nf">update_from_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctrl_msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;&quot;Update the class from a control message.</span>
+
+<span class="sd">        Unlike setting the control message directly this method</span>
+<span class="sd">        respects the don not care rules according to the same logic as the LLI.</span>
+<span class="sd">        Usefull for interpretting incoming control messages</span>
+
+<span class="sd">        :param ctrl_msg: Yaw of the vehicle in radians</span>
+<span class="sd">        :type ctrl_msg: class: `svea_msg.msgs.lli_ctrl`</span>
+<span class="sd">        :return: True if the control message changed anything, False otherwise</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">prev_steer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steering</span>
+        <span class="n">prev_vel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span>
+        <span class="n">prev_gear</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gear</span>
+        <span class="n">prev_fdiff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">front_diff_locked</span>
+        <span class="n">prev_rdiff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rear_diff_locked</span>
+        <span class="n">prev_flags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_flags</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">steering</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_range</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">steering</span> <span class="o">=</span> <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">steering</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ctrl_msg</span><span class="o">.</span><span class="n">velocity</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_range</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">velocity</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">trans_diff</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear_change_mask</span><span class="p">:</span>
+            <span class="n">gear_is_high</span> <span class="o">=</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear_mask</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gear</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">gear_is_high</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdiff_change_mask</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">front_diff_locked</span> <span class="o">=</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdiff_mask</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdiff_change_mask</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rear_diff_locked</span> <span class="o">=</span> <span class="n">status</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdiff_mask</span>
+        <span class="k">if</span> <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">ctrl</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_flags</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">control_flags</span> <span class="o">=</span> <span class="n">ctrl_msg</span><span class="o">.</span><span class="n">ctrl</span>
+
+        <span class="n">changed</span> <span class="o">=</span> <span class="p">(</span><span class="n">prev_steer</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">steering</span>
+                   <span class="ow">or</span> <span class="n">prev_vel</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span>
+                   <span class="ow">or</span> <span class="n">prev_gear</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gear</span>
+                   <span class="ow">or</span> <span class="n">prev_fdiff</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">front_diff_locked</span>
+                   <span class="ow">or</span> <span class="n">prev_rdiff</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rear_diff_locked</span>
+                   <span class="ow">or</span> <span class="n">prev_flags</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_flags</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">changed</span></div></div>
+
+
+<span class="c1">## Helper functions ##</span>
+<span class="k">def</span> <span class="nf">_set_placehoder_covariance</span><span class="p">(</span><span class="n">covariance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fill the list covariance so it is similar to a identity matrix&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">covariance</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">covariance</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">covariance</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+
+<span class="k">def</span> <span class="nf">_normalize_angle</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Normalize an angle to the interval (-pi, pi]&quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="n">angle</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
+        <span class="n">angle</span> <span class="o">-=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">while</span> <span class="n">angle</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
+        <span class="n">angle</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">return</span> <span class="n">angle</span>
+
+
+<div class="viewcode-block" id="yaw_cov_to_quaternion_cov"><a class="viewcode-back" href="../api.html#states.yaw_cov_to_quaternion_cov">[docs]</a><span class="k">def</span> <span class="nf">yaw_cov_to_quaternion_cov</span><span class="p">(</span><span class="n">yaw</span><span class="p">,</span> <span class="n">yaw_covariance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the quaternion covariance based on the yaw and yaw covariance.</span>
+
+<span class="sd">    Perform the operation :math:`C_{\\theta} = R C_q R^T`</span>
+<span class="sd">    where :math:`C_{\\theta}` is the yaw covariance,</span>
+<span class="sd">    :math:`C_q` is the quaternion covariance and :math:`R` is</span>
+<span class="sd">    the Jacobian of the transform from yaw to a quaternion.</span>
+<span class="sd">    :math:`R` will be a collumn vector defined by:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            R = \\\\</span>
+<span class="sd">            \\frac{dx}{d\\theta}     &amp;= 0, \\\\</span>
+<span class="sd">            \\frac{dy}{d\\theta}     &amp;= 0, \\\\</span>
+<span class="sd">            \\frac{dz}{d\\theta}     &amp;= \\frac{1}{2} \\cos \\frac{1}{2} \\theta, \\\\</span>
+<span class="sd">            \\frac{dw}{d\\theta}     &amp;= -\\frac{1}{2} \\sin \\frac{1}{2} \\theta, \\\\</span>
+
+<span class="sd">    :param yaw: Yaw of the vehicle in radians</span>
+<span class="sd">    :type quat: float</span>
+<span class="sd">    :return: The yaw covariance transformed to quaternion coordinates.</span>
+<span class="sd">    :rtype: 4x4 numpy array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span>
+              <span class="mi">0</span><span class="p">,</span>
+              <span class="mf">0.5</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">yaw</span><span class="o">*</span><span class="mf">0.5</span><span class="p">),</span>
+              <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">yaw</span><span class="o">*</span><span class="mf">0.5</span><span class="p">)]</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">quat_covariance</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">yaw_covariance</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">quat_covariance</span></div>
+
+
+<div class="viewcode-block" id="quaternion_cov_to_yaw_cov"><a class="viewcode-back" href="../api.html#states.quaternion_cov_to_yaw_cov">[docs]</a><span class="k">def</span> <span class="nf">quaternion_cov_to_yaw_cov</span><span class="p">(</span><span class="n">quat</span><span class="p">,</span> <span class="n">quat_covariance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the quaternion covariance based on the yaw and yaw covariance.</span>
+
+<span class="sd">    Perform the operation :math:`C_q = R C_{\\theta} R^T`</span>
+<span class="sd">    where :math:`C_q` is the quaternion covariance,</span>
+<span class="sd">    :math:`C_{\\theta}` is the yaw covariance and :math:`R` is</span>
+<span class="sd">    the Jacobian of the transform from a quaternion into yaw.</span>
+<span class="sd">    :math:`R` will be a row vector defined by:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            R = \\\\</span>
+<span class="sd">            \\frac{\\partial \\theta}{\\partial x}     &amp;= ay + bx, \\\\</span>
+<span class="sd">            \\frac{\\partial \\theta}{\\partial y}     &amp;= ax - by, \\\\</span>
+<span class="sd">            \\frac{\\partial \\theta}{\\partial z}     &amp;= aw - bz, \\\\</span>
+<span class="sd">            \\frac{\\partial \\theta}{\\partial w}     &amp;= az + bw, \\\\</span>
+
+<span class="sd">    The transform from yaw to quaternion is :math:`\\theta = arctan2(g, h)`,</span>
+<span class="sd">    with :math:`g = 2zw + 2xy` and :math:`h = x^2 + y^2 + z^2 + w^2`.</span>
+<span class="sd">    The partial derivatives of  :math:`\\arctan2(g, h)` in terms of</span>
+<span class="sd">    :math:`g` and `h` are</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \\frac{\\partial}{\\partial g}    &amp;= \\frac{g}{g^2+h^2}, \\\\</span>
+<span class="sd">            \\frac{\\partial}{\\partial h}    &amp;= \\frac{h}{g^2+h^2}, \\\\</span>
+
+<span class="sd">    With :math:`a = 2frac{\\partial}{\\partial g}` and `b = 2frac{\\partial}{\\partial h}`,</span>
+<span class="sd">    the chain rule yields the expression for :math:`R` above.</span>
+
+<span class="sd">    :param quat: Heading of the vehicle represented by a quaternion.</span>
+<span class="sd">    :type quat: Any container that has numerical values in index 0, 1, 2 and 3</span>
+<span class="sd">    :param quat_covariance: Covariance matrix for the quaternion</span>
+<span class="sd">    :type quat_covariance: 4x4 numpy array</span>
+<span class="sd">    :return: The quaternion covariance transformed to yaw coordinates.</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">quat</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="o">*</span><span class="n">w</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">w</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">gh2</span> <span class="o">=</span> <span class="n">g</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">h</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">g</span><span class="o">/</span><span class="n">gh2</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">h</span><span class="o">/</span><span class="n">gh2</span>
+
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">a</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="o">*</span><span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">a</span><span class="o">*</span><span class="n">w</span> <span class="o">-</span> <span class="n">b</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="n">a</span><span class="o">*</span><span class="n">z</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">w</span><span class="p">]</span>
+    <span class="n">yaw_covariance</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">quat_covariance</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">yaw_covariance</span></div>
+
+
+<div class="viewcode-block" id="xy_yaw_from_quaternion"><a class="viewcode-back" href="../api.html#states.xy_yaw_from_quaternion">[docs]</a><span class="k">def</span> <span class="nf">xy_yaw_from_quaternion</span><span class="p">(</span><span class="n">quat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the yaw angle in the xy plane from a rotation quaternion.</span>
+<span class="sd">    :param quat: A unit quaternion representing the</span>
+<span class="sd">    :type quat: Any container that has numerical values in index 0, 1, 2 and 3</span>
+<span class="sd">    :return: The yaw angle in radians projected on the xy plane</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">quat</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="o">*</span><span class="n">w</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="extract_pose"><a class="viewcode-back" href="../api.html#states.extract_pose">[docs]</a><span class="k">def</span> <span class="nf">extract_pose</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Extract the pose from a message</span>
+<span class="sd">    :param msg: An Odometry, Subject, Transform or any variation of Pose message</span>
+<span class="sd">    :return: The Pose contained in msg</span>
+<span class="sd">    :rtype: class:`geometry_msgs.msg.Pose`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="p">(</span><span class="n">Odometry</span><span class="p">,</span> <span class="n">PoseWithCovarianceStamped</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">pose</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="p">(</span><span class="n">PoseStamped</span><span class="p">,</span> <span class="n">PoseWithCovariance</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">msg</span><span class="o">.</span><span class="n">pose</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">Pose</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">msg</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Could not extract pose from message of type </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">msg</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="extract_pose_covariance"><a class="viewcode-back" href="../api.html#states.extract_pose_covariance">[docs]</a><span class="k">def</span> <span class="nf">extract_pose_covariance</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Extract the covariance from a message</span>
+<span class="sd">    :param msg: An Odometry, Subject, Transform or any variation of Pose message</span>
+<span class="sd">    :return: The Covariance contained in msg</span>
+<span class="sd">    :rtype: class:`numpy.array`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="p">(</span><span class="n">Odometry</span><span class="p">,</span> <span class="n">PoseWithCovarianceStamped</span><span class="p">)):</span>
+        <span class="n">covaraiance_list</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">covariance</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">PoseWithCovariance</span><span class="p">):</span>
+        <span class="n">covaraiance_list</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">covariance</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Could not extract pose covariance from message of type </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">msg</span><span class="p">)))</span>
+    <span class="n">covariance_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">covaraiance_list</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">covariance_array</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, Smart Mobility Lab.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>API Documentation &#8212; SVEA API 1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome!" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          SVEA Doc</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">GOTO <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulators">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sensor-interfaces">Sensor Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#localizers-interfaces">Localizers Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-controllers.control_interfaces">Control Interfaces</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Sections <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">API Documentation</a><ul>
+<li><a class="reference internal" href="#models">Models</a><ul>
+<li><a class="reference internal" href="#module-models.bicycle">Bicycle</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulators">Simulators</a><ul>
+<li><a class="reference internal" href="#module-simulators.sim_SVEA">Simple SVEA Simulator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sensor-interfaces">Sensor Interfaces</a><ul>
+<li><a class="reference internal" href="#module-sensors.lidars">LiDAR</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#localizers-interfaces">Localizers Interfaces</a><ul>
+<li><a class="reference internal" href="#module-localizers.qualisys_localizers">Qualisys</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-controllers.control_interfaces">Control Interfaces</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="api-documentation">
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-models.bicycle">
+<span id="bicycle"></span><h3>Bicycle<a class="headerlink" href="#module-models.bicycle" title="Permalink to this headline">¶</a></h3>
+<p>Module for bicycle models with params set for SVEA cars.</p>
+<dl class="class">
+<dt id="models.bicycle.SimpleBicycleState">
+<em class="property">class </em><code class="descclassname">models.bicycle.</code><code class="descname">SimpleBicycleState</code><span class="sig-paren">(</span><em>x=0.0</em>, <em>y=0.0</em>, <em>yaw=0.0</em>, <em>v=0.0</em>, <em>dt=0.1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/bicycle.html#SimpleBicycleState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.bicycle.SimpleBicycleState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extended from PythonRobotics for compatibility. State-space
+equation is:</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/ef0760c342037066456ef1f8900aeca7221c0471.svg" alt="\dot{x}     &amp;= v\cos(\phi), \\
+\dot{y}     &amp;= v\sin(\phi), \\
+\dot{\phi}  &amp;= \frac{v}{L} \tan(\delta), \\
+\dot{v}     &amp;= a."/></p>
+</div></div></blockquote>
+<p>where <img class="math" src="_images/math/f92c026bea3c6a79c621e4a4dba46b8a15eaa39e.svg" alt="x, y, \phi, v"/> are x position, y position, yaw,
+and velocity; <img class="math" src="_images/math/8b96b7837fced6a4d5257a0b5a92978d3f41f0b4.svg" alt="\delta, a"/> are the steering angle and
+acceleration inputs; and <img class="math" src="_images/math/b28448f8e8c748f607bc44617d300d35a965ebcf.svg" alt="L"/> is the wheel
+base length. This object also includes a method for dynamics updates
+based on the set sampling time and the embedded bicycle model.
+Units are [m, rad, s, m/s]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Initial x position, defaults to 0.0</li>
+<li><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Initial y position, defaults to 0.0</li>
+<li><strong>yaw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Initial yaw, defaults to 0.0</li>
+<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Initial velocity, defaults to 0.0</li>
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Sampling time for dynamics update, defaults to 0.1</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="models.bicycle.SimpleBicycleState.get_dt">
+<code class="descname">get_dt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/bicycle.html#SimpleBicycleState.get_dt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.bicycle.SimpleBicycleState.get_dt" title="Permalink to this definition">¶</a></dt>
+<dd><p>(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Currently set sampling time</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.bicycle.SimpleBicycleState.get_readable_state">
+<code class="descname">get_readable_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/bicycle.html#SimpleBicycleState.get_readable_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.bicycle.SimpleBicycleState.get_readable_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns state as self-sufficiently readable state
+(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">State as readable dict {x: __, y: __, yaw: __, v: __}</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.bicycle.SimpleBicycleState.get_state">
+<code class="descname">get_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/bicycle.html#SimpleBicycleState.get_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.bicycle.SimpleBicycleState.get_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">State as numpy array [x, y, yaw, v]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.bicycle.SimpleBicycleState.get_state_dim">
+<code class="descname">get_state_dim</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/bicycle.html#SimpleBicycleState.get_state_dim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.bicycle.SimpleBicycleState.get_state_dim" title="Permalink to this definition">¶</a></dt>
+<dd><p>(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dimension of state space</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.bicycle.SimpleBicycleState.set_dt">
+<code class="descname">set_dt</code><span class="sig-paren">(</span><em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/bicycle.html#SimpleBicycleState.set_dt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.bicycle.SimpleBicycleState.set_dt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setter for sampling time used in dynamics update
+(will be updated to use properties)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="models.bicycle.SimpleBicycleState.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>steering</em>, <em>velocity</em>, <em>transmission=0</em>, <em>differential_front=0</em>, <em>differential_rear=0</em>, <em>ctrl_code=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/models/bicycle.html#SimpleBicycleState.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.bicycle.SimpleBicycleState.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates state using set sampling time, dt, and embedded bicycle
+dynamics. Designed to take same inputs as SVEA vehicle’s
+low-level interface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>steering</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – input steering angle for the car</li>
+<li><strong>velocity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – input velocity for the car</li>
+<li><strong>transmission</strong> – [deprecated]</li>
+<li><strong>differential_front</strong> – [deprecated]</li>
+<li><strong>differential_rear</strong> – [deprecated]</li>
+<li><strong>ctrl_code</strong> – [deprecated]</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="simulators">
+<h2>Simulators<a class="headerlink" href="#simulators" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-simulators.sim_SVEA">
+<span id="simple-svea-simulator"></span><h3>Simple SVEA Simulator<a class="headerlink" href="#module-simulators.sim_SVEA" title="Permalink to this headline">¶</a></h3>
+<p>Simulation module for the SVEA platform. Creates fake ROS
+subscriptions and publications that match the real car platform.
+Intended for debugging code BEFORE running on a real car.</p>
+<dl class="class">
+<dt id="simulators.sim_SVEA.SimSVEA">
+<em class="property">class </em><code class="descclassname">simulators.sim_SVEA.</code><code class="descname">SimSVEA</code><span class="sig-paren">(</span><em>vehicle_name</em>, <em>initialized_model</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulators/sim_SVEA.html#SimSVEA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulators.sim_SVEA.SimSVEA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles simulation of a SVEA vehicle. The object takes in a model
+and pretends to be the low-level of a SVEA vehicle. It will spin up
+a continuous loop that updates the state of the fake vehicle using
+the model dynamics at a fixed rate and takes control inputs by
+subscribing to the same low-level interface ROS topic the actual
+SVEA low-level system uses and even publishes actuated control to
+the same topic as the low-level system.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of vehicle, etc. SVEA0, used for creating
+ROS topic names</li>
+<li><strong>initialized_model</strong> (<em>Model</em>) – Model to use as pretend SVEA vehicle. The
+only requirements on the model is that it
+has an ‘update’ method that takes a
+steering angle and a velocity as inputs</li>
+<li><strong>dt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Sampling time in [s]</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simulators.sim_SVEA.SimSVEA.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulators/sim_SVEA.html#SimSVEA.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulators.sim_SVEA.SimSVEA.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spins up ROS background thread; must be called to start
+receiving and sending data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">itself</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#simulators.sim_SVEA.SimSVEA" title="simulators.sim_SVEA.SimSVEA">SimSVEA</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="sensor-interfaces">
+<h2>Sensor Interfaces<a class="headerlink" href="#sensor-interfaces" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-sensors.lidars">
+<span id="lidar"></span><h3>LiDAR<a class="headerlink" href="#module-sensors.lidars" title="Permalink to this headline">¶</a></h3>
+<p>LiDAR module that contains ROS interface objects for the LiDARs used by
+SML. Currently, supporting: RPLidar, (coming soon) Hokuyo</p>
+<dl class="class">
+<dt id="sensors.lidars.RPLidar">
+<em class="property">class </em><code class="descclassname">sensors.lidars.</code><code class="descname">RPLidar</code><span class="sig-paren">(</span><em>emergency_dist=0.2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sensors/lidars.html#RPLidar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sensors.lidars.RPLidar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface handling the RPLidar. Collects and stores the most recent
+scan and handles stopping and starting the RPLidar. Implements a
+couple extra feature(s): emergency detection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>emergency_dist</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Distance threshold for simple detection of
+scenarios that could be considered an
+emergency, defaults to 0.2 [m]</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="sensors.lidars.RPLidar.get_is_emergency">
+<code class="descname">get_is_emergency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sensors/lidars.html#RPLidar.get_is_emergency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sensors.lidars.RPLidar.get_is_emergency" title="Permalink to this definition">¶</a></dt>
+<dd><p>(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Flag indicating whether something is too close or not</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sensors.lidars.RPLidar.get_raw_scan">
+<code class="descname">get_raw_scan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sensors/lidars.html#RPLidar.get_raw_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sensors.lidars.RPLidar.get_raw_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Most recent lidar scan as list of ranges</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sensors.lidars.RPLidar.get_raw_scan_with_time">
+<code class="descname">get_raw_scan_with_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sensors/lidars.html#RPLidar.get_raw_scan_with_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sensors.lidars.RPLidar.get_raw_scan_with_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Most recent lidar scan as list of ranges along with
+last scan delay</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sensors.lidars.RPLidar.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sensors/lidars.html#RPLidar.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sensors.lidars.RPLidar.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spins up ROS background thread; must be called to start
+receiving and sending data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">itself</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#sensors.lidars.RPLidar" title="sensors.lidars.RPLidar">RPLidar</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sensors.lidars.RPLidar.start_motor">
+<code class="descname">start_motor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sensors/lidars.html#RPLidar.start_motor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sensors.lidars.RPLidar.start_motor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Physically starts spinning the RPLidar</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sensors.lidars.RPLidar.stop_motor">
+<code class="descname">stop_motor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sensors/lidars.html#RPLidar.stop_motor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sensors.lidars.RPLidar.stop_motor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Physically stops the RPLidar from spinning</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="localizers-interfaces">
+<h2>Localizers Interfaces<a class="headerlink" href="#localizers-interfaces" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-localizers.qualisys_localizers">
+<span id="qualisys"></span><h3>Qualisys<a class="headerlink" href="#module-localizers.qualisys_localizers" title="Permalink to this headline">¶</a></h3>
+<p>ROS interface objects for localization with Qualisys odom. The launch
+files to be used in conjunction with these objects are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="n">qualisys</span><span class="o">.</span><span class="n">launch</span>
+<span class="n">qualisys_odom</span><span class="o">.</span><span class="n">launch</span> <span class="n">model_name</span><span class="p">:</span><span class="o">=&lt;</span><span class="n">insert</span> <span class="n">your</span> <span class="n">model</span> <span class="n">name</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>It is recommended you include these launch files in your project
+roslaunch</p>
+<dl class="class">
+<dt id="localizers.qualisys_localizers.QualisysOdom">
+<em class="property">class </em><code class="descclassname">localizers.qualisys_localizers.</code><code class="descname">QualisysOdom</code><span class="sig-paren">(</span><em>qualisys_model_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/localizers/qualisys_localizers.html#QualisysOdom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#localizers.qualisys_localizers.QualisysOdom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for taking Qualisys Odometry msgs and converting it directly
+into a State object that is convenient for cars. Units are
+[m, rad, s, m/s]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>qualisys_model_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of model given in the Qualisys
+software.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="localizers.qualisys_localizers.QualisysOdom.get_state">
+<code class="descname">get_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/localizers/qualisys_localizers.html#QualisysOdom.get_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#localizers.qualisys_localizers.QualisysOdom.get_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Current state as a list [x, y, yaw, v] [m, m, rad, m/s]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="localizers.qualisys_localizers.QualisysOdom.get_state_np">
+<code class="descname">get_state_np</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/localizers/qualisys_localizers.html#QualisysOdom.get_state_np"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#localizers.qualisys_localizers.QualisysOdom.get_state_np" title="Permalink to this definition">¶</a></dt>
+<dd><p>(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Current state as numpy array [x, y, yaw, v]
+[m, m, rad, m/s]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="localizers.qualisys_localizers.QualisysOdom.get_state_obj">
+<code class="descname">get_state_obj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/localizers/qualisys_localizers.html#QualisysOdom.get_state_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#localizers.qualisys_localizers.QualisysOdom.get_state_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Current state as a State object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#localizers.qualisys_localizers.State" title="localizers.qualisys_localizers.State">State</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="localizers.qualisys_localizers.QualisysOdom.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/localizers/qualisys_localizers.html#QualisysOdom.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#localizers.qualisys_localizers.QualisysOdom.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spins up ROS background thread; must be called to start
+receiving and sending data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">itself</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#localizers.qualisys_localizers.QualisysOdom" title="localizers.qualisys_localizers.QualisysOdom">QualisysOdom</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="localizers.qualisys_localizers.State">
+<em class="property">class </em><code class="descclassname">localizers.qualisys_localizers.</code><code class="descname">State</code><span class="sig-paren">(</span><em>x=0.0</em>, <em>y=0.0</em>, <em>yaw=0.0</em>, <em>v=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/localizers/qualisys_localizers.html#State"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#localizers.qualisys_localizers.State" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class representing the state of a vehicle. State is purposefully
+unit-less to support different applications.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – x position, defaults to 0.0</li>
+<li><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – y position, defaults to 0.0</li>
+<li><strong>yaw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – yaw, defaults to 0.0</li>
+<li><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – velocity, defaults to 0.0</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-controllers.control_interfaces">
+<span id="control-interfaces"></span><h2>Control Interfaces<a class="headerlink" href="#module-controllers.control_interfaces" title="Permalink to this headline">¶</a></h2>
+<p>ROS interface objects for sending control to the SVEA car’s low-level
+controller. The low-level controller expects unit-less steering and
+velocity values from [-127, 127] that correspond to the minimum and
+maximum steering angles and velocities. We implement the interfaces
+for two reasons:
+(1) our models typically expect steering angles in [rads] and velocities
+in [m/s], and
+(2) we would like to add some features on top of just sending the
+control inputs, like persistent control or control blending.</p>
+<dl class="class">
+<dt id="controllers.control_interfaces.ControlInterface">
+<em class="property">class </em><code class="descclassname">controllers.control_interfaces.</code><code class="descname">ControlInterface</code><span class="sig-paren">(</span><em>vehicle_name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/controllers/control_interfaces.html#ControlInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#controllers.control_interfaces.ControlInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard control interface. Make it easy to input steering
+angles in radians and velocities in m/s. Assumes very simplistic
+models of the low-level actuation. It assumes a quadratic steering
+model and a linear velocity model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of vehicle being controlled; used to
+create ROS topic names for subscription and
+publications, defaults to empty string</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="controllers.control_interfaces.ControlInterface.send_control">
+<code class="descname">send_control</code><span class="sig-paren">(</span><em>steering=nan</em>, <em>velocity=nan</em>, <em>brake_force=0</em>, <em>transmission=-1</em>, <em>differential_front=-1</em>, <em>differential_rear=-1</em>, <em>ctrl_code=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/controllers/control_interfaces.html#ControlInterface.send_control"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#controllers.control_interfaces.ControlInterface.send_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for taking control inputs and implementing features
+over the control inputs. This method converts steering angles
+and velocities from radians and m/s to unit-less values that the
+low level system expects, saturates the unit-less values,
+implements a stopping feature for blocking control inputs (note,
+this is not necessarily a braking feature, it only blocks inputs
+from being published, thus it should not be used for emergency
+braking), and sends/publishes inputs to the low level interface.</p>
+<p>If an argument is left empty the low level interface will be
+told to use the last sent value. The same is true if the gear or
+differential arguments have any other values than 0 or 1. If you
+do <em>not</em> call send_control then the car will <em>not</em> do anything.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>steering</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – input steering angle for the car in [rad], if
+argument left empty the low level system will
+implement the last sent valid value, default
+nan.</li>
+<li><strong>velocity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – input velocity for the car [m/s], if argument
+left empty the low level system will implement
+the last sent valid value, default nan</li>
+<li><strong>brake_force</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – brake force as a percentage [0, 100] of
+maximum braking force, defaults to 0</li>
+<li><strong>transmission</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – 0 means low gear, 1 means high gear, -1
+means keep the currently set gear, defaults
+to -1</li>
+<li><strong>differential_front</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – 0 means unlocked, 1 means locked, -1
+means keep the currently set lock
+state, defaults to -1</li>
+<li><strong>differential_rear</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – 0 means unlocked, 1 means locked, -1
+means keep the currently set lock
+state, defaults to -1</li>
+<li><strong>ctrl_code</strong> – [deprecated]</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="controllers.control_interfaces.ControlInterface.set_is_stop">
+<code class="descname">set_is_stop</code><span class="sig-paren">(</span><em>is_stop=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/controllers/control_interfaces.html#ControlInterface.set_is_stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#controllers.control_interfaces.ControlInterface.set_is_stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setter function for stopping the car. <strong>This is not the same
+as emergency braking.</strong>
+(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>is_stop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – flag for blocking or unblocking the control
+inputs to the car, defaults to True.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="controllers.control_interfaces.ControlInterface.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/controllers/control_interfaces.html#ControlInterface.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#controllers.control_interfaces.ControlInterface.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spins up ROS background thread; must be called to start
+receiving and sending data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">itself</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#controllers.control_interfaces.ControlInterface" title="controllers.control_interfaces.ControlInterface">ControlInterface</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="controllers.control_interfaces.ControlInterfaceWTeleop">
+<em class="property">class </em><code class="descclassname">controllers.control_interfaces.</code><code class="descname">ControlInterfaceWTeleop</code><span class="sig-paren">(</span><em>vehicle_name=''</em>, <em>percent_teleop=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/controllers/control_interfaces.html#ControlInterfaceWTeleop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#controllers.control_interfaces.ControlInterfaceWTeleop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from standard control interface but layers functions for
+receiving and implementing remote teleop control inputs from WebRTC
+app. This control interface is designed to handle two input sources
+and blend the inputs into one input; in particular, this is useful
+when there is a remote operator and on-board automation sending
+control inputs at the same time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vehicle_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of vehicle being controlled; used to
+create ROS topic names for subscription and
+publications, defaults to empty string</li>
+<li><strong>percent_teleop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – percent from [0, 100], defaults to 100</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="controllers.control_interfaces.ControlInterfaceWTeleop.send_control">
+<code class="descname">send_control</code><span class="sig-paren">(</span><em>steering=0</em>, <em>velocity=0</em>, <em>transmission=0</em>, <em>differential_front=0</em>, <em>differential_rear=0</em>, <em>ctrl_code=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/controllers/control_interfaces.html#ControlInterfaceWTeleop.send_control"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#controllers.control_interfaces.ControlInterfaceWTeleop.send_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Triggers control input to be sent over low-level-interface,
+computes linear combination of teleop control input and control
+inputs given as arguments to this function based on the set
+blending percent.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>steering</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – input steering angle for the car in [rad],
+defaults to 0</li>
+<li><strong>velocity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – input velocity for the car in [m/s], defaults to
+0</li>
+<li><strong>transmission</strong> – [deprecated]</li>
+<li><strong>differential_front</strong> – [deprecated]</li>
+<li><strong>differential_rear</strong> – [deprecated]</li>
+<li><strong>ctrl_code</strong> – [deprecated]</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="controllers.control_interfaces.ControlInterfaceWTeleop.set_ctrl_blend">
+<code class="descname">set_ctrl_blend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/controllers/control_interfaces.html#ControlInterfaceWTeleop.set_ctrl_blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#controllers.control_interfaces.ControlInterfaceWTeleop.set_ctrl_blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setter function for percent blend between remote control input
+and automated control input. Implemented as
+<img class="math" src="_images/math/f5c4528aabdd2e218e061251912b0bae223fd318.svg" alt="u = p u_h + (1-p) u_a"/>, where <img class="math" src="_images/math/e101f4e934bcb60eb4f0fee5ebda9bd415b9ed92.svg" alt="u_h, u_a, p"/> are
+the teleop input, automated input, and the percent/100.
+(will be updated to use properties)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>percent_teleop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – perentage from [0, 100]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="controllers.control_interfaces.OldControlInterface">
+<em class="property">class </em><code class="descclassname">controllers.control_interfaces.</code><code class="descname">OldControlInterface</code><span class="sig-paren">(</span><em>vehicle_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/controllers/control_interfaces.html#OldControlInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#controllers.control_interfaces.OldControlInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>[Deprecated] Control interface compliant with old arduino firmware
+where low level control is set by raw PWM values from 900-2100.</p>
+</dd></dl>
+
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Smart Mobility Lab.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

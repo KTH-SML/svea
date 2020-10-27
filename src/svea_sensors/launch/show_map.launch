@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+    Launch default odometry and localization
+-->
+
+<launch>
+  
+  <!-- map server -->
+  <arg name="map_name" default="itrl.yaml"/>
+  <arg name="file_name" default="$(find svea_sensors)/maps/$(arg map_name)" />
+  <node pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg file_name)" />
+
+</launch>

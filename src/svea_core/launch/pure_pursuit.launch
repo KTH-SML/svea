@@ -1,0 +1,7 @@
+<launch>
+    <arg name="is_sim" default="true"/>
+
+    <node pkg="svea_core" type="pure_pursuit.py" name="SVEA_purepursuit" output="screen">
+        <param name="is_sim" value="$(arg is_sim)"/>
+    </node>
+</launch>

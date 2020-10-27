@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>sensors.lidars &#8212; SVEA API 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          SVEA Doc</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">GOTO <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#simulators">Simulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#sensor-interfaces">Sensor Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#localizers-interfaces">Localizers Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#module-controllers.control_interfaces">Control Interfaces</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Sections <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for sensors.lidars</h1><div class="highlight"><pre>
+<span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">LiDAR module that contains ROS interface objects for the LiDARs used by</span>
+<span class="sd">SML. Currently, supporting: RPLidar, (coming soon) Hokuyo</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Thread</span>
+
+<span class="kn">import</span> <span class="nn">rospy</span>
+<span class="kn">from</span> <span class="nn">sensor_msgs.msg</span> <span class="k">import</span> <span class="n">LaserScan</span>
+<span class="kn">from</span> <span class="nn">std_srvs.srv</span> <span class="k">import</span> <span class="n">Empty</span>
+
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;MIT&quot;</span>
+<span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Frank Jiang&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;frankji@kth.se&quot;</span>
+<span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+
+<div class="viewcode-block" id="RPLidar"><a class="viewcode-back" href="../../api.html#sensors.lidars.RPLidar">[docs]</a><span class="k">class</span> <span class="nc">RPLidar</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interface handling the RPLidar. Collects and stores the most recent</span>
+<span class="sd">    scan and handles stopping and starting the RPLidar. Implements a</span>
+<span class="sd">    couple extra feature(s): emergency detection.</span>
+
+<span class="sd">    :param emergency_dist: Distance threshold for simple detection of</span>
+<span class="sd">                           scenarios that could be considered an</span>
+<span class="sd">                           emergency, defaults to 0.2 [m]</span>
+<span class="sd">    :type emergency_dist: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># options: serial_port, serial_baudrate, frame_id, inverted,</span>
+    <span class="c1">#          angle_compensate scan_mode</span>
+    <span class="n">ROS_PARAM_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;rplidarNode&quot;</span>
+    <span class="n">IMPORTANT_ROS_PARAMS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;serial_port&quot;</span><span class="p">,</span> <span class="s2">&quot;frame_id&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;angle_compensate&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">emergency_dist</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+        <span class="c1"># rospy.init_node(&#39;rplidar_handler&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">=</span> <span class="s2">&quot;RPLidar A2/A3 Handler&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">emergency_dist</span> <span class="o">=</span> <span class="n">emergency_dist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_emergency</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="RPLidar.start"><a class="viewcode-back" href="../../api.html#sensors.lidars.RPLidar.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spins up ROS background thread; must be called to start</span>
+<span class="sd">        receiving and sending data</span>
+
+<span class="sd">        :return: itself</span>
+<span class="sd">        :rtype: RPLidar</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_and_spin_ros</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    <span class="k">def</span> <span class="nf">_init_and_spin_ros</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s2">&quot;Starting Lidar Interface Node: </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_collect_srvs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_listen</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_collect_srvs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="s1">&#39;start_motor&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_motor_srv</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">ServiceProxy</span><span class="p">(</span><span class="s1">&#39;start_motor&#39;</span><span class="p">,</span> <span class="n">Empty</span><span class="p">)</span>
+
+        <span class="n">rospy</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="s1">&#39;stop_motor&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_motor_srv</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">ServiceProxy</span><span class="p">(</span><span class="s1">&#39;stop_motor&#39;</span><span class="p">,</span> <span class="n">Empty</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_start_listen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">Subscriber</span><span class="p">(</span><span class="s1">&#39;scan&#39;</span><span class="p">,</span> <span class="n">LaserScan</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_scan</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s2">&quot;Lidar Interface successfully initialized&quot;</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_read_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scan_msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan</span> <span class="o">=</span> <span class="n">scan_msg</span><span class="o">.</span><span class="n">ranges</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle_min</span> <span class="o">=</span> <span class="n">scan_msg</span><span class="o">.</span><span class="n">angle_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle_max</span> <span class="o">=</span> <span class="n">scan_msg</span><span class="o">.</span><span class="n">angle_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle_increment</span> <span class="o">=</span> <span class="n">scan_msg</span><span class="o">.</span><span class="n">angle_increment</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_increment</span> <span class="o">=</span> <span class="n">scan_msg</span><span class="o">.</span><span class="n">time_increment</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_scan_time</span> <span class="o">=</span> <span class="n">scan_msg</span><span class="o">.</span><span class="n">scan_time</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_emergency</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scan</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">emergency_dist</span>
+
+    <span class="k">def</span> <span class="nf">_build_param_printout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">param_str</span> <span class="o">=</span> <span class="s2">&quot;{0}:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IMPORTANT_ROS_PARAMS</span><span class="p">:</span>
+            <span class="n">curr_param</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROS_PARAM_PREFIX</span><span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">param_name</span><span class="p">)</span>
+            <span class="n">param_str</span> <span class="o">+=</span> <span class="s2">&quot;  - {0}: {1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">curr_param</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">param_str</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_param_printout</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_param_printout</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RPLidar.start_motor"><a class="viewcode-back" href="../../api.html#sensors.lidars.RPLidar.start_motor">[docs]</a>    <span class="k">def</span> <span class="nf">start_motor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Physically starts spinning the RPLidar</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_motor_srv</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">rospy</span><span class="o">.</span><span class="n">ServiceException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">+</span> <span class="s2">&quot;: Start motor service failed: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RPLidar.stop_motor"><a class="viewcode-back" href="../../api.html#sensors.lidars.RPLidar.stop_motor">[docs]</a>    <span class="k">def</span> <span class="nf">stop_motor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Physically stops the RPLidar from spinning</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stop_motor_srv</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">rospy</span><span class="o">.</span><span class="n">ServiceException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node_name</span> <span class="o">+</span> <span class="s2">&quot;: Stop motor service failed: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RPLidar.get_raw_scan"><a class="viewcode-back" href="../../api.html#sensors.lidars.RPLidar.get_raw_scan">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (will be updated to use properties)</span>
+
+<span class="sd">        :return: Most recent lidar scan as list of ranges</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan</span></div>
+
+<div class="viewcode-block" id="RPLidar.get_raw_scan_with_time"><a class="viewcode-back" href="../../api.html#sensors.lidars.RPLidar.get_raw_scan_with_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw_scan_with_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (will be updated to use properties)</span>
+
+<span class="sd">        :return: Most recent lidar scan as list of ranges along with</span>
+<span class="sd">                 last scan delay</span>
+<span class="sd">        :rtype: float, list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_scan_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scan</span></div>
+
+<div class="viewcode-block" id="RPLidar.get_is_emergency"><a class="viewcode-back" href="../../api.html#sensors.lidars.RPLidar.get_is_emergency">[docs]</a>    <span class="k">def</span> <span class="nf">get_is_emergency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        (will be updated to use properties)</span>
+
+<span class="sd">        :return: Flag indicating whether something is too close or not</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_emergency</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019, Smart Mobility Lab.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
