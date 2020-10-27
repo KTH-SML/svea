@@ -166,7 +166,7 @@ where you should see something that looks like:
 To run a more involved example, call:
 
 ```bash
-roslaunch svea_core floor2_sim.launch
+roslaunch svea_core floor2.launch
 ```
 
 where you should see something that looks like:
