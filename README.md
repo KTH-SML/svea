@@ -138,8 +138,8 @@ cars with little effort. However, this does not mean the code will work on a
 real vehicle without further tuning or changes.
 
 There are three pre-written scripts to serve as examples of how to use the
-code base in simulation. See and read the source code in
-`svea_starter/src/svea_core/scripts/sim`.
+code base. See and read the source code in
+`svea_starter/src/svea_core/scripts/core_examples`.
 
 You can try them out by running one of the two commands:
 
