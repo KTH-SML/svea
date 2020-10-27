@@ -173,7 +173,11 @@ where you should see something that looks like:
 
 ![key-teleop example](./media/floor2_rviz.png)
 
+Now you are ready to read through the tutorials! You can find them in `svea_starter/docs/tutorials`.
+
 ## Going from simulation to real
+
+**Note, you only have to follow this section when running the real cars!**
 
 Since the simulated SVEA cars are built to function very similarly to the real
 SVEA cars, the transfer from simulation to real vehicles is fairly simple!
