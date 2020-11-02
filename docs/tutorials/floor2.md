@@ -44,7 +44,7 @@ your solution, as the created plot includes the simulated vehicle's real-time
 velocity in the title of the plot. Try running it and see how the steady-state
 velocity compares with the `target_velocity` that is set in:
 
-`svea_core/scripts/core_examples/pure_pursuit.py`.
+`svea_core/scripts/core_examples/pure_pursuit.py'`.
 
 Some of you might find it strange that the velocity is offset and a little noisy
 in simulation. This is an intentional feature of the simulation. While we cannot

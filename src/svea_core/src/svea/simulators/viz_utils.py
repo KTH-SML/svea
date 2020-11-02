@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
 """
-Module with some commonly useful visualization functions
+Module with some commonly useful visualization functions.
+
+Currently, contains vizualization functions for:
+    1. Vehicles
+    2. Trajectories
+    3. Lidar Scans
 """
 
 import numpy as np
@@ -10,15 +15,22 @@ import matplotlib.pyplot as plt
 import rospy
 
 import tf
-from geometry_msgs.msg import Point32, PolygonStamped, PointStamped
+from geometry_msgs.msg import Point, Point32, PolygonStamped, PointStamped
 from geometry_msgs.msg import Pose, PoseStamped, PoseArray
 from nav_msgs.msg import Path
+from sensor_msgs.msg import PointCloud
+from std_msgs.msg import ColorRGBA
+from visualization_msgs.msg import Marker
 
 __license__ = "MIT"
-__maintainer__ = "Frank Jiang"
+__maintainer__ = "Frank Jiang, Javier Cerna"
 __email__ = "frankji@kth.se"
 __status__ = "Development"
 
+
+############################
+## VEHICLE VIZUALIZATIONS ##
+############################
 
 # SVEA Vehicle parameters
 LENGTH = 0.586  # [m]
@@ -176,6 +188,11 @@ def publish_3Dcar(polygon_publisher, pose_publisher, x, y, yaw):
     polygon_publisher.publish(car_poly)
     pose_publisher.publish(car_pose)
 
+
+###############################
+## TRAJECTORY VISUALIZATIONS ##
+###############################
+
 def lists_to_pose_stampeds(x_list, y_list, yaw_list=None, t_list=None):
     poses = []
     for i in range(len(x_list)):
@@ -280,3 +297,97 @@ def publish_pose_array(poses_publisher, x_list, y_list, yaw_list):
     pose_array.header.frame_id = 'map'
     pose_array.poses = lists_to_poses(x_list, y_list, yaw_list)
     poses_publisher.publish(pose_array)
+
+
+##########################
+## LIDAR VIZUALIZATIONS ##
+##########################
+
+def publish_lidar_points(point_cloud_publisher, points):
+    """Publishes the detected points from a single channel Lidar as a
+    pointcloud
+
+    :param point_cloud_publisher: ROS publisher for broadcasting
+                                  pointcloud with
+    :type point_cloud_publisher: rospy.topics.Publisher
+    :param points: List of detected points by lidar
+    :type points: list
+    """
+    point_cloud = PointCloud()
+
+    point_cloud.header.stamp = rospy.Time.now()
+    point_cloud.header.frame_id = 'map'
+
+    point_cloud.points = [Point32(x=point[0], y=point[1], z=top_height)
+                          for point in points]
+
+    point_cloud_publisher.publish(point_cloud)
+
+def publish_lidar_rays(rays_publisher, lidar_pos, points):
+    """Publishes the rays from a single channel Lidar corresponding to
+    detected points (i.e. points in range)
+
+    :param rays_publisher: ROS publisher for broadcasting rays with
+    :type rays_publisher: rospy.topics.Publisher
+    :param lidar_pos: Position of lidar, first two values should be XY
+    :type lidar_pos: list
+    :param points: List of detected points by lidar
+    :type points: list
+    """
+    marker_msg = Marker()
+    marker_msg.header.stamp = rospy.Time.now()
+    marker_msg.header.frame_id = 'map'
+
+    marker_msg.type = Marker.LINE_LIST
+    marker_msg.action = Marker.ADD
+
+    marker_msg.points = []
+
+    for point in points:
+        marker_msg.points.append(Point(x=lidar_pos[0],
+                                       y=lidar_pos[1],
+                                       z=top_height))
+        marker_msg.points.append(Point(x=point[0],
+                                       y=point[1],
+                                       z=top_height))
+
+    marker_msg.id = 0
+    marker_msg.color = ColorRGBA(r=1, g=0, b=0, a=0.05)
+    marker_msg.scale.x = 0.05
+    marker_msg.pose.orientation.w = 1.0
+
+    rays_publisher.publish(marker_msg)
+
+def publish_edges(edges_publisher, edges):
+    """Publishes the list of edges to RVIZ
+
+    :param edges_publisher: ROS publisher for broadcasting edges with
+    :type edges_publisher: rospy.topics.Publisher
+    :param edges: List of edges to visualize
+    :type edges: list
+    """
+    marker_msg = Marker()
+    marker_msg.header.stamp = rospy.Time.now()
+    marker_msg.header.frame_id = 'map'
+
+    marker_msg.type = Marker.LINE_LIST
+    marker_msg.action = Marker.ADD
+
+    marker_msg.points = []
+
+    for edge in edges:
+        pt1 = edge[0]
+        pt2 = edge[1]
+        marker_msg.points.append(Point(x=pt1[0],
+                                       y=pt1[1],
+                                       z=top_height))
+        marker_msg.points.append(Point(x=pt2[0],
+                                       y=pt2[1],
+                                       z=top_height))
+
+    marker_msg.id = 0
+    marker_msg.color = ColorRGBA(r=0, g=0, b=1, a=1)
+    marker_msg.scale.x = 0.05
+    marker_msg.pose.orientation.w = 1.0
+
+    edges_publisher.publish(marker_msg)

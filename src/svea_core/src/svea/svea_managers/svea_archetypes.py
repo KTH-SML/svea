@@ -8,6 +8,7 @@ from copy import deepcopy
 
 import rospy
 from svea.actuation import ActuationInterface
+from svea.sensors import Lidar
 from svea.data import BasicDataHandler
 
 __license__ = "MIT"
@@ -57,6 +58,8 @@ class SVEAManager(object):
         self.actuation = actuation(vehicle_name)
         self.data_handler = data_handler(vehicle_name)
 
+        self.lidar = Lidar()
+
         # bring localizer state out into manager
         self.state = self.localizer.state
         self.last_state_time = None
@@ -72,6 +75,7 @@ class SVEAManager(object):
         :type wait: bool
         """
         self.localizer.start()
+        self.lidar.start()
         self.actuation.start(wait)
 
     def wait_for_state(self):

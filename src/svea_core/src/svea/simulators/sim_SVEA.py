@@ -8,8 +8,10 @@ import math
 import numpy as np
 from threading import Thread
 import rospy
+
 from svea_msgs.msg import lli_ctrl
 from svea.states import SVEAControlValues
+from sim_lidar import SimLidar
 
 __license__ = "MIT"
 __maintainer__ = "Frank Jiang"
@@ -39,6 +41,8 @@ class SimSVEA(object):
     :type dt: float
     :param start_paused: Start simulation paused
     :type start_paused: bool, optional
+    :param run_lidar: Run simulated lidar alongside simulation
+    :type run_lidar: bool
     :param publish_pose: Publish the simulated vehicles pose if `True`
                          Default: `False`
     :type publish_pose: bool, optional
@@ -63,6 +67,7 @@ class SimSVEA(object):
                  initialized_model,
                  dt=0.02,
                  start_paused=False,
+                 run_lidar=False,
                  publish_pose=False,
                  publish_odometry=False):
 
@@ -96,6 +101,10 @@ class SimSVEA(object):
         self.control_values = SVEAControlValues(0, 0, 0, False, False)
 
         self._last_pub_time = rospy.get_time()
+
+        self._run_lidar = run_lidar
+        if self._run_lidar:
+            self.simulated_lidar = SimLidar(vehicle_name).start()
 
     def start(self):
         """
@@ -179,6 +188,8 @@ class SimSVEA(object):
                 velocity = self._percent_to_vel(vel_percent) \
                     + np.random.normal(0, self.SPEED_NOISE_STD)
                 self.model.update(steering, velocity, self.dt)
+                if self._run_lidar:
+                    self.simulated_lidar.update_lidar_position(self.model.state)
                 if curr_time - self._last_pub_time > 1.0/self.LOC_PUB_FREQ:
                     self.svea_state_pub.publish(self.current_state.state_msg)
                     if self.publish_pose:
