@@ -182,7 +182,7 @@ Now you are ready to read through the tutorials! You can find them in `svea_star
 Since the simulated SVEA cars are built to function very similarly to the real
 SVEA cars, the transfer from simulation to real vehicles is fairly simple!
 
-### Low-level Interface Setup
+### Adding the low-level interface
 
 To your roslaunch file, add
 
@@ -197,14 +197,9 @@ To your roslaunch file, add
 Then, you just have model mismatch to deal with.
 
 
-### Sensor setup
+### Running localization on the real SVEA
 
-To grant the necessary permissions for the NVIDIA TX2 to comunicate with the IMU, run: 
-
-```bash
-sudo bash <svea_starter_root>/src/svea_sensors/grant_i2c_permisions.sh
-```
-Then, you will need to add a localization node to your launch file. Start by adding the default `localize.launch` to your project launch:
+Running the localization amounts to adding `localize.launch` to your project launch:
 
 ```xml
 <include file="$(find svea_sensors)/launch/localize.launch">
