@@ -1,31 +1,19 @@
 """
-Track handling module. Creates a class for representing a track.
-
-The track is defined by one stay inside polygon and a keep out polygon.
-The coordinates are defined relative to a given occupation grid map.
-
-The track class is intended as a unified way of defning boundaries where there
-are no natural bounds. 
-It is not intended to be ideal for path planning and similar tasks.
-
-The track should not be relied upon to contain all 
+Track handling module. Contains classes for handling tracks.
 """
 
-import rospy
-from yaml import load, dump
-# import numpy as np
-# from copy import deepcopy
-# from math import cos, sin, sqrt, radians
 from threading import Thread
-
+import rospy
 from geometry_msgs.msg import (PolygonStamped,
                                Point32,
                                PointStamped,
                                PoseWithCovarianceStamped,
                                PoseStamped)
-# from visualization_msgs.msg import Marker
+try:
+    from yaml import load, dump
+except ImportError:
+    pass
 
-# from viz_utils import publish_lidar_points, publish_lidar_rays, publish_edges
 
 __license__ = "MIT"
 __maintainer__ = "Tobias Bolin"
@@ -35,7 +23,17 @@ __status__ = "Development"
 
 class Track(object):
     """ Representation of a track.
-    :param vehicle_name: Name of vehicle lidar is attached to
+    Useful for loading the track parameters.
+    Can publish the track as polygons for visualization in rviz.
+
+    The track is defined by one stay inside polygon and a keep out polygon.
+    The coordinates are defined relative to a given occupation grid map.
+
+    The track class is intended as a unified way of defining
+    track boundaries in a way that is easy to relate to the real world.
+    It is not intended to be ideal for path planning and similar tasks.
+
+    :param vehicle_name: Name of vehicle
     :type vehicle_name: str, optional
     :param publish_track: If the track should be published
     for visualization in rviz. Default: False
@@ -45,9 +43,8 @@ class Track(object):
     def __init__(self, vehicle_name='', publish_track=False):
 
         self.vehicle_name = vehicle_name
-        sub_namespace = vehicle_name + '/' if vehicle_name else ''
-        self.stay_in_topic = sub_namespace + 'track/stay_in'
-        self.keep_out_topic = sub_namespace + 'track/keep_out'
+        self.stay_in_topic = 'track/stay_in'
+        self.keep_out_topic = 'track/keep_out'
         self.publish_track = publish_track
         self._stay_in = None
         self._keep_out = None
@@ -64,14 +61,12 @@ class Track(object):
         return self
 
     def _init_and_spin_ros(self):
-        rospy.loginfo("Starting Track Node: \n"
-                      + str(self))
+        rospy.loginfo("Starting Track Node: \n" + str(self))
         if self.publish_track:
             self._start_publish()
             self._publish_track()
         rospy.loginfo("{} Track successfully initialized".format(
             self.vehicle_name))
-        # self._start_simulation()
         rospy.spin()
 
     def _start_publish(self):
@@ -96,6 +91,7 @@ class Track(object):
         keep_out_msg.header = stay_in_msg.header
         keep_out_msg.polygon.points = list_to_polygon(self.keep_out)
         self.keep_out_pub.publish(keep_out_msg)
+        rospy.loginfo('Track published')
 
     def _get_stay_in_from_parameters(self):
         stay_in = rospy.search_param('stay_in')
@@ -109,21 +105,17 @@ class Track(object):
 
     @property
     def stay_in(self):
-        """"""
+        """The stay inside polygon"""
         if self._stay_in is None:
             self._get_stay_in_from_parameters()
         return self._stay_in
 
     @property
     def keep_out(self):
-        """"""
+        """The keep out polygon"""
         if self._keep_out is None:
             self._get_keep_out_from_parameters()
         return self._keep_out
-
-    # def update_track(self):
-    #     self._get_polygons_from_parameters()
-    #     self._publish_track()
 
 
 def list_to_polygon(node_list, z=0.3):
@@ -132,18 +124,25 @@ def list_to_polygon(node_list, z=0.3):
 
 
 class EditableTrack(Track):
+    """ A track that can be edited through rviz
+
+    This is a horrible hack. Use at your own risk.
+    Start by creating a file named `track_under_construction.yaml`
+    in `~/.ros` and continue by figuring out how the class
+    works by reading the code.
+    """
 
     def __init__(self, *args, **kwargs):
         Track.__init__(self, publish_track=True)
         self.file_name = 'track_under_construction.yaml'
         self.point_topic = '/clicked_point'
-        self.set_stay_in_topic = '/initialpose'  # geometry_msgs/PoseWithCovarianceStamped
-        self.set_keep_out_topic = '/move_base_simple/goal' # geometry_msgs/PoseStamped
-        self.state = 'Inactive' # Inactive, StayIn, KeepOut, 
+        self.set_stay_in_topic = '/initialpose'
+        self.set_keep_out_topic = '/move_base_simple/goal'
+        self.state = 'Inactive'  # Inactive, StayIn, KeepOut
         self.save_threshold = 0.2
 
     def _init_and_spin_ros(self):
-        rospy.loginfo("Starting Track Creation Node: \n"
+        rospy.loginfo("Starting Track Editing Node: \n"
                       + str(self))
         self._start_listen()
         self._start_publish()
@@ -244,4 +243,4 @@ def rotate(collection, n):
 
 
 def calc_dist(p1, p2):
-    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+    return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5

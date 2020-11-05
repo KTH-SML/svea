@@ -10,6 +10,7 @@ from svea.controllers.pure_pursuit import PurePursuitController
 from svea.data import BasicDataHandler, TrajDataHandler, RVIZPathHandler
 from svea.models.bicycle import SimpleBicycleModel
 from svea.simulators.sim_SVEA import SimSVEA
+from svea.track import Track
 
 
 ## SIMULATION PARAMS ##########################################################
@@ -76,6 +77,10 @@ def main():
                            traj_x, traj_y,
                            data_handler = DataHandler)
     svea.start(wait=True)
+
+    # start track handler
+    track = Track(vehicle_name, publish_track=True)
+    track.start()
 
     if is_sim:
         # start simulation

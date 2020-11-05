@@ -207,6 +207,22 @@ Visualization Manager:
         "": true
       Queue Size: 1
       Value: true
+    - Alpha: 1
+      Class: rviz/Polygon
+      Color: 245; 121; 0
+      Enabled: true
+      Name: Keep Out
+      Topic: /track/keep_out
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Class: rviz/Polygon
+      Color: 25; 255; 0
+      Enabled: true
+      Name: Stay In
+      Topic: /track/stay_in
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 162; 162; 162
@@ -235,25 +251,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 16.524080276489258
+      Distance: 14.331798553466797
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -2.1927549839019775
-        Y: -10.488762855529785
+        X: -2.139354705810547
+        Y: -12.464001655578613
         Z: 1.430511474609375e-6
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6897962689399719
+      Pitch: 0.6197963356971741
       Target Frame: map
       Value: ThirdPersonFollower (rviz)
-      Yaw: 5.050559043884277
+      Yaw: 4.885556697845459
     Saved: ~
 Window Geometry:
   Displays:
@@ -272,4 +288,4 @@ Window Geometry:
     collapsed: true
   Width: 1920
   X: 0
-  Y: 27
+  Y: 0

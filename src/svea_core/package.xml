@@ -68,7 +68,7 @@
   <exec_depend>robot_localization</exec_depend>
   <exec_depend>mrpt_map</exec_depend>
   <exec_depend>svea_msgs</exec_depend>
-
+  <exec_depend>python-yaml</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
