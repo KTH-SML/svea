@@ -128,8 +128,8 @@ class EditableTrack(Track):
 
     This is a horrible hack. Use at your own risk.
     Start by creating a file named `track_under_construction.yaml`
-    in `~/.ros` and continue by figuring out how the class
-    works by reading the code.
+    in `~/.ros` and runing rosdep.
+    Continue by figuring out how the class works by reading the code.
     """
 
     def __init__(self, *args, **kwargs):

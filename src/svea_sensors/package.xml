@@ -49,7 +49,7 @@
   <exec_depend>tf2</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>urg_node</exec_depend>
-  <exec_depend>zed_wrapper</exec_depend>
+  <!--<exec_depend>zed_wrapper</exec_depend>-->
   <exec_depend>slam_toolbox</exec_depend>
   <exec_depend>slam_toolbox_msgs</exec_depend>
   <exec_depend>amcl</exec_depend>
