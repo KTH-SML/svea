@@ -3,6 +3,7 @@ Track handling module. Contains classes for handling tracks.
 """
 
 from threading import Thread
+from copy import deepcopy
 import rospy
 from geometry_msgs.msg import (PolygonStamped,
                                Point32,
@@ -11,8 +12,14 @@ from geometry_msgs.msg import (PolygonStamped,
                                PoseStamped)
 try:
     from yaml import load, dump
+    yaml_available = True
 except ImportError:
-    pass
+    yaml_available = False
+if yaml_available:
+    try:
+        from yaml import CLoader as Loader, CDumper as Dumper
+    except ImportError:
+        from yaml import Loader, Dumper
 
 
 __license__ = "MIT"
@@ -26,12 +33,15 @@ class Track(object):
     Useful for loading the track parameters.
     Can publish the track as polygons for visualization in rviz.
 
-    The track is defined by one stay inside polygon and a keep out polygon.
+    The track is defined by two polygons.
+    One stay inside polygon and one keep out polygon.
     The coordinates are defined relative to a given occupation grid map.
+    The polygons can be assumed to be simple (ie. not self intersecting).
+    There are however no check for self intersections done by this class.
 
-    The track class is intended as a unified way of defining
+    This track definition is intended as a unified way of defining
     track boundaries in a way that is easy to relate to the real world.
-    It is not intended to be ideal for path planning and similar tasks.
+    It is not necesarily ideal for direct use in path planning and similar tasks.
 
     :param vehicle_name: Name of vehicle
     :type vehicle_name: str, optional
@@ -41,7 +51,6 @@ class Track(object):
     """
 
     def __init__(self, vehicle_name='', publish_track=False):
-
         self.vehicle_name = vehicle_name
         self.stay_in_topic = 'track/stay_in'
         self.keep_out_topic = 'track/keep_out'
@@ -91,36 +100,41 @@ class Track(object):
         keep_out_msg.header = stay_in_msg.header
         keep_out_msg.polygon.points = list_to_polygon(self.keep_out)
         self.keep_out_pub.publish(keep_out_msg)
-        rospy.loginfo('Track published')
+        rospy.logdebug('Track published')
 
     def _get_stay_in_from_parameters(self):
         stay_in = rospy.search_param('stay_in')
         self._stay_in = rospy.get_param(stay_in)
-        self._stay_in.append(self._stay_in[0])
 
     def _get_keep_out_from_parameters(self):
         keep_out = rospy.search_param('keep_out')
         self._keep_out = rospy.get_param(keep_out)
-        self._keep_out.append(self._keep_out[0])
 
     @property
     def stay_in(self):
-        """The stay inside polygon"""
+        """The stay inside polygon, guaranteed to be closed"""
         if self._stay_in is None:
             self._get_stay_in_from_parameters()
-        return self._stay_in
+        return close_polygon(self._stay_in)
 
     @property
     def keep_out(self):
-        """The keep out polygon"""
+        """The keep out polygon, guaranteed to be closed"""
         if self._keep_out is None:
             self._get_keep_out_from_parameters()
-        return self._keep_out
+        return close_polygon(self._keep_out)
 
 
-def list_to_polygon(node_list, z=0.3):
+def list_to_polygon(node_list, z=0.1):
     polygon = [Point32(*(n + [z])) for n in node_list]
     return polygon
+
+
+def close_polygon(polygon_list):
+    polygon_list = deepcopy(polygon_list)
+    if polygon_list[0] != polygon_list[-1]:
+        polygon_list.append(polygon_list[0])
+    return polygon_list
 
 
 class EditableTrack(Track):
@@ -138,7 +152,7 @@ class EditableTrack(Track):
         self.point_topic = '/clicked_point'
         self.set_stay_in_topic = '/initialpose'
         self.set_keep_out_topic = '/move_base_simple/goal'
-        self.state = 'Inactive'  # Inactive, StayIn, KeepOut
+        self.state = 'inactive'  # inactive, stay_in, keep_out
         self.save_threshold = 0.2
 
     def _init_and_spin_ros(self):
@@ -163,15 +177,15 @@ class EditableTrack(Track):
 
     def _on_point_publish(self, msg):
         point = [msg.point.x, msg.point.y]
-        if self.state == 'Inactive':
+        if self.state == 'inactive':
             pass
-        elif self.state == 'StayIn':
+        elif self.state == 'stay_in':
             if (len(self._stay_in) > 0
                     and calc_dist(point, self._stay_in[-1]) < self.save_threshold):
                 self._save_polygon()
             else:
                 self._stay_in.append(point)
-        elif self.state == 'KeepOut':
+        elif self.state == 'keep_out':
             if (len(self._keep_out) > 0
                     and calc_dist(point, self._keep_out[-1]) < self.save_threshold):
                 self._save_polygon()
@@ -179,43 +193,50 @@ class EditableTrack(Track):
                 self._keep_out.append(point)
         self._publish_track()
 
-    def _on_pose_publish(self, msg):
-        if self.state != 'StayIn':
-            self.state = 'StayIn'
-        elif len(self._stay_in) > 0:
-            position = msg.pose.pose.position
-            point = [position.x, position.y]
-            self._stay_in = rotate_to_closest(point, self._stay_in)
-            del self._stay_in[-1]
+    def _handle_polygon_select(self, position, polygon_name):
+        point = [position.x, position.y]
+        var_name = '_' + polygon_name
+        clean_name = polygon_name.replace('_', ' ')
+        polygon = getattr(self, var_name)
+        polygon = rotate_to_closest(point, polygon)
+        if self.state == polygon_name and len(polygon) > 0:
+            rospy.loginfo("Removed point at {0} from {1} polygon"
+                          .format(polygon[-1], clean_name))
+            del polygon[-1]
+        if len(polygon) > 0:
+            rospy.loginfo("Now adding to {0} from point {1}"
+                          .format(clean_name, polygon[-1]))
+        else:
+            rospy.loginfo("Now adding to {0}".format(clean_name))
+        self.state = polygon_name
+        setattr(self, var_name, polygon)
         self._publish_track()
 
+    def _on_pose_publish(self, msg):
+        position = msg.pose.pose.position
+        self._handle_polygon_select(position, 'stay_in')
+
     def _on_goal_publish(self, msg):
-        if self.state != 'KeepOut':
-            self.state = 'KeepOut'
-        elif len(self._keep_out) > 0:
-            position = msg.pose.position
-            point = [position.x, position.y]
-            self._keep_out = rotate_to_closest(point, self._keep_out)
-            del self._keep_out[-1]
-        self._publish_track()
+        position = msg.pose.position
+        self._handle_polygon_select(position, 'keep_out')
 
     def _save_polygon(self):
         with open(self.file_name, 'r') as file:
-            yaml_dict = load(file)
+            yaml_dict = load(file, Loader=Loader)
         if yaml_dict is None:
             yaml_dict = dict()
-        if self.state == 'StayIn':
+        if self.state == 'stay_in':
             yaml_dict['stay_in'] = self._stay_in
             rospy.loginfo('stay_in saved to {}'.format(self.file_name))
-        elif self.state == 'KeepOut':
+        elif self.state == 'keep_out':
             yaml_dict['keep_out'] = self._keep_out
             rospy.loginfo('keep_out saved to {}'.format(self.file_name))
         with open(self.file_name, 'w') as file:
-            dump(yaml_dict, file)
+            dump(yaml_dict, file, Dumper=Dumper)
 
     def _load_polygon(self):
         with open(self.file_name, 'r') as file:
-            yaml_dict = load(file)
+            yaml_dict = load(file, Loader=Loader)
         if yaml_dict is not None:
             stay_in = yaml_dict.get('stay_in', False)
             if stay_in:
@@ -226,6 +247,15 @@ class EditableTrack(Track):
 
 
 def rotate_to_closest(point, point_list):
+    """Rotate a list so that the element closest to point is at the end of the list
+
+    :param point: a 2D point in space, represented by a list or tuple containing 2 floats 
+    :type point: list or tuple
+    :param point_list: A list of 2D points
+    :type point_list: A list of points
+    :returns: The rotated point list
+    :rtype: A list of points
+    """
     if len(point_list) == 0:
         return point_list
     min_distance = float('inf')
