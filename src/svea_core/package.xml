@@ -71,6 +71,7 @@
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>robot_localization</exec_depend>
   <exec_depend>svea_msgs</exec_depend>
+  <exec_depend>python-yaml</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>rosserial_python</exec_depend>
   <exec_depend>rosserial_server</exec_depend>

@@ -13,6 +13,7 @@
 
     <node pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map_file)" />
     <rosparam command="load" file="$(find svea_core)/resources/params/obstacles.yaml" />
+    <rosparam command="load" file="$(find svea_core)/resources/params/track.yaml" />
 
     <node pkg="svea_core" type="floor2_example.py" name="floor2_example" output="screen">
         <param name="start_pt" value="$(arg start_pt)"/>
