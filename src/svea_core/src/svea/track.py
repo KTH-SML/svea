@@ -104,11 +104,19 @@ class Track(object):
 
     def _get_stay_in_from_parameters(self):
         stay_in = rospy.search_param('stay_in')
-        self._stay_in = rospy.get_param(stay_in)
+        if stay_in is not None:
+            self._stay_in = rospy.get_param(stay_in)
+        else:
+            track = rospy.search_param('track')
+            self._stay_in = rospy.get_param(track)[0]
 
     def _get_keep_out_from_parameters(self):
         keep_out = rospy.search_param('keep_out')
-        self._keep_out = rospy.get_param(keep_out)
+        if keep_out is not None:
+            self._keep_out = rospy.get_param(keep_out)
+        else:
+            track = rospy.search_param('track')
+            self._keep_out = rospy.get_param(track)[1]
 
     @property
     def stay_in(self):
