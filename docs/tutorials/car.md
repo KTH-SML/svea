@@ -3,7 +3,7 @@ This document contains intructions for to work with the SVEA platform.
 
 __If you have an issue, please check the Common Problems section at the bottom.__
 
-First are the basic rules that should always be followed when working with the cars. The second sections is a description of some of the components of the car followed by: startup and shut down procedures, and finally some common problems and solutions.
+First are the basic rules that should always be followed when working with the cars. The second section is a description of some of the components of the car followed by: startup and shut down procedures, instructions for how to interface with the car and finally some common problems and solutions.
 
 ## Basic rules for working with the cars
 
@@ -81,12 +81,17 @@ For more information on the receiver, see the [TRX-4 owners manual](https://trax
 The USB hub connects all USB devices to the TX2. It is mounted on the rear of the SVEA.
 
 ### 4G WiFi modem
-The 4G modem provides independent internet acces to the SVEA. The switch is mounted underneath the USB hub. The TX2 receives the internet connection over USB. Other computers can connect to the switch over WiFi.
+The 4G modem provides independent internet acces to the SVEA.
+The modem is mounted at the back, underneath the USB hub.
+The TX2 receives the internet connection over USB.
+Other computers can connect to the modem over WiFi.
+
+The modem has two buttons, a big power button on the front and a smaler menu button on top. 
 
 ## Procedures for turning the car ON and OFF 
 
 ### Turn ON 12V power
-1. Plug in the powerbank cord to the powerbank. (Alternatively, plug the power adapter into the power board.)
+1. Plug in the powerbank cord to the powerbank. (Alternatively, plug the 19V power adapter into the power board.)
 2. Push the button on the power bank. The switches on the powerboard should now turn red.
 3. Turn ON the 12V switch. It should turn green. The LEDs on the powerboard should start displaying the idle pattern and a red LED on the TX2 should turn on.
 
@@ -125,16 +130,40 @@ These steps assumes that 12V power is already ON.
 
 Always check these things before leaving a SVEA!
 
+## Interfacing with the car
+The simplest way to interface with the car is to use an HDMI cable to connect the TX2 to a screen. 
+
+### Connecting to WiFi and using SSH
+When driving you can connect to the car over SSH.
+Start by connect your computer to the WiFi of the 4G modem on the car.
+If you are unsure if the 4G modem is turned on: take the modem out from the SVEA and press the big button. If nothing appears on the screen, try holding down the button for 5 seconds.
+
+You can find the SSID and password by first taking the modem out of the car, and then pressing the small button on top until the WiFI information  is shown on the screen.
+Once the 4G modem is on and your computer is connected to the 4G modem WiFi you should be able to connect to the svea by typing in __(replace # with the number of your car)__ `ssh nvidia@svea#.local`  in a terminal.
+
+You should also see the _listening to ROS on another computer_ section in the [README](../../README.md) for how to use the remote features of ROS.
+
 ## Common Problems
 
 ### Realsense T265 not found when launching localize.launch
-Unplug and plug back in the RS T265 USB cable. Due to a quirk with how the T265 starts, this will need to be done every time the TX2 is booted.
+Unplug and plug back in the RS T265 USB cable.
+Due to a quirk with how the T265 starts, this will need to be done every time the TX2 is booted.
 
 ### ESC LED blinks with a fast green light 
-Normal if the servo switch is OFF or no signal is sent from the SPMB. If a signal is being sent and the servos switch is green, the ESC has likely been calibrated incorrectly. See TRX-4 owner's manual for how to calibrate the ESC.
+Normal if the servo switch is OFF or no signal is sent from the SPMB.
+If a signal is being sent and the servos switch is green, the ESC has likely been calibrated incorrectly.
+See TRX-4 owner's manual for how to calibrate the ESC.
 
-### ESC LED is blinking with a slow red light
+### ESC LED is blinking with a slow red light or shines with a green light
 The ESC is in LiPo (different type of battery than what we are using) mode instead of NiMH mode and the under voltage protection has been triggered. See the TRX-4 owner's manual for how to switch the ESC to NiMH mode. 
 
 ### Remote LED is blinking with a slow red light
-Remote batteries are low on power. Replace the batteries in the remote.
+Remote batteries are low on power.
+Replace the batteries in the remote.
+
+### The 4G modem refuses to turn on
+The rechargable battery of the 4G modem is likely out of power.
+Try connecting the 4G modem to a USB port and push the button for 5 seconds.
+A charging symbol should appear on the screen.
+Let the modem charge for at least 15 minutes, unplug the USB cable and try pressing the button for 5 seconds again.
+The battery in the 4G modem will usually run out in a couple of days if it is left on and does not receive power from another device. 
