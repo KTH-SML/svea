@@ -1,0 +1,34 @@
+<launch>
+    <arg name="obstacles_list" default="$(find mpc_ca)/config/obstacles.yaml" />
+
+    <!-- Occupancy grid parameters -->
+    <arg name="og_width" default="100" />
+    <arg name="og_height" default="100" />
+    <arg name="og_resolution" default="0.2" />
+    <arg name="og_origin_x" default="0" />
+    <arg name="og_origin_y" default="0" />
+
+    <arg name="planner_algorithm" default="mpc" />
+    <arg name="use_rviz" default="true"/>
+
+    <group if="$(eval use_rviz == true)">
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find mpc_ca)/rviz/obstacle_sandbox.rviz" />
+    </group>
+
+    <node name="planner" pkg="mpc_ca" type="run_planner.py" output="screen">
+        <rosparam file="$(find mpc_ca)/config/planner.yaml" command="load" />
+        <rosparam file="$(arg obstacles_list)" command="load" />
+
+        <!-- Occupancy grid parameters -->
+        <param name="og_width" value="$(arg og_width)"/>
+        <param name="og_height" value="$(arg og_height)"/>
+        <param name="og_resolution" value="$(arg og_resolution)"/>
+        <param name="og_origin_x" value="$(arg og_origin_x)"/>
+        <param name="og_origin_y" value="$(arg og_origin_y)"/>
+
+        <param name="planner_algorithm" value="$(arg planner_algorithm)"/>
+
+        <remap from="~initial_state" to="/initialpose" />
+        <remap from="~goal_state" to="/move_base_simple/goal" />
+    </node>
+</launch>
