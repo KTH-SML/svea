@@ -9,7 +9,7 @@ import numpy as np
 from threading import Thread
 import rospy
 
-from svea_msgs.msg import lli_ctrl
+from svea_msgs.msg import lli_ctrl, lli_emergency
 from svea.states import SVEAControlValues
 from sim_lidar import SimLidar
 
@@ -52,6 +52,7 @@ class SimSVEA(object):
     """
 
     LOC_PUB_FREQ = 50 # Hz
+    CTRL_WAIT_TIME = 0.2 # s
     MAX_SPEED_0 = 1.7 # [m/s]
     MAX_SPEED_1 = 3.6 # [m/s]
     MAX_STEERING_ANGLE = 40*math.pi/180
@@ -75,6 +76,7 @@ class SimSVEA(object):
         self._state_topic = sub_namespace + 'state'
         self._request_topic = sub_namespace + 'lli/ctrl_request'
         self._actuated_topic = sub_namespace + 'lli/ctrl_actuated'
+        self._emergency_topic = sub_namespace + 'lli/emergency'
 
         if vehicle_name:
             self.vehicle_name = vehicle_name
@@ -91,16 +93,19 @@ class SimSVEA(object):
         self.publish_pose = publish_pose
         if self.publish_pose:
             self._pose_topic = sub_namespace + 'pose'
-
         self.publish_odometry = publish_odometry
         if self.publish_odometry:
             self._odometry_topic = sub_namespace + 'odometry/corrected'
+        self._last_pub_time = rospy.get_time()
 
         self.node_name = "simulated_" + self.vehicle_name
         self.is_pause = start_paused
         self.control_values = SVEAControlValues(0, 0, 0, False, False)
 
-        self._last_pub_time = rospy.get_time()
+        self._last_ctrl_time = rospy.get_time()
+
+        self.is_emergency = False
+        self.sender_id = None
 
         self._run_lidar = run_lidar
         if self._run_lidar:
@@ -134,6 +139,9 @@ class SimSVEA(object):
         rospy.Subscriber(self._request_topic,
                          lli_ctrl,
                          self._update_ctrl_request)
+        rospy.Subscriber(self._emergency_topic,
+                         lli_emergency,
+                         self._update_emergency)
         self._start_simulation()
 
     def _start_publish(self):
@@ -187,10 +195,18 @@ class SimSVEA(object):
                     + np.random.normal(0, self.STEER_NOISE_STD)
                 velocity = self._percent_to_vel(vel_percent) \
                     + np.random.normal(0, self.SPEED_NOISE_STD)
-                self.model.update(steering, velocity, self.dt)
+                if not self.is_emergency:
+                    if (curr_time - self._last_ctrl_time) < self.CTRL_WAIT_TIME:
+                        self.model.update(steering, velocity, self.dt)
+                else:
+                    self.model.update(steering, 0, self.dt)
+
+                # update lidar position
                 if self._run_lidar:
                     self.simulated_lidar.update_lidar_position(self.model.state)
-                if curr_time - self._last_pub_time > 1.0/self.LOC_PUB_FREQ:
+
+                # publish fake localization data
+                if (curr_time - self._last_pub_time) > 1.0/self.LOC_PUB_FREQ:
                     self.svea_state_pub.publish(self.current_state.state_msg)
                     if self.publish_pose:
                         self.pose_pub.publish(self.current_state.pose_msg)
@@ -200,9 +216,34 @@ class SimSVEA(object):
             rate.sleep()  # force update frequency to be realistic
 
     def _update_ctrl_request(self, ctrl_request_msg):
+        self._last_ctrl_time = rospy.get_time()
         changed = self.control_values.update_from_msg(ctrl_request_msg)
         if changed:
             self.ctrl_actuated_pub.publish(self.control_values.ctrl_msg)
+
+    @property
+    def emergency(self):
+        """Check if the emergency flag is set. Emulating actuation
+        interface emergency check.
+
+        :return: `True` if emergency flag is set, `False` otherwise,
+                 `None` if no information has been received.
+        :rtype: bool
+        """
+        return self.is_emergency
+
+    def _update_emergency(self, emergency_msg):
+        emergency = emergency_msg.emergency
+        sender_id = emergency_msg.sender_id
+        if self.is_emergency and (sender_id == self.sender_id):
+            # only one who stated emergency allowed to change it
+            if not emergency:
+                # this means sender is calling not emergency
+                self.is_emergency = False
+                self.sender_id = None
+        elif emergency:
+            self.is_emergency = True
+            self.sender_id = sender_id
 
     def _build_param_printout(self):
         param_str = "### {0} Simulation:\n".format(self.vehicle_name)
