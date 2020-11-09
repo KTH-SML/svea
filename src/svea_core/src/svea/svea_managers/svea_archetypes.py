@@ -193,7 +193,7 @@ class SVEAManager(object):
         :type velocity: float
         :return: Whether requested steering and velocity are safe or not
         and the primary reason why vehicle is unsafe
-        :rtype: bool
+        :rtype: bool, str
         """
         #TODO: report whether steering or velocity (or both) are the
         #      safety breaching factor
@@ -231,18 +231,22 @@ class SVEAManager(object):
                         last_state = rel_state
                         if result == "Unsafe" or result == "Ctrl Unsafe":
                             break
-            results = np.array(safe_check_results)
-            is_safe = np.logical_or(results == "Safe", results == "Ctrl Safer")
-            # check if all lidar points are safe
-            if not np.all(is_safe):
-                num_ctrl_unsafe = np.sum(results == "Ctrl Unsafe")
-                num_state_unsafe = np.sum(results == "Unsafe")
-                reason = "Requested control leads to unsafe state" \
-                         if num_ctrl_unsafe > num_state_unsafe \
-                         else "Point(s) detected by lidar are unsafe states"
+            if len(safe_check_results) != 0:
+                results = np.array(safe_check_results)
+                is_safe = np.logical_or(results == "Safe", results == "Ctrl Safer")
+                # check if all lidar points are safe
+                if not np.all(is_safe):
+                    num_ctrl_unsafe = np.sum(results == "Ctrl Unsafe")
+                    num_state_unsafe = np.sum(results == "Unsafe")
+                    reason = "Requested control leads to unsafe state" \
+                            if num_ctrl_unsafe > num_state_unsafe \
+                            else "Point(s) detected by lidar are unsafe states"
+                else:
+                    reason = "Vehicle is safe"
+                return np.all(is_safe), reason
             else:
-                reason = "Vehicle is safe"
-            return np.all(is_safe), reason
+                reason = "No points in range of lidar"
+                return True, reason
         return False, reason
 
     @property
