@@ -14,7 +14,7 @@ from svea.track import Track
 
 
 ## SIMULATION PARAMS ##########################################################
-vehicle_name = "SVEA"
+vehicle_name = ""
 target_velocity = 1.0 # [m/s]
 dt = 0.01 # frequency of the model updates
 
@@ -59,10 +59,8 @@ def main():
     # select data handler based on the ros params
     if use_rviz:
         DataHandler = RVIZPathHandler
-    elif use_matplotlib:
-        DataHandler = TrajDataHandler
     else:
-        DataHandler = BasicDataHandler
+        DataHandler = TrajDataHandler
 
     if is_sim:
         # start the simulation
@@ -93,7 +91,10 @@ def main():
 
         # compute control input via pure pursuit
         steering, velocity = svea.compute_control()
+        tic = rospy.get_time()
         svea.send_control(steering, velocity)
+        toc = rospy.get_time()
+        rospy.loginfo_throttle(0.5, toc-tic)
 
         # visualize data
         if use_matplotlib or use_rviz:
