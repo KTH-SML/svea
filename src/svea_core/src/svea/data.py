@@ -8,6 +8,7 @@ accessing, data visualizing, and saving data.
 
 import math
 import pickle
+from collections import deque
 import rospy
 from copy import deepcopy
 import matplotlib.pyplot as plt
@@ -22,7 +23,8 @@ from svea.simulators.viz_utils import (
     publish_path,
     publish_3Dcar,
     publish_target,
-    plot_car)
+    plot_car,
+    lists_to_pose_stampeds)
 
 __license__ = "MIT"
 __maintainer__ = "Frank Jiang"
@@ -264,11 +266,12 @@ class RVIZPathHandler(TrajDataHandler):
     :type traj_y: list
     """
 
-    TRAVEL_DIST_THRESH = 0.2
+    TRAVEL_DIST_THRESH = 0.1
+    PATH_MAX_LEN = 1000
 
     def __init__(self, vehicle_name='', traj_x=[], traj_y=[]):
         TrajDataHandler.__init__(self, vehicle_name, traj_x, traj_y)
-
+        self.past_path = deque(maxlen=self.PATH_MAX_LEN)
         self.sub_namespace = vehicle_name + '/' if vehicle_name else ''
         poly_topic = self.sub_namespace + "3D_car"
         self.car_poly_pub = \
@@ -319,7 +322,13 @@ class RVIZPathHandler(TrajDataHandler):
 
     def pub_path(self):
         """ Publish path """
-        publish_path(self.past_path_pub, self.x, self.y)
+        new_path = lists_to_pose_stampeds(self.x[-1:], self.y[-1:])
+        self.past_path += new_path
+        path = Path()
+        path.header.stamp = rospy.Time.now()
+        path.header.frame_id = 'map'
+        path.poses = self.past_path
+        self.past_path_pub.publish(path)
 
     def pub_target(self):
         """ Publish target """
