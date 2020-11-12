@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>mpc_ca</name>
+  <version>0.0.0</version>
+  <description>The MPC Collision Avoidance (mpc_ca) package</description>
+
+  <maintainer email="javier.cerna@pucp.pe">Javier Cerna</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+</package>

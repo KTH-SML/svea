@@ -7,7 +7,7 @@
     <arg name="is_sim" default="true"/>
     <arg name="map_file" default="$(find svea_core)/resources/maps/floor2.yaml" />
 
-    <group if="$(eval use_rviz == true)">
+    <group if="$(eval is_sim == true)">
         <node type="rviz" name="rviz" pkg="rviz" args="-d $(find svea_core)/resources/rviz/SVEA_floor2.rviz" />
     </group>
 

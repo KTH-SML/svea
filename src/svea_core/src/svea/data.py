@@ -53,6 +53,11 @@ class BasicDataHandler(object):
         self.ctrl_v = [0.0]
         self.ctrl_t = [rospy.get_time()]
 
+        # emergencies record
+        self.emergency_start_end = [] # 1 start, 0 end
+        self.emergency_reasons = []
+        self.emergency_t = []
+
         self._last_published_state = None
 
     @property
@@ -91,18 +96,30 @@ class BasicDataHandler(object):
         self.t.append(state.time_stamp)
 
     def log_ctrl(self, steering, v, t):
-        """ Log control input and time of control
+        """ Log control input and time of control at time of request
 
         :param steering: Steering input
         :type steering: float
         :param v: Velocity input
         :type v: float
-        :param t: Ttamp of control input
+        :param t: Timestamp of control input [s]
         :type t: float
         """
         self.ctrl_steer.append(steering)
         self.ctrl_v.append(v)
         self.ctrl_t.append(t)
+
+    def log_emergency(self, is_start, reason, t):
+        """ Log when emergencies are called and ended
+
+        :param is_start: Whether it's start of emergency or not
+        :type is_start: bool
+        :param t: Timestame of emergency [s]
+        :type t: float
+        """
+        self.emergency_start_end.append(int(is_start))
+        self.emergency_reasons.append(reason)
+        self.emergency_t.append(t)
 
     def plot_data(self):
         """ Plot data collected so far """

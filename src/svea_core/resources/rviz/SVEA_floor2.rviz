@@ -24,7 +24,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Lidar Point Cloud
+    SyncSource: Raw LiDAR
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -65,9 +65,9 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 1313
+      Max Intensity: 1678
       Min Color: 0; 0; 0
-      Min Intensity: 173
+      Min Intensity: 122
       Name: Raw LiDAR
       Position Transformer: XYZ
       Queue Size: 10
@@ -95,7 +95,7 @@ Visualization Manager:
       Color: 0; 170; 255
       Enabled: true
       Name: SVEA
-      Topic: /SVEA/3D_car
+      Topic: /3D_car
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -110,7 +110,7 @@ Visualization Manager:
       Shaft Length: 0.75
       Shaft Radius: 0.05000000074505806
       Shape: Arrow
-      Topic: /SVEA/vis_pose
+      Topic: /vis_pose
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -133,7 +133,7 @@ Visualization Manager:
       Radius: 0.029999999329447746
       Shaft Diameter: 0.10000000149011612
       Shaft Length: 0.10000000149011612
-      Topic: /SVEA/path_plan
+      Topic: /path_plan
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -143,7 +143,7 @@ Visualization Manager:
       History Length: 1
       Name: Target
       Radius: 0.20000000298023224
-      Topic: /SVEA/target
+      Topic: /target
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -166,7 +166,7 @@ Visualization Manager:
       Radius: 0.029999999329447746
       Shaft Diameter: 0.10000000149011612
       Shaft Length: 0.10000000149011612
-      Topic: /SVEA/past_path
+      Topic: /past_path
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -194,17 +194,17 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.05000000074505806
       Style: Flat Squares
-      Topic: /SVEA/viz_lidar_points
+      Topic: /viz_lidar_points
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /SVEA/viz_lidar_rays
+      Marker Topic: /viz_lidar_rays
       Name: Lidar Rays
       Namespaces:
-        "": true
+        {}
       Queue Size: 1
       Value: true
     - Alpha: 1
@@ -251,7 +251,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 14.331798553466797
+      Distance: 18.28129768371582
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -288,4 +288,4 @@ Window Geometry:
     collapsed: true
   Width: 1920
   X: 0
-  Y: 0
+  Y: 27
