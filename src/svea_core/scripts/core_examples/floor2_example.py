@@ -91,10 +91,7 @@ def main():
 
         # compute control input via pure pursuit
         steering, velocity = svea.compute_control()
-        tic = rospy.get_time()
         svea.send_control(steering, velocity)
-        toc = rospy.get_time()
-        rospy.loginfo_throttle(0.5, toc-tic)
 
         # visualize data
         if use_matplotlib or use_rviz:
