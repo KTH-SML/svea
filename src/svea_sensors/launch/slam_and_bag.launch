@@ -5,7 +5,7 @@
 
 <launch>
   <!-- <param name="use_sim_time" value="true"/> -->
-  <!-- Start default odometryand SLAM -->
+  <!-- Start default odometry and SLAM -->
   <arg name="xavier" default="false"/>
   <arg name="use_rs" default="false"/>
   <arg name="rviz" default="false"/>
@@ -19,7 +19,7 @@
   
   <!-- ROS bag -->
     <node pkg="rosbag" type="record" name="record" output="screen" args="-o /home/$(env USER)/bagfiles/ /rs/t265_camera/odom/sample
- /zed/zed_node/odom /scan /rosout /laser_status /imu/data /imu/raw/ /imu/status /imu/temp /Hokyoulidar/parameter_descriptions /Hokyoulidar/parameter_updates"/>
+ /zed/zed_node/odom /scan /rosout /laser_status /imu/data /imu/raw/ /imu/status /imu/temp /Hokyoulidar/parameter_descriptions /Hokyoulidar/parameter_updates /lli/ctrl_actuated"/>
   
 </launch>
 

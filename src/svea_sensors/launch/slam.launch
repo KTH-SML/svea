@@ -16,6 +16,7 @@
   </group>
   <group if="$(arg use_rs)">
     <include file="$(find svea_sensors)/launch/rs_odometry.launch">
+      <arg name="start_serial" value="true" />
       <arg name="xavier" value="$(arg xavier)"/>
     </include>
   </group>

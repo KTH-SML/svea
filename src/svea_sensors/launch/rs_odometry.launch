@@ -24,8 +24,8 @@
   <group ns="rs">
     <!-- Setings to turn of the SLAM capabilities of the RS T265 -->
     <rosparam>
-        realsense_camera/tracking_module/enable_relocalization: false
-        realsense_camera/tracking_module/enable_pose_jumping: false
+        realsense_camera/tracking_module/enable_relocalization: true
+        realsense_camera/tracking_module/enable_pose_jumping: true
         realsense_camera/tracking_module/hold_back_imu_for_frames: false
         realsense_camera/tracking_module/odom_frame_id: "odom"
     </rosparam>
