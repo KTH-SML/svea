@@ -164,7 +164,6 @@ class SimLidar(object):
         return self._obstacles
 
     def _update_visible_edges(self):
-        # TODO
         if self._last_visibility_pos is None:
             self._last_visibility_pos = self._lidar_position
         elif np.all(self._last_visibility_pos == self._lidar_position):
@@ -217,10 +216,6 @@ class SimLidar(object):
 
     def publish_viz_rays(self):
         publish_lidar_rays(self._viz_rays_pub, self._lidar_position, self.viz_points)
-
-    def publish_viz_edges(self):
-        # only for troubleshooting
-        publish_edges(self._viz_edges_pub, self._visible_edges)
 
 
 def beam_intersection(beam_and_edges):

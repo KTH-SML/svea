@@ -66,7 +66,7 @@ def main():
         # start the simulation
         model_for_sim = SimpleBicycleModel(start_pt)
         simulator = SimSVEA(vehicle_name, model_for_sim,
-                            dt=dt, start_paused=True).start()
+                            dt=dt, run_lidar=True, start_paused=True).start()
 
     # start pure pursuit SVEA manager
     svea = SVEAPurePursuit(vehicle_name,
@@ -75,10 +75,6 @@ def main():
                            traj_x, traj_y,
                            data_handler = DataHandler)
     svea.start(wait=True)
-
-    # start track handler
-    track = Track(vehicle_name, publish_track=True)
-    track.start()
 
     if is_sim:
         # start simulation

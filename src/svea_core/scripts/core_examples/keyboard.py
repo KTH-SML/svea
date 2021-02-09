@@ -50,7 +50,7 @@ def main():
         # start the simulation
         model_for_sim = SimpleBicycleModel(init_state)
         simulator = SimSVEA(vehicle_name, model_for_sim,
-                            dt=dt, run_lidar=True, start_paused=True).start()
+                            dt=dt, start_paused=True).start()
 
     # start manager of the simulated SVEA
     svea = SVEAManager(vehicle_name,
