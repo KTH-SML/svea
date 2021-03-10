@@ -106,9 +106,9 @@ def compute_spacings(leader, followers):
     return spacings
 
 
-def toggle_pause(leader, followers):
-    leader.toggle_pause_simulation()
-    [follower.toggle_pause_simulation() for follower in followers]
+def toggle_pause(leader_sim, follower_sims):
+    leader_sim.toggle_pause_simulation()
+    [follower_sim.toggle_pause_simulation() for follower_sim in follower_sims]
 
 
 def wait_for_platoon_states(leader, followers):

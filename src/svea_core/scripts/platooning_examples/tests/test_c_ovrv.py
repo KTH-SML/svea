@@ -4,6 +4,8 @@ import numpy as np
 from ..c_ovrv_utils import *
 from svea.svea_managers.path_following_sveas import SVEAPlatoonMember
 from svea.localizers import LocalizationInterface
+from svea.simulators.sim_SVEA import SimSVEA
+from svea.models.bicycle import SimpleBicycleModel
 from svea.data import RVIZPathHandler
 from svea.models.cooperative import C_OVRV
 
@@ -87,3 +89,15 @@ def test_compute_spacings():
     follower.state.y = 0.0
     spacings = compute_spacings(leader, [follower])
     assert spacings == [0.5 - BACKTOWHEEL - FRONTTOWHEEL]
+
+def test_toggle_pause():
+    rospy.init_node('test')
+    leader_sim = SimSVEA(SimpleBicycleModel())
+    follower_sim = SimSVEA(SimpleBicycleModel())
+    toggle_pause(leader_sim, [follower_sim])
+    assert leader_sim.is_pause
+    assert follower_sim.is_pause
+
+    toggle_pause(leader_sim, [follower_sim])
+    assert not leader_sim.is_pause
+    assert not follower_sim.is_pause
