@@ -75,3 +75,15 @@ def test_reached_steady_state():
     follower.state.v = 1.99
     at_steady_state = reached_steady_state(steady_vel, leader, [follower])
     assert at_steady_state
+
+def test_compute_spacings():
+    leader = SVEAPlatoonMember(LocalizationInterface, [], [],
+                               data_handler = RVIZPathHandler)
+    follower = SVEAPlatoonMember(LocalizationInterface, [], [],
+                               data_handler = RVIZPathHandler)
+    leader.state.x = 1.0
+    leader.state.y = 0.0
+    follower.state.x = 0.5
+    follower.state.y = 0.0
+    spacings = compute_spacings(leader, [follower])
+    assert spacings == [0.5 - BACKTOWHEEL - FRONTTOWHEEL]
