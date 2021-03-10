@@ -77,6 +77,9 @@
   <exec_depend>rosserial_server</exec_depend>
   <exec_depend>rosserial_msgs</exec_depend>
 
+  <test_depend>rostest</test_depend>
+  <test_depend>ros_pytest</test_depend>
+
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
