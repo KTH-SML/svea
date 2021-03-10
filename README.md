@@ -1,7 +1,7 @@
 # SVEA Starter Suite
 
 ### Quicklinks:
-- [SVEA website](svea.eecs.kth.se)
+- [SVEA website](https://svea.eecs.kth.se)
 - [Tutorials](https://github.com/KTH-SML/svea/blob/main/docs/tutorials/intro.md)
 - [Documentation](https://kth-sml.github.io/svea/)
 
