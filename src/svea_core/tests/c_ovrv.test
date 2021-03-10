@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="test_module" value="$(find svea_core)/scripts/platooning_examples"/>
+  <test test-name="test_c_ovrv" pkg="ros_pytest" type="ros_pytest_runner" />
+</launch>
