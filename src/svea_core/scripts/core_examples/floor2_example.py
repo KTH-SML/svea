@@ -10,11 +10,9 @@ from svea.controllers.pure_pursuit import PurePursuitController
 from svea.data import BasicDataHandler, TrajDataHandler, RVIZPathHandler
 from svea.models.bicycle import SimpleBicycleModel
 from svea.simulators.sim_SVEA import SimSVEA
-from svea.track import Track
 
 
 ## SIMULATION PARAMS ##########################################################
-vehicle_name = ""
 target_velocity = 1.0 # [m/s]
 dt = 0.01 # frequency of the model updates
 
@@ -65,12 +63,11 @@ def main():
     if is_sim:
         # start the simulation
         model_for_sim = SimpleBicycleModel(start_pt)
-        simulator = SimSVEA(vehicle_name, model_for_sim,
-                            dt=dt, run_lidar=True, start_paused=True).start()
+        simulator = SimSVEA(model_for_sim, dt=dt,
+                            run_lidar=True, start_paused=True).start()
 
     # start pure pursuit SVEA manager
-    svea = SVEAPurePursuit(vehicle_name,
-                           LocalizationInterface,
+    svea = SVEAPurePursuit(LocalizationInterface,
                            PurePursuitController,
                            traj_x, traj_y,
                            data_handler = DataHandler)

@@ -13,7 +13,6 @@ from svea.simulators.sim_SVEA import SimSVEA
 
 
 ## SIMULATION PARAMS ##########################################################
-vehicle_name = "SVEA"
 init_state = [0.0, 0.0, 0.0, 0.0] #[x, y, yaw, v], units: [m, m, rad, m/s]
 init_state = VehicleState(*init_state)
 dt = 0.01
@@ -49,12 +48,10 @@ def main():
     if is_sim:
         # start the simulation
         model_for_sim = SimpleBicycleModel(init_state)
-        simulator = SimSVEA(vehicle_name, model_for_sim,
-                            dt=dt, start_paused=True).start()
+        simulator = SimSVEA(model_for_sim, dt=dt, start_paused=True).start()
 
     # start manager of the simulated SVEA
-    svea = SVEAManager(vehicle_name,
-                       LocalizationInterface,
+    svea = SVEAManager(LocalizationInterface,
                        KeyboardDummyController)
     svea.start(wait=True)
 

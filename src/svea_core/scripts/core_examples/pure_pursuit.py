@@ -13,7 +13,6 @@ from svea.simulators.sim_SVEA import SimSVEA
 
 
 ## SIMULATION PARAMS ##########################################################
-vehicle_name = "SVEA"
 init_state = [0.0, 0.0, 0.0, 0.0] #[x, y, yaw, v], units: [m, m, rad, m/s]
 init_state = VehicleState(*init_state)
 target_velocity = 0.6 # [m/s]
@@ -40,12 +39,10 @@ def main():
     if is_sim:
         # start the simulation
         model_for_sim = SimpleBicycleModel(init_state)
-        simulator = SimSVEA(vehicle_name, model_for_sim,
-                            dt=dt, start_paused=True).start()
+        simulator = SimSVEA(model_for_sim, dt=dt, start_paused=True).start()
 
     # start pure pursuit SVEA manager
-    svea = SVEAPurePursuit(vehicle_name,
-                           LocalizationInterface,
+    svea = SVEAPurePursuit(LocalizationInterface,
                            PurePursuitController,
                            traj_x, traj_y)
     svea.start(wait=True)

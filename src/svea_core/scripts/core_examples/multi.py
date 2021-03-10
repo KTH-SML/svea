@@ -46,21 +46,21 @@ def main():
     if is_sim:
         # start the simulation
         model_for_sim0 = SimpleBicycleModel(init_state0)
-        simulator0 = SimSVEA(vehicle_name0, model_for_sim0,
+        simulator0 = SimSVEA(model_for_sim0, vehicle_name=vehicle_name0,
                              dt=dt, start_paused=True).start()
         model_for_sim1 = SimpleBicycleModel(init_state1)
-        simulator1 = SimSVEA(vehicle_name1, model_for_sim1,
+        simulator1 = SimSVEA(model_for_sim1, vehicle_name=vehicle_name1,
                              dt=dt, start_paused=True).start()
 
     # initialize pure pursuit SVEA managers
-    svea0 = SVEAPurePursuit(vehicle_name0,
-                            LocalizationInterface,
+    svea0 = SVEAPurePursuit(LocalizationInterface,
                             PurePursuitController,
-                            traj_x, traj_y)
-    svea1 = SVEAPurePursuit(vehicle_name1,
-                            LocalizationInterface,
+                            traj_x, traj_y,
+                            vehicle_name=vehicle_name0)
+    svea1 = SVEAPurePursuit(LocalizationInterface,
                             PurePursuitController,
-                            traj_x, traj_y)
+                            traj_x, traj_y,
+                            vehicle_name=vehicle_name1)
     svea0.start(wait=True)
     svea1.start(wait=True)
 
