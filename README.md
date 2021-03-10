@@ -1,5 +1,10 @@
 # SVEA Starter Suite
 
+### Quicklinks:
+- [SVEA website](svea.eecs.kth.se)
+- [Tutorials](https://github.com/KTH-SML/svea/blob/main/docs/tutorials/intro.md)
+- [Documentation](https://kth-sml.github.io/svea/)
+
 ## A short description
 This repo contains a basic library of python objects and scripts to make
 development on the Small-Vehicles-for-Autonomy (SVEA) platform simpler
@@ -25,21 +30,6 @@ yourself.
 
 To read up on OOP, check out Real Python's
 [introduction on OOP](https://realpython.com/python3-object-oriented-programming/).
-Focus on understanding why OOP exists and how it is used in Python, not
-necessarily how to create new classes themselves.
-
-## Reporting Issues
-The **preferred** way to handle issues is for you to submit issues with the issue
-functionality at the top of this page. This allows for a couple benefits:
-
-1. other users will be able to  answer questions they have the solution to
-2. ensure questions are visible to all, so anyone else with the same question
-can find the answer right away
-3. to tie in version control into the issue handling
-
-This also means that it is good to check the issues page carefully before
-posting a new issue, in case someone else has also asked the same question
-before.
 
 # Installation
 
@@ -83,19 +73,19 @@ sudo apt upgrade
 before continuing onto installing the library.
 
 ## Installing the library
-Start by going to the folder where you want the code to sit using terminal.
+Start by going to the folder where you want the code to reside.
 For example, choose the home directory or a directory for keeping projects in.
 Once you are in the chosen directory, use the command:
 
 ```bash
-git clone https://github.com/KTH-SML/svea_starter
+git clone https://github.com/KTH-SML/svea
 ```
 
 to download the library. Then, a new directory will appear called
-`./svea_starter`. Go into the directory with command:
+`./svea`. Go into the directory with command:
 
 ```bash
-cd svea_starter
+cd svea
 ```
 
 To install all of the ROS dependencies that you are missing for this library run:
@@ -113,11 +103,11 @@ rospack profile
 ```
 
 To make sure the libraries are linked in the future, also call (**you need to replace
-`<path-to-svea-starter>` with the file path to whever you cloned "svea_starter", e.g.
-`/home/nvidia/svea_starter/devel/setup.bash`**):
+`<path-to-svea>` with the file path to whever you cloned "svea_starter", e.g.
+`/home/nvidia/svea/devel/setup.bash`**):
 
 ```bash
-echo "source <path-to-svea-starter>/devel/setup.bash" >> ~/.bashrc
+echo "source <path-to-svea>/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -134,12 +124,12 @@ The intended workflow with the code base is as follows:
 The simulated vehicles provide identical interfaces and information patterns
 to the real SVEA cars, thus by following this workflow, development work
 should always start in simulation and code can be directly ported to the real
-cars with little effort. However, this does not mean the code will work on a
+cars. However, this does not mean the code will work on a
 real vehicle without further tuning or changes.
 
 There are three pre-written scripts to serve as examples of how to use the
-code base. See and read the source code in
-`svea_starter/src/svea_core/scripts/core_examples`.
+core library. See and read the source code in
+`svea_core/scripts/core_examples`.
 
 You can try them out by running one of the two commands:
 
@@ -161,7 +151,7 @@ roslaunch svea_core pure_pursuit.launch
 
 where you should see something that looks like:
 
-![key-teleop example](./media/purepursuit.png)
+![purepursuit example](./media/purepursuit.png)
 
 To run a more involved example, call:
 
@@ -179,9 +169,6 @@ Now you are ready to read through the tutorials! You can find them in `svea_star
 
 **Note, you only have to follow this section when running the real cars!**
 
-Since the simulated SVEA cars are built to function very similarly to the real
-SVEA cars, the transfer from simulation to real vehicles is fairly simple!
-
 ### Adding the low-level interface
 
 To your roslaunch file, add
@@ -193,9 +180,6 @@ To your roslaunch file, add
     <param name="baud" value="250000"/>
 </node>
 ```
-
-Then, you just have model mismatch to deal with.
-
 
 ### Running localization on the real SVEA
 
@@ -228,35 +212,3 @@ You can test if this worked by launching something on the SVEA car in the same t
 3. you can add the contents of ```export_ros_ip.sh``` directly to the end of your ```~/.bashrc```,
 
 or some other preferred approach.
-
-## Documentation
-
-There is documentation available for the current SVEA API. To access it open
-docs/\_build/index.html in your favorite browser.
-
-# Contributing
-
-Interested in contributing to the code or features?
-
-Start by emailing:
-
-frankji@kth.se
-
-Adding stable and properly stylized code to an existing code base is a regular
-task for professional engineers in the tech world and is often a skill that is
-evaluated in programming interviews.
-
-To learn how to program and style Python code, refer to the following
-standardized style guide:
-
-[PEP 8 -- Style Guide for Python](https://www.python.org/dev/peps/pep-0008/#introduction)
-
-**TL;DR - "code is read much more often than it is written" -Guido/Pep 8, use
-4-space indents, each line must have < 80 characters (IMO), no uneccesary
-whitespace, use good naming systems, be readable, be logical.**
-
-As usual, practice makes perfect! Style guides take a little time to get used
-to, but once you overcome the learning curve, the rewards are worth it.
-If you are interested, consider using the SVEA code base to practice, as the
-style checking on contributions will be strict to ensure the code base is clean
-and user-friendly.
