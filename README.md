@@ -212,3 +212,10 @@ You can test if this worked by launching something on the SVEA car in the same t
 3. you can add the contents of ```export_ros_ip.sh``` directly to the end of your ```~/.bashrc```,
 
 or some other preferred approach.
+
+# Testing
+This repository is using pytests through the ros-pytests framework. To run the available tests, run
+```bash
+catkin run_tests
+```
+which will run any linked tests in each ROS package's CMakeList.txt
