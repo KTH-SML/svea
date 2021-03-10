@@ -1,8 +1,11 @@
-from ..c_ovrv_utils import *
-from svea.svea_managers.path_following_sveas import SVEAPlatoonMember
-from svea.models.cooperative import C_OVRV
+import rospy
 import math
 import numpy as np
+from ..c_ovrv_utils import *
+from svea.svea_managers.path_following_sveas import SVEAPlatoonMember
+from svea.localizers import LocalizationInterface
+from svea.data import RVIZPathHandler
+from svea.models.cooperative import C_OVRV
 
 def test_rotate2D_from_tuple():
     xy = (1.0, 0.0)
@@ -48,3 +51,27 @@ def test_collect_platoon_pts():
     assert xs == [math.sqrt(2.0)/2 * 2, math.sqrt(2.0)/2 * 1]
     assert ys == [math.sqrt(2.0)/2 * 2, math.sqrt(2.0)/2 * 1]
     assert yaws == [math.radians(45), math.radians(45)]
+
+def test_not_reached_steady_state():
+    rospy.init_node('test')
+    steady_vel = 2.0
+    leader = SVEAPlatoonMember(LocalizationInterface, [], [],
+                               data_handler = RVIZPathHandler)
+    follower = SVEAPlatoonMember(LocalizationInterface, [], [],
+                                 data_handler = RVIZPathHandler)
+    leader.state.v = 0.5
+    follower.state.v = 0.5
+    at_steady_state = reached_steady_state(steady_vel, leader, [follower])
+    assert not at_steady_state
+
+def test_reached_steady_state():
+    rospy.init_node('test')
+    steady_vel = 2.0
+    leader = SVEAPlatoonMember(LocalizationInterface, [], [],
+                               data_handler = RVIZPathHandler)
+    follower = SVEAPlatoonMember(LocalizationInterface, [], [],
+                                 data_handler = RVIZPathHandler)
+    leader.state.v = 1.99
+    follower.state.v = 1.99
+    at_steady_state = reached_steady_state(steady_vel, leader, [follower])
+    assert at_steady_state
