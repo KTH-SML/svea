@@ -28,3 +28,15 @@ def test_compute_offset():
     offset = compute_offset(spacing, heading)
     np.testing.assert_almost_equal(offset,
         np.array([math.sqrt(2.0)/2, math.sqrt(2.0)/2, 0, 0]))
+
+def test_compute_positions():
+    vehicle_pt = [0.0, 0.0, math.radians(45), 0.0]
+    spacing = 1.0 - BACKTOWHEEL - FRONTTOWHEEL
+    spacings = [spacing, spacing]
+    leader_pt, follower_pts = compute_positions_from_spacings(vehicle_pt, spacings)
+    correct_leader_pt = [math.sqrt(2.0)/2 * 2, math.sqrt(2.0)/2 * 2, math.radians(45), 0.0]
+    correct_follower0_pt = [math.sqrt(2.0)/2 * 1, math.sqrt(2.0)/2 * 1, math.radians(45), 0.0]
+    correct_follower1_pt = [0.0, 0.0, math.radians(45), 0.0]
+    np.testing.assert_almost_equal(leader_pt, correct_leader_pt)
+    np.testing.assert_almost_equal(follower_pts[0], correct_follower0_pt)
+    np.testing.assert_almost_equal(follower_pts[1], correct_follower1_pt)
