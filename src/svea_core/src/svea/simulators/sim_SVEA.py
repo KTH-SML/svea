@@ -8,7 +8,8 @@ import math
 import numpy as np
 from threading import Thread
 import rospy
-
+import tf2_ros
+from geometry_msgs.msg import TransformStamped
 from svea_msgs.msg import lli_ctrl, lli_emergency
 from svea.states import SVEAControlValues
 from sim_lidar import SimLidar
@@ -29,14 +30,14 @@ class SimSVEA(object):
     SVEA low-level system uses and even publishes actuated control to
     the same topic as the low-level system.
 
-    :param vehicle_name: Name of vehicle, etc. SVEA0, used for creating
-                         ROS topic names
-    :type vehicle_name: str
     :param initialized_model: Model to use as pretend SVEA vehicle. The
                               only requirements on the model is that it
                               has an 'update' method that takes a
                               steering angle and a velocity as inputs
     :type initialized_model: Model
+    :param vehicle_name: Name of vehicle, etc. SVEA0, used for creating
+                         ROS topic names, defaults to ''
+    :type vehicle_name: str
     :param dt: Sampling time in [s]
     :type dt: float
     :param start_paused: Start simulation paused
@@ -64,11 +65,12 @@ class SimSVEA(object):
     PERC_TO_LLI_COEFF = 1.27
 
     def __init__(self,
-                 vehicle_name,
                  initialized_model,
+                 vehicle_name='',
                  dt=0.02,
                  start_paused=False,
                  run_lidar=False,
+                 publish_tf = True,
                  publish_pose=False,
                  publish_odometry=False):
 
@@ -84,12 +86,20 @@ class SimSVEA(object):
             namespace = rospy.get_namespace()
             self.vehicle_name = namespace.split('/')[-2]
 
+        self._map_frame_id = 'map'
+        self._odom_frame_id = sub_namespace + 'odom'
+        self._base_link_frame_id = sub_namespace + 'base_link'
+
         self.model = initialized_model
         self.dt = dt
         self.current_state = self.model.state
-        self.current_state.frame_id = 'map'
-        self.current_state.child_frame_id = sub_namespace + 'base_link'
+        self.current_state.frame_id = self._map_frame_id
+        self.current_state.child_frame_id = self._base_link_frame_id
 
+        self.publish_tf = publish_tf
+        if self.publish_tf:
+            # for broadcasting fake tf tree
+            self.tf_br = tf2_ros.TransformBroadcaster()
         self.publish_pose = publish_pose
         if self.publish_pose:
             self._pose_topic = sub_namespace + 'pose'
@@ -208,12 +218,34 @@ class SimSVEA(object):
                 # publish fake localization data
                 if (curr_time - self._last_pub_time) > 1.0/self.LOC_PUB_FREQ:
                     self.svea_state_pub.publish(self.current_state.state_msg)
+                    if self.publish_tf:
+                        self._broadcast_tf()
                     if self.publish_pose:
                         self.pose_pub.publish(self.current_state.pose_msg)
                     if self.publish_odometry:
                         self.odometry_pub.publish(self.current_state.odometry_msg)
                     self._last_pub_time = rospy.get_time()
             rate.sleep()  # force update frequency to be realistic
+
+    def _broadcast_tf(self):
+        map2odom = TransformStamped()
+        map2odom.header.stamp = self.current_state.pose_msg.header.stamp
+        map2odom.header.frame_id = self._map_frame_id
+        map2odom.child_frame_id = self._odom_frame_id
+        map2odom.transform.rotation.w = 1.0
+        self.tf_br.sendTransform(map2odom)
+
+        odom2base = TransformStamped()
+        odom2base.header.stamp = self.current_state.pose_msg.header.stamp
+        odom2base.header.frame_id = self._odom_frame_id
+        odom2base.child_frame_id = self._base_link_frame_id
+        pose = self.current_state.pose_msg.pose.pose
+        odom2base.transform.translation.x = pose.position.x
+        odom2base.transform.translation.y = pose.position.y
+        odom2base.transform.translation.z = pose.position.z
+        odom2base.transform.rotation = pose.orientation
+        self.tf_br.sendTransform(odom2base)
+
 
     def _update_ctrl_request(self, ctrl_request_msg):
         self._last_ctrl_time = rospy.get_time()
