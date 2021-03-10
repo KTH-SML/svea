@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="vehicle_name" default='SVEA'/>
+    <arg name="is_sim" default="true"/>
+    <arg name="use_rviz" default="true"/>
+    <arg name="start_pt" default= '-8.01, -16.2, 0.9877181, 0.0'/>
+    <arg name="path_plan" default="-2.05,-6.87;14.8,18.2" />
+    <arg name="map_file" default="$(find svea_core)/resources/maps/floor2.yaml" />
+
+    <group if="$(eval is_sim == true)">
+        <node type="rviz" name="rviz" pkg="rviz" args="-d $(find svea_core)/resources/rviz/c_ovrv.rviz" />
+    </group>
+    <node pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map_file)" />
+
+    <node pkg="svea_core" type="c_ovrv_example.py" name="c_ovrv_example" output="screen">
+        <param name="start_pt" value="$(arg start_pt)"/>
+        <param name="use_rviz" value="$(arg use_rviz)"/>
+    </node>
+</launch>
