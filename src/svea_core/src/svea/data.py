@@ -44,6 +44,8 @@ class BasicDataHandler(object):
 
     def __init__(self, vehicle_name=''):
         self.vehicle_name = vehicle_name
+        self.start_time = rospy.get_time()
+
         self.x = []
         self.y = []
         self.yaw = []
@@ -53,7 +55,7 @@ class BasicDataHandler(object):
         # start with zeros since SVEA does this at launch
         self.ctrl_steer = [0.0]
         self.ctrl_v = [0.0]
-        self.ctrl_t = [rospy.get_time()]
+        self.ctrl_t = [0.0]
 
         # emergencies record
         self.emergency_start_end = [] # 1 start, 0 end
@@ -95,7 +97,7 @@ class BasicDataHandler(object):
         self.y.append(state.y)
         self.yaw.append(state.yaw)
         self.v.append(state.v)
-        self.t.append(state.time_stamp)
+        self.t.append(state.time_stamp.to_sec()-self.start_time)
 
     def log_ctrl(self, steering, v, t):
         """ Log control input and time of control at time of request
@@ -109,7 +111,7 @@ class BasicDataHandler(object):
         """
         self.ctrl_steer.append(steering)
         self.ctrl_v.append(v)
-        self.ctrl_t.append(t)
+        self.ctrl_t.append(t-self.start_time)
 
     def log_emergency(self, is_start, reason, t):
         """ Log when emergencies are called and ended

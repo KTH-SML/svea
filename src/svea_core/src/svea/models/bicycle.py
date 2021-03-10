@@ -33,16 +33,8 @@ class SimpleBicycleModel(object):
     based on the set sampling time and the embedded bicycle model.
     Units are [m, rad, s, m/s]
 
-    :param x: Initial x position, defaults to 0.0
-    :type x: float
-    :param y: Initial y position, defaults to 0.0
-    :type y: float
-    :param yaw: Initial yaw, defaults to 0.0
-    :type yaw: float
-    :param v: Initial velocity, defaults to 0.0
-    :type v: float
-    :param dt: Sampling time for dynamics update, defaults to 0.1
-    :type dt: float
+    :param state: Initial state of model, defaults to origin
+    :type state: VehicleState
     """
 
     L = 0.32
@@ -54,6 +46,7 @@ class SimpleBicycleModel(object):
         """ Initialize state. """
         self.state = state
         self.steering = 0
+        self.state.time_stamp = rospy.get_rostime()
 
     def __repr__(self):
         return self.state.__repr__()
