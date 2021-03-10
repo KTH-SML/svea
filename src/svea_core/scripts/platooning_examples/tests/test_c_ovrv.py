@@ -40,3 +40,11 @@ def test_compute_positions():
     np.testing.assert_almost_equal(leader_pt, correct_leader_pt)
     np.testing.assert_almost_equal(follower_pts[0], correct_follower0_pt)
     np.testing.assert_almost_equal(follower_pts[1], correct_follower1_pt)
+
+def test_collect_platoon_pts():
+    leader_pt = [math.sqrt(2.0)/2 * 2, math.sqrt(2.0)/2 * 2, math.radians(45), 0.0]
+    follower_pts = [[math.sqrt(2.0)/2 * 1, math.sqrt(2.0)/2 * 1, math.radians(45), 0.0]]
+    xs, ys, yaws = collect_platoon_pts(leader_pt, follower_pts)
+    assert xs == [math.sqrt(2.0)/2 * 2, math.sqrt(2.0)/2 * 1]
+    assert ys == [math.sqrt(2.0)/2 * 2, math.sqrt(2.0)/2 * 1]
+    assert yaws == [math.radians(45), math.radians(45)]
