@@ -18,9 +18,8 @@ The SVEA platform consists of the following hardware components:
 8. [NVIDIA TX2](https://developer.nvidia.com/buy-jetson?product=jetson_tx2&location=US)
 
 As described in the diagram above, the TX2 is the main computer where all sensor
-data goes and where all high-level decision+control is made. This is where most
-of your work will occur. The TX2 runs NVIDIA's JetPack SDK which includes their
-implementation of Ubuntu 18.04 for ARM.
+data goes and where all high-level decision+control is made. The TX2 runs NVIDIA's
+JetPack SDK which includes their implementation of Ubuntu 18.04 for ARM.
 
 The original RC remote still works to control the chassis, with some additional
 features added on. In particular, in addition to the RC remote's standard
@@ -79,9 +78,7 @@ requirements.
 
 In general, many of the basic funcions needed on the SVEA platform have
 convenient python interfaces. You can see them in
-`svea_research/src/svea_core/src/svea/`. For an extensive documentation of the
-library, checkout the documentation by opening
-`svea_research/docs/library/_build/index.html` in your favorite browser.
+`svea_core/src/svea/`.
 
 For the SVEA platform's library, we have focused on wrapping ROS-related tasks
 with clean python interface objects. To handle ROS' asynchronous nature, we
@@ -94,7 +91,7 @@ of these object's callbacks run on a separate thread, we can run the interface
 objects in the same thread and access all of their data from one script. This
 has many benefits, but the most important ones are:
 1. We can program/script in the more common Python OOP style, instead of
-   conforming to the typical style of designing a web of ROS nodes
+   conforming to the traditional rospy style of designing a web of ROS nodes
 2. We can do a task with a single script
 3. We only need to debug from a single script
 4. We can actually use debuggers like `pdb` in this single script
@@ -164,9 +161,9 @@ flexible folder that contains whatever scripts or files that are needed for a
 project that do not get put into a separate repository. Explicitly, if you are
 working on a new project with the SVEA platform, then do one of the two options:
 1. If your work fits nicely into the structure of the svea_core ROS package,
-   create a directory in `svea_research/src/svea_core/scripts`
+   create a directory in `src/svea_core/scripts`
 2. If your work requires it's own ROS package structure, create a ROS package in
-   `svea_research/src`
+   `src` on the same level as `svea_core`.
 
 In general, we recommend you start with adding a directory within the
 `svea_core` package and working from there, but if you find that this is too

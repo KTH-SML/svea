@@ -46,7 +46,7 @@ velocity compares with the `target_velocity` that is set in:
 
 `svea_core/scripts/core_examples/pure_pursuit.py'`.
 
-Some of you might find it strange that the velocity is offset and a little noisy
+You might find it strange that the velocity is offset and a little noisy
 in simulation. This is an intentional feature of the simulation. While we cannot
 hope to identically replicate the disturbances and model mismatch that happens
 on the real vehicle, we have recreated some basic phenomenon that affect the
@@ -149,16 +149,12 @@ trajectory, try launching `floor2.launch` again and make sure that the polygon
 of the vehicle doesn't intersect with a wall at any point.
 
 The process of choosing a trajectory is fairly inconvenient, however, you should
-not have to do it often. In order to handle unexpected obstacles, you will need
-to develop a planner to automatically generate plans in real-time. However, this
+not have to do it often. Ideally, you should be using a planner to automatically
+generate planned trajectories for you in real-time. However, this
 initial trajectory should serve as a good baseline that you can use to test
 other parts of your automation pipeline.
 
 ## Testing the solution
-
-**Note, it's best to do this part of the tutorial under the supervision of
-either Frank or Tobias.** We include it here in text so that you can read about
-what will happen in this part of the tutorial and plan ahead accordingly.
 
 Finally, you are ready to try out your initial solution on the real vehicles! To
 do this, start out by carefully reading the "Going from simulation to real"

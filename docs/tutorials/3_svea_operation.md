@@ -1,17 +1,18 @@
+<!--TODO: move some of the commented out instructions to a course tutorial-->
 # SVEA car instructions
-This document contains intructions for to work with the SVEA platform. 
+This document contains instructions for working with the SVEA platform. 
 
 __If you have an issue, please check the Common Problems section at the bottom.__
 
 First are the basic rules that should always be followed when working with the cars. The second section is a description of some of the components of the car followed by: startup and shut down procedures, instructions for how to interface with the car and finally some common problems and solutions.
 
-## Basic rules for working with the cars
+## Basic tips for working with the cars
 
 * Always keep the wheels of the table or on the floor when you turn on the ESC.
-* Do not modify the cars to enhance their performance without contacting Tobias first. Adjusting the suspension is the exception to this rule.
-* Do not "borrow" parts from other teams cars to replace ones that you suspect are broken on your own. Ask Frank or Tobias for support first.
+<!--* Do not modify the cars to enhance their performance without contacting Tobias first. Adjusting the suspension is the exception to this rule.-->
+<!--* Do not "borrow" parts from other teams cars to replace ones that you suspect are broken on your own. Ask Frank or Tobias for support first.-->
 * Someone should always be ready with the remote override when the car is driving autonomosly.
-* __Always unplug all charging batteries if you are the last person to leave the project room for the day!__
+<!--* __Always unplug all charging batteries if you are the last person to leave the project room for the day!__-->
 
 
 ## SVEA components and terminology

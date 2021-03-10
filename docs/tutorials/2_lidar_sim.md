@@ -1,7 +1,7 @@
 # Lidar Simulation tutorial
 
 In this tutorial, we will introduce the lidar simulation pipeline that is
-available to you. The lidar simulation we have implemented relies on predefining
+available in this repo. The lidar simulation we have implemented relies on predefining
 all the obstacles you want the lidar to emulate as polygons. To do this, you
 need to edit the configuration file: `svea_core/resources/param/obstacles.yaml`.
 In there you will see a list of polygon vertices listed in either clockwise or
@@ -95,5 +95,5 @@ the `rostopic` command.
 
 If the data is successfully publishing to the ROS network, then the SVEA manager
 will already be receiving it. Knowing this, try and figure out how to use the
-scan data from your project script (e.g. from `team_X_floor2.py`) and print out
+scan data from your project script and print out
 the closest point in the scan to the vehicle.
