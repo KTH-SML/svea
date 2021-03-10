@@ -4,18 +4,12 @@
 Module containing archetypal SVEA manager classes.
 """
 
-from math import cos, sin, sqrt
 from copy import deepcopy
-from random import randint
-import numpy as np
 
 import rospy
-from svea_msgs.msg import lli_emergency
 from svea.actuation import ActuationInterface
 from svea.sensors import Lidar
-from svea.states import VehicleState
 from svea.data import BasicDataHandler
-from svea.models.bicycle import SimpleBicycleModel
 
 __license__ = "MIT"
 __maintainer__ = "Frank Jiang"
@@ -36,9 +30,6 @@ class SVEAManager(object):
     interfaces since the main functionality is performed elsewhere in
     another ROS node.
 
-    :param vehicle_name: Name of vehicle; used to initialize each
-                         software module.
-    :type vehicle_name: str
     :param localizer: A chosen localization interface class constructor
     :type localizer: class
     :param controller: A chosen controller class constructor
@@ -49,14 +40,18 @@ class SVEAManager(object):
     :param data_handler: A chosen data handler class constructor,
                          defaults to BasicDataHandler
     :type data_handler: class
+    :param vehicle_name: Name of vehicle; used to initialize each
+                         software module, defaults to ''
+    :type vehicle_name: str
     """
 
     MAX_WAIT = 1.0/10.0 # no slower than 10Hz
     SAFETY_HORIZON = 1.0 # look one second ahead to check safety
 
-    def __init__(self, vehicle_name, localizer, controller,
+    def __init__(self, localizer, controller,
                        actuation=ActuationInterface,
-                       data_handler=BasicDataHandler):
+                       data_handler=BasicDataHandler,
+                       vehicle_name=''):
 
         self.vehicle_name = vehicle_name
         sub_namespace = vehicle_name + '/' if vehicle_name else ''
