@@ -4,6 +4,8 @@
 - [SVEA website](https://svea.eecs.kth.se)
 - [Tutorials](https://github.com/KTH-SML/svea/blob/main/docs/tutorials/intro.md)
 - [Documentation](https://kth-sml.github.io/svea/)
+- [Sim to Real Tips](https://github.com/KTH-SML/svea#going-from-simulation-to-real)
+- [Testing](https://github.com/KTH-SML/svea#testing)
 
 ## A short description
 This repo contains a basic library of python objects and scripts to make
