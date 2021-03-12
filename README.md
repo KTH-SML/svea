@@ -3,7 +3,6 @@
 ### Quicklinks:
 - [SVEA website](https://svea.eecs.kth.se)
 - [Tutorials](https://github.com/KTH-SML/svea/blob/main/docs/tutorials/intro.md)
-- [Documentation](https://kth-sml.github.io/svea/)
 - [Sim to Real Tips](https://github.com/KTH-SML/svea#going-from-simulation-to-real)
 - [Testing](https://github.com/KTH-SML/svea#testing)
 
@@ -214,6 +213,9 @@ You can test if this worked by launching something on the SVEA car in the same t
 3. you can add the contents of ```export_ros_ip.sh``` directly to the end of your ```~/.bashrc```,
 
 or some other preferred approach.
+
+# Documentation
+After cloning the repository, you can open the core library's documentation by opening `docs/library/_build/index.html` in your favorite browser.
 
 # Testing
 This repository is using pytests through the ros-pytests framework. To run the available tests, run
