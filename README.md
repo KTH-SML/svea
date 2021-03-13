@@ -2,7 +2,7 @@
 
 ### Quicklinks:
 - [SVEA website](https://svea.eecs.kth.se)
-- [Tutorials](https://github.com/KTH-SML/svea/blob/main/docs/tutorials/intro.md)
+- [Tutorials](https://github.com/KTH-SML/svea/tree/main/docs/tutorials)
 - [Sim to Real Tips](https://github.com/KTH-SML/svea#going-from-simulation-to-real)
 - [Testing](https://github.com/KTH-SML/svea#testing)
 
