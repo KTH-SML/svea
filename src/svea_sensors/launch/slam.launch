@@ -4,13 +4,13 @@
 -->
 
 <launch>
-  <!-- Start default odometry -->
+  <!-- Start odometry -->
   
   <arg name="xavier" default="false"/>
-  <arg name="use_rs" default="false"/>
+  <arg name="use_rs" default="true"/>
   
   <group unless="$(arg use_rs)">
-    <include file="$(find svea_sensors)/launch/default_odometry.launch">
+    <include file="$(find svea_sensors)/launch/zed_odometry.launch">
       <arg name="xavier" value="$(arg xavier)"/>
     </include>            
   </group>

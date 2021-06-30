@@ -1,4 +1,4 @@
-#include "watchdog/watchdog.h"
+#include <imu_bno055/watchdog.h>
 
 namespace watchdog {
 

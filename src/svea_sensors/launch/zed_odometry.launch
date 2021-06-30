@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <!--
-    Default odometry launch file
+    Zed based odometry launch file
 -->
-
 
 <launch>
   <arg name="xavier" default="false"/>
@@ -39,7 +38,7 @@
   
   <!-- Robot localization-->
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
-    <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/default_ekf.yaml" />
+    <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/zed_ekf.yaml" />
     <param name="imu0" value="/imu/data"/>
     <param name="odom0" value="/zed/zed_node/odom"/>
     <!--  Placeholder for output topic remapping
@@ -49,7 +48,7 @@
   </node>
   
   <!-- Hokuyo LIDAR -->
-  <arg name="ip_address"             default="192.168.3.11" /> <!-- <arg name="svo_file" default="path/to/svo/file.svo"> -->
+  <arg name="ip_address" default="192.168.3.11" /> <!-- <arg name="svo_file" default="path/to/svo/file.svo"> -->
   <node pkg="urg_node" type="urg_node" name="Hokyoulidar">
     <param name="ip_address"    value="$(arg ip_address)" />
     <param name="frame_id" value="laser"/>

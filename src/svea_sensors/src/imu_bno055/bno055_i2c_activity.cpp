@@ -5,7 +5,7 @@
  * and which handles all ROS duties.
  */
 
-#include "imu_bno055/bno055_i2c_activity.h"
+#include <imu_bno055/bno055_i2c_activity.h>
 
 namespace imu_bno055 {
 

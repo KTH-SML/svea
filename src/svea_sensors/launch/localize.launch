@@ -17,7 +17,7 @@
   <group if="$(arg start_sensors)">
     <param name="use_sim_time" value="false" />
     <group unless="$(arg use_rs)">
-      <include file="$(find svea_sensors)/launch/default_odometry.launch">
+      <include file="$(find svea_sensors)/launch/zed_odometry.launch">
         <arg name="xavier" value="$(arg xavier)" />
       </include>            
     </group>
@@ -34,7 +34,7 @@
     <param name="use_sim_time" value="true" />
     <group unless="$(arg use_rs)">
       <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
-        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/default_ekf.yaml" />
+        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/zed_ekf.yaml" />
         <param name="imu0" value="/imu/data"/>
         <param name="odom0" value="/zed/zed_node/odom"/>
       </node>

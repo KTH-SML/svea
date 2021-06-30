@@ -49,11 +49,15 @@
   <exec_depend>tf2</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>urg_node</exec_depend>
-  <!--<exec_depend>zed_wrapper</exec_depend>-->
+  <exec_depend>zed_wrapper</exec_depend>
   <exec_depend>slam_toolbox</exec_depend>
   <exec_depend>slam_toolbox_msgs</exec_depend>
   <exec_depend>amcl</exec_depend>
   <exec_depend>map_server</exec_depend>
+  <exec_depend>rosserial_python</exec_depend>
+  <exec_depend>rosserial_server</exec_depend>
+  <exec_depend>rosserial_msgs</exec_depend>
+  <exec_depend>svea_core</exec_depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

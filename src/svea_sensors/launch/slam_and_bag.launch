@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!--
-    Launch default odometry and 2d mrpt icp slam
+    Launch odometry and SLAM toolbox
 -->
 
 <launch>
   <!-- <param name="use_sim_time" value="true"/> -->
   <!-- Start default odometry and SLAM -->
   <arg name="xavier" default="false"/>
-  <arg name="use_rs" default="false"/>
+  <arg name="use_rs" default="true"/>
   <arg name="rviz" default="false"/>
   <arg name="slam_delay" default="5"/> <!-- Delay before starting SLAM node -->
   <include file="$(find svea_sensors)/launch/slam.launch">
