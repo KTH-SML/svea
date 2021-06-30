@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!--
-    Default odometry launch file
+    Xaviert odometry launch file
 -->
 
 <launch>
   <arg name="use_rs" default="false"/>
   <group unless="$(arg use_rs)">
-    <include file="$(find svea_sensors)/launch/default_odometry.launch">
+    <include file="$(find svea_sensors)/launch/zed_odometry.launch">
       <arg name="xavier" value="true"/>
     </include>            
   </group>

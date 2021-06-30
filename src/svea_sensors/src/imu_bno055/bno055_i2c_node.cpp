@@ -7,7 +7,7 @@
  */
 
 #include <imu_bno055/bno055_i2c_activity.h>
-#include "watchdog/watchdog.h"
+#include <imu_bno055/watchdog.h>
 #include <cstdlib>
 #include <ros/ros.h>
 #include <csignal>

@@ -1,16 +1,21 @@
 #!/usr/bin/env python
 
 """
-LiDAR module that contains ROS interface objects for the LiDARs used by
-SML. Currently, supporting: RPLidar, (coming soon) Hokuyo
+Sensor module that contains ROS interface objects for various sensors.
+Currently supporting: Lidars, Wheel Encoders
 """
 
 from threading import Thread
-
+import math
 import rospy
 from sensor_msgs.msg import LaserScan
-from std_srvs.srv import Empty
+from svea_msgs.msg import lli_encoder
+from geometry_msgs.msg import TwistWithCovarianceStamped
 
+
+__author__ = "Frank Jiang and Tobias Bolin"
+__copyright__ = "Copyright 2020, Frank Jiang"
+__credits__ = ["Frank Jiang", "Tobias Bolin"]
 __license__ = "MIT"
 __maintainer__ = "Frank Jiang"
 __email__ = "frankji@kth.se"
@@ -34,7 +39,7 @@ class Lidar():
         receiving and sending data
 
         :return: itself
-        :rtype: RPLidar
+        :rtype: Lidar
         """
         Thread(target=self._init_and_spin_ros, args=()).start()
         return self
@@ -48,7 +53,8 @@ class Lidar():
         pass
 
     def _start_listen(self):
-        rospy.Subscriber('scan', LaserScan, self._read_scan)
+        rospy.Subscriber('scan', LaserScan, self._read_scan,
+                         tcp_nodelay=True)
         rospy.loginfo("Lidar Interface successfully initialized")
         rospy.spin()
 
@@ -89,32 +95,76 @@ class Lidar():
         while cb in self.callbacks:
             self.callbacks.pop(self.callbacks.index(cb))
 
-class RPLidar():
+
+class WheelEncoder():
+    """Interface for wheel encoders
+
+    :param vehicle_name: name of the vehicle, defaults to ''
+    :type vehicle_name: str, optional
+    :param encoder_frame: Transform frame id of the encoders,
+        defaults to 'base_link'
+    :type encoder_frame: str, optional
+    :param encoder_topic: Topic that encoder messages should be read from,
+        defaults to 'lli/encoder'
+    :type encoder_topic: str, optional
+    :param direction_topic: Topic with twist messages
+        used for calculating the direction, defaults to ''
+    :type direction_topic: str, optional
+    :param axle_track: Whidth between the wheels in mm,
+        defaults to 199.0
+    :type axle_track: float, optional
+    :param wheel_radius: Radius of the wheels in mm,
+        defaults to 60.0
+    :type wheel_radius: float, optional
+    :param ticks_per_revolution: Number of encoder ticks in one revolution of a wheel,
+        defaults to 60
+    :type ticks_per_revolution: int, optional
+    :param linear_covariance: Covariance of the linear velocity in the published twist messages,
+        defaults to 0.2
+    :type linear_covariance: float, optional
+    :param angular_covariance: Covariance of the angular velocity
+        in the published twist messages, defaults to 0.4
+    :type angular_covariance: float, optional
     """
-    Interface handling the RPLidar. Collects and stores the most recent
-    scan and handles stopping and starting the RPLidar. Implements a
-    couple extra feature(s): emergency detection.
 
-    :param emergency_dist: Distance threshold for simple detection of
-                           scenarios that could be considered an
-                           emergency, defaults to 0.2 [m]
-    :type emergency_dist: float
-    """
-
-    # options: serial_port, serial_baudrate, frame_id, inverted,
-    #          angle_compensate scan_mode
-    ROS_PARAM_PREFIX = "rplidarNode"
-    IMPORTANT_ROS_PARAMS = ["serial_port", "frame_id",
-                            "angle_compensate"]
-
-    def __init__(self, emergency_dist=0.2):
-        # rospy.init_node('rplidar_handler')
-        self.node_name = "RPLidar A2/A3 Handler"
-
-        self.scan = []
-
-        self.emergency_dist = emergency_dist
-        self.is_emergency = False
+    def __init__(self,
+                 vehicle_name='',
+                 encoder_frame='base_link',
+                 encoder_topic='lli/encoder',
+                 direction_topic='',
+                 axle_track=199.0,
+                 wheel_radius=60.0,
+                 ticks_per_revolution=60,
+                 linear_covariance=0.2,
+                 angular_covariance=0.4,
+                 ):
+        if vehicle_name:
+            self.vehicle_name = vehicle_name
+        else:
+            namespace = rospy.get_namespace()
+            self.vehicle_name = namespace.split('/')[-1]
+        self.linear_covariance = linear_covariance
+        self.angular_covariance = angular_covariance
+        self.encoder_topic = encoder_topic
+        self.direction_topic = direction_topic
+        self.frame_id = encoder_frame
+        # Vehicle parameters
+        mm_to_meter = 1e-3
+        tau = 2 * math.pi
+        self.axle_track = axle_track * mm_to_meter
+        self.wheel_radius = wheel_radius
+        self.ticks_per_revolution = ticks_per_revolution
+        self.tick_to_distance_coefficient = (
+            wheel_radius * tau * mm_to_meter / ticks_per_revolution
+        )
+        # Storage fields
+        self.direction = 1
+        self.linear_velocity = 0.0
+        self.angular_velocity = 0.0
+        self.r_wheel_velocity = 0.0
+        self.l_wheel_velocity = 0.0
+        # list of functions to call whenever a new reading comes in
+        self.callbacks = []
 
     def start(self):
         """
@@ -122,97 +172,92 @@ class RPLidar():
         receiving and sending data
 
         :return: itself
-        :rtype: RPLidar
+        :rtype: WheelEncoderInterface
         """
         Thread(target=self._init_and_spin_ros, args=()).start()
         return self
 
     def _init_and_spin_ros(self):
-        rospy.loginfo("Starting Lidar Interface Node: \n" + str(self))
+        rospy.loginfo('Starting wheel encoder Interface for'
+                      + self.vehicle_name)
         self._collect_srvs()
         self._start_listen()
+        rospy.loginfo('Succesfully initiated wheel encoder Interface for'
+                      + self.vehicle_name)
 
     def _collect_srvs(self):
-        rospy.wait_for_service('start_motor')
-        self.start_motor_srv = rospy.ServiceProxy('start_motor', Empty)
-
-        rospy.wait_for_service('stop_motor')
-        self.stop_motor_srv = rospy.ServiceProxy('stop_motor', Empty)
+        pass
 
     def _start_listen(self):
-        rospy.Subscriber('scan', LaserScan, self._read_scan)
-        rospy.loginfo("Lidar Interface successfully initialized")
-        rospy.spin()
+        self.encoder_subscriber = rospy.Subscriber(
+            self.encoder_topic,
+            lli_encoder,
+            self._process_encoder_data,
+            tcp_nodelay=True)
+        if self.direction_topic:
+            self.actuation_subscriber = rospy.Subscriber(
+                self.direction_topic,
+                TwistWithCovarianceStamped,
+                self._process_direction,
+                tcp_nodelay=True)
 
-    def _read_scan(self, scan_msg):
-        self.scan = scan_msg.ranges
+    def _process_encoder_data(self, msg):
+        right_wheel_velocity = self._calc_wheel_velocity(
+            msg.right_ticks,
+            msg.right_time_delta)
+        left_wheel_velocity = self._calc_wheel_velocity(
+            msg.left_ticks,
+            msg.left_time_delta)
+        direction = self.direction
+        # Linear velocity
+        self.linear_velocity = (right_wheel_velocity + left_wheel_velocity)/2
+        self.linear_velocity *= direction
+        # Angular velocity
+        angular_velocity = (right_wheel_velocity - left_wheel_velocity)
+        angular_velocity /= self.axle_track
+        angular_velocity *= direction
+        self.angular_velocity = angular_velocity
+        for cb in self.callbacks:
+            cb(self)
 
-        self.angle_min = scan_msg.angle_min
-        self.angle_max = scan_msg.angle_max
-        self.angle_increment = scan_msg.angle_increment
+    def _process_direction(self, msg):
+        velocity = msg.twist.twist.linear.x
+        direction_epsilon = self.tick_to_distance_coefficient * 0.5 # m/s
+        if velocity > direction_epsilon:
+            self.direction = 1
+        elif velocity < direction_epsilon:
+            self.direction = -1
+        else:
+            self.directions = 0
 
-        self.time_increment = scan_msg.time_increment
+    def _calc_wheel_velocity(self, ticks, time_delta):
+        if time_delta == 0:
+            return 0
+        distance = ticks * self.tick_to_distance_coefficient
+        velocity = (distance/time_delta) * 1e6
+        return velocity
 
-        self.last_scan_time = scan_msg.scan_time
+    def add_callback(self, cb):
+        """Add a callback. Every function passed into this method
+        will be called whenever new information comes in from the sensor.
 
-        self.is_emergency = min(self.scan) < self.emergency_dist
+        :param cb: A callback function intended for responding to the
+                   reception of a new reading.
 
-    def _build_param_printout(self):
-        param_str = "{0}:\n".format(self.node_name)
-
-        for param_name in self.IMPORTANT_ROS_PARAMS:
-            curr_param = rospy.get_param(self.ROS_PARAM_PREFIX+ '/' + param_name)
-            param_str += "  - {0}: {1}\n".format(param_name, curr_param)
-
-        return param_str
-
-    def __repr__(self):
-        return self._build_param_printout()
-    def __str__(self):
-        return self._build_param_printout()
-
-    def start_motor(self):
+                   The function should take a WheelEncoder object
+                   as input.
+        :type cb: function
+        :return: Handle to the callback function
         """
-        Physically starts spinning the RPLidar
-        """
-        try:
-            self.start_motor_srv()
-        except rospy.ServiceException as exc:
-            print(self.node_name + ": Start motor service failed: " + str(exc))
+        self.callbacks.append(cb)
 
-    def stop_motor(self):
-        """
-        Physically stops the RPLidar from spinning
-        """
-        try:
-            self.stop_motor_srv()
-        except rospy.ServiceException as exc:
-            print(self.node_name + ": Stop motor service failed: " + str(exc))
+    def remove_callback(self, cb):
+        """Remove callback so it will no longer be called when state
+        information is received
 
-    def get_raw_scan(self):
+        :param cb: A callback function that should be no longer used
+                   in response to the reception of state info
+        :type cb: function
         """
-        (will be updated to use properties)
-
-        :return: Most recent lidar scan as list of ranges
-        :rtype: list
-        """
-        return self.scan
-
-    def get_raw_scan_with_time(self):
-        """
-        (will be updated to use properties)
-
-        :return: Most recent lidar scan as list of ranges along with
-                 last scan delay
-        :rtype: float, list
-        """
-        return self.last_scan_time, self.scan
-
-    def get_is_emergency(self):
-        """
-        (will be updated to use properties)
-
-        :return: Flag indicating whether something is too close or not
-        :rtype: bool
-        """
-        return self.is_emergency
+        while cb in self.callbacks:
+            self.callbacks.pop(self.callbacks.index(cb))

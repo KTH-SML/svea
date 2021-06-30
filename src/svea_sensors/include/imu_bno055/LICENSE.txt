@@ -1,7 +1,3 @@
-
-
-
-The robot_localization package also makes use of code written by Dheera Venkatraman for the BNO 055 IMU. 
 This code is released under the 3-Clause BSD License license:
 
 Copyright 2019 Dheera Venkatraman

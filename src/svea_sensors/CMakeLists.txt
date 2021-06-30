@@ -143,10 +143,15 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/svea_sensors_node.cpp)
-add_executable(bno055_i2c_node src/bno055_i2c_activity.cpp src/bno055_i2c_node.cpp src/watchdog.cpp)
-add_executable(speed_telemetry src/speed_telemetry.cpp)
-add_executable(speed_coefficient_estimation src/speed_coefficient_estimation.cpp)
-add_executable(odom_to_map_node src/odom_to_map_node.cpp src/noetic_transform_listener.cpp)
+add_executable(bno055_i2c_node 
+               src/imu_bno055/bno055_i2c_activity.cpp
+               src/imu_bno055/bno055_i2c_node.cpp 
+               src/imu_bno055/watchdog.cpp)
+#add_executable(speed_telemetry src/speed_telemetry.cpp)
+#add_executable(speed_coefficient_estimation src/speed_coefficient_estimation.cpp)
+add_executable(odom_to_map_node
+               src/odom_to_map_node.cpp
+               src/noetic_tf2_ros/noetic_transform_listener.cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the followinsveag renames the
 ## target back to the shorter version for ease of user use
@@ -156,7 +161,6 @@ add_executable(odom_to_map_node src/odom_to_map_node.cpp src/noetic_transform_li
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 #add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(speed_coefficient_estimation ${catkin_EXPORTED_TARGETS})
 add_dependencies(odom_to_map_node svea_msgs_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
@@ -164,10 +168,7 @@ add_dependencies(odom_to_map_node svea_msgs_generate_messages_cpp ${catkin_EXPOR
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(bno055_i2c_node ${catkin_LIBRARIES})
-target_link_libraries(speed_telemetry ${catkin_LIBRARIES})
-target_link_libraries(speed_coefficient_estimation ${catkin_LIBRARIES})
 target_link_libraries(odom_to_map_node ${catkin_LIBRARIES})
-#target_link_libraries(noetic_tf2_ros ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -193,6 +194,12 @@ install(TARGETS bno055_i2c_node
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+install(TARGETS odom_to_map_node
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
