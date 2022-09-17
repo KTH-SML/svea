@@ -1,4 +1,4 @@
-# Lidar Simulation tutorial
+# Lidar Simulation
 
 In this tutorial, we will introduce the lidar simulation pipeline that is
 available in this repo. The lidar simulation we have implemented relies on predefining
@@ -39,7 +39,7 @@ the OccupancyGrid. A pickle has already been created for floor2, so you can load
 it in from `svea_core/resources/maps/floor2.pickle`. After loading the floor2
 map in, your window should look something like:
 
-![blank floor](./lidar_sim_imgs/blank_floor2.png)
+![blank floor](/media/tutorials/blank_floor2.png)
 
 Now, to add a new obstacle press "Add new obstacle" and after that, every point
 you click on the map will be a vertex in a new, polygonal obstacle. You should
@@ -53,7 +53,7 @@ have added an example set of obstacles that correspond to the walls of floor2.
 If you want to keep this, it's best you save your obstacles as a new file. The
 obstacle set we have created looks like this:
 
-![floor2 walls](./lidar_sim_imgs/floor2_walls.png)
+![floor2 walls](/media/tutorials/floor2_walls.png)
 
 It's likely that you will make a mistake at some point while using the GUI.
 Unfortunately, there is no "undo" button in the GUI currently. Thus, to fix this
@@ -86,7 +86,7 @@ Once you have enabled the Lidar simulator, try running the floor2 example once
 more and you should see some new visualizations showing up. For example, it
 should look something like this:
 
-![lidar example](./lidar_sim_imgs/lidar_example.png)
+![lidar example](/media/tutorials/lidar_example.png)
 
 Now that you can see the simulated lidar in RVIZ, let's try to do something with
 the laser scans themselves. The lidar simulator will actually publish out scan

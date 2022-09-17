@@ -1,0 +1,33 @@
+# Configuration file for [MkDocs](https://mkdocs.org)
+#
+# This configuration requires the following pip packages to work:
+# - mkdocs
+#
+# To build the documentation:
+# > mkdocs build
+
+site_name: SVEA
+site_description: 'Starter ROS workspace for working with the [s]mall [ve]hicles for [a]utonomy platform '
+site_author: Smart Mobility Lab
+# site_url: https://svea.eecs.kth.se
+
+repo_url: https://github.com/KTH-SML/svea
+copyright: "2020, Smart Mobility Lab"
+
+theme: readthedocs
+
+nav:
+  - Home: index.md
+  - Tutorial:
+    - 0. Introduction: tutorials/0_intro.md
+    - 1. Floor 2 and Pure-Pursuit: tutorials/1_floor2.md
+    - 2. Lidar Simulation: tutorials/2_lidar_sim.md
+    - 3. The SVEA: tutorials/3_svea_operation.md
+
+markdown_extensions:
+  - smarty
+  - sane_lists
+  - admonition
+  - toc:
+      permalink: True
+

@@ -140,7 +140,7 @@ roslaunch svea_core key_teleop.launch
 
 for a keyboard teleop example. Once launched, you should see the following:
 
-![key-teleop example](./media/key_teleop.png)
+![key-teleop example](docs/media/key_teleop.png)
 
 where you can use arrow keys to control the simulated SVEA car.
 
@@ -152,7 +152,7 @@ roslaunch svea_core pure_pursuit.launch
 
 where you should see something that looks like:
 
-![purepursuit example](./media/purepursuit.png)
+![purepursuit example](docs/media/purepursuit.png)
 
 To run a more involved example, call:
 
@@ -162,7 +162,7 @@ roslaunch svea_core floor2.launch
 
 where you should see something that looks like:
 
-![key-teleop example](./media/floor2_rviz.png)
+![key-teleop example](docs/media/floor2_rviz.png)
 
 Now you are ready to read through the tutorials! You can find them in `svea_starter/docs/tutorials`.
 

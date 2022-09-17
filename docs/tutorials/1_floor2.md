@@ -1,4 +1,4 @@
-# Floor2 pure-pursuit tutorial
+# Floor 2 and Pure-Pursuit
 
 In this tutorial, we will start interacting with the code base for the SVEA
 platform. In particular, you will inspect the pure-pursuit examples we have
