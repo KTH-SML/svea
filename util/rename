@@ -1,0 +1,28 @@
+#! /bin/sh
+#
+# Rename the package to something else.
+#
+# When calling this script without argument
+# it will try to rename after the name of the repo.
+#
+# Author: Kaj Munhoz Arfvidsson
+
+
+. "$(dirname "$0")/config.sh"
+
+
+OLD_NAME="svea_dev"
+NEW_NAME=${1:-$REPOSITORY_NAME}
+
+
+sed -i "s/$OLD_NAME/$NEW_NAME/g" \
+    "$REPOSITORY_PATH/CMakeLists.txt" \
+    "$REPOSITORY_PATH/README.md" \
+    "$REPOSITORY_PATH/package.xml" \
+    "$REPOSITORY_PATH/setup.py" \
+    "$REPOSITORY_PATH/src/$OLD_NAME/__init__.py" \
+    "$REPOSITORY_PATH/util/rename"
+
+mv  "$REPOSITORY_PATH/src/$OLD_NAME" \
+    "$REPOSITORY_PATH/src/$NEW_NAME"
+

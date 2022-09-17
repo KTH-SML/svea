@@ -1,0 +1,32 @@
+#! /bin/sh
+#
+# Create a container from an image
+#
+# The last argument to the script is the image name, this will also be the
+# container name after it has been created. The container is will be privileged
+# and share the host network.
+#
+# Author: Kaj Munhoz Arfvidsson
+
+
+. "$(dirname "$0")/config.sh"
+
+
+# Setting default arguments
+if [ -z "$*" ]
+then set -- "$IMAGE_TAG"
+fi
+
+
+[ -n "$DEBUG" ] && fn="echo" || fn="exec"
+
+"$fn" docker create \
+    -it \
+    -e "TERM=xterm-256color" \
+    -v "$SHRVOL_SRC:$SHRVOL_DST" \
+    -v "/dev:/dev" \
+    --network host \
+    --privileged \
+    --name "$CONTAINER_NAME" \
+    "$*"
+
