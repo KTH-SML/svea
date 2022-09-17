@@ -28,5 +28,5 @@ fi
     --network host \
     --privileged \
     --name "$CONTAINER_NAME" \
-    "$*"
+    "$@"
 

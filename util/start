@@ -17,5 +17,5 @@ fi
 
 "$fn" docker start \
     -i \
-    "$*"
+    "$@"
 

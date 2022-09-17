@@ -28,5 +28,5 @@ fi
     -e "TERM=xterm-256color" \
     -v "$SHRVOL_SRC:$SHRVOL_DST" \
     --name "$CONTAINER_NAME" \
-    "$*"
+    "$@"
 

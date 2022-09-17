@@ -20,5 +20,5 @@ fi
     --network host \
     --build-arg "ROSDISTRO=$ROSDISTRO" \
     --build-arg "WORKSPACE=$WORKSPACE" \
-    "$*"
+    "$@"
 

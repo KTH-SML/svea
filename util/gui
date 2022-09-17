@@ -23,6 +23,6 @@
     -v "/etc/localtime:/etc/localtime:ro" \
     -v "$SHRVOL_SRC:$SHRVOL_DST" \
     --rm \
-    "$*" \
+    "$@" \
     osrf/ros:melodic-desktop
 
