@@ -20,7 +20,7 @@ if [ -f requirements.txt ]; then
 fi
 
 rosdep install \
-    --rosdistro melodic \
+    --rosdistro "$ROSDISTRO" \
     --from-paths src \
     --ignore-src \
     -qry
