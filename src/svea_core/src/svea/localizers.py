@@ -5,7 +5,7 @@ Module containing localization interfaces for motion capture, indoor
 localization, etc.
 """
 
-from __future__ import division
+
 from threading import Thread, Event
 import rospy
 

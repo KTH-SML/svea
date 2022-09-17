@@ -12,7 +12,7 @@ in [m/s], and
 control inputs.
 """
 
-from __future__ import division
+
 from threading import Thread, Event
 from collections import deque
 from math import pi, isnan

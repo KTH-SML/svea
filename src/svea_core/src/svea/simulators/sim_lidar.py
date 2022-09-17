@@ -13,7 +13,7 @@ from multiprocessing import Pool
 from sensor_msgs.msg import LaserScan, PointCloud
 from visualization_msgs.msg import Marker
 
-from viz_utils import publish_lidar_points, publish_lidar_rays, publish_edges
+from .viz_utils import publish_lidar_points, publish_lidar_rays, publish_edges
 
 __license__ = "MIT"
 __maintainer__ = "Javier Cerna, Frank Jiang"

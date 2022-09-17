@@ -13,7 +13,7 @@ from svea.svea_managers.path_following_sveas import SVEAPlatoonMember
 from svea.localizers import LocalizationInterface
 from svea.data import RVIZPathHandler
 from svea.models.cooperative import C_OVRV
-from c_ovrv_utils import *
+from .c_ovrv_utils import *
 
 mpl.style.use('seaborn')
 
@@ -130,7 +130,7 @@ def main():
     c_ovrv_model = C_OVRV(platoon_size, num_neighbors, k_gains, min_spacing,
                           desired_time_headway, init_velocity, dt=dt)
     init_eq_pt = c_ovrv_model.equilibrium_pt
-    print("the initial eq points", init_eq_pt)
+    print(("the initial eq points", init_eq_pt))
     leader_eq_pt, follower_eq_pts = \
         compute_positions_from_spacings(follower_start_pts[-1],
                                         init_eq_pt[:platoon_size])

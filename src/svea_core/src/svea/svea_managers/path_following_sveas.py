@@ -6,7 +6,7 @@ Module containing path following SVEA managers
 
 import math
 
-from svea_archetypes import SVEAManager
+from .svea_archetypes import SVEAManager
 # from svea.simulators.viz_utils import publish_path, publish_target
 from svea.data import TrajDataHandler
 from svea.controllers import pure_pursuit
