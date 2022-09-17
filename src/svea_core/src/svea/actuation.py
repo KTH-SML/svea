@@ -25,6 +25,10 @@ __email__ = "tbolin@kth.se "
 __status__ = "Development"
 
 
+def cmp(a, b):
+    return (a > b) - (a < b)
+
+
 class ActuationInterface(object):
     """ Standard actuation interface. Make it easy to input steering
     angles in radians and velocities in m/s. Assumes very simplistic
