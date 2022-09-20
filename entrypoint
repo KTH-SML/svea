@@ -14,11 +14,6 @@ source util/config.sh
 remote_ros() { source util/remote_ros.sh; }; remote_ros
 
 # Install any dependencies that has been added by volume...
-
-if [ -f requirements.txt ]; then
-    python3 -m pip install -r requirements.txt
-fi
-
 rosdep install \
     --rosdistro "$ROSDISTRO" \
     --from-paths src \

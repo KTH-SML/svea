@@ -27,6 +27,8 @@ RUN apt-get update -y && \
         python3-matplotlib \
         python3-catkin-tools \
         && \
+    python3 -m pip install -U pip && \
+    python3 -m pip install -r requirements.txt && \
     rm -rf /var/lib/apt/lists/*
 
 ## Create svea workspace
