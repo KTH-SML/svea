@@ -12,7 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
   svea_msgs
-  roscpp
   std_msgs
   rospy
 )
@@ -109,7 +108,7 @@ catkin_python_setup()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES svea
-  CATKIN_DEPENDS roscpp rospy std_msgs
+  CATKIN_DEPENDS rospy std_msgs
 #  DEPENDS system_lib
 )
 
@@ -201,7 +200,3 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 #catkin_add_nosetests(src/svea/tests)
-if(CATKIN_ENABLE_TESTING)
-  find_package(rostest REQUIRED)
-  add_rostest(tests/c_ovrv.test)
-endif()
