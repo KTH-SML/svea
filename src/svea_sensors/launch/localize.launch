@@ -61,7 +61,7 @@
         <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
     </node>
 
-    <node pkg="svea_sensors" type="odom_to_map_node" name="odom_to_map_node" output="screen">
+    <node pkg="svea_sensors" type="odom_to_map" name="odom_to_map" output="screen">
         <param name="map_frame" value="$(arg map_frame)"/>
         <param name="wait_for_transform" value="$(arg wait_for_transform)"/>
         <param name="publish_odometry" value="$(arg publish_odometry)"/>

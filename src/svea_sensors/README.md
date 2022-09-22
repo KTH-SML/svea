@@ -16,10 +16,6 @@ released under the [BSD 3-Clause license](svea_sensors/src/imu_bno055/LICENSE.tx
 released under the [BSD 3-Clause license](svea_sensors/src/imu_bno055/LICENSE.txt).
 
 
-**Author: Tobias Bolin <br/>
-Affiliation: [KTH Royal Institute of Technology](https://www.kth.se/) <br/>
-Maintainer: Tobias Bolin, tbolin@kth.se**
-
 ### Supported Sensors
 
 The package includes launch files, transforms, dependencies etc. for the
@@ -410,7 +406,7 @@ by [mdrwiega](https://github.com/mdrwiega) instead.
     The frame id used in published messages.
 
 
-### odom_to_map_node
+### odom_to_map
 
 A node that translate odometry messages published in an odom frame onto a map
 based on a transform from e. g. AMCL.
