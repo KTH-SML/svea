@@ -1,18 +1,19 @@
 <?xml version="1.0"?>
 <!--
-    Xaviert odometry launch file
+    Xavier odometry launch file
 -->
 
 <launch>
-  <arg name="use_rs" default="false"/>
-  <group unless="$(arg use_rs)">
-    <include file="$(find svea_sensors)/launch/zed_odometry.launch">
-      <arg name="xavier" value="true"/>
-    </include>            
-  </group>
-  <group if="$(arg use_rs)">
-    <include file="$(find svea_sensors)/launch/rs_odometry.launch">
-      <arg name="xavier" value="true"/>
+
+    <!-- Launch file arguments -->
+    <arg name="camera" default="zed"/>
+
+    <!-- Start the stereo camera -->
+    <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
+        <arg name="xavier" value="true"/>
     </include>
-  </group>  
+    <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/rs_odometry.launch">
+        <arg name="xavier" value="true"/>
+    </include>
+
 </launch>
