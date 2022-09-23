@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Node to test the lli control interface by giving different directional commands to the car.

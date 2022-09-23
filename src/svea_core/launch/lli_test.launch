@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="rosserial_python" type="serial_node.py" name="serial_node" ns="$(optenv HOSTNAME add_export_HOSTNAME_to_bashrc)">
+        <!-- <param name="port" value="/dev/arduinoPWM"/> -->
+        <param name="port" value="/dev/ttyACM0"/>
+        <param name ="baud" value="250000" />
+    </node>
+
+    <node pkg="svea_core" type="lli_test.py" name="lli_test" output="screen" ns="$(optenv HOSTNAME add_export_HOSTNAME_to_bashrc)">
+    </node>
+
+</launch>
