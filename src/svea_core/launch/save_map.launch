@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-    <arg name="save_dir"    default="$(find svea_core)/resources/maps"/>
+    <arg name="save_dir"    default="$(find svea_core)/maps"/>
     <arg name="file_name"   default="%y%m%d-%H%M"/>
     <arg name="save_method" default="numpy"/>
 
