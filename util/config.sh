@@ -60,33 +60,49 @@ climb() {
     return $?
 }
 
+# Assert shell variable with name NAME is the number one
+# > isone NAME
+isone() {
+    VALUE="$(eval echo "\$$1")"
+    test "${VALUE:-0}" -eq 1
+    return $?
+}
+
 
 ################################################################################
 ################################################################################
 
-
-ROSDISTRO="noetic"
 
 REPOSITORY_PATH="$(climb .git)"
 REPOSITORY_NAME="$(basename "$REPOSITORY_PATH")"
 
 BUILD_CONTEXT="$REPOSITORY_PATH"
+BUILD_IMAGE="ros"
+BUILD_TAG="noetic"
 IMAGE_TAG="$(basename "$BUILD_CONTEXT")"
 IMAGE_TAG="${IMAGE_TAG%%.*}"
 CONTAINER_NAME="$REPOSITORY_NAME"
 
+ROSDISTRO="${BUILD_TAG%%-*}"
 WORKSPACE="/$IMAGE_TAG"
 SHRVOL_SRC="$REPOSITORY_PATH/src"
 SHRVOL_DST="$WORKSPACE/src"
 
+if [ ${DESKTOP:-0} -eq 1 ]; then
+    BUILD_IMAGE="osrf/ros"
+    BUILD_TAG="$ROSDISTRO-desktop"
+fi
+
 
 if [ -n "$DEBUG" ]; then
-    echo "ROSDISTRO=$ROSDISTRO"
     echo "REPOSITORY_PATH=$REPOSITORY_PATH"
     echo "REPOSITORY_NAME=$REPOSITORY_NAME"
     echo "BUILD_CONTEXT=$BUILD_CONTEXT"
+    echo "BUILD_IMAGE=$BUILD_IMAGE"
+    echo "BUILD_TAG=$BUILD_TAG"
     echo "IMAGE_TAG=$IMAGE_TAG"
     echo "CONTAINER_NAME=$CONTAINER_NAME"
+    echo "ROSDISTRO=$ROSDISTRO"
     echo "WORKSPACE=$WORKSPACE"
     echo "SHRVOL_SRC=$SHRVOL_SRC"
     echo "SHRVOL_DST=$SHRVOL_DST"

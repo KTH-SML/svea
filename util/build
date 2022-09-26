@@ -10,14 +10,16 @@
 
 # Set default arguments
 if [ -z "$*" ]
-then set -- -t "$IMAGE_TAG" "$BUILD_CONTEXT"
+then set -- --tag "$IMAGE_TAG" "$BUILD_CONTEXT"
 fi
 
 
-[ -n "$DEBUG" ] && fn="echo" || fn="exec"
+isone DEBUG && fn="echo" || fn="exec"
 
 "$fn" docker build \
     --network host \
+    --build-arg "BUILD_IMAGE=$BUILD_IMAGE" \
+    --build-arg "BUILD_TAG=$BUILD_TAG" \
     --build-arg "ROSDISTRO=$ROSDISTRO" \
     --build-arg "WORKSPACE=$WORKSPACE" \
     "$@"
