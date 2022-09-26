@@ -24,6 +24,7 @@ RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
         apt-utils \
         git vim nano curl iputils-ping \
+        python3-tk \
         python3-pip \
         python3-numpy \
         python3-matplotlib \
