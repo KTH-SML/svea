@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """ ROS node that approximates velocity based on actuated values
 """

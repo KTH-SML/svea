@@ -53,7 +53,7 @@
 
     <!-- Hokuyo LIDAR -->
     <node pkg="urg_node" type="urg_node" name="Hokyoulidar">
-        <param name="lidar_ip"          value="$(arg lidar_ip)" />
+        <param name="ip_address"        value="$(arg lidar_ip)" />
         <param name="frame_id"          value="laser"/>
         <param name="calibrate_time"    value="true"/>
         <param name="publish_intensity" value="true"/>
