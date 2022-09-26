@@ -17,7 +17,7 @@
 
 # Setting default arguments
 if [ -z "$*" ]
-then set -- "$IMAGE_TAG"
+then set -- --name "$CONTAINER_NAME" "$IMAGE_TAG"
 fi
 
 
@@ -27,6 +27,5 @@ fi
     -it \
     -e "TERM=xterm-256color" \
     -v "$SHRVOL_SRC:$SHRVOL_DST" \
-    --name "$CONTAINER_NAME" \
     "$@"
 

@@ -21,8 +21,9 @@
     -e "QT_X11_NO_MITSHM=1" \
     -v "/tmp/.X11-unix:/tmp/.X11-unix" \
     -v "/etc/localtime:/etc/localtime:ro" \
-    -v "$SHRVOL_SRC:$SHRVOL_DST" \
+    -v "$PWD:/ws" \
     --rm \
+    --workdir /ws \
     "$@" \
-    osrf/ros:melodic-desktop
+    "osrf/ros:$ROSDISTRO-desktop"
 

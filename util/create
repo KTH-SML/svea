@@ -14,7 +14,7 @@
 
 # Setting default arguments
 if [ -z "$*" ]
-then set -- "$IMAGE_TAG"
+then set -- --name "$CONTAINER_NAME" "$IMAGE_TAG"
 fi
 
 
@@ -27,6 +27,5 @@ fi
     -v "/dev:/dev" \
     --network host \
     --privileged \
-    --name "$CONTAINER_NAME" \
     "$@"
 
