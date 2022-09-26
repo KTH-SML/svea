@@ -2,50 +2,36 @@
 <package format="2">
   <name>svea_core</name>
   <version>0.0.0</version>
-  <description>The svea core package</description>
+  <description>The svea_core package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
-  <!-- Example:  -->
-  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="nvidia@todo.todo">nvidia</maintainer>
-
+  <maintainer email="frankji@kth.se">Frank Jiang</maintainer>
+  <maintainer email="kajarf@kth.se">Kaj Munhoz Arfvidsson</maintainer>
 
   <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
   <license>MIT</license>
 
-
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
-  <!-- Optional attribute type can be: website, bugtracker, or repository -->
-  <!-- Example: -->
   <url type="website">https://github.com/KTH-SML/svea</url>
 
-
   <!-- Author tags are optional, multiple are allowed, one per tag -->
-  <!-- Authors do not have to be maintainers, but could be -->
-  <!-- Example: -->
-  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+  <author email="tbolin@kth.se">Tobias Bolin</author>
+  <author email="frankji@kth.se">Frank Jiang</author>
 
 
   <!-- The *depend tags are used to specify dependencies -->
   <!-- Dependencies can be catkin packages or system dependencies -->
   <buildtool_depend>catkin</buildtool_depend>
-  <test_depend>rosunit</test_depend>
-  <depend>rospy</depend>
-  <depend>std_msgs</depend>
-  <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
-  <depend>svea_msgs</depend>
-  <depend>rosserial_msgs</depend>
-  <depend>robot_localization</depend>
+  <depend>nav_msgs</depend>
   <depend>python3-yaml</depend>
+  <depend>robot_localization</depend>
+  <depend>rospy</depend>
+  <depend>rosserial_msgs</depend>
   <depend>rosserial_python</depend>
-  <depend>rosserial_server</depend>
-
-  <build_depend>mrpt_map</build_depend>
-  <build_depend>message_generation</build_depend>
-  <exec_depend>message_runtime</exec_depend>
+  <depend>std_msgs</depend>
+  <depend>svea_msgs</depend>
+  <test_depend>rosunit</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

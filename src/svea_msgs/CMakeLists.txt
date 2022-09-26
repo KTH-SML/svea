@@ -8,8 +8,6 @@ project(svea_msgs)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
   std_msgs
   nav_msgs
   geometry_msgs
@@ -112,7 +110,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES SVEA_msgs
-  CATKIN_DEPENDS message_runtime roscpp rospy std_msgs nav_msgs geometry_msgs
+  CATKIN_DEPENDS message_runtime std_msgs nav_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
@@ -122,10 +120,10 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
+# include_directories(
 # include
-  ${catkin_INCLUDE_DIRS}
-)
+#   ${catkin_INCLUDE_DIRS}
+# )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
