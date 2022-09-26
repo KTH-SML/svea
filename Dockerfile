@@ -28,7 +28,6 @@ RUN apt-get update -y && \
         python3-catkin-tools \
         && \
     python3 -m pip install -U pip && \
-    python3 -m pip install -r requirements.txt && \
     rm -rf /var/lib/apt/lists/*
 
 ## Create svea workspace
@@ -47,10 +46,12 @@ RUN cp -f entrypoint /ros_entrypoint.sh && \
         --ignore-src \
         -qry \
         && \
+    pip install -r requirements.txt && \
     rm -rf /var/lib/apt/lists/*
 
-# Run catkin build on workspace.
-# (improves build speeds later on)
+# Run catkin build on workspace (improves build speeds later on).
+# Ending on true is a hacky way to ensure the docker build continues
+# even if the catkin build fail
 
 RUN catkin config \
         --init \
