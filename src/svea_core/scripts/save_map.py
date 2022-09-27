@@ -15,9 +15,9 @@ class save_map:
         rospy.init_node('save_map')
 
         # load parameters
-        self.save_dir = rospy.get_param('save_dir')
-        self.file_name = rospy.get_param('file_name')
-        self.save_method = rospy.get_param('save_method')
+        self.save_dir = rospy.get_param('~save_dir', None)
+        self.file_name = rospy.get_param('~file_name', None)
+        self.save_method = rospy.get_param('~save_method', None)
 
         # make sure save directory exist
         self.save_dir = Path(self.save_dir)
