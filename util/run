@@ -17,10 +17,10 @@ fi
 
 
 # enable X11 access if DESKTOP is true
-isone DESKTOP && ! isone DEBUG && xhost +local:docker
+istrue DESKTOP && ! istrue DEBUG && xhost +local:docker
 
 
-isone DEBUG && fn="echo" || fn="exec"
+istrue DEBUG && fn="echo" || fn="exec"
 
 "$fn" docker run \
     -it \

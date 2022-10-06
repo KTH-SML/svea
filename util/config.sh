@@ -61,8 +61,8 @@ climb() {
 }
 
 # Assert shell variable with name NAME is the number one
-# > isone NAME
-isone() {
+# > istrue NAME
+istrue() {
     VALUE="$(eval echo "\$$1")"
     test "${VALUE:-0}" -eq 1
     return $?

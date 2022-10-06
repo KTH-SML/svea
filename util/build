@@ -14,7 +14,7 @@ then set -- --tag "$IMAGE_TAG" "$BUILD_CONTEXT"
 fi
 
 
-isone DEBUG && fn="echo" || fn="exec"
+istrue DEBUG && fn="echo" || fn="exec"
 
 "$fn" docker build \
     --network host \
