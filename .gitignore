@@ -9,3 +9,6 @@ src/CMakeLists.txt
 
 .vscode/
 src/.vscode/
+
+venv/
+site/

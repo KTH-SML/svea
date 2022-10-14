@@ -1,11 +1,11 @@
-# Introduction tutorial
+# Introduction
 
 In this tutorial, we will introduce the SVEA hardware and software, and discuss
 some of the organization around the SVEA software stack.
 
 ## Hardware
 
-![svea hardware](../../media/svea_hardware.png)
+![svea hardware](/media/svea_hardware.png)
 
 The SVEA platform consists of the following hardware components:
 1. [Single-channel LiDAR](https://www.hokuyo-usa.com/products/lidar-obstacle-detection/ust-10lx)
