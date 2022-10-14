@@ -5,6 +5,7 @@ logs/*
 .catkin_workspace
 src/CMakeLists.txt
 
+__pycache__/
 *.pyc
 
 .vscode/

@@ -1,0 +1,30 @@
+#! /bin/bash
+#
+# This entrypoint script will be called everytime a container is started.
+#
+# Author: Kaj Munhoz Arfvidsson
+
+set -e
+
+# Get project information
+source util/config.sh
+
+# Set ROS_IP etc. for e.g. rviz remote connection
+# https://stackoverflow.com/a/65912397
+remote_ros() { source util/remote_ros.sh; }; remote_ros
+
+# Install any dependencies that has been added by volume...
+rosdep install \
+    --rosdistro "$ROSDISTRO" \
+    --from-paths src \
+    --ignore-src \
+    -qry
+
+# To build anything that has been added by volume...
+catkin build
+
+# https://github.com/osrf/docker_images/issues/114
+printf "\nsource '$PWD/devel/setup.bash'" >> $HOME/.bashrc
+
+exec "$@"
+
