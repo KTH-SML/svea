@@ -1,24 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(svea_sensors)
+project(svea_msgs)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11 -li2c)
+# add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
-  sensor_msgs
   std_msgs
   nav_msgs
-  diagnostic_msgs
-  svea_msgs
-  robot_localization
-  roscpp
-  rospy
-  tf2
-  tf2_ros
+  geometry_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -55,11 +48,13 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+ add_message_files(
+   FILES
+   lli_ctrl.msg
+   lli_encoder.msg
+   lli_emergency.msg
+   VehicleState.msg
+ )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -76,10 +71,12 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   std_msgs
+   geometry_msgs
+   nav_msgs
+ )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -111,9 +108,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-   INCLUDE_DIRS include
-   #LIBRARIES noetic_tf2_ros
-   CATKIN_DEPENDS geometry_msgs nav_msgs svea_msgs robot_localization roscpp rospy tf2 tf2_ros
+#  INCLUDE_DIRS include
+#  LIBRARIES SVEA_msgs
+  CATKIN_DEPENDS message_runtime std_msgs nav_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
@@ -123,51 +120,40 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
+# include_directories(
+# include
+#   ${catkin_INCLUDE_DIRS}
+# )
 
 ## Declare a C++ library
-#add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/svea_sensors.cpp
-    #noetic_transform_listener src/noetic_transform_listener.cpp
-    #)
+# add_library(${PROJECT_NAME}
+#   src/${PROJECT_NAME}/SVEA_msgs.cpp
+# )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-#add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/svea_sensors_node.cpp)
-add_executable(bno055_i2c_node
-               src/imu_bno055/bno055_i2c_activity.cpp
-               src/imu_bno055/bno055_i2c_node.cpp
-               src/imu_bno055/watchdog.cpp)
-#add_executable(speed_telemetry src/speed_telemetry.cpp)
-#add_executable(speed_coefficient_estimation src/speed_coefficient_estimation.cpp)
-add_executable(odom_to_map
-               src/svea_sensors/odom_to_map.cpp)
+# add_executable(${PROJECT_NAME}_node src/SVEA_msgs_node.cpp)
+
 ## Rename C++ executable without prefix
-## The above recommended prefix causes long target names, the followinsveag renames the
+## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
 # set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-#add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(odom_to_map ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(bno055_i2c_node ${catkin_LIBRARIES})
-target_link_libraries(odom_to_map ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -188,17 +174,6 @@ target_link_libraries(odom_to_map ${catkin_LIBRARIES})
 # install(TARGETS ${PROJECT_NAME}_node
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-install(TARGETS bno055_i2c_node
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-install(TARGETS odom_to_map
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
@@ -227,7 +202,7 @@ install(TARGETS odom_to_map
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_svea_sensors.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_SVEA_msgs.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

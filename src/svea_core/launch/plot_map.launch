@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+
+    <node pkg="svea_core" type="plot_map.py" name="plot_map" output="screen"/>
+
+</launch>

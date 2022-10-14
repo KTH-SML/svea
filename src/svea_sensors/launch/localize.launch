@@ -4,79 +4,68 @@
 -->
 
 <launch>
-  <!-- Start odometry -->
-  <arg name="xavier" default="false" />
-  <arg name="use_rs" default="true" />
-  <arg name="start_sensors" default="true" />
-  <arg name="start_serial" default="false" />
-  <arg name="rviz" default="false" />
-  <group if="$(arg rviz)">
-    <include file="$(find svea_sensors)/launch/rviz.launch" />
-  </group>
-  <!-- Start the sensors -->
-  <group if="$(arg start_sensors)">
-    <param name="use_sim_time" value="false" />
-    <group unless="$(arg use_rs)">
-      <include file="$(find svea_sensors)/launch/zed_odometry.launch">
-        <arg name="xavier" value="$(arg xavier)" />
-      </include>            
-    </group>
-    <group if="$(arg use_rs)">
-      <include file="$(find svea_sensors)/launch/rs_odometry.launch">
-        <arg name="xavier" value="$(arg xavier)" />
-        <arg name="start_serial" value="$(arg start_serial)" />
-      </include>
-    </group>
-  </group>
 
-  <!-- Do not start the sensors, useful when running from a bag file -->
-  <group unless="$(arg start_sensors)">
-    <param name="use_sim_time" value="true" />
-    <group unless="$(arg use_rs)">
-      <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
-        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/zed_ekf.yaml" />
-        <param name="imu0" value="/imu/data"/>
-        <param name="odom0" value="/zed/zed_node/odom"/>
-      </node>
-    </group>
-    <group if="$(arg use_rs)">
-      <node pkg="robot_localization" type="ekf_localization_node" name="ekf_rs" clear_params="true" >
-        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/rs_ekf.yaml" />
-        <param name="publish_tf" value="true"/>
-        <param name="odom0" value="/rs/t265_camera/odom/sample"/>
-        <param name="imu0" value="/imu/data"/>
-      </node>
-    </group>
-    <include file="$(find svea_sensors)/launch/transforms.launch">
-      <arg name="xavier" value="$(arg xavier)"/>
-    </include>
-  </group>
+    <!-- Launch file arguments -->
+    <arg name="xavier"              default="false"/>
+    <arg name="use_camera"          default="true"/>
+    <arg name="camera"              default="rs"/>
+    <arg name="map_file"            default=""/>
+    <arg name="map_frame"           default="map"/>
+    <arg name="wait_for_transform"  default="false"/>
+    <arg name="publish_odometry"    default="true"/>
+    <arg name="publish_pose"        default="true"/>
+    <arg name="initial_pose_x"      default="0.0" />
+    <arg name="initial_pose_y"      default="0.0" />
+    <arg name="initial_pose_a"      default="0.0" />
 
-  <!-- Start map server -->
-  <arg name="map_name" default="itrl.yaml"/>
-  <arg name="file_name" default="$(find svea_sensors)/maps/$(arg map_name)" />
-  <node pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg file_name)" />
-  
-  <!-- Start localization (AMCL) -->
-  <arg name="initial_pose_x" default="0.0" />
-  <arg name="initial_pose_y" default="0.0" />
-  <arg name="initial_pose_a" default="0.0" /> 
-  <node pkg="amcl" type="amcl" name="amcl_localization" output="screen">
-    <rosparam command="load" file="$(find svea_sensors)/params/amcl/localize.yaml" />
-    <param name="scan" value="scan" />
-    <param name="initial_pose_x" value="$(arg initial_pose_x)" />
-    <param name="initial_pose_y" value="$(arg initial_pose_y)" />
-    <param name="initial_pose_a" value="$(arg initial_pose_a)" />
-  </node>
 
-  <arg name="map_frame" default="map" />
-  <arg name="wait_for_transform" default="false" />
-  <arg name="publish_odometry" default="true" />
-  <arg name="publish_pose" default="true" />
-  <node pkg="svea_sensors" type="odom_to_map_node" name="odom_to_map_node" output="screen">
-    <param name="map_frame" value="$(arg map_frame)" />
-    <param name="wait_for_transform" value="$(arg wait_for_transform)" />
-    <param name="publish_odometry" value="$(arg publish_odometry)" />
-    <param name="publish_pose" value="$(arg publish_pose)" />
-  </node>
+    <!-- Start the stereo camera -->
+    <group if="$(arg use_camera)">
+        <param name="use_sim_time" value="false"/>
+        <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/rs_odometry.launch">
+            <arg name="xavier" value="$(arg xavier)"/>
+        </include>
+        <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
+            <arg name="xavier" value="$(arg xavier)"/>
+        </include>
+    </group>
+
+    <!-- Do not start the sensors, useful when running from a bag file -->
+    <group unless="$(arg use_camera)">
+        <param name="use_sim_time" value="true" />
+        <node if="$(eval camera == 'rs')" pkg="robot_localization" type="ekf_localization_node" name="ekf_rs" clear_params="true" >
+            <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/rs_ekf.yaml"/>
+            <param name="publish_tf" value="true"/>
+            <param name="odom0" value="/rs/t265_camera/odom/sample"/>
+            <param name="imu0" value="/imu/data"/>
+        </node>
+        <node if="$(eval camera == 'zed')" pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
+            <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/zed_ekf.yaml"/>
+            <param name="imu0" value="/imu/data"/>
+            <param name="odom0" value="/zed/zed_node/odom"/>
+        </node>
+        <include file="$(find svea_sensors)/launch/transforms.launch">
+            <arg name="xavier" value="$(arg xavier)"/>
+        </include>
+    </group>
+
+    <!-- Start map server -->
+    <node if="$(eval map_file != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
+
+    <!-- Start localization (AMCL) -->
+    <node pkg="amcl" type="amcl" name="amcl_localization" output="screen">
+        <rosparam command="load" file="$(find svea_sensors)/params/amcl/localize.yaml"/>
+        <param name="scan"              value="scan"/>
+        <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
+        <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
+        <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
+    </node>
+
+    <node pkg="svea_sensors" type="odom_to_map" name="odom_to_map" output="screen">
+        <param name="map_frame" value="$(arg map_frame)"/>
+        <param name="wait_for_transform" value="$(arg wait_for_transform)"/>
+        <param name="publish_odometry" value="$(arg publish_odometry)"/>
+        <param name="publish_pose" value="$(arg publish_pose)"/>
+    </node>
+
 </launch>
