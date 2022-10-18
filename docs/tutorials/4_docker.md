@@ -18,19 +18,32 @@ experience by combining ROS and docker.
 
 ### Docker Cheat Sheet
 
-- `docker build -t svea .` Build an image and name it `svea`. *Use SVEA's
-  utility script instead.*
-- `docker create -it --name zebra svea` Create a container from the image `svea`
-   and name it `zebra`. *Use utility script for `run` instead*
-- `docker start -i zebra` Start the container `zebra` (it must be created).
-- `docker run -it svea` Do `docker create` followed by a `docker start`.
-  *Use SVEA's utility script instead.*
-- `docker exec -it svea [command...]` Execute command as a sibling process to
-  a running container. (Useful to start separate terminal with command `bash`).
-- `docker images` List all images.
-- `docker ps -a` List all containers.
-- `docker container prune` Remove all exited containers.
-- `docker image prune -a` Remove all images not associated with a container.
+#### `docker build -t svea .`
+Build an image and name it `svea`. *Use SVEA's utility script instead.*
+
+#### `docker create -it --name zebra svea`
+Create a container from the image `svea` and name it `zebra`. *Use utility script for `run` instead*
+
+#### `docker start -i zebra`
+Start the container `zebra` (it must be created).
+
+#### `docker run -it svea`
+Do `docker create` followed by a `docker start`. *Use SVEA's utility script instead.*
+
+#### `docker exec -it svea [command...]`
+Execute command as a sibling process to a running container. (Useful to start separate terminal with command `bash`).
+
+#### `docker images`
+List all images.
+
+#### `docker ps -a`
+List all containers.
+
+#### `docker container prune`
+Remove all exited containers.
+
+#### `docker image prune -a`
+Remove all images not associated with a container.
 
 ## Background
 

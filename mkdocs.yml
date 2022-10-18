@@ -23,6 +23,9 @@ nav:
     - 1. Floor 2 and Pure-Pursuit: tutorials/1_floor2.md
     - 2. Lidar Simulation: tutorials/2_lidar_sim.md
     - 3. The SVEA: tutorials/3_svea_operation.md
+    - 4. Docker: tutorials/4_docker.md
+  - Instructions:
+    - Documentation: instructions/documentation.md
 
 markdown_extensions:
   - smarty
@@ -30,4 +33,12 @@ markdown_extensions:
   - admonition
   - toc:
       permalink: True
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          docstring_style: sphinx
+          paths:
+            - src/svea_core/src
 
