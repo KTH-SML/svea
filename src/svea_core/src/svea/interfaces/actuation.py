@@ -1,22 +1,10 @@
-#!/usr/bin/env python
-
-"""
-ROS interface objects for sending actuation commands to the SVEA car's
-low-level controller. The low-level controller expects unit-less
-steering and velocity values from [-127, 127] that correspond to the
-minimum and maximum steering angles and velocities. We implement the
-interfaces for two reasons:
-(1) our models typically expect steering angles in [rads] and velocities
-in [m/s], and
-(2) we would like to add some features on top of just sending the
-control inputs.
-"""
-
-
 from threading import Thread, Event
 from collections import deque
 from math import pi, isnan
+from typing import Optional
+
 import rospy
+
 from svea_msgs.msg import lli_ctrl
 
 __license__ = "MIT"
@@ -24,61 +12,84 @@ __maintainer__ = "Tobias Bolin, Frank Jiang"
 __email__ = "tbolin@kth.se "
 __status__ = "Development"
 
+__all__ = [
+    'ActuationInterface',
+]
+
 
 def cmp(a, b):
     return (a > b) - (a < b)
 
 
-class ActuationInterface(object):
-    """ Standard actuation interface. Make it easy to input steering
-    angles in radians and velocities in m/s. Assumes very simplistic
-    models of the low-level actuation. It assumes a linear steering
-    model and a linear velocity model. The control interface assumes
-    that the ESC is in the default Sports mode.
+class ActuationInterface:
+    """Interface object for sending actuation commands to the SVEA car's low-level
+    controller.
 
-    :param vehicle_name: Name of vehicle being controlled;
-                         The name will be effectively be added as a
-                         namespace to the topics used by the
-                         corresponding low lever interface i.e
-                         `namespace/vehicle_name/lli/topic`, defaults to
-                         ''
-    :type vehicle_name: str, optional
-    :param log_length: Number of messages from control requests,
-                       control actuated and the remote that should be
-                       stored in the internal log. Set to `None` for
-                       unlimited logging, defaults to 100
-    :type log_length: int or None, optional
+    We implement the interface for two reasons:
+
+    1. Our models typically expect steering angle `[rad]` and velocity `[m/s]`.
+    2. We would like to add some features on top of just sending the control
+       inputs.
+
+    The low-level controller expects unit-less steering and velocity values between
+    `[-127, 127]` that correspond to the minimum and maximum steering angles and
+    velocities.
+
+    This interface makes it easy to input steering angles in `[rad]` and
+    velocities in `[m/s]`. Assumes very simplistic models of the low-level
+    actuation. It assumes a linear steering model and a linear velocity model.
+    The control interface assumes that the ESC is in the default Sports mode.
+
+    Args:
+        vehicle_name: Name of vehicle being controlled; The name will be
+            effectively be added as a namespace to the topics used by the
+            corresponding low lever interface i.e
+            `namespace/vehicle_name/lli/topic`.
+        log_length: Number of messages from control requests, control actuated
+            and the remote that should be stored in the internal log. Set to
+            `None` for unlimited logging.
     """
 
     # arduino's expected input frequency
-    OPERATING_FREQ = 50 # [Hz]
+    OPERATING_FREQ = 50             # [Hz]
     # saturation input limits to keep hardware healthy
-    MAX_STEER_PERCENT = 90 # [%]
-    MAX_SPEED_PERCENT = 90 # [%]
+    MAX_STEER_PERCENT = 90          # [%]
+    MAX_SPEED_PERCENT = 90          # [%]
     # assumed maximum steering angle, approximately 40 degrees
-    MAX_STEERING_ANGLE = 40*pi/180 # [rad]
-    # assumed max velocity
+    MAX_STEERING_ANGLE = 40*pi/180  # [rad]
     # By testing, the max velocity in Gear 0 is around 1.7 m/s.
     # The max velocity in Gear 2 is around 3.6 m/s.
-    MAX_SPEED_0 = 1.7 # [m/s]
-    MAX_SPEED_1 = 3.6 # [m/s]
-
+    MAX_SPEED_0 = 1.7               # [m/s]
+    MAX_SPEED_1 = 3.6               # [m/s]
     # scaling factor, percentage to lli actuation
     PERC_TO_LLI_COEFF = 1.27
     # An approximation of the range of velocity inputs around zero
     # which will not be enough to make the car move.
-    VELOCITY_DEADBAND = 15.0 # [%]
-    # binary masks
-    TRANSMISSION_MASK = 0b00000001 # Bit indicating status of the transmission
-    FDIFF_MASK = 0b00000010 # Bit indicating status of the forward differential
-    RDIFF_MASK = 0b00000100 # Bit indicating status of the rear differential
+    VELOCITY_DEADBAND = 15.0        # [%]
 
-    SOFTWARE_IDLE_MASK = 0b00000001 # Bit indicating software idle
-    REMOTE_IDLE_MASK = 0b00000010 # Bit indicating remote idle
-    REMOTE_OVERRIDE_MASK = 0b00000100 # Bit indicating remote override
-    EMERGENCY_MASK = 0b00001000 # Bit indicating emergency stop engaged
+    ## Binary masks ##
 
-    def __init__(self, vehicle_name='', log_length=100):
+    # Bit indicating status of the transmission
+    TRANSMISSION_MASK = 0b00000001
+    # Bit indicating status of the forward differential
+    FDIFF_MASK = 0b00000010
+    # Bit indicating status of the rear differential
+    RDIFF_MASK = 0b00000100
+    # Bit indicating software idle
+    SOFTWARE_IDLE_MASK = 0b00000001
+    # Bit indicating remote idle
+    REMOTE_IDLE_MASK = 0b00000010
+    # Bit indicating remote override
+    REMOTE_OVERRIDE_MASK = 0b00000100
+    # Bit indicating emergency stop engaged
+    EMERGENCY_MASK = 0b00001000
+
+    def __init__(
+        self,
+        vehicle_name: str = '',
+        log_length: int = 100,
+    ):
+
         sub_namespace = vehicle_name + '/' if vehicle_name else ''
         self._request_topic = '{}lli/ctrl_request'.format(sub_namespace)
         self._actuated_topic = '{}lli/ctrl_actuated'.format(sub_namespace)
@@ -105,30 +116,30 @@ class ActuationInterface(object):
         self.ctrl_actuated_log = deque(maxlen=log_length)
         self.remote_log = deque(maxlen=log_length)
 
-    def start(self, wait=False):
-        """ Spins up ROS background thread; must be called to start
-        receiving and sending data
+    def start(self, wait: bool = False) -> 'ActuationInterface':
+        """Spins up ROS background thread; must be called to start receiving
+        and sending data.
 
-        :param wait: `True` if the interface should call
-                     `wait_until_ready` before returning, defaults to `False`
-        :type wait: bool
-        :return: itself
-        :rtype: ControlInterface
+        Args:
+            wait: True if the interface should call `wait_until_ready` before
+                returning.
         """
         Thread(target=self._init_and_spin_ros, args=()).start()
         if wait:
             self.wait_until_ready()
         return self
 
-    def wait_until_ready(self, timeout=10.0):
-        """ Wait until the Control Interface is ready. Will also return
-        after `timeout` seconds or if rospy is shutdown.
+    def wait_until_ready(self, timeout: float = 10.0) -> bool:
+        """Wait until the interface is ready.
 
-        :param timeout: Number of seconds to wait for a response
-                        from the low level interface, defaults to `10`
-        :type timeout: float, optional
-        :return: `False` if timed out or rospy is shutdown, `True` otherwise
-        :rtype: bool
+        Args:
+            timeout: Number of seconds to wait for a response from the low
+                level interface.
+
+        Returns:
+            False if timed out or rospy is shutdown, true otherwise. Will
+            return when the interface is ready, after `timeout` seconds or if
+            rospy is shutdown.
         """
         num_attempts = 0
         attempt_limit = int(timeout) or 1
@@ -141,16 +152,17 @@ class ActuationInterface(object):
             num_attempts += 1
         return is_ready
 
-    def _wait_until_ready(self, timeout=10.0):
-        """ Internal method for waiting until the Control Interface is
-        ready. Will also return after `timeout` seconds or if rospy is
-        shutdown.
+    def _wait_until_ready(self, timeout: float = 10.0) -> bool:
+        """Internal method for waiting until the Control Interface is ready.
 
-        :param timeout: Number of seconds to wait for a response
-                        from the low level interface, defaults to `10`
-        :type timeout: float, optional
-        :return: `False` if timed out or rospy is shutdown, `True` otherwise
-        :rtype: bool
+        Args:
+            timeout: Number of seconds to wait for a response from the low
+                level interface.
+
+        Returns:
+            False if timed out or rospy is shutdown, true otherwise. Will
+            return when the interface is ready, after `timeout` seconds or if
+            rospy is shutdown.
         """
         num_attempts = 0
         attempt_limit = int(timeout) or 1
@@ -306,57 +318,52 @@ class ActuationInterface(object):
             rospy.sleep(0.05)
             reverse_msg.velocity = current_velocity
 
-    def send_control(self,
-                     steering=float('nan'),
-                     velocity=float('nan'),
-                     brake_force=0,
-                     transmission=-1,
-                     differential_front=-1,
-                     differential_rear=-1,
-                     ctrl_code=0):
-        """ Method for taking control inputs and implementing features
-        over the control inputs. This method converts steering angles
-        and velocities from radians and m/s to unit-less values that the
-        low level system expects, saturates the unit-less values,
-        implements a stopping feature for blocking control inputs (note,
-        this is not necessarily a braking feature, it only blocks inputs
-        from being published, thus it should not be used for emergency
-        braking), and sends/publishes inputs to the low level interface.
+    def send_control(
+        self,
+        steering: Optional[float] = None,
+        velocity: Optional[float] = None,
+        brake_force: float = 0,
+        transmission: int = -1,
+        differential_front: int = -1,
+        differential_rear: int = -1,
+        ctrl_code: int = 0,
+    ):
+        """Method for taking control inputs and implementing features over the
+        control inputs.
 
-        If an argument is left empty the low level interface will be
-        told to use the last sent value. The same is true if the gear or
-        differential arguments have any other values than 0 or 1. If you
-        do *not* call send_control then the car will *not* do anything.
+        This method converts steering angles and velocities from `[rad]` and
+        `[m/s]` to unit-less values that the low-level system expects,
+        saturates the unit-less values, implements a stopping feature for
+        blocking control inputs (note, this is not necessarily a braking
+        feature, it only blocks inputs from being published, thus it should not
+        be used for emergency braking), and sends/publishes inputs to the
+        low-level interface.
 
-        :param steering: input steering angle for the car in [rad], if
-                         argument left empty the low level system will
-                         use the last sent valid value, defaults to
-                         float('nan').
-        :type steering: float, optional
-        :param velocity: input velocity for the car [m/s], if argument
-                         left empty the low level system will implement
-                         the last sent valid value, defaults to
-                         float('nan')
-        :type velocity: float, optional
-        :param brake_force: brake force as a percentage [0, 100] of
-                            maximum braking force, defaults to 0
-        :type brake_force: float
-        :param transmission: 0 means low gear, 1 means high gear, -1
-                             means keep the currently set gear, defaults
-                             to -1
-        :type transmission: int, optional
-        :param differential_front: 0 means unlocked, 1 means locked, -1
-                                   means keep the currently set lock
-                                   state, defaults to -1
-        :type differential_front: int, optional
-        :param differential_rear: 0 means unlocked, 1 means locked, -1
-                                  means keep the currently set lock
-                                  state, defaults to -1
-        :type differential_rear: int, optional
-        :param ctrl_code: [deprecated]
+        If an argument is left empty the low-level interface will be told to
+        use the last sent value. The same is true if the gear or differential
+        arguments have any other values than 0 or 1. If you do *not* call
+        `send_control` then the car will *not* do anything.
+
+        Args:
+            steering: Input steering angle for the car in `[rad]`, if argument
+                left empty the low-level system will use the last sent valid
+                value.
+            velocity: Input velocity for the car `[m/s]`, if argument left
+                empty the low-level system will implement the last sent valid
+                value.
+            brake_force: Brake force as a percentage `[0, 100]` of maximum
+                braking force.
+            transmission: 0 means low gear, 1 means high gear, -1 means keep
+                the currently set gear.
+            differential_front: 0 means unlocked, 1 means locked, -1 means keep
+                the currently set lock state.
+            differential_rear: 0 means unlocked, 1 means locked, -1 means keep
+                the currently set lock state.
+            ctrl_code: Deprecated.
         """
+
         # Steering
-        if not isnan(steering):
+        if steering is not None and not isnan(steering):
             steer_percent = self._steer_to_percent(steering)
             steer_percent = self._clip_steering(steer_percent)
             self.ctrl_request.steering = steer_percent
@@ -364,6 +371,7 @@ class ActuationInterface(object):
                     round(steer_percent * self.PERC_TO_LLI_COEFF)
         else:
             self.ctrl_msg.steering = -128
+
         # Velocity
         if brake_force > 0:
             if self._is_reverse:
@@ -371,7 +379,7 @@ class ActuationInterface(object):
             self.ctrl_msg.velocity = \
                     -round(brake_force * self.PERC_TO_LLI_COEFF)
             self.ctrl_request.velocity = 0
-        elif not isnan(velocity):
+        elif velocity is not None and not isnan(velocity):
             vel_percent = self._vel_to_percent(velocity)
             vel_percent = self._clip_velocity(vel_percent)
             vel_percent = self._remove_velocity_deadzone(vel_percent)
@@ -381,6 +389,7 @@ class ActuationInterface(object):
                 self._set_reverse(True)
         else:
             self.ctrl_msg.velocity = -128
+
         # Transmission and differentials
         self.ctrl_msg.trans_diff = 0
         if transmission in (0, 1):
@@ -400,46 +409,46 @@ class ActuationInterface(object):
             self.ctrl_request_log.append(self.ctrl_request)
 
     @property
-    def is_stop(self):
-        return self._is_stop
+    def is_stop(self) -> bool: return self._is_stop
 
     @is_stop.setter
-    def is_stop(self, is_stop):
-        """ Setter function for stopping the car. **This is not the same
-        as emergency braking.**
+    def is_stop(self, is_stop: bool):
+        """Setter function for stopping the car.
 
-        :param is_stop: flag for blocking or unblocking the control
-                        inputs to the car.
-        :type is_stop: bool
+        **This is not the same as emergency braking.**
+
+        Args:
+            is_stop: Flag for blocking or unblocking the control inputs to the
+                car.
         """
         self._is_stop = is_stop
 
     @property
-    def max_speed(self):
-        """ Get the maximum speed, dependent on gear
+    def max_speed(self) -> float:
+        """Get the maximum speed, dependent on gear.
 
-        :return: the maximum speed, independent of direction
-        :rtype: float
+        Returns:
+            The maximum speed, independent of direction
         """
         return self.MAX_SPEED_1 if self.gear else self.MAX_SPEED_0
 
     @property
-    def max_speed_signal(self):
-        """ Get the maximal velocity that the controller will actually
-        attempt to actuate for the current gear
+    def max_speed_signal(self) -> float:
+        """Get the maximal velocity that the controller will actually attempt
+        to actuate for the current gear.
 
-        :return: the maximum actuated speed, independent of direction
-        :rtype: float
+        Returns:
+            The maximum actuated speed, independent of direction.
         """
         return self.max_speed * self.MAX_SPEED_PERCENT/100
 
     @property
-    def gear(self):
-        """ Current gear
+    def gear(self) -> int:
+        """Current gear.
 
-        :return: `0` if low gear `1` if high gear,
-                 `None` if no information has been received.
-        :rtype: int
+        Returns:
+            `0` if low gear `1` if high gear, `None` if no information has been
+            received.
         """
         try:
             trans_diff = self.ctrl_actuated_log[-1].trans_diff

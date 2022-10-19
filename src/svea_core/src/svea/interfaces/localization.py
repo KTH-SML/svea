@@ -1,12 +1,6 @@
-#!/usr/bin/env python
-
-"""
-Module containing localization interfaces for motion capture, indoor
-localization, etc.
-"""
-
-
 from threading import Thread, Event
+from typing import Callable
+
 import rospy
 
 from svea.states import VehicleState
@@ -17,23 +11,27 @@ __maintainer__ = "Tobias Bolin, Frank Jiang"
 __email__ = "tbolin@kth.se "
 __status__ = "Development"
 
+__all__ = [
+    'LocalizationInterface',
+]
 
-class LocalizationInterface(object):
+class LocalizationInterface:
     """Interface handling the reception of state information from the
-    localization stack. This object can take on several callback
-    functions and execute them as soon as state information is
-    available.
+    localization stack.
 
-    :param vehicle_name: Name of vehicle being controlled;
-                         The name will be effectively be added as a
-                         namespace to the topics used by the
-                         corresponding localization node i.e
-                         `namespace/vehicle_name/state`, defaults to
-                         ''
-    :type vehicle_name: str, optional
+    This object can take on several callback functions and execute them as soon
+    as state information is available.
+
+    Args:
+        vehicle_name: Name of vehicle being controlled; The name will be
+            effectively be added as a namespace to the topics used by the
+            corresponding localization node i.e `namespace/vehicle_name/state`.
     """
 
-    def __init__(self, vehicle_name=''):
+    def __init__(
+        self,
+        vehicle_name: str = '',
+    ):
         self.vehicle_name = vehicle_name
         sub_namespace = vehicle_name + '/' if vehicle_name else ''
         self._state_topic = sub_namespace + 'state'
@@ -48,12 +46,9 @@ class LocalizationInterface(object):
         # list of functions to call whenever a new state comes in
         self.callbacks = []
 
-    def start(self):
-        """Spins up ROS background thread; must be called to start
-        receiving data
-
-        :return: itself
-        :rtype: LocalizationInterface
+    def start(self) -> 'LocalizationInterface':
+        """Spins up ROS background thread; must be called to start receiving
+        data.
         """
         Thread(target=self._init_and_spin_ros, args=()).start()
         return self
@@ -100,24 +95,25 @@ class LocalizationInterface(object):
         for cb in self.callbacks:
             cb(self.state)
 
-    def add_callback(self, cb):
-        """Add state callback. Every function passed into this method
-        will be called whenever new state information comes in from the
-        localization stack.
+    def add_callback(self, cb: Callable[[VehicleState], None]):
+        """Add state callback.
 
-        :param cb: A callback function intended for responding to the
-                   reception of state info
-        :type cb: function
+        Every function passed into this method will be called whenever new
+        state information comes in from the localization stack.
+
+        Args:
+            cb: A callback function intended for responding to the reception of
+                state info.
         """
         self.callbacks.append(cb)
 
-    def remove_callback(self, cb):
+    def remove_callback(self, cb: Callable[[VehicleState], None]):
         """Remove callback so it will no longer be called when state
-        information is received
+        information is received.
 
-        :param cb: A callback function that should be no longer used
-                   in response to the reception of state info
-        :type cb: function
+        Args:
+            cb: A callback function that should be no longer used in response
+            to the reception of state info.
         """
         while cb in self.callbacks:
             self.callbacks.pop(self.callbacks.index(cb))
