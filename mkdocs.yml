@@ -26,6 +26,9 @@ nav:
     - 4. Docker: tutorials/4_docker.md
   - Development:
     - Documentation: development/documentation.md
+  - Reference:
+    - Models: reference/models.md
+    - Interfaces: reference/interfaces.md
 
 markdown_extensions:
   - smarty
@@ -46,6 +49,7 @@ extra_javascript:
   - mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
 watch:
   - src/svea_core/src
 
