@@ -68,6 +68,19 @@ When you are ready to deploy, you can do so to GitHub Pages very easily. By
 calling `mkdocs gh-deploy` everything will be setup and uploaded
 automatically.
 
+Use *docstrings* to document code. The plugin `mkdocstrings` will auto-generate
+content with the syntax shown below. Follow Google's
+[style guide](https://google.github.io/styleguide/pyguide.html) to write the
+documentation.
+
+```text
+# ref/interfaces.md
+
+::: svea.ActuationInterface
+
+::: svea.LocalizationInterface
+```
+
 ## Future
 
 #### docstrings

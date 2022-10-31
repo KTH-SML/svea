@@ -14,7 +14,7 @@ site_author: Smart Mobility Lab
 repo_url: https://github.com/KTH-SML/svea
 copyright: "2020, Smart Mobility Lab"
 
-theme: readthedocs
+theme: material
 
 nav:
   - Home: index.md
@@ -24,21 +24,40 @@ nav:
     - 2. Lidar Simulation: tutorials/2_lidar_sim.md
     - 3. The SVEA: tutorials/3_svea_operation.md
     - 4. Docker: tutorials/4_docker.md
-  - Instructions:
-    - Documentation: instructions/documentation.md
+  - Development:
+    - Documentation: development/documentation.md
 
 markdown_extensions:
   - smarty
+  - def_list
   - sane_lists
   - admonition
   - toc:
       permalink: True
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_javascript:
+  - mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+watch:
+  - src/svea_core/src
 
 plugins:
+  - autorefs
   - mkdocstrings:
       handlers:
         python:
-          docstring_style: sphinx
+          options:
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
           paths:
             - src/svea_core/src
 

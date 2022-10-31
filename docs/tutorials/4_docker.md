@@ -18,32 +18,49 @@ experience by combining ROS and docker.
 
 ### Docker Cheat Sheet
 
-#### `docker build -t svea .`
-Build an image and name it `svea`. *Use SVEA's utility script instead.*
+: `docker build -t svea .`
 
-#### `docker create -it --name zebra svea`
-Create a container from the image `svea` and name it `zebra`. *Use utility script for `run` instead*
+    Build an image and name it `svea`.
 
-#### `docker start -i zebra`
-Start the container `zebra` (it must be created).
+    *Use SVEA's utility script `build` instead.*
 
-#### `docker run -it svea`
-Do `docker create` followed by a `docker start`. *Use SVEA's utility script instead.*
+: `docker create -it --name zebra svea`
 
-#### `docker exec -it svea [command...]`
-Execute command as a sibling process to a running container. (Useful to start separate terminal with command `bash`).
+    Create a container from the image `svea` and name it `zebra`.
 
-#### `docker images`
-List all images.
+    *Unless necessary, use utility script `run` instead.*
 
-#### `docker ps -a`
-List all containers.
+: `docker start -i zebra`
 
-#### `docker container prune`
-Remove all exited containers.
+    Start the container `zebra` (it must be created).
 
-#### `docker image prune -a`
-Remove all images not associated with a container.
+    *Unless necessary, use utility script `run` instead.*
+
+: `docker run -it svea`
+
+    Do `docker create` followed by a `docker start`.
+
+    *Use SVEA's utility script `run` instead.*
+
+: `docker exec -it svea [command...]`
+
+    Execute command as a sibling process to a running container. (Useful to start separate terminal with command `bash`).
+
+: `docker images`
+
+    List all images.
+
+: `docker ps -a`
+
+    List all containers.
+
+: `docker container prune`
+
+    Remove all exited containers.
+
+: `docker image prune -a`
+
+    Remove all images not associated with a container.
 
 ## Background
 
@@ -559,56 +576,57 @@ From here on you work just as before but simply from the workspace repository in
 
 ## Utility scripts reference
 
-### `util/build`
+: `util/build`
 
-Build an image with the following options:
+    Build an image with the following options:
 
-- `--network host`: Use host network when building.
-- `--build-arg ROSDISTRO`: Use `ROSDISTRO` from `config.sh`
-- `--build-arg WORKSPACE`: Use `WORKSPACE` from `config.sh`
+    - `--network host`: Use host network when building.
+    - `--build-arg ROSDISTRO`: Use `ROSDISTRO` from `config.sh`
+    - `--build-arg WORKSPACE`: Use `WORKSPACE` from `config.sh`
 
-### `util/run`
+: `util/run`
 
-Run a container with the following options:
+    Run a container with the following options:
 
-- `-it`: Make it interactive (attach `STDIN`). Allocate TTY in container.
-- `-e TERM=xterm-256color`: Make terminal colorful.
-- `-v <host-src>:<container-dest>`: [Shared volume](https://docs.docker.com/storage/volumes/) for workspace/package.
-- `-v /dev:/dev`: New device connections will be visible inside the container.
-- `--network host`: Use the host’s network.
-- `--privileged`: Allow access to host’s devices.
-- `--name <name>`: Give the container a name.
+    - `-it`: Make it interactive (attach `STDIN`). Allocate TTY in container.
+    - `-e TERM=xterm-256color`: Make terminal colorful.
+    - `-v <host-src>:<container-dest>`: [Shared volume](https://docs.docker.com/storage/volumes/) for workspace/package.
+    - `-v /dev:/dev`: New device connections will be visible inside the container.
+    - `--network host`: Use the host’s network.
+    - `--privileged`: Allow access to host’s devices.
+    - `--name <name>`: Give the container a name.
 
-### `util/run-dev`
+: `util/run-dev`
 
-Run a container with the same options as `util/create` except:
+    Run a container with the same options as `util/create` except:
 
-- `--network host` is removed. Container will use the default network `bridge`.
-- `--privileged` is removed. Container will not have access to devices.
-- `-v /dev:/dev`: is removed. Container will not have access to devices.
+    - `--network host` is removed. Container will use the default network `bridge`.
+    - `--privileged` is removed. Container will not have access to devices.
+    - `-v /dev:/dev`: is removed. Container will not have access to devices.
 
-### `util/config.sh`
+: `util/config.sh`
 
-Can be sourced for common variables such as workspace location etc.
+    Can be sourced for common variables such as workspace location etc.
 
-The following environment variables are set once `util/config.sh` is sourced:
+    The following environment variables are set once `util/config.sh` is sourced:
 
-- `REPOSITORY_PATH`: Absolute path to the repository you are in.
-- `REPOSITORY_NAME`: Base name of the repository (should be same as project name).
-- `BUILD_CONTEXT`: Read the description on `[docker build](https://docs.docker.com/engine/reference/commandline/build/#description)`. If you are using `util/config.sh` from the template `svea_pkg`, then it will try to locate a workspace next to its own repository to increase build speeds by allowing docker to cache. The rule is: if the package is located at `<path>/MY_PROJECT` then expect a workspace to exist at `<path>/MY_PROJECT_ws`.
-- `IMAGE_TAG`: Name of the built image.
-- `CONTAINER_NAME`: Name of the created container.
-- `ROSDISTRO`: The used ROS distribution. Do **not** change this.
-- `WORKSPACE`: The absolute path to the ROS workspace inside the container.
-- `SHRVOL_SRC`: Absolute path to directory (host side) that should be shared with container.
-- `SHRVOL_DST`: Absolute path to directory (container side) that should be shared with container.
+    - `REPOSITORY_PATH`: Absolute path to the repository you are in.
+    - `REPOSITORY_NAME`: Base name of the repository (should be same as project name).
+    - `BUILD_CONTEXT`: Read the description on `[docker build](https://docs.docker.com/engine/reference/commandline/build/#description)`. If you are using `util/config.sh` from the template `svea_pkg`, then it will try to locate a workspace next to its own repository to increase build speeds by allowing docker to cache. The rule is: if the package is located at `<path>/MY_PROJECT` then expect a workspace to exist at `<path>/MY_PROJECT_ws`.
+    - `IMAGE_TAG`: Name of the built image.
+    - `CONTAINER_NAME`: Name of the created container.
+    - `ROSDISTRO`: The used ROS distribution. Do **not** change this.
+    - `WORKSPACE`: The absolute path to the ROS workspace inside the container.
+    - `SHRVOL_SRC`: Absolute path to directory (host side) that should be shared with container.
+    - `SHRVOL_DST`: Absolute path to directory (container side) that should be shared with container.
 
-### `util/remote_ros.sh`
+: `util/remote_ros.sh`
 
-*Note: This script should be sourced*.
+    Set up ROS environment variables for a remote ROS Master. Takes one argument, the master’s hostname. If no argument is given, it is assumed ROS Master runs on the same machine.
 
-Set up ROS environment variables for a remote ROS Master. Takes one argument, the master’s hostname. If no argument is given, it is assumed ROS Master runs on the same machine.
+    *Note: This script should be sourced*.
 
-### `util/rename`
+: `util/rename`
 
-Rename package to match the repository.
+    Rename package to match the repository.
+
