@@ -26,7 +26,7 @@
     <!-- Start RViz -->
     <node if="$(eval use_rviz and not remote_rviz)"
           name="rviz" pkg="rviz" type="rviz"
-          args="-d $(find svea_core)/resources/rviz/SVEA_floor2.rviz"/>
+          args="-d $(find svea_core)/rviz/SVEA_floor2.rviz"/>
 
     <!-- Start pure_pursuit -->
     <node name="pure_pursuit" pkg="svea_examples" type="pure_pursuit.py" output="screen">

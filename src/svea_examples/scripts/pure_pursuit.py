@@ -10,7 +10,7 @@ from tf.transformations import quaternion_from_euler
 from svea.models.bicycle import SimpleBicycleModel
 from svea.states import VehicleState
 from svea.simulators.sim_SVEA import SimSVEA
-from svea.localizers import LocalizationInterface
+from svea.interfaces import LocalizationInterface
 from svea.controllers.pure_pursuit import PurePursuitController
 from svea.svea_managers.path_following_sveas import SVEAPurePursuit
 from svea.data import TrajDataHandler, RVIZPathHandler

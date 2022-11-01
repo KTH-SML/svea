@@ -7,7 +7,7 @@ Module containing archetypal SVEA manager classes.
 from copy import deepcopy
 
 import rospy
-from svea.actuation import ActuationInterface
+from svea.interfaces import ActuationInterface
 from svea.sensors import Lidar
 from svea.data import BasicDataHandler
 

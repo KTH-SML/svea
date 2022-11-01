@@ -10,7 +10,7 @@ from svea.states import VehicleState
 from svea.simulators.sim_SVEA import SimSVEA
 from svea.models.bicycle import SimpleBicycleModel
 from svea.svea_managers.path_following_sveas import SVEAPlatoonMember
-from svea.localizers import LocalizationInterface
+from svea.interfaces import LocalizationInterface
 from svea.data import RVIZPathHandler
 from svea.models.cooperative import C_OVRV
 from .c_ovrv_utils import *

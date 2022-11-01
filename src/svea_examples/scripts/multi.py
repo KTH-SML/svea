@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from svea.svea_managers.path_following_sveas import SVEAPurePursuit
 from svea.states import VehicleState
-from svea.localizers import LocalizationInterface
+from svea.interfaces import LocalizationInterface
 from svea.controllers.pure_pursuit import PurePursuitController
 from svea.models.bicycle import SimpleBicycleModel
 from svea.simulators.sim_SVEA import SimSVEA

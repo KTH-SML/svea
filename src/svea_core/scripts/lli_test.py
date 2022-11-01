@@ -6,7 +6,7 @@ Node to test the lli control interface by giving different directional commands 
 
 import rospy
 import math
-from svea.actuation import ActuationInterface
+from svea.interfaces import ActuationInterface
 
 def main():
     """

@@ -5,7 +5,7 @@ import math
 import numpy as np
 from ..c_ovrv_utils import *
 from svea.svea_managers.path_following_sveas import SVEAPlatoonMember
-from svea.localizers import LocalizationInterface
+from svea.interfaces import LocalizationInterface
 from svea.simulators.sim_SVEA import SimSVEA
 from svea.models.bicycle import SimpleBicycleModel
 from svea.data import RVIZPathHandler
