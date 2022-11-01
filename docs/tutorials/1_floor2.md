@@ -26,7 +26,7 @@ should first create your own version of the example that you can edit. You can d
 this by copying `svea/src/svea_examples/launch/floor2.launch` into
 `svea/src/<your project package>/launch/` and
 `svea/src/svea_examples/scripts/pure_pursuit.py` into
-`svea/src/<your project package>/scripts/`. 
+`svea/src/<your project package>/scripts/`.
 
 ## Task 1: Addressing overshoot
 
@@ -66,7 +66,7 @@ ability to stop the SVEA automatically.
 The most basic version of emergency stops that you should try in this task
 is stopping the SVEA if it comes too close to a list of obstacle points. Imagine
 that you already know where the obstacles are and they are represented by a
-list of XY coordinates (e.g. [(x1, y1), (x2, y2), ...]). Then, you should
+list of XY coordinates (e.g. `[(x1, y1), (x2, y2), ...]`). Then, you should
 try to update your implementation to stop when the SVEA gets too close to
 these points. We will leave the definition of being "too close" up to you.
 
@@ -76,6 +76,7 @@ to others. To make your life easier, there's already a number of visualization
 functions in `svea/src/svea_core/src/svea/simulators/viz_utils.py`.
 
 If this is "too easy" for you, then consider the following enhancements:
+
 1. Use the RVIZ "Publish Point" button to create obstacles through the `/clicked_point` ROS topic
 2. Add the walls to the obstacle points by using the map (see `svea/src/svea_core/scripts/plot_map.py` to see how to work with the map)
 

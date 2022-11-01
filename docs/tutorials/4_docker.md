@@ -69,12 +69,6 @@ gitGraph
     > cd PROJET_ws
     ```
 
-- Change package name in source code using
-
-    ```
-    > util/rename MY_PKG
-    ```
-
 - Change `README`, `LICENSE`, or `.gitignore` if necessary.
 
 - Add ROS packages in `src`.
