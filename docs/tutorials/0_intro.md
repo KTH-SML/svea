@@ -8,6 +8,7 @@ some of the organization around the SVEA software stack.
 ![svea hardware](/media/svea_hardware.png)
 
 The SVEA platform consists of the following hardware components:
+
 1. [Single-channel LiDAR](https://www.hokuyo-usa.com/products/lidar-obstacle-detection/ust-10lx)
 2. [IMU](https://www.adafruit.com/product/2472)
 3. [Stereo tracking camera](https://www.intelrealsense.com/tracking-camera-t265/) (outputs only odometry)
@@ -19,7 +20,7 @@ The SVEA platform consists of the following hardware components:
 
 As described in the diagram above, the TX2 is the main computer where all sensor
 data goes and where all high-level decision+control is made. The TX2 runs NVIDIA's
-JetPack SDK which includes their implementation of Ubuntu 18.04 for ARM.
+JetPack SDK which includes their implementation of Ubuntu 20.04 for ARM.
 
 The original RC remote still works to control the chassis, with some additional
 features added on. In particular, in addition to the RC remote's standard
@@ -49,7 +50,7 @@ int8 ctrl
 Here, `steering` and `velocity` do not have the typical units. Instead of [rad]
 and [m/s] both have integer values from 127 to -127.
 For `steering`, this corresponds to a steering range between about 45 degrees
-(pi/4 radians) to the left and -45 degrees (-pi/4 radians) to the right,
+($\pi/4$ radians) to the left and -45 degrees ($-\pi/4$ radians) to the right,
 respectively. The resultant heading change of the vehicle will also be affected
 by whether the front and/or rear differential locks are locked or not. For
 `velocity`, this corresponds to a range between max speed forward and max speed
@@ -70,7 +71,7 @@ receiving reports from the Teensy where it is used to communicate whether:
 Since it's a bit complicated to write controllers that compute steering and
 velocity in a range from [-127, 127] and set the right bit in `trans_diff` we
 have added methods to the `ActuationInterface` class in
-`svea_core/src/svea/actuation.py` so you can conveniently affect these
+`svea_core/src/svea/interfaces/actuation.py` so you can conveniently affect these
 mechanics. In most cases, the `ActuationInterface` should satisfy your actuation
 requirements.
 
@@ -90,6 +91,7 @@ that is accessible to the scope where the object was instanstiated. Since each
 of these object's callbacks run on a separate thread, we can run the interface
 objects in the same thread and access all of their data from one script. This
 has many benefits, but the most important ones are:
+
 1. We can program/script in the more common Python OOP style, instead of
    conforming to the traditional rospy style of designing a web of ROS nodes
 2. We can do a task with a single script
@@ -116,100 +118,3 @@ Instead of taking my word for it, take a look for yourself! In the next
 tutorial, we will guide you through an example where you will adjust a script in
 simulation and then run it on a real vehicle.
 
-## Directory structure
-
-In this section, we will talk about the directory structure of this repository.
-More importantly, we will focus on how to add new files, and through the process
-show you what and where files you likely want to know about are.
-
-To keep this repo both organized and simple to use, we utilize **both a flat and
-hierarchical directory structure**. Flatness is used for standard and commonly
-used files, while hierarchy (use of sub-directories) is used for reducing
-clutter from either specialized, but important, files or a category of files
-that has a large variety. For example, `actuation.py` is considered a standard
-and commonly used file, since it is required in any use of the SVEA platform. In
-contrast, `cooperative.py`, which contains dynamical models used for network
-cooperation between several vehicles, is a specialized file that is important
-for some work, but is organized into a folder with the rest of all the possible
-models the svea core library might include.
-
-
-### Adding new files
-
-There are a number of possible new files you might be interested in adding. We
-have tried to account for all the possible file types one would need to add
-while working on the SVEA platform, but may have missed some; if this is the
-case, please let one of the maintainers of the repository know so we can
-incorporate it into the directory structure. Here are the file/folder types we
-have accounted for:
-
-1. Bash utility scripts
-2. ROS package
-3. SVEA ROS launch files
-4. Custom ROS msg definitions
-5. ROS bags
-6. ROS maps
-7. ROS yaml configuration/parameter files
-8. RVIZ configuration files
-9. Project folders
-10. Standard/commonly used python modules
-11. Specialized/categorized python modules
-12. Tests
-
-The type "Project folder" is left vague on purpose. A project folder is a
-flexible folder that contains whatever scripts or files that are needed for a
-project that do not get put into a separate repository. Explicitly, if you are
-working on a new project with the SVEA platform, then do one of the two options:
-1. If your work fits nicely into the structure of the svea_core ROS package,
-   create a directory in `src/svea_core/scripts`
-2. If your work requires it's own ROS package structure, create a ROS package in
-   `src` on the same level as `svea_core`.
-
-In general, we recommend you start with adding a directory within the
-`svea_core` package and working from there, but if you find that this is too
-limiting for your work, then you can move your work it's own ROS package. If the
-files you want to add to the repository fits any of these categories, here's an
-illustration of where to place them:
-
-```
-├── docs
-├── media
-├── utilities
-│   └── * New bash utility scripts
-└── src
-    ├── * New ROS package
-    └── svea_core
-        ├── launch
-        │   └── * New ROS launch file
-        ├── msg
-        │   └── * New custom ROS msg definition
-        ├── resources
-        │   ├── bags
-        │   │   └── * New ROS bag
-        │   ├── maps
-        │   │   └── * New ROS map
-        │   ├── param
-        │   │   └── * New ROS yaml file
-        │   └── rviz
-        │       └── * New RVIZ configuration file
-        ├── scripts
-        │   └── * New project folder
-        └── src
-            └── svea
-                ├── actuation.py
-                ├── localization.py
-                ├── sensors.py
-                ├── states.py
-                ├── * New standard/commonly used python module
-                ├── controllers
-                │   └── * New specialized/categorized python module
-                ├── models
-                ├── path_planners
-                ├── simulators
-                ├── svea_managers
-                └── tests
-                    └── * New tests
-```
-
-**Note**, for new specialized/catagorized python modules, they should go into
-the appropriately named folder (i.e. `bicycle.py` goes into `models`).

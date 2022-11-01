@@ -3,7 +3,7 @@
 In this tutorial, we will introduce the lidar simulation pipeline that is
 available in this repo. The lidar simulation we have implemented relies on predefining
 all the obstacles you want the lidar to emulate as polygons. To do this, you
-need to edit the configuration file: `svea_core/resources/param/obstacles.yaml`.
+need to edit the configuration file: `svea_core/params/obstacles.yaml`.
 In there you will see a list of polygon vertices listed in either clockwise or
 conter-clockwise order.
 
@@ -36,7 +36,7 @@ finish drawing obstacles. However, before you create a new obstacle, let's first
 load in a map. The GUI will only load in pickle files, since we need the
 OccupancyGrid to know what pixels in the image correspond to what coordinates in
 the OccupancyGrid. A pickle has already been created for floor2, so you can load
-it in from `svea_core/resources/maps/floor2.pickle`. After loading the floor2
+it in from `svea_core/maps/floor2.pickle`. After loading the floor2
 map in, your window should look something like:
 
 ![blank floor](/media/tutorials/blank_floor2.png)
@@ -47,8 +47,8 @@ try to close the polygon, since this is usually most convenient. As soon as you
 are done creating vertices, click the "Finish obstacle" button. Repeat this
 until you have created all the obstacles you want to. Once you are done creating
 obstacles, you can simply click the "Export" button and save the yaml file in a
-good place (we recommend `svea_core/resources/param`). There is already a file
-in `svea_core/resources/param` called `obstacles.yaml`. In `obstacles.yaml`, we
+good place (we recommend `svea_core/params`). There is already a file
+in `svea_core/params` called `obstacles.yaml`. In `obstacles.yaml`, we
 have added an example set of obstacles that correspond to the walls of floor2.
 If you want to keep this, it's best you save your obstacles as a new file. The
 obstacle set we have created looks like this:
@@ -65,7 +65,7 @@ If you have created several more yaml files, you can load them in instead of the
 default floor2 obstacles by editing the following line in your launch file:
 
 ```xml
-<rosparam command="load" file="$(find svea_core)/resources/params/obstacles.yaml" />
+<rosparam command="load" file="$(find svea_core)/params/obstacles.yaml" />
 ```
 
 where you can change `obstacles.yaml` to whatever obstacles file you want
