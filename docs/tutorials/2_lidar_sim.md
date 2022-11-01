@@ -10,10 +10,9 @@ conter-clockwise order.
 ## Obstacle Editor GUI
 
 To make the additions of obstacles easier, we have provided a GUI for creating
-obstacles on a given map. The GUI is written in Python 3, as opposed to the
-usual Python 2 in this repository. Thus, you will likely need to install some
-extra dependencies before we can try running the GUI. Start by adding
-Python 3 libraries you are likely missing:
+obstacles on a given map. You might need to install some extra dependencies
+before we can try running the GUI. Start by adding libraries you are likely
+missing:
 
 ```
 sudo apt install python3-tk
