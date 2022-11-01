@@ -10,6 +10,8 @@
     <!-- Start map server -->
     <node name="map_server" pkg="map_server" type="map_server" args="$(find svea_core)/maps/$(arg map).yaml" output="screen"/>
 
+    <rosparam command="load" file="$(find svea_core)/params/obstacles.yaml" />
+
     <group unless="$(arg is_sim)">
 
         <!-- Start low-level interface -->
