@@ -558,7 +558,7 @@ should first create your own version of the example that you can edit. You can d
 this by copying <code>svea/src/svea_examples/launch/floor2.launch</code> into
 <code>svea/src/&lt;your project package&gt;/launch/</code> and
 <code>svea/src/svea_examples/scripts/pure_pursuit.py</code> into
-<code>svea/src/&lt;your project package&gt;/scripts/</code>. </p>
+<code>svea/src/&lt;your project package&gt;/scripts/</code>.</p>
 <h2 id="task-1-addressing-overshoot">Task 1: Addressing overshoot<a class="headerlink" href="#task-1-addressing-overshoot" title="Permanent link">&para;</a></h2>
 <p>When you run the Floor 2 example as is, you will notice that at some turns
 the vehicle has a big overshoot and some times gets very close, or even
@@ -589,16 +589,18 @@ ability to stop the SVEA automatically.</p>
 <p>The most basic version of emergency stops that you should try in this task
 is stopping the SVEA if it comes too close to a list of obstacle points. Imagine
 that you already know where the obstacles are and they are represented by a
-list of XY coordinates (e.g. [(x1, y1), (x2, y2), &hellip;]). Then, you should
+list of XY coordinates (e.g. <code>[(x1, y1), (x2, y2), ...]</code>). Then, you should
 try to update your implementation to stop when the SVEA gets too close to
 these points. We will leave the definition of being &ldquo;too close&rdquo; up to you.</p>
 <p>We recommend that you try to visualize these obstacle points to make it
 easier for you to develop this functionality and to make it easier to show
 to others. To make your life easier, there&rsquo;s already a number of visualization
 functions in <code>svea/src/svea_core/src/svea/simulators/viz_utils.py</code>.</p>
-<p>If this is &ldquo;too easy&rdquo; for you, then consider the following enhancements:
-1. Use the RVIZ &ldquo;Publish Point&rdquo; button to create obstacles through the <code>/clicked_point</code> ROS topic
-2. Add the walls to the obstacle points by using the map (see <code>svea/src/svea_core/scripts/plot_map.py</code> to see how to work with the map)</p>
+<p>If this is &ldquo;too easy&rdquo; for you, then consider the following enhancements:</p>
+<ol>
+<li>Use the RVIZ &ldquo;Publish Point&rdquo; button to create obstacles through the <code>/clicked_point</code> ROS topic</li>
+<li>Add the walls to the obstacle points by using the map (see <code>svea/src/svea_core/scripts/plot_map.py</code> to see how to work with the map)</li>
+</ol>
 <p><strong>Tip</strong>: To find the points you want for your trajectory, you can use the
 &ldquo;Publish Point&rdquo; tool in the toolbar of the RVIZ window. If you click on the
 &ldquo;Pubilsh Point&rdquo; button to activate the tool, when you hover around the map,
