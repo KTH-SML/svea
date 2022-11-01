@@ -6,11 +6,11 @@ Module containing path following SVEA managers
 
 import math
 
-from svea_archetypes import SVEAManager
+from .svea_archetypes import SVEAManager
 # from svea.simulators.viz_utils import publish_path, publish_target
 from svea.data import TrajDataHandler
 from svea.controllers import pure_pursuit
-from svea.controllers.pure_pursuit import PurePursuitSpeedController
+from svea.controllers.pure_pursuit import PurePursuitController
 
 ## PURE PURSUIT PARAMS ########################################################
 pure_pursuit.k = 0.6  # look forward gain
@@ -155,7 +155,7 @@ class SVEAPlatoonMember(SVEAPurePursuit):
                  vehicle_name=''):
 
         SVEAPurePursuit.__init__(self, localizer,
-                                 PurePursuitSpeedController,
+                                 PurePursuitController,
                                  traj_x, traj_y,
                                  data_handler = data_handler,
                                  vehicle_name = vehicle_name)

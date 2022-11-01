@@ -37,34 +37,23 @@ To read up on OOP, check out Real Python's
 ## System Requirements
 This library is developed on and intended for systems running:
 
-1. Ubuntu 18.04 (installation tutorial [here](https://ubuntu.com/tutorials/tutorial-install-ubuntu-desktop#1-overview))
-2. ROS Melodic (installation instructions [here](http://wiki.ros.org/melodic/Installation/Ubuntu))
-3. Python 2.7
-
-Python 2.7 will be made default when you install ROS. An easy way to check if
-Python 2.7 is the default version on your system is to open a terminal and run
-
-```bash
-python
-```
-
-to make sure you see "Python 2.7" appear somewhere in the header of the text
-that appears afterwards.
+1. Ubuntu 20.04 (installation tutorial [here](https://ubuntu.com/tutorials/tutorial-install-ubuntu-desktop#1-overview))
+2. ROS Noetic (installation instructions [here](http://wiki.ros.org/noetic/Installation/Ubuntu))
 
 If you do not want to install Ubuntu onto your computer, consider installing a
 [virtual machine](https://www.osboxes.org/ubuntu/) or use
-[docker](https://docs.docker.com/install/) with Ubuntu 18.04 images.
+[docker](https://docs.docker.com/install/) with Ubuntu 20.04 images.
 
-Some may need to install some additional python tools (install the **Python 2.7**
-versions):
+Install python dependencies by calling:
 
-1. [numpy](https://scipy.org/install.html) **(You may need to update your version of numpy to the newest)** You can do this with `pip install numpy`
-2. [matplotlib](https://matplotlib.org/users/installing.html)
+```
+pip install -r requirements.txt
+```
 
 The installation instructions later on will use `catkin build` instead of
 `catkin_make`, so you should also [install catkin tools using apt-get](https://catkin-tools.readthedocs.io/en/latest/installing.html#installing-on-ubuntu-with-apt-get).
 
-If you had a pre-existing ROS Melodic installation, please run:
+If you had a pre-existing ROS Noetic installation, please run:
 
 ```bash
 sudo apt update
@@ -100,11 +89,10 @@ Finally, compile and link the libraries using:
 ```bash
 catkin build
 source devel/setup.bash
-rospack profile
 ```
 
 To make sure the libraries are linked in the future, also call (**you need to replace
-`<path-to-svea>` with the file path to whever you cloned "svea_starter", e.g.
+`<path-to-svea>` with the file path to wherever you cloned "svea", e.g.
 `/home/nvidia/svea/devel/setup.bash`**):
 
 ```bash
@@ -128,43 +116,26 @@ should always start in simulation and code can be directly ported to the real
 cars. However, this does not mean the code will work on a
 real vehicle without further tuning or changes.
 
-There are three pre-written scripts to serve as examples of how to use the
+There are pre-written scripts to serve as examples of how to use the
 core library. See and read the source code in
-`svea_core/scripts/core_examples`.
-
-You can try them out by running one of the two commands:
-
-```bash
-roslaunch svea_core key_teleop.launch
-```
-
-for a keyboard teleop example. Once launched, you should see the following:
-
-![key-teleop example](./media/key_teleop.png)
-
-where you can use arrow keys to control the simulated SVEA car.
+`svea_examples/scripts`.
 
 For a pure pursuit example, call:
 
 ```bash
-roslaunch svea_core pure_pursuit.launch
+roslaunch svea_examples floor2.launch use_rviz:=false
 ```
 
-where you should see something that looks like:
+where you should see a matplotlib visualization that looks like:
 
-![purepursuit example](./media/purepursuit.png)
+![purepursuit example](docs/media/purepursuit.png)
 
-To run a more involved example, call:
+or you can run with RViz, `use_rviz:=true`, then you should see something that
+looks like:
 
-```bash
-roslaunch svea_core floor2.launch
-```
+![rviz example](docs/media/floor2_rviz.png)
 
-where you should see something that looks like:
-
-![key-teleop example](./media/floor2_rviz.png)
-
-Now you are ready to read through the tutorials! You can find them in `svea_starter/docs/tutorials`.
+Now you are ready to read through the tutorials! You can find them in `svea/docs/tutorials`.
 
 ## Going from simulation to real
 
@@ -187,13 +158,8 @@ To your roslaunch file, add
 Running the localization amounts to adding `localize.launch` to your project launch:
 
 ```xml
-<include file="$(find svea_sensors)/launch/localize.launch">
-    <arg name="use_rs" value="true"/>
-    <arg name="file_name" value="$(arg map_file)"/>
-</include>
+<include file="$(find svea_sensors)/launch/localize.launch"/>
 ```
-
-**Note**, `localize.launch` will run a map_server, so you will not need to include map server in your launch when running on the real vehicle. If you need to install more packages to run `localize.launch`, please refer to the installation instructions in `svea_sensors/README.md`.
 
 ### RC Remote
 
@@ -204,22 +170,16 @@ When the RC remote is not in override mode, it's inputs will still be received b
 Since you will not be able to drive the SVEA cars with a display plugged in, it can be useful to link a computer that does have a display to the SVEA car's ROS network. This will let you use [RVIZ](http://wiki.ros.org/rviz) and [PlotJuggler](http://wiki.ros.org/plotjuggler) on the computer with a display while accessing the data streams on the SVEA car. This amounts to telling the computer with a display where the ROS master it should be listening to (in this case, it should listen to the ROS master running on the SVEA car) is located on the network. On both the SVEA car and the computer with a display, run:
 
 ```bash
-. <svea_starter_root>/scripts/export_ros_ip.sh
+. <svea_root>/util/remote_ros.sh
 ```
 
 You can test if this worked by launching something on the SVEA car in the same terminal where the export commands were run and then calling ```rostopic list``` on the computer with a display in the same terminal where the export commands were run. You should see the topics you expect to be on the SVEA car also available on the computer with a display. If this worked, you have some options for how you want to use it. You can either:
 1. call this script everytime you want to link the SVEA car and the computer with a display togther (the script only links the terminal window you run it in),
 2. add an [alias](https://mijingo.com/blog/creating-bash-aliases) to the end of the SVEA car and the computer's ```~/.bashrc``` to create a new bash command,
-3. you can add the contents of ```export_ros_ip.sh``` directly to the end of your ```~/.bashrc```,
+3. you can add the contents of ```remote_ros.sh``` directly to the end of your ```~/.bashrc```,
 
 or some other preferred approach.
 
 # Documentation
 After cloning the repository, you can open the core library's documentation by opening `docs/library/_build/index.html` in your favorite browser.
 
-# Testing
-This repository is using pytests through the ros-pytests framework. To run the available tests, run
-```bash
-catkin run_tests
-```
-which will run any linked tests in each ROS package's CMakeList.txt

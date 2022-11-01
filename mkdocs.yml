@@ -1,0 +1,68 @@
+# Configuration file for [MkDocs](https://mkdocs.org)
+#
+# This configuration requires the following pip packages to work:
+# - mkdocs
+#
+# To build the documentation:
+# > mkdocs build
+
+site_name: SVEA
+site_description: 'Starter ROS workspace for working with the [s]mall [ve]hicles for [a]utonomy platform '
+site_author: Smart Mobility Lab
+# site_url: https://svea.eecs.kth.se
+
+repo_url: https://github.com/KTH-SML/svea
+copyright: "2020, Smart Mobility Lab"
+
+theme: material
+
+nav:
+  - Home: index.md
+  - Tutorial:
+    - 0. Introduction: tutorials/0_intro.md
+    - 1. Floor 2 and Pure-Pursuit: tutorials/1_floor2.md
+    - 2. Lidar Simulation: tutorials/2_lidar_sim.md
+    - 3. The SVEA: tutorials/3_svea_operation.md
+    - 4. Docker: tutorials/4_docker.md
+    - 5. Advanced Docker Workflows: tutorials/5_more_docker.md
+  - Development:
+    - Documentation: development/documentation.md
+  - Reference:
+    - Models: reference/models.md
+    - Interfaces: reference/interfaces.md
+
+markdown_extensions:
+  - smarty
+  - def_list
+  - sane_lists
+  - admonition
+  - toc:
+      permalink: True
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_javascript:
+  - mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+watch:
+  - src/svea_core/src
+
+plugins:
+  - autorefs
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
+          paths:
+            - src/svea_core/src
+

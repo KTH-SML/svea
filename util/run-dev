@@ -1,0 +1,36 @@
+#! /bin/sh
+#
+# Create and start (run) a container.
+#
+# OBS: This is the development version. The container will
+# not be privileged or have access to the host's network.
+#
+# Author: Kaj Munhoz Arfvidsson
+
+
+. "$(dirname "$0")/config.sh"
+
+
+# Setting default arguments
+if [ -z "$*" ]
+then set -- --name "$CONTAINER_NAME" "$IMAGE_TAG"
+fi
+
+
+# enable X11 access if DESKTOP is true
+istrue DESKTOP && ! istrue DEBUG && xhost +local:docker
+
+
+istrue DEBUG && fn="echo" || fn="exec"
+
+"$fn" docker run \
+    -it \
+    -e "TERM=xterm-256color" \
+    -e "DISPLAY" \
+    -e "LIBGL_ALWAYS_SOFTWARE=1" \
+    -e "QT_X11_NO_MITSHM=1" \
+    -v "/tmp/.X11-unix:/tmp/.X11-unix" \
+    -v "/etc/localtime:/etc/localtime:ro" \
+    -v "$SHRVOL_SRC:$SHRVOL_DST" \
+    "$@"
+

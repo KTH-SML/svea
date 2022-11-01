@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="save_dir"    default="$(find svea_core)/maps"/>
+    <arg name="file_name"   default="%y%m%d-%H%M"/>
+    <arg name="save_method" default="numpy"/>
+
+    <node pkg="svea_core" type="save_map.py" name="save_map" output="screen">
+        <param name="save_dir"      value="$(arg save_dir)"/>
+        <param name="file_name"     value="$(arg file_name)"/>
+        <param name="save_method"   value="$(arg save_method)"/>
+    </node>
+
+</launch>

@@ -12,7 +12,7 @@ import tf2_ros
 from geometry_msgs.msg import TransformStamped
 from svea_msgs.msg import lli_ctrl, lli_emergency
 from svea.states import SVEAControlValues
-from sim_lidar import SimLidar
+from .sim_lidar import SimLidar
 
 __license__ = "MIT"
 __maintainer__ = "Frank Jiang"

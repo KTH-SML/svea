@@ -4,32 +4,25 @@
 -->
 
 <launch>
-  <!-- Start odometry -->
-  
-  <arg name="xavier" default="false"/>
-  <arg name="use_rs" default="true"/>
-  
-  <group unless="$(arg use_rs)">
-    <include file="$(find svea_sensors)/launch/zed_odometry.launch">
-      <arg name="xavier" value="$(arg xavier)"/>
-    </include>            
-  </group>
-  <group if="$(arg use_rs)">
-    <include file="$(find svea_sensors)/launch/rs_odometry.launch">
-      <arg name="start_serial" value="true" />
-      <arg name="xavier" value="$(arg xavier)"/>
+
+    <!-- Launch file arguments -->
+    <arg name="xavier"      default="false"/>
+    <arg name="camera"      default="rs"/>
+    <arg name="slam_delay"  default="5"/>
+
+
+    <!-- Start the stereo camera -->
+    <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/rs_odometry.launch">
+        <arg name="xavier" value="$(arg xavier)"/>
     </include>
-  </group>
-  
-  <arg name="rviz" default="false"/>
-  <group if="$(arg rviz)">
-    <include file="$(find svea_sensors)/launch/rviz.launch" />
-  </group>
-  
-  <arg name="slam_delay" default="5"/> <!-- Delay before starting SLAM node -->
-  <node pkg="slam_toolbox" type="sync_slam_toolbox_node" name="slam_toolbox" output="screen" launch-prefix="bash -c 'sleep $(arg slam_delay); $0 $@' ">
-    <rosparam command="load" file="$(find svea_sensors)/params/slam_toolbox/slam_sync.yaml" />
-  </node>
+    <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
+        <arg name="xavier" value="$(arg xavier)"/>
+    </include>
+
+    <!-- Start SLAM -->
+    <node pkg="slam_toolbox" type="sync_slam_toolbox_node" name="slam_toolbox" output="screen" launch-prefix="bash -c 'sleep $(arg slam_delay); $0 $@' ">
+        <rosparam command="load" file="$(find svea_sensors)/params/slam_toolbox/slam_sync.yaml" />
+    </node>
 
 </launch>
 

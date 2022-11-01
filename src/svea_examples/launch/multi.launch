@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Launch file arguments -->
+    <arg name="is_sim" default="true"/>
+
+    <!-- Start multi.py -->
+    <node pkg="svea_examples" type="multi.py" name="SVEA_multi" output="screen">
+        <param name="is_sim" value="$(arg is_sim)"/>
+    </node>
+
+</launch>

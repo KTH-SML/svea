@@ -7,7 +7,7 @@ Module containing archetypal SVEA manager classes.
 from copy import deepcopy
 
 import rospy
-from svea.actuation import ActuationInterface
+from svea.interfaces import ActuationInterface
 from svea.sensors import Lidar
 from svea.data import BasicDataHandler
 
@@ -96,7 +96,7 @@ class SVEAManager(object):
             timeout = None
         else:
             timeout = self.MAX_WAIT - (time - self.last_state_time)
-        if timeout <= 0:
+        if timeout is None or timeout <= 0:
             return deepcopy(self.state)
 
         self.localizer.ready_event.wait(timeout)

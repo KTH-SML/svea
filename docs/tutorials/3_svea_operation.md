@@ -1,6 +1,8 @@
 <!--TODO: move some of the commented out instructions to a course tutorial-->
-# SVEA car instructions
-This document contains instructions for working with the SVEA platform. 
+
+# The SVEA
+
+This document contains instructions for working with the SVEA platform.
 
 __If you have an issue, please check the Common Problems section at the bottom.__
 
@@ -35,13 +37,13 @@ The ESC is located underneath the battery box, to the left. It is connected to t
 For more information on the ESC, see the [TRX-4 owners manual](https://traxxas.com/sites/default/files/82056-4-OM-EN-R01.pdf) page 18-20.
 
 ### Power bank
-The power bank is a large LiPo power bank. It is located in the large right hand side compartment of the battery box. 
+The power bank is a large LiPo power bank. It is located in the large right hand side compartment of the battery box.
 The power bank has a power on button (it will power off automatically when it does not detect a sufficient power draw) and a small LCD screen indicating the current charge percentage.  The power bank provides power to everything on the SVEA that the motor battery does not provide power for. It mainly powers the TX2, the USB hub, and various sensors.
 
 ### TX2
-The Nvidia Jetson TX2 is the main computer of the SVEA. It is located on top of the battery box. **The power on button is located on the left side.** It is the closest to the front, out of 4 buttons. On the left side, there is a USB port, a HDMI port, an ethernet port, and the WiFi antennas. 
+The Nvidia Jetson TX2 is the main computer of the SVEA. It is located on top of the battery box. **The power on button is located on the left side.** It is the closest to the front, out of 4 buttons. On the left side, there is a USB port, a HDMI port, an ethernet port, and the WiFi antennas.
 
-When power is connected to the TX2 a small red LED on the TX2 should turn on. When the TX2 is powered on two additional green LEDs on the TX2 should also turn on. 
+When power is connected to the TX2 a small red LED on the TX2 should turn on. When the TX2 is powered on two additional green LEDs on the TX2 should also turn on.
 
 ### Remote
 An RC remote that came with the TRX-4. As a normal RC remote it has a throttle and a steering wheel. In addition, it also has a three state switch on the top (which controls the differential locks and override mode) and a thumb switch to control the gear.
@@ -57,7 +59,7 @@ The power board has two main purposes: Regulate the power from the power bank an
 
 The SPMB has two switches: one for toggling the 12V power supply and one for toggling the servo power. The switches have built in LEDs that will be green when on and red when off. The servo switch can also shine yelow if it is in the ON position but the Teensy is not sending a servo power signal. No servo power signal is normal if there is no signal comming from either the remote or the TX2.
 
-The 4 LEDs are controlled by the teensy. They are labeled 0-3 starting from the front. In normal operation they will indicate the status of the low level interface (LLI) flags. Green means that the flag is set, and red means that it is not. 
+The 4 LEDs are controlled by the teensy. They are labeled 0-3 starting from the front. In normal operation they will indicate the status of the low level interface (LLI) flags. Green means that the flag is set, and red means that it is not.
 A green light means that:
 
 0. The TX2 is sending signals to the SPMB
@@ -74,7 +76,7 @@ There are other buttons located just in front of the LEDs. __DO NOT TOUCH THESE 
 To the far right on the power board is the large connector that connects to the power bank.
 
 ### Receiver
-The receiver receives control signals from the remote and passes them on to the power board. The reciver has one LED. If it is green, then the remote is connected, if it is red, then the receiver is waiting, and if it is flashing red, then the receiver has given up on waiting for the remote (make sure that the remote is on and try pressing the receiver reset button). 
+The receiver receives control signals from the remote and passes them on to the power board. The reciver has one LED. If it is green, then the remote is connected, if it is red, then the receiver is waiting, and if it is flashing red, then the receiver has given up on waiting for the remote (make sure that the remote is on and try pressing the receiver reset button).
 
 For more information on the receiver, see the [TRX-4 owners manual](https://traxxas.com/sites/default/files/82056-4-OM-EN-R01.pdf)
 
@@ -87,9 +89,9 @@ The modem is mounted at the back, underneath the USB hub.
 The TX2 receives the internet connection over USB.
 Other computers can connect to the modem over WiFi.
 
-The modem has two buttons, a big power button on the front and a smaler menu button on top. 
+The modem has two buttons, a big power button on the front and a smaler menu button on top.
 
-## Procedures for turning the car ON and OFF 
+## Procedures for turning the car ON and OFF
 
 ### Turn ON 12V power
 1. Plug in the powerbank cord to the powerbank. (Alternatively, plug the 19V power adapter into the power board.)
@@ -102,10 +104,10 @@ These steps assume that 12V power is already ON.
 
 ### Turn ON motor and servo power
 These steps assumes that 12V power is already ON.
-1. Make sure that the SVEA is either on the floor or propped up so that the wheels are not touching the table. 
+1. Make sure that the SVEA is either on the floor or propped up so that the wheels are not touching the table.
 2. Make sure that the servo switch is in the OFF position (it should be red).
 3. Turn ON the remote. The LED on the remote should turn green.
-4. Make sure that the LED on the receiver shines with a steady green light. If it blinks red: push the receiver reset button on the power board. 
+4. Make sure that the LED on the receiver shines with a steady green light. If it blinks red: push the receiver reset button on the power board.
 5. Plug in the motor battery.
 6. Press the ESC button until the LED lights up (but don't hold the button down after the LED lights up!).
 7. Turn ON the servo switch. It should turn green.
@@ -132,7 +134,7 @@ These steps assumes that 12V power is already ON.
 Always check these things before leaving a SVEA!
 
 ## Interfacing with the car
-The simplest way to interface with the car is to use an HDMI cable to connect the TX2 to a screen. 
+The simplest way to interface with the car is to use an HDMI cable to connect the TX2 to a screen.
 
 ### Connecting to WiFi and using SSH
 When driving you can connect to the car over SSH.
@@ -142,7 +144,7 @@ If you are unsure if the 4G modem is turned on: take the modem out from the SVEA
 You can find the SSID and password by first taking the modem out of the car, and then pressing the small button on top until the WiFI information  is shown on the screen.
 Once the 4G modem is on and your computer is connected to the 4G modem WiFi you should be able to connect to the svea by typing in __(replace # with the number of your car)__ `ssh nvidia@svea#.local`  in a terminal.
 
-You should also see the _listening to ROS on another computer_ section in the [README](../../README.md) for how to use the remote features of ROS.
+You should also see the _listening to ROS on another computer_ section in the [README](https://github.com/kth-sml/svea) for how to use the remote features of ROS.
 
 ## Common Problems
 
@@ -150,13 +152,13 @@ You should also see the _listening to ROS on another computer_ section in the [R
 Unplug and plug back in the RS T265 USB cable.
 Due to a quirk with how the T265 starts, this will need to be done every time the TX2 is booted.
 
-### ESC LED blinks with a fast green light 
+### ESC LED blinks with a fast green light
 Normal if the servo switch is OFF or no signal is sent from the SPMB.
 If a signal is being sent and the servos switch is green, the ESC has likely been calibrated incorrectly.
 See TRX-4 owner's manual for how to calibrate the ESC.
 
 ### ESC LED is blinking with a slow red light or shines with a green light
-The ESC is in LiPo (different type of battery than what we are using) mode instead of NiMH mode and the under voltage protection has been triggered. See the TRX-4 owner's manual for how to switch the ESC to NiMH mode. 
+The ESC is in LiPo (different type of battery than what we are using) mode instead of NiMH mode and the under voltage protection has been triggered. See the TRX-4 owner's manual for how to switch the ESC to NiMH mode.
 
 ### Remote LED is blinking with a slow red light
 Remote batteries are low on power.
@@ -167,4 +169,4 @@ The rechargable battery of the 4G modem is likely out of power.
 Try connecting the 4G modem to a USB port and push the button for 5 seconds.
 A charging symbol should appear on the screen.
 Let the modem charge for at least 15 minutes, unplug the USB cable and try pressing the button for 5 seconds again.
-The battery in the 4G modem will usually run out in a couple of days if it is left on and does not receive power from another device. 
+The battery in the 4G modem will usually run out in a couple of days if it is left on and does not receive power from another device.

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 Module for cooperative models with params set for SVEA cars. This model
 can be used for maintaining platoon structures with various
@@ -12,6 +10,8 @@ TODO:
       model creation only supports k-nearest neighbor communication.
 """
 
+from typing import Sequence
+
 import numpy as np
 
 __license__ = "MIT"
@@ -21,56 +21,62 @@ __status__ = "Development"
 
 
 class C_OVRV(object):
-    """
-    The cooperative version of the optimal-velocity-relative-velocity
-    (OVRV) model, aka the C-OVRV model. The model dictates the
-    longitudinal speed of a given vehicle in a platoon based on the
-    communicated state of the k-nearest platoon members. Specifically,
-    the expected communicated values are the forward space-gap, velocity
-    and length of each of the communicating vehicles. This C-OVRV model
-    has the following state-space equation:
+    r"""Cooperative model for the SVEA car.
 
-        .. math::
+    The cooperative version of the optimal-velocity-relative-velocity (OVRV)
+    model, aka the C-OVRV model. The model dictates the longitudinal speed of a
+    given vehicle in a platoon based on the communicated state of the k-nearest
+    platoon members. Specifically, the expected communicated values are the
+    forward space-gap, velocity and length of each of the communicating
+    vehicles. This C-OVRV model has the following state-space equation:
 
-            \\dot{s} &= R\\dot{x} + ce_1, \\\\
-            \\ddot{x} &= (K_1+K_4D)s + M\\dot{x} - K_1\\nu - K_4D(\\nu + l) + w.
+    $$
+    \begin{aligned}
+        \dot{s} &= R\dot{x} + ce_1,                                         \\
+        \ddot{x} &= (K_1+K_4D)s + M\dot{x} - K_1\nu - K_4D(\nu + l) + w.
+    \end{aligned}
+    $$
 
-    where :math:`s, \dot{x}` are the space-gap between a vehicle and the
-    vehicle in front of it and the longitudinal speed of the vehicle.
-    Units are [m, s, m/s].
+    where $s, \dot{x}$ are the space-gap between a vehicle and the vehicle in
+    front of it and the longitudinal speed of the vehicle. Units are
+    `[m, s, m/s]`.
 
     This model is meant to be used at steady-state. In other words, the
-    platoon should already be formed and travelling at the intended
-    speed.
+    platoon should already be formed and travelling at the intended speed.
 
-    :param platoon_size: Number of vehicles in platoon.
+    Args:
+        platoon_size: Number of vehicles in platoon.
+        num_neighbors: Number of forward neighbors communicating with
+            initially.
+        k_gains: Gains $k_1, k_2, k_3, k_4$. Exception will be thrown if given
+            number of values is not 4.
+        min_spacing: Jam or minimum spacing, corresponds to $\eta$ in `[m]`.
+        time_headway: Desired time headway, corresponds to $\tau$ in `[s]`.
+        init_leader_vel: Initial velocity of leader vehicle in `[m/s]`.
+        length: Bumper-to-bumper length in `[m]`, defaults to length of SVEA.
+        dt: Sampling time for dynamics update in `[s]`.
+
     :type platoon_size: int
-    :param num_neighbors: Number of forward neighbors communicating
-    with initially.
     :type num_neighbors: int
-    :param k_gains: Gains, k_1, k_2, k_3, k_4, error will be thrown if
-    given number of values is not 4.
     :type k_gains: list
-    :param min_spacing: Jam or minimum spacing, corresponds to
-    :math: `\eta` in [m].
     :type min_spacing: float
-    :param time_headway: Desired time headway, corresponds to
-    :math:`\tau` in [s].
     :type time_headway: float
-    :param init_leader_vel: Initial velocity of leader vehicle in [m/s].
     :type init_leader_vel: float
-    :param length: Bumper-to-bumper length in [m], defaults to 0.586
-    (length of SVEA).
     :type length: float
-    :param dt: Sampling time for dynamics update in [s], defaults to
-    0.01
     :type dt: float
     """
 
-    def __init__(self, platoon_size, num_neighbors, k_gains, min_spacing,
-                       time_headway, init_leader_vel, length=0.586, dt=0.01):
-        """ Initialize state. """
-
+    def __init__(
+        self,
+        platoon_size: int,
+        num_neighbors: int,
+        k_gains: Sequence,
+        min_spacing: float,
+        time_headway: float,
+        init_leader_vel: float,
+        length: float = 0.586,
+        dt: float = 0.01
+    ):
 
         self.curr_platoon_size = platoon_size
         self.curr_num_neighbors = num_neighbors
@@ -157,23 +163,25 @@ class C_OVRV(object):
     def __str__(self):
         return self._build_param_printout()
 
-    def compute_accel(self, spaces, velocities, leader_v):
-        """
-        Given current spacing and velocity in the platoon, compute the
+    def compute_accel(
+        self,
+        spaces: Sequence,
+        velocities: Sequence,
+        leader_v: float
+    ) -> list:
+        """Given current spacing and velocity in the platoon, compute the
         acceleration based on the C-OVRV model.
 
-        :param spaces: Spaces in front of each vehicle in the platoon,
-        must be same length as the size of the platoon.
-        :type spaces: list
-        :param velocities: Velocity of each vehicle in the platoon,
-        must be same length as the size of the platoon.
-        :type velocities: list
-        :param leader_v: Current velocity of the vehicle in front of the
-        platoon.
-        :type leader_v: float
-        :return: Accelerations for each vehicle to properly maintain the
-        platoon. These can be considered control inputs.
-        :rtype: list
+        Args:
+            spaces: Spaces in front of each vehicle in the platoon, must be
+                same length as the size of the platoon.
+            velocities: Velocity of each vehicle in the platoon, must be same
+                length as the size of the platoon.
+            leader_v: Current velocity of the vehicle in front of the platoon.
+
+        Returns:
+            Accelerations for each vehicle to properly maintain the platoon.
+            These can be considered control inputs.
         """
         assert len(spaces) == self.curr_platoon_size \
                and len(velocities) == self.curr_platoon_size
@@ -186,37 +194,34 @@ class C_OVRV(object):
         accels = out[self.curr_platoon_size:]
         return accels
 
-    def update_leader_vel(self, new_vel):
-        """
-        Update leader velocity [m/s] for updating equilibrium of C-OVRV
+    def update_leader_vel(self, new_vel: float):
+        """Update leader velocity `[m/s]` for updating equilibrium of C-OVRV
         model.
 
-        :param new_vel: New velocity of the vehicle in front of the
-        platoon (leader).
-        :type new_vel: float
+        Args:
+            new_vel: New velocity of the vehicle in front of the platoon
+                (leader).
         """
         self.leader_vel = new_vel
         self._update_system_dynamics()
 
-    def update_platoon_size(self, new_size):
-        """
-        Update platoon size for updating dynamics and equilibrium point
-        of C-OVRV model.
+    def update_platoon_size(self, new_size: int):
+        """Update platoon size for updating dynamics and equilibrium point of
+            C-OVRV model.
 
-        :param new_size: New platoon size.
-        :type new_size: int
+        Args:
+            new_size: New platoon size.
         """
         self.curr_platoon_size = new_size
         self._update_system_dynamics()
 
-    def update_k_neighbors(self, new_k):
-        """
-        Update number of communicating neighbors (in the forward
+    def update_k_neighbors(self, new_k: int):
+        """Update number of communicating neighbors (in the forward
         direction) for updating dynamics and equilibrium point of C-OVRV
         model.
 
-        :param new_k: New number of communicating neighbors.
-        :type new_k: int
+        Args:
+            new_k: New number of communicating neighbors.
         """
         self.curr_num_neighbors = new_k
         self._update_system_dynamics()
