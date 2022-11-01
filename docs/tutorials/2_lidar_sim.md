@@ -16,7 +16,7 @@ extra dependencies before we can try running the GUI. Start by adding
 Python 3 libraries you are likely missing:
 
 ```
-sudo apt install python-imaging-tk python3-tk
+sudo apt install python3-tk
 pip3 install numpy pillow
 ```
 
@@ -25,7 +25,7 @@ Then, try running the obstacle building GUI using the following commands
 dependencies**):
 
 ```
-roscd svea_core/scripts/util
+roscd svea_core/util
 python3 obstacles_builder_gui.py
 ```
 
