@@ -203,7 +203,7 @@ for supported architectures such as `amd64`, not on the NVIDIA TX2).
 **Instructions**
 
 - Make sure to build and run using `DESKTOP=1` as described in
-  [I need to work on many packages](4_docker.md#im-starting-a-new-project) and
+  [I'm starting a new project](4_docker.md#im-starting-a-new-project) and
   [I will work on a single package](#i-will-work-on-a-single-package).
 
 ---
