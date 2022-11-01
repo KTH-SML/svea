@@ -5,7 +5,7 @@ some of the organization around the SVEA software stack.
 
 ## Hardware
 
-![svea hardware](/media/svea_hardware.png)
+![svea hardware](../media/svea_hardware.png)
 
 The SVEA platform consists of the following hardware components:
 

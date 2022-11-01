@@ -8,5 +8,5 @@ this workspace, please refer to the README on the Github repo.
 
 Spot any typos? Please let [frankji@kth.se] know.
 
-![svea vehicle](/media/svea_headshot.jpg)
+![svea vehicle](media/svea_headshot.jpg)
 
