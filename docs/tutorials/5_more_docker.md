@@ -2,6 +2,65 @@
 
 ## Setup & Workflow
 
+### *I need to install Docker*
+
+Although you can run docker practically anywhere, no matter operating system or
+hardware, you will probably find it easier to work with on Linux. Even though
+we recommend Ubuntu for the sake of simplicity, in theory, working with docker
+should be the same regardless of OS.
+
+**Background**
+
+Docker is both a piece of software and a company. The software is
+available through Docker the company’s commercial software
+[Docker Desktop](https://www.docker.com/products/docker-desktop/) or
+their free and open-source
+[Docker Engine](https://docs.docker.com/engine/). Docker Engine is the
+core component for building and running Docker images/containers and is
+thus included in Docker Desktop. However, unless you are running Linux
+you cannot install Docker Engine as a standalone program.
+
+It is also important to know that Docker Desktop run containers inside an
+embedded VM. This can cause some unexpected issues when using the host
+network since you are then actually using the VM’s network. Device access
+and shared volumes can behave similarly. For these reasons it is
+recommended to use Docker Engine if possible. In theory Docker Desktop
+should work fine for simulation. You cannot use it for deployment
+(running on SVEAs) though since there is so much depending on device
+access and the host network. See "*I need to simulate multiple SVEAs"*
+
+**NVIDIA GPUs**
+
+If you have an NVIDIA GPU you can also install
+[NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
+which is a runtime for Docker Engine that can leverage your GPU, i.e.
+your container get access to your GPU. Notice, however, that if you need
+CUDA drivers then you must use relevant CUDA images.
+
+---
+
+### *I’m using Linux*
+
+Using Linux makes everything easier. If you are uncomfortable or unfamiliar
+with Linux it is recommended that you use the newest version of Ubuntu. In
+this case it is also recommended that you learn the basics of how to use a
+terminal.
+
+**Installing Docker Engine**
+
+For Ubuntu you can install Docker Engine by following
+[these](https://docs.docker.com/engine/install/ubuntu/) steps.
+
+**Installing Docker Desktop**
+
+Since a huge part of the SVEA workflow is to simulate before moving onto
+the vehicles, it is necessary that you have all the necessary tools (such
+as RViz) available to you. Currently Docker Desktop for Linux does not
+allow you to run GUI applications and is therefore not suitable. Please
+install Docker Engine.
+
+---
+
 ### *I’m using Windows*
 
 Windows does not have support for Docker Engine natively. Therefore you must
@@ -29,7 +88,7 @@ Ubuntu. It will continue the setup process and you will need to create a
 new user.
 
 After WSL and Ubuntu is installed and setup you can continue to install
-Docker Engine just as described in [I’m using Linux](4_docker.md#im-using-linux).
+Docker Engine just as described in [I’m using Linux](#im-using-linux).
 
 **Installing Docker Desktop and an X11 server**
 
@@ -144,7 +203,7 @@ for supported architectures such as `amd64`, not on the NVIDIA TX2).
 **Instructions**
 
 - Make sure to build and run using `DESKTOP=1` as described in
-  [I need to work on many packages](4_docker.md#i-need-to-work-on-many-packages) and
+  [I need to work on many packages](4_docker.md#im-starting-a-new-project) and
   [I will work on a single package](#i-will-work-on-a-single-package).
 
 ---
