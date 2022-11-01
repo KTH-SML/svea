@@ -1,0 +1,1055 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Starter ROS workspace for working with the [s]mall [ve]hicles for [a]utonomy platform ">
+      
+      
+        <meta name="author" content="Smart Mobility Lab">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
+    
+    
+      
+        <title>5. Advanced Docker Workflows - SVEA</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.20d9efc8.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#advanced-docker-workflows" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SVEA" class="md-header__button md-logo" aria-label="SVEA" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SVEA
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              5. Advanced Docker Workflows
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/KTH-SML/svea" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SVEA" class="md-nav__button md-logo" aria-label="SVEA" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    SVEA
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/KTH-SML/svea" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Tutorial
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Tutorial" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorial
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0_intro/" class="md-nav__link">
+        0. Introduction
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1_floor2/" class="md-nav__link">
+        1. Floor 2 and Pure-Pursuit
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2_lidar_sim/" class="md-nav__link">
+        2. Lidar Simulation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3_svea_operation/" class="md-nav__link">
+        3. The SVEA
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4_docker/" class="md-nav__link">
+        4. Docker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          5. Advanced Docker Workflows
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        5. Advanced Docker Workflows
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup-workflow" class="md-nav__link">
+    Setup &amp; Workflow
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup &amp; Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#i-need-to-install-docker" class="md-nav__link">
+    I need to install Docker
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#im-using-linux" class="md-nav__link">
+    I’m using Linux
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#im-using-windows" class="md-nav__link">
+    I’m using Windows
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#im-using-macos" class="md-nav__link">
+    I’m using MacOS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#i-will-work-on-a-single-package" class="md-nav__link">
+    I will work on a single package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#i-need-to-use-rviz-rqt-or-other-guis" class="md-nav__link">
+    I need to use RViz, rqt, or other GUIs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#i-need-to-simulate-multiple-sveas-with-their-own-ros-master-on-one-computer" class="md-nav__link">
+    I need to simulate multiple SVEAs (with their own ROS Master) on one computer
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-scenario" class="md-nav__link">
+    Example scenario
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Development
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Development" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Development
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/documentation/" class="md-nav__link">
+        Documentation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/models/" class="md-nav__link">
+        Models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/interfaces/" class="md-nav__link">
+        Interfaces
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup-workflow" class="md-nav__link">
+    Setup &amp; Workflow
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup &amp; Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#i-need-to-install-docker" class="md-nav__link">
+    I need to install Docker
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#im-using-linux" class="md-nav__link">
+    I’m using Linux
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#im-using-windows" class="md-nav__link">
+    I’m using Windows
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#im-using-macos" class="md-nav__link">
+    I’m using MacOS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#i-will-work-on-a-single-package" class="md-nav__link">
+    I will work on a single package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#i-need-to-use-rviz-rqt-or-other-guis" class="md-nav__link">
+    I need to use RViz, rqt, or other GUIs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#i-need-to-simulate-multiple-sveas-with-their-own-ros-master-on-one-computer" class="md-nav__link">
+    I need to simulate multiple SVEAs (with their own ROS Master) on one computer
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-scenario" class="md-nav__link">
+    Example scenario
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/KTH-SML/svea/edit/master/docs/tutorials/5_more_docker.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="advanced-docker-workflows">Advanced Docker Workflows<a class="headerlink" href="#advanced-docker-workflows" title="Permanent link">&para;</a></h1>
+<h2 id="setup-workflow">Setup &amp; Workflow<a class="headerlink" href="#setup-workflow" title="Permanent link">&para;</a></h2>
+<h3 id="i-need-to-install-docker"><em>I need to install Docker</em><a class="headerlink" href="#i-need-to-install-docker" title="Permanent link">&para;</a></h3>
+<p>Although you can run docker practically anywhere, no matter operating system or
+hardware, you will probably find it easier to work with on Linux. Even though
+we recommend Ubuntu for the sake of simplicity, in theory, working with docker
+should be the same regardless of OS.</p>
+<p><strong>Background</strong></p>
+<p>Docker is both a piece of software and a company. The software is
+available through Docker the company’s commercial software
+<a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> or
+their free and open-source
+<a href="https://docs.docker.com/engine/">Docker Engine</a>. Docker Engine is the
+core component for building and running Docker images/containers and is
+thus included in Docker Desktop. However, unless you are running Linux
+you cannot install Docker Engine as a standalone program.</p>
+<p>It is also important to know that Docker Desktop run containers inside an
+embedded VM. This can cause some unexpected issues when using the host
+network since you are then actually using the VM’s network. Device access
+and shared volumes can behave similarly. For these reasons it is
+recommended to use Docker Engine if possible. In theory Docker Desktop
+should work fine for simulation. You cannot use it for deployment
+(running on SVEAs) though since there is so much depending on device
+access and the host network. See &ldquo;<em>I need to simulate multiple SVEAs&rdquo;</em></p>
+<p><strong>NVIDIA GPUs</strong></p>
+<p>If you have an NVIDIA GPU you can also install
+<a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html">NVIDIA Container Toolkit</a>
+which is a runtime for Docker Engine that can leverage your GPU, i.e.
+your container get access to your GPU. Notice, however, that if you need
+CUDA drivers then you must use relevant CUDA images.</p>
+<hr />
+<h3 id="im-using-linux"><em>I’m using Linux</em><a class="headerlink" href="#im-using-linux" title="Permanent link">&para;</a></h3>
+<p>Using Linux makes everything easier. If you are uncomfortable or unfamiliar
+with Linux it is recommended that you use the newest version of Ubuntu. In
+this case it is also recommended that you learn the basics of how to use a
+terminal.</p>
+<p><strong>Installing Docker Engine</strong></p>
+<p>For Ubuntu you can install Docker Engine by following
+<a href="https://docs.docker.com/engine/install/ubuntu/">these</a> steps.</p>
+<p><strong>Installing Docker Desktop</strong></p>
+<p>Since a huge part of the SVEA workflow is to simulate before moving onto
+the vehicles, it is necessary that you have all the necessary tools (such
+as RViz) available to you. Currently Docker Desktop for Linux does not
+allow you to run GUI applications and is therefore not suitable. Please
+install Docker Engine.</p>
+<hr />
+<h3 id="im-using-windows"><em>I’m using Windows</em><a class="headerlink" href="#im-using-windows" title="Permanent link">&para;</a></h3>
+<p>Windows does not have support for Docker Engine natively. Therefore you must
+use one of the two options below.</p>
+<p><strong>Installing WSL2 and Docker Engine</strong></p>
+<p>A virtualization layer called Windows Subsystem for Linux (WSL) can be
+enabled/installed natively on Windows 10 Build 19041 and above.  This
+allow for a &ldquo;real&rdquo; Linux distribution to run inside of Windows! For
+Windows 11 Build 22000 and above you can even run Linux GUI apps such as
+Nautilus or even RViz for ROS. To install WSL simply run</p>
+<div class="highlight"><pre><span></span><code>wsl --install
+</code></pre></div>
+<p>and then reboot. The installed default distribution is Ubuntu. For more
+information on installing WSL follow
+<a href="https://docs.microsoft.com/en-us/windows/wsl/install">this</a> guide and
+then, if you want to read about GUI support, continue with
+<a href="https://docs.microsoft.com/en-us/windows/wsl/tutorials/gui-apps">this</a>.
+After the reboot you can search for, and launch, the &ldquo;application&rdquo;
+Ubuntu. It will continue the setup process and you will need to create a
+new user.</p>
+<p>After WSL and Ubuntu is installed and setup you can continue to install
+Docker Engine just as described in <a href="#im-using-linux">I’m using Linux</a>.</p>
+<p><strong>Installing Docker Desktop and an X11 server</strong></p>
+<p>An alternative to WSL is to use Docker Desktop. Although discouraged by
+this guide it is a possibility. If you need to choose this alternative
+then you will have to install an X11 server. The most common one is
+<strong>VcXsrv</strong>. There is many videos on this topic,
+<a href="https://www.youtube.com/watch?v=YbXDJJE5zsc">here</a> is one that covers
+most things.</p>
+<hr />
+<h3 id="im-using-macos"><em>I’m using MacOS</em><a class="headerlink" href="#im-using-macos" title="Permanent link">&para;</a></h3>
+<p><strong>Note:</strong> This is has not been tested.</p>
+<p>Similar to Windows, MacOS does not have support for Docker Engine natively.
+Since there is no MacOS equivalent of WSL, Docker Engine cannot be used at
+all. Instead you need to use Docker Desktop.</p>
+<p><strong>Installing Docker Desktop</strong></p>
+<p>Although discouraged by this guide Docker Desktop is the only solution
+for MacOS. You will have to install an X11 server for example XQuartz.
+<a href="https://www.youtube.com/watch?v=cNDR6Z24KLM">Here</a> is a video on the
+topic. Take more inspiration from the instructions given in
+<a href="#im-using-windows">I’m using Windows</a>.</p>
+<hr />
+<h3 id="i-will-work-on-a-single-package"><em>I will work on a single package</em><a class="headerlink" href="#i-will-work-on-a-single-package" title="Permanent link">&para;</a></h3>
+<p><strong>Workflow</strong></p>
+<p>Similar to <a href="https://github.com/kth-sml/svea"><code>svea</code></a> repository,
+<a href="https://github.com/kth-sml/svea_pkg"><code>svea_pkg</code></a> is a template for new SVEA
+packages. When starting a new package you should first go to
+<a href="https://github.com/kth-sml/svea_pkg">svea_pkg</a> and click &ldquo;Use this template&rdquo;.
+When doing so GitHub will copy <code>svea_pkg</code> to a new repository much like a fork
+but that is completely separated from <code>svea_pkg</code> (you cannot create PRs etc.).</p>
+<pre class="mermaid"><code>%%{init: {'gitGraph': {'mainBranchName': 'KTH-SML/svea_pkg', 'showCommitLabel': false}}}%%
+gitGraph
+    commit
+    commit
+    branch USER/MY_PKG
+    commit type:HIGHLIGHT tag: "copy"
+    commit</code></pre>
+<p><strong>Instructions</strong></p>
+<ul>
+<li>
+<p>Go to <a href="https://github.com/KTH-SML/svea_pkg"><code>svea_pkg</code></a>.</p>
+<ul>
+<li>
+<p>Click &ldquo;Use this template&rdquo;</p>
+</li>
+<li>
+<p>Change the name to reflect your project, this instruction will use
+  <code>MY_PKG</code>.</p>
+</li>
+<li>
+<p>Write a suitable description.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Clone your fork to your host computer.</p>
+<div class="highlight"><pre><span></span><code>&gt; git clone https://github.com/USER/MY_PKG
+&gt; cd MY_PKG
+</code></pre></div>
+</li>
+<li>
+<p>Change package name in source code, <code>CMakeLists.txt</code>, <code>package.xml</code>, etc.</p>
+</li>
+<li>
+<p>Add dependencies in <code>package.xml</code> and <code>CMakeLists.txt</code>.</p>
+</li>
+<li>
+<p>Build image (this will take a few minutes depending on your machine). This
+  step will make Docker fetch <code>svea</code> and place <code>MY_PKG</code> inside <code>svea/src</code>,
+  finally producing an image containing all of <code>svea</code> and <code>MY_PKG</code>.</p>
+<div class="highlight"><pre><span></span><code>&gt; DESKTOP=1 util/build
+</code></pre></div>
+<p><strong>Note:</strong> You cannot use <code>DESKTOP=1</code> on SVEA, it will only work on <code>amd64</code>
+(normal) computers.</p>
+</li>
+<li>
+<p>Continue to <a href="../4_docker/#im-ready-to-start-development">I’m ready to start development</a>.</p>
+</li>
+</ul>
+<hr />
+<h3 id="i-need-to-use-rviz-rqt-or-other-guis"><em>I need to use RViz, rqt, or other GUIs</em><a class="headerlink" href="#i-need-to-use-rviz-rqt-or-other-guis" title="Permanent link">&para;</a></h3>
+<p><strong>Background</strong></p>
+<p>ROS images are distributed by the Open Source Robotics Foundation (OSRF)
+and there are a number of distributions (<code>melodic</code>, <code>noetic</code>, …) and
+variants (<code>base</code>, <code>desktop</code>, &hellip;) available. The official ROS images that you
+get by <code>docker pull ros:&lt;tag&gt;</code> are built for different platforms/architectures
+(<code>amd64</code>, <code>arm64v8</code>, …), however, some variants are not available there
+(such as <code>desktop</code>). For such variants you need to use OSRF&rsquo;s own profile on
+Docker Hub, <code>docker pull osrf/ros:&lt;tag&gt;</code>.  The drawback is that the images
+under OSRF’s profile are not available for all platforms. This is the case
+for the TX2 that SVEA has. The <code>desktop</code> variant is not built for TX2’s
+architecture <code>arm64v8</code>. That means the SVEA image cannot use another
+ROS variant other than <code>base</code> as we need them to run on the SVEA
+hardware.</p>
+<p>So, normally GUI applications cannot be launched in a container without any
+configuration. Luckily our utility scripts fixes this automatically. When
+the SVEA image has been built with <code>DESKTOP=1 util/build</code> and the container
+has been created with <code>DESKTOP=1 util/run</code> then GUIs are supported (only
+for supported architectures such as <code>amd64</code>, not on the NVIDIA TX2).</p>
+<p><strong>Instructions</strong></p>
+<ul>
+<li>Make sure to build and run using <code>DESKTOP=1</code> as described in
+  <a href="../4_docker/#im-starting-a-new-project">I need to work on many packages</a> and
+  <a href="#i-will-work-on-a-single-package">I will work on a single package</a>.</li>
+</ul>
+<hr />
+<h3 id="i-need-to-simulate-multiple-sveas-with-their-own-ros-master-on-one-computer"><em>I need to simulate multiple SVEAs (with their own ROS Master) on one computer</em><a class="headerlink" href="#i-need-to-simulate-multiple-sveas-with-their-own-ros-master-on-one-computer" title="Permanent link">&para;</a></h3>
+<p>For this scenario you are probably using something like ABConnect to
+communicate between your units. This is more than fine and it is possible to
+simulate as if they were running on completely separate machines.</p>
+<p><strong>Background</strong></p>
+<p>Let’s first consider the normal scenario running &ldquo;producation&rdquo; on a SVEA.
+Then the container would share the host’s network and it would seem that
+ROS is running on the host and not inside a container. This is mainly due
+to that the container can open and close ports as it chooses. To share
+the host’s network you use the option <code>--network host</code>. It is important
+to remember that you cannot run multiple containers, with a ROS Master
+each, while sharing the host’s network since that would be the same as
+trying to run multiple ROS Masters on your host!</p>
+<p>Next we consider another docker network type, namely <code>--network bridge</code>
+(the default network type). This network will allow internet access from
+the host-side to all connected containers, however, all containers’ ports
+are not exposed on the host side. Normally this would <strong>not</strong> be suitable
+for SVEA development and especially so on the real vehicles. However,
+when we are simulating multiple SVEAs on one machine, each with its own
+container, then it can be a useful setup. That is because the containers
+still share the same network, <code>bridge</code>, and can actually reach each
+other. Using a broker like ABConnect will establish the shortest route
+for P2P communication and that will be through docker’s internal &ldquo;router&rdquo;
+for <code>bridge</code> and nothing more, i.e. communication stays within <code>bridge</code>
+which is allowed. (If you would try to setup two machines with containers
+on two separate <code>bridge</code> networks, then this wouldn’t work since no ports
+are exposed on the hosts.)</p>
+<p>Now, there is a final quirk with docker <code>bridge</code> networks. Somehow, the
+default <code>bridge</code> network (named <code>bridge</code>) does not set up domain name
+resolution for the container name. This means that you need to specify
+container’s IP in order to reach them. If, however, you create a new
+network (of type <code>bridge</code>) and connect containers to that, then docker
+will fix domain name resolution for the container names. Then you can
+reach the containers by name, i.e. <code>ping svea_pkg</code>. This is what is
+instructed below.</p>
+<p>A useful command for inspecting networks is</p>
+<div class="highlight"><pre><span></span><code>&gt; docker network inspect my_network
+</code></pre></div>
+<p><strong>Instructions</strong></p>
+<ul>
+<li>
+<p>Create, and possibly start, your containers if you haven’t already done
+  so. This can be done with <code>docker create</code>, <code>docker run</code> or <code>util/run-dev</code>
+  (<code>util/run-dev</code> will not connect to the host’s network).</p>
+<div class="highlight"><pre><span></span><code>&gt; util/run-dev
+</code></pre></div>
+</li>
+<li>
+<p>Create a new docker network. The network name doesn’t matter, you can use
+  <code>ros</code> for example.</p>
+<div class="highlight"><pre><span></span><code>&gt; docker network create ros
+</code></pre></div>
+</li>
+<li>
+<p>Next you will need to know each container’s name. If you have created the
+  container(s) using <code>util/create-dev</code> they will have the same name as the
+  repository they are created from. To confirm the name(s) get a list of
+  all containers using</p>
+<div class="highlight"><pre><span></span><code>&gt; docker ps -a
+</code></pre></div>
+</li>
+<li>
+<p>Connect each container to the newly created network.</p>
+<div class="highlight"><pre><span></span><code>&gt; docker network connect ros my_container
+</code></pre></div>
+</li>
+<li>
+<p>Now you can enter the container(s) and develop as you normally would.
+  They will exist (almost) as separate machines connected to the virtual
+  network <code>ros</code>. This network does give them internet access but no ports
+  are exposed to the host.</p>
+</li>
+</ul>
+<hr />
+<h2 id="example-scenario">Example scenario<a class="headerlink" href="#example-scenario" title="Permanent link">&para;</a></h2>
+<p>I (username <code>kaarmu</code>) have decided to create an MPC controller package <code>svea_mpc</code> for
+SVEA in a fictional project about safe zebra crossings. We assume I’ve
+already installed docker and have a working system using one of the methods
+described. Since I only want to develop one package I can base it on <code>KTH-SML/svea_pkg</code>.</p>
+<pre class="mermaid"><code>%%{init: {'gitGraph': {'mainBranchName': 'KTH-SML/svea_pkg', 'showCommitLabel': false}}}%%
+gitGraph
+    commit
+    commit
+    branch kaarmu/svea_mpc
+    commit type: HIGHLIGHT tag: "copy"
+    commit
+    commit</code></pre>
+<p>Read more on <a href="#i-will-work-on-a-single-package">I will work on a single package</a>.</p>
+<p>After implementing my controller, now I want to evaluate it using simulation
+in RViz. It is recommended to start <code>roscore</code> separately.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">## HOST ubuntu22 ##</span>
+util/run
+<span class="c1">## CONTAINER svea_mpc ##</span>
+roscore <span class="p">&amp;</span>
+rosrun rviz rviz -d &lt;path-to-rviz-file&gt;
+roslaunch svea_mpc test.launch
+</code></pre></div>
+<hr />
+<p>Some time has passed and I have realized that my SVEA needs object detection
+and situational awareness. I keep them separate by creating the packages
+<code>object_detect</code> and <code>sitaware</code>. My project now includes 3 packages in total
+(except for <code>svea_core</code>, <code>svea_sensors</code>, etc. that’s included). This forces
+me to create my own workspace instead of using <code>svea</code> workspace (that is
+automatically used for single-package projects).</p>
+<p>First, I will need to create <code>object_detect</code> and <code>sitaware</code> from <code>svea_pkg</code>
+in the same way <code>svea_mpc</code> was created. The graph from above would now look
+something like this</p>
+<pre class="mermaid"><code>%%{init: {'gitGraph': {'mainBranchName': 'KTH-SML/svea_pkg', 'showCommitLabel': false}}}%%
+gitGraph
+    commit
+    commit
+    branch kaarmu/svea_mpc
+    commit type: HIGHLIGHT tag: "copy"
+    commit
+    commit
+    checkout KTH-SML/svea_pkg
+    branch kaarmu/object_detect
+    commit type: HIGHLIGHT tag: "copy"
+    commit
+    commit
+    checkout KTH-SML/svea_pkg
+    branch kaarmu/sitaware
+    commit type: HIGHLIGHT tag: "copy"
+    commit
+    commit</code></pre>
+<p>To create my new workspace I will base it on <code>svea</code> just as I did with
+<code>svea_mpc</code> from <code>svea_pkg</code>. The workspace will be called <code>zebra_ws</code> to
+reflect my project.</p>
+<pre class="mermaid"><code>%%{init: {'gitGraph': {'mainBranchName': 'KTH-SML/svea', 'showCommitLabel': false}}}%%
+gitGraph
+    commit
+    commit
+    commit
+    branch kaarmu/zebra_ws
+    commit type: HIGHLIGHT tag: "copy"
+    commit</code></pre>
+<p>The <code>zebra_ws</code> workspace can now add these repositories as submodules.</p>
+<div class="highlight"><pre><span></span><code>&gt; git submodule add https://github.com/kaarmu/object_detect src/object_detect
+&gt; git submodule add https://github.com/kaarmu/sitaware src/sitaware
+&gt; git submodule add https://github.com/kaarmu/svea_mpc src/svea_mpc
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>zebra_ws/
+    Dockerfile
+    entrypoint
+    src/
+        object_detect/      &lt;&lt; new submodule
+        sitaware/           &lt;&lt; new submodule
+        svea_core/
+        svea_mpc/           &lt;&lt; new submodule
+        svea_sensors/
+        vehicle_msgs/
+    util/
+</code></pre></div>
+<p>From here on you work just as before but simply from the workspace repository
+instead of a package! The utility scripts will still work as expected and you
+follow almost the same practices with Git. The difference now is that you must
+be aware of the submodules. Please read online on how to effectively work with
+submodules.</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../4_docker/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 4. Docker" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              4. Docker
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../development/documentation/" class="md-footer__link md-footer__link--next" aria-label="Next: Documentation" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Documentation
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      2020, Smart Mobility Lab
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8492ddcf.min.js"></script>
+      
+        <script src="../../mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

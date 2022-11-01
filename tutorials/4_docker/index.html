@@ -1,0 +1,974 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Starter ROS workspace for working with the [s]mall [ve]hicles for [a]utonomy platform ">
+      
+      
+        <meta name="author" content="Smart Mobility Lab">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
+    
+    
+      
+        <title>4. Docker - SVEA</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.20d9efc8.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#docker" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SVEA" class="md-header__button md-logo" aria-label="SVEA" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SVEA
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              4. Docker
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/KTH-SML/svea" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SVEA" class="md-nav__button md-logo" aria-label="SVEA" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    SVEA
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/KTH-SML/svea" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Tutorial
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Tutorial" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorial
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0_intro/" class="md-nav__link">
+        0. Introduction
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1_floor2/" class="md-nav__link">
+        1. Floor 2 and Pure-Pursuit
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2_lidar_sim/" class="md-nav__link">
+        2. Lidar Simulation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3_svea_operation/" class="md-nav__link">
+        3. The SVEA
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          4. Docker
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        4. Docker
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    Summary
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#background" class="md-nav__link">
+    Background
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-workflow" class="md-nav__link">
+    Setup &amp; Workflow
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup &amp; Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#im-starting-a-new-project" class="md-nav__link">
+    I'm starting a new project
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#im-ready-to-start-development" class="md-nav__link">
+    I’m ready to start development
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#im-ready-to-deploy-running-on-svea" class="md-nav__link">
+    I’m ready to deploy (running on SVEA)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-cheat-sheet" class="md-nav__link">
+    Docker Cheat Sheet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#utility-scripts-reference" class="md-nav__link">
+    Utility scripts reference
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5_more_docker/" class="md-nav__link">
+        5. Advanced Docker Workflows
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Development
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Development" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Development
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/documentation/" class="md-nav__link">
+        Documentation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/models/" class="md-nav__link">
+        Models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/interfaces/" class="md-nav__link">
+        Interfaces
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    Summary
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#background" class="md-nav__link">
+    Background
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-workflow" class="md-nav__link">
+    Setup &amp; Workflow
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup &amp; Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#im-starting-a-new-project" class="md-nav__link">
+    I'm starting a new project
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#im-ready-to-start-development" class="md-nav__link">
+    I’m ready to start development
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#im-ready-to-deploy-running-on-svea" class="md-nav__link">
+    I’m ready to deploy (running on SVEA)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-cheat-sheet" class="md-nav__link">
+    Docker Cheat Sheet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#utility-scripts-reference" class="md-nav__link">
+    Utility scripts reference
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/KTH-SML/svea/edit/master/docs/tutorials/4_docker.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h1>
+<h3 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h3>
+<p>Docker is the solution to standardized, reproducible developer environments.
+With its integration, developers do not need to worry about running projects no
+one has touched since forever ago. Now will SVEA also run using docker!
+This new worklow seek to create a an effortless and powerful developer
+experience by combining ROS and docker.</p>
+<h2 id="background">Background<a class="headerlink" href="#background" title="Permanent link">&para;</a></h2>
+<p>Containers are a way to &ldquo;package software into standardized units&rdquo;. This is
+helpful both for fast and easy development as well as for reliability when it
+is time to deploy the product. For SVEA, working with Docker offers a workflow
+that ensures that your ROS workspace, and any dependencies, are always
+installed correctly. There are many reasons to work with Docker, however,
+this background will mainly focus on the ROS installation.</p>
+<p>ROS is a large and complex software stack. It is released in &ldquo;distributions&rdquo;
+(Kinetic, Melodic, Noetic, …) that are tightly coupled with a targeted OS.
+For instance, ROS Noetic is released on Ubuntu 20.04 and cannot be installed
+on any other Ubuntu version. At writing moment, SVEA requires ROS Noetic. As
+a consequence, the SVEA developer must run Ubuntu 20.04. Beside OS contraints
+the installation of ROS and any project dependencies can be highly error prone.
+It is also important to consider how a software environment degenerate over
+time. All of these problems are easily avoided with containerization. Needless
+to say it would be nice if a SVEA environment can be set up reliably each time
+with no manual configuration at all, using as little as one command…</p>
+<h2 id="setup-workflow">Setup &amp; Workflow<a class="headerlink" href="#setup-workflow" title="Permanent link">&para;</a></h2>
+<h3 id="im-starting-a-new-project"><em>I&rsquo;m starting a new project</em><a class="headerlink" href="#im-starting-a-new-project" title="Permanent link">&para;</a></h3>
+<p><strong>Workflow</strong></p>
+<p>The <code>svea</code> repository is a template for new SVEA projects. When starting a
+new project you should go to <a href="https://github.com/kth-sml/svea"><code>svea</code></a> and click
+&ldquo;Use this template&rdquo;. When doing so GitHub will copy <code>svea</code>, all of its content
+and history, to a new separate repository. This is very similar to forking but
+the difference being that <code>svea</code> and your new project will not be linked, i.e.
+<code>svea</code> is copied but will not be an &ldquo;upstream&rdquo; source you can push to.</p>
+<pre class="mermaid"><code>%%{init: {'gitGraph': {'mainBranchName': 'KTH-SML/svea', 'showCommitLabel': false}}}%%
+gitGraph
+    commit
+    commit
+    branch USER/PROJECT_ws
+    commit type: HIGHLIGHT tag: "copy"
+    commit</code></pre>
+<p><strong>Instructions</strong></p>
+<ul>
+<li>
+<p>Go to <a href="https://github.com/kth-sml/svea"><code>svea</code></a>.</p>
+<ul>
+<li>
+<p>Click &ldquo;Use this template&rdquo;</p>
+</li>
+<li>
+<p>Change the name to reflect your project. This instruction will use
+  <code>PROJECT_ws</code> where <code>_ws</code> emphasize that this is a ROS workspace.</p>
+</li>
+<li>
+<p>Write a suitable description.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Clone <code>PROJECT_ws</code> to your host computer.</p>
+<div class="highlight"><pre><span></span><code>&gt; git clone https://github.com/USER/PROJECT_ws
+&gt; cd PROJET_ws
+</code></pre></div>
+</li>
+<li>
+<p>Change package name in source code using</p>
+<div class="highlight"><pre><span></span><code>&gt; util/rename MY_PKG
+</code></pre></div>
+</li>
+<li>
+<p>Change <code>README</code>, <code>LICENSE</code>, or <code>.gitignore</code> if necessary.</p>
+</li>
+<li>
+<p>Add ROS packages in <code>src</code>.</p>
+</li>
+<li>
+<p>Add python dependencies in <code>requirements.txt</code></p>
+</li>
+<li>
+<p>Build image (this will take a few minutes depending on your machine) using</p>
+<div class="highlight"><pre><span></span><code>&gt; DESKTOP=1 util/build
+</code></pre></div>
+<p><strong>Note:</strong> You cannot use <code>DESKTOP=1</code> on SVEA, it will only work on <code>amd64</code>
+(normal) computers.</p>
+</li>
+<li>
+<p>Continue to <a href="#im-ready-to-start-development">I’m ready to start development</a>.</p>
+</li>
+</ul>
+<hr />
+<h3 id="im-ready-to-start-development"><em>I’m ready to start development</em><a class="headerlink" href="#im-ready-to-start-development" title="Permanent link">&para;</a></h3>
+<p>This workflow allow us to deploy <em>and</em> develop inside container. In fact, it
+might be easier for you to develop inside a container as you can work from any
+distribution, not only Ubuntu.</p>
+<p><strong>Instructions</strong></p>
+<ul>
+<li>
+<p>Run a container using</p>
+<div class="highlight"><pre><span></span><code>&gt; DESKTOP=1 util/run
+</code></pre></div>
+<p><strong>Note:</strong> You cannot use <code>DESKTOP=1</code> on SVEA, it will only work on <code>amd64</code>
+(normal) computers.</p>
+</li>
+<li>
+<p>Do development.</p>
+<ul>
+<li>
+<p>The image comes with a few tools preinstalled (<code>git</code>, <code>vim</code>, <code>nano</code>,
+  <code>curl</code>, <code>ping</code>).</p>
+</li>
+<li>
+<p>You can use <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack">this</a>
+  VS Code extension if you prefer that. Read more <a href="https://code.visualstudio.com/docs/remote/containers">here</a>.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>When you want to exit either enter the command <code>exit</code>, use the keyboard
+  shortcut <code>ctrl+d</code> or if you want the container to be running in the
+  background, detach using keyboard shortcut <code>ctrl+p ctrl+q</code> (you can
+  attach again with <code>docker attach PROJECT_ws</code>).</p>
+</li>
+<li>
+<p>If you want to enter a container that has been previously exited then call</p>
+<div class="highlight"><pre><span></span><code>&gt; docker start -i &lt;name&gt;
+</code></pre></div>
+<p><strong>Note:</strong> If GUI applications does not work when doing this it might be
+because you haven&rsquo;t allowed Docker in X11. This is something that is done
+for you in <code>util/run</code>.</p>
+</li>
+</ul>
+<hr />
+<h3 id="im-ready-to-deploy-running-on-svea"><em>I’m ready to deploy (running on SVEA)</em><a class="headerlink" href="#im-ready-to-deploy-running-on-svea" title="Permanent link">&para;</a></h3>
+<p><strong>Instructions</strong></p>
+<ul>
+<li>
+<p>Start the SVEA.</p>
+</li>
+<li>
+<p>Use SSH to remote connect to the SVEA. SVEAs&rsquo; hostname are typically <code>svea#</code>
+  where <code>#</code> is a number, e.g. SVEA3 will have the hostname <code>svea3</code>.</p>
+<div class="highlight"><pre><span></span><code>&gt; ssh nvidia@svea#
+</code></pre></div>
+</li>
+<li>
+<p>Clone <code>PROJECT_ws</code> to the SVEA.</p>
+<div class="highlight"><pre><span></span><code>&gt; git clone https://github.com/USER/PROJECT_ws
+&gt; cd PROJECT_ws
+</code></pre></div>
+</li>
+<li>
+<p>Deploying is very similar to developing with Docker, simply build and run
+  without <code>DESKTOP=1</code>. Building will take around 10-15 min on SVEAs.</p>
+<div class="highlight"><pre><span></span><code>&gt; util/build
+&gt; util/run
+</code></pre></div>
+</li>
+<li>
+<p>Your workspace will be sourced automatically so at this step you should be
+  able to launch your project.</p>
+<div class="highlight"><pre><span></span><code>&gt; roslunch ...
+</code></pre></div>
+</li>
+</ul>
+<hr />
+<h2 id="docker-cheat-sheet">Docker Cheat Sheet<a class="headerlink" href="#docker-cheat-sheet" title="Permanent link">&para;</a></h2>
+<dl>
+<dd>
+<p><code>docker build -t svea .</code></p>
+<p>Build an image and name it <code>svea</code>.</p>
+<p><em>Use SVEA&rsquo;s utility script <code>build</code> instead.</em></p>
+</dd>
+<dd>
+<p><code>docker create -it --name zebra svea</code></p>
+<p>Create a container from the image <code>svea</code> and name it <code>zebra</code>.</p>
+<p><em>Unless necessary, use utility script <code>run</code> instead.</em></p>
+</dd>
+<dd>
+<p><code>docker start -i zebra</code></p>
+<p>Start the container <code>zebra</code> (it must be created).</p>
+<p><em>Unless necessary, use utility script <code>run</code> instead.</em></p>
+</dd>
+<dd>
+<p><code>docker run -it svea</code></p>
+<p>Do <code>docker create</code> followed by a <code>docker start</code>.</p>
+<p><em>Use SVEA&rsquo;s utility script <code>run</code> instead.</em></p>
+</dd>
+<dd>
+<p><code>docker exec -it svea [command...]</code></p>
+<p>Execute command as a sibling process to a running container. (Useful to start separate terminal with command <code>bash</code>).</p>
+</dd>
+<dd>
+<p><code>docker images</code></p>
+<p>List all images.</p>
+</dd>
+<dd>
+<p><code>docker ps -a</code></p>
+<p>List all containers.</p>
+</dd>
+<dd>
+<p><code>docker container prune</code></p>
+<p>Remove all exited containers.</p>
+</dd>
+<dd>
+<p><code>docker image prune -a</code></p>
+<p>Remove all images not associated with a container.</p>
+</dd>
+</dl>
+<h2 id="utility-scripts-reference">Utility scripts reference<a class="headerlink" href="#utility-scripts-reference" title="Permanent link">&para;</a></h2>
+<dl>
+<dd>
+<p><code>util/build</code></p>
+<p>Build an image with the following options:</p>
+<ul>
+<li><code>--network host</code>: Use host network when building.</li>
+<li><code>--build-arg ROSDISTRO</code>: Use <code>ROSDISTRO</code> from <code>config.sh</code></li>
+<li><code>--build-arg WORKSPACE</code>: Use <code>WORKSPACE</code> from <code>config.sh</code></li>
+</ul>
+</dd>
+<dd>
+<p><code>util/run</code></p>
+<p>Run a container with the following options:</p>
+<ul>
+<li><code>-it</code>: Make it interactive (attach <code>STDIN</code>). Allocate TTY in container.</li>
+<li><code>-e TERM=xterm-256color</code>: Make terminal colorful.</li>
+<li><code>-v &lt;host-src&gt;:&lt;container-dest&gt;</code>: <a href="https://docs.docker.com/storage/volumes/">Shared volume</a> for workspace/package.</li>
+<li><code>-v /dev:/dev</code>: New device connections will be visible inside the container.</li>
+<li><code>--network host</code>: Use the host’s network.</li>
+<li><code>--privileged</code>: Allow access to host’s devices.</li>
+<li><code>--name &lt;name&gt;</code>: Give the container a name.</li>
+</ul>
+</dd>
+<dd>
+<p><code>util/run-dev</code></p>
+<p>Run a container with the same options as <code>util/create</code> except:</p>
+<ul>
+<li><code>--network host</code> is removed. Container will use the default network <code>bridge</code>.</li>
+<li><code>--privileged</code> is removed. Container will not have access to devices.</li>
+<li><code>-v /dev:/dev</code>: is removed. Container will not have access to devices.</li>
+</ul>
+</dd>
+<dd>
+<p><code>util/config.sh</code></p>
+<p>Can be sourced for common variables such as workspace location etc.</p>
+<p>The following environment variables are set once <code>util/config.sh</code> is sourced:</p>
+<ul>
+<li><code>REPOSITORY_PATH</code>: Absolute path to the repository you are in.</li>
+<li><code>REPOSITORY_NAME</code>: Base name of the repository (should be same as project name).</li>
+<li><code>BUILD_CONTEXT</code>: Read the description on <code>[docker build](https://docs.docker.com/engine/reference/commandline/build/#description)</code>. If you are using <code>util/config.sh</code> from the template <code>svea_pkg</code>, then it will try to locate a workspace next to its own repository to increase build speeds by allowing docker to cache. The rule is: if the package is located at <code>&lt;path&gt;/MY_PROJECT</code> then expect a workspace to exist at <code>&lt;path&gt;/MY_PROJECT_ws</code>.</li>
+<li><code>IMAGE_TAG</code>: Name of the built image.</li>
+<li><code>CONTAINER_NAME</code>: Name of the created container.</li>
+<li><code>ROSDISTRO</code>: The used ROS distribution. Do <strong>not</strong> change this.</li>
+<li><code>WORKSPACE</code>: The absolute path to the ROS workspace inside the container.</li>
+<li><code>SHRVOL_SRC</code>: Absolute path to directory (host side) that should be shared with container.</li>
+<li><code>SHRVOL_DST</code>: Absolute path to directory (container side) that should be shared with container.</li>
+</ul>
+</dd>
+<dd>
+<p><code>util/remote_ros.sh</code></p>
+<p>Set up ROS environment variables for a remote ROS Master. Takes one argument, the master’s hostname. If no argument is given, it is assumed ROS Master runs on the same machine.</p>
+<p><em>Note: This script should be sourced</em>.</p>
+</dd>
+</dl>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../3_svea_operation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 3. The SVEA" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              3. The SVEA
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../5_more_docker/" class="md-footer__link md-footer__link--next" aria-label="Next: 5. Advanced Docker Workflows" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              5. Advanced Docker Workflows
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      2020, Smart Mobility Lab
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.8492ddcf.min.js"></script>
+      
+        <script src="../../mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
