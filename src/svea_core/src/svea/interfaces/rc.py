@@ -9,7 +9,7 @@ from threading import Thread
 from collections import deque
 import rospy
 
-from svea_msgs.msg import lli_ctrl, DriveInput
+from svea_msgs.msg import lli_ctrl
 from svea.states import SVEAControlValues
 
 __license__ = "MIT"
