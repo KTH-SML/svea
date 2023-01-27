@@ -128,7 +128,7 @@ class SVEAManager(object):
         """Checks if the firmware is in emergency lock or not"""
         return self.actuation.emergency
 
-    def send_control(self, steering, velocity):
+    def send_control(self, steering, velocity, transmission=-1):
         """Send control input off to low-level controller and actuate
         SVEA.
 
@@ -136,8 +136,10 @@ class SVEAManager(object):
         :type steering: float
         :param velocity: Velocity request in [m/s]
         :type velocity: float
+        :param transmission: Transmission resquest [0 or 1]
+        :type transmission: int
         """
-        self.actuation.send_control(steering, velocity)
+        self.actuation.send_control(steering, velocity, transmission)
         # log control as soon as it's actually sent
         self.data_handler.log_ctrl(steering, velocity, rospy.get_time())
 
