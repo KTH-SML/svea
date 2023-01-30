@@ -368,8 +368,12 @@ class VehicleState(object):
                 twist = twist.twist
             except AttributeError:
                 break
-        # assume no velocity along z direction, and always positive
-        self.v = math.sqrt(twist.linear.x**2 + twist.linear.y**2)
+        # project velocity vector onto heading of vehicle
+        rot_angle = -self.yaw # rotate to heading of body frame
+        vel_vec = np.array([twist.linear.x, twist.linear.y])
+        rot_vel_vec = rotate_xy(vel_vec, rot_angle)
+        # take x-component of velocity vector in body frame
+        self.v = rot_vel_vec[0]
         try:
             self.covariance[self.V_IX, self.V_IX] = twist_msg.covariance[0]
         except AttributeError:
@@ -641,6 +645,16 @@ def _normalize_angle(angle):
     while angle <= -np.pi:
         angle += 2*np.pi
     return angle
+
+
+def rotate_xy(xy_pt, rot_angle):
+    """Rotate numpy array xy_pt by rot_angle"""
+    c = math.cos(rot_angle)
+    s = math.sin(rot_angle)
+    rot_mat = np.array([[c, -s], [s, c]])
+    pt = np.reshape(xy_pt, (2, 1))
+    rot_pt = rot_mat @ pt
+    return np.reshape(rot_pt, xy_pt.shape)
 
 
 def yaw_cov_to_quaternion_cov(yaw, yaw_covariance):
