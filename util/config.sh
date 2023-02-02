@@ -68,6 +68,26 @@ istrue() {
     return $?
 }
 
+# Find all directories that (immediately) contains a file named TARGET.
+# Once a file is found do not continue searching in subdirectories.
+# > shallow_find TARGET [PATHS...]
+shallow_find() {
+    TARGET="$1"
+    shift
+    find "$@"                                               \
+        -mindepth 1                                         \
+        -type d                                             \
+        -exec sh -c 'test -f "$1/$2"' -- {} "$TARGET" \;    \
+        -prune                                              \
+        -print
+    return $?
+}
+
+find_entrypoints() {
+    shallow_find 'entrypoint' "$REPOSITORY_PATH" | tr '\n' ' '
+    return $?
+}
+
 
 ################################################################################
 ################################################################################

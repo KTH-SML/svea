@@ -26,5 +26,6 @@ catkin build
 # https://github.com/osrf/docker_images/issues/114
 printf "\nsource '$PWD/devel/setup.bash'" >> $HOME/.bashrc
 
-exec "$@"
+# recursively execute entrypoints
+exec $(find_entrypoints) "$@"
 
