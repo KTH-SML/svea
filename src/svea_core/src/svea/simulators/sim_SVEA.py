@@ -206,8 +206,9 @@ class SimSVEA(object):
                 velocity = self._percent_to_vel(vel_percent) \
                     + np.random.normal(0, self.SPEED_NOISE_STD)
                 if not self.is_emergency:
-                    if (curr_time - self._last_ctrl_time) < self.CTRL_WAIT_TIME:
-                        self.model.update(steering, velocity, self.dt)
+                    if not (curr_time - self._last_ctrl_time) < self.CTRL_WAIT_TIME:
+                        steering, velocity = 0, 0
+                    self.model.update(steering, velocity, self.dt)
                 else:
                     self.model.update(steering, 0, self.dt)
 
