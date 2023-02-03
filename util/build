@@ -10,7 +10,7 @@
 
 # Set default arguments
 if [ -z "$*" ]
-then set -- --tag "$IMAGE_TAG" "$BUILD_CONTEXT"
+then set -- --tag "$IMAGE_TAG" --file "$BUILD_FILE" "$BUILD_CONTEXT"
 fi
 
 
