@@ -55,6 +55,7 @@ class BasicDataHandler(object):
         # start with zeros since SVEA does this at launch
         self.ctrl_steer = [0.0]
         self.ctrl_v = [0.0]
+        self.ctrl_trans = [-1]
         self.ctrl_t = [0.0]
 
         # emergencies record
@@ -99,7 +100,7 @@ class BasicDataHandler(object):
         self.v.append(state.v)
         self.t.append(state.time_stamp.to_sec()-self.start_time)
 
-    def log_ctrl(self, steering, v, t):
+    def log_ctrl(self, steering, v, t, trans=-1):
         """ Log control input and time of control at time of request
 
         :param steering: Steering input
@@ -108,9 +109,12 @@ class BasicDataHandler(object):
         :type v: float
         :param t: Timestamp of control input [s]
         :type t: float
+        :param trans: Transmission input
+        :type trans: int
         """
         self.ctrl_steer.append(steering)
         self.ctrl_v.append(v)
+        self.ctrl_trans.append(trans)
         self.ctrl_t.append(t-self.start_time)
 
     def log_emergency(self, is_start, reason, t):
