@@ -1,13 +1,11 @@
-
-
 laser_max_beams: 50 
-odom_model_type: omni-corrected
+odom_model_type: diff-corrected
 update_min_d: -1
 update_min_a: -1
 transform_tolerance: 0.01
     
 min_particles: 100
-max_particles: 800
+max_particles: 500
 resample_interval: 1
 selective_resampling: true
     
@@ -18,11 +16,11 @@ initial_cov_xx: 2.0
 initial_cov_yy: 2.0
 initial_cov_aa: 1.0
     
-odom_alpha1: 0.1 # Rot from rot
-odom_alpha2: 0.1 # Rot from trans
-odom_alpha3: 0.4  # Trans from trans
-odom_alpha4: 0.2  # Trans from rot
-odom_alpha5: 0.2 # Side slipp
+odom_alpha1: 0.4 # Rot from rot
+odom_alpha2: 0.4 # Rot from trans
+odom_alpha3: 1.6  # Trans from trans
+odom_alpha4: 0.8  # Trans from rot
+#odom_alpha5: 0.2  Side slipp (not used unless odom_model_type is omni)
     
 laser_model_type: likelihood_field
 laser_sigma_hit: 0.04

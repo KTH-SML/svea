@@ -14,6 +14,12 @@ from svea.interfaces import LocalizationInterface
 from svea.controllers.pure_pursuit import PurePursuitController
 from svea.svea_managers.path_following_sveas import SVEAPurePursuit
 from svea.data import TrajDataHandler, RVIZPathHandler
+# Added for obstace pose visualization
+from svea.simulators.viz_utils import (
+    publish_pose_array
+)
+from geometry_msgs.msg import PoseArray, PointStamped
+from sensor_msgs.msg import LaserScan
 
 
 def load_param(name, value=None):
@@ -56,7 +62,9 @@ class pure_pursuit:
     DELTA_TIME = 0.01
     TRAJ_LEN = 10
     GOAL_THRESH = 0.2
-    TARGET_VELOCITY = 1.0
+    # Obstacle threshold for obstacle management
+    OBS_THRESH = 0.2
+    TARGET_VELOCITY = 0.35
     RATE = 1e9
 
     def __init__(self):
@@ -68,8 +76,11 @@ class pure_pursuit:
         ## Parameters
 
         self.POINTS = load_param('~points')
+        self.OBSTACLES = load_param('~obstacles_points')
         self.IS_SIM = load_param('~is_sim', False)
         self.USE_RVIZ = load_param('~use_rviz', False)
+        # Get remote rviz parameter
+        self.REMOTE_RVIZ = load_param('~remote_rviz', False)
         self.STATE = load_param('~state', [0, 0, 0, 0])
 
         assert_points(self.POINTS)
@@ -102,31 +113,62 @@ class pure_pursuit:
         self.svea = SVEAPurePursuit(LocalizationInterface,
                                     PurePursuitController,
                                     xs, ys,
-                                    data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
+                                    data_handler=RVIZPathHandler if self.USE_RVIZ or self.REMOTE_RVIZ else TrajDataHandler)
 
         self.svea.controller.target_velocity = self.TARGET_VELOCITY
+        # Create publisher in order to publish obstacle points onto RVIz
+        self.init_pts_publisher = rospy.Publisher("/obstacles_points",
+                                         PoseArray, queue_size=1) 
+        # Subscriber for the obstacle points topic
+        self.obs_sub = rospy.Subscriber('/clicked_point', PointStamped, self.obs_callback)
+        
         self.svea.start(wait=True)
 
         # everything ready to go -> unpause simulator
         if self.IS_SIM:
             self.simulator.toggle_pause_simulation()
 
+    def obs_callback(self, msg):
+        obs = [msg.point.x, msg.point.y, 0]
+        self.OBSTACLES.append(obs)
+
     def run(self):
         while self.keep_alive():
             self.spin()
 
     def keep_alive(self):
-        return not (self.svea.is_finished or rospy.is_shutdown())
+        #!! self.svea.is_finished becomes true if in pure_pursuit controller, function _calc_target_index,
+        return not (rospy.is_shutdown())
 
     def spin(self):
-
+        #!! Safe to send controls is localization node is up and running
+        safe = self.svea.localizer.is_ready
+        #!! Previous was state and not self.state (so when computing new trajectory for new goal, the trajectory would 
+        #!! always start fro (0,0) and not the new position)
         # limit the rate of main loop by waiting for state
-        state = self.svea.wait_for_state()
+        self.state = self.svea.wait_for_state()
 
-        steering, velocity = self.svea.compute_control(state)
-        self.svea.send_control(steering, velocity)
+        # Obstacle Management
+        x = []
+        y = []
+        yaws = []
+        # if state.x,y is too close to obtacle point, then stop
+        for obs in self.OBSTACLES:
+            # Added for obstacle pose visualization
+            x.append(obs[0])
+            y.append(obs[1])
+            yaws.append(0)
+            if np.hypot(self.state.x - obs[0], self.state.y - obs[1]) < self.OBS_THRESH:
+                # If vehicle is too close to an obstacle, then stop its motion
+                self.svea.send_control(0, 0)
+                safe = False
+        publish_pose_array(self.init_pts_publisher, x, y, yaws)
 
-        if np.hypot(state.x - self.goal[0], state.y - self.goal[1]) < self.GOAL_THRESH:
+        if safe:
+            steering, velocity = self.svea.compute_control(self.state)
+            self.svea.send_control(steering, velocity)
+
+        if np.hypot(self.state.x - self.goal[0], self.state.y - self.goal[1]) < self.GOAL_THRESH:
             self.update_goal()
             xs, ys = self.compute_traj()
             self.svea.update_traj(xs, ys)

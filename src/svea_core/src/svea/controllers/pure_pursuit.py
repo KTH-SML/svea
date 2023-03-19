@@ -31,19 +31,22 @@ class PurePursuitController(object):
         return steering, velocity
 
     def compute_steering(self, state, target=None):
-        if target is None:
-            self.find_target(state)
+        if self.is_finished:
+            return 0.0
         else:
-            # allow manual setting of target
-            self.target = target
+            if target is None:
+                self.find_target(state)
+            else:
+                # allow manual setting of target
+                self.target = target
 
-        tx, ty = self.target
-        alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
-        if state.v < 0:  # back
-            alpha = math.pi - alpha
-        Lf = self.k * state.v + self.Lfc
-        delta = math.atan2(2.0 * self.L * math.sin(alpha) / Lf, 1.0)
-        return delta
+            tx, ty = self.target
+            alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
+            if state.v < 0:  # back
+                alpha = math.pi - alpha
+            Lf = self.k * state.v + self.Lfc
+            delta = math.atan2(2.0 * self.L * math.sin(alpha) / Lf, 1.0)
+            return delta
 
     def compute_velocity(self, state):
         if self.is_finished:
@@ -81,6 +84,8 @@ class PurePursuitController(object):
 
         # terminating condition
         if dist < 0.1:
-            self.is_finished = True
+            #!! Bug: ithe robot will stop at the first waypoint thinking that it has completed its path
+            #self.is_finished = True
+            pass
 
         return ind
