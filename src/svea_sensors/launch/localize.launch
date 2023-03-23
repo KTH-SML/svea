@@ -17,7 +17,7 @@
     <arg name="initial_pose_x" default="0.0" />
     <arg name="initial_pose_y" default="0.0" />
     <arg name="initial_pose_a" default="0.0" />
-    <arg name="use_wheel_encoders" default="true" />
+    <arg name="use_wheel_encoders" default="false" />
 
     <!-- Start the stereo camera -->
     <group if="$(arg use_camera)">

@@ -49,6 +49,7 @@
         <param name="odom0"         value="rs/t265_camera/odom/sample"/>
         <param name="imu0"          value="imu/data"/>
         <param name="twist0"        value="actuation_twist"/>
+        <param name="twist1"        value="wheel_encoder_twist"/>
     </node>
 
     <!-- Hokuyo LIDAR -->
