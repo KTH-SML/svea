@@ -55,7 +55,6 @@ class pure_pursuit:
 
     DELTA_TIME = 0.01
     TRAJ_LEN = 10
-    GOAL_THRESH = 0.2
     TARGET_VELOCITY = 1.0
     RATE = 1e9
 
@@ -77,20 +76,20 @@ class pure_pursuit:
         ## Set initial values for node
 
         # initial state
-        self.state = VehicleState(*self.STATE)
-        publish_initialpose(self.state)
+        state = VehicleState(*self.STATE)
+        publish_initialpose(state)
 
         # create goal state
         self.curr = 0
         self.goal = self.POINTS[self.curr]
-        xs, ys = self.compute_traj()
+        xs, ys = self.compute_traj(state)
 
         ## Create simulators, models, managers, etc.
 
         if self.IS_SIM:
 
             # simulator need a model to simulate
-            self.sim_model = SimpleBicycleModel(self.state)
+            self.sim_model = SimpleBicycleModel(state)
 
             # start the simulator immediately, but paused
             self.simulator = SimSVEA(self.sim_model,
@@ -116,20 +115,20 @@ class pure_pursuit:
             self.spin()
 
     def keep_alive(self):
-        return not (self.svea.is_finished or rospy.is_shutdown())
+        return not rospy.is_shutdown()
 
     def spin(self):
 
         # limit the rate of main loop by waiting for state
         state = self.svea.wait_for_state()
 
-        steering, velocity = self.svea.compute_control(state)
-        self.svea.send_control(steering, velocity)
-
-        if np.hypot(state.x - self.goal[0], state.y - self.goal[1]) < self.GOAL_THRESH:
+        if self.svea.is_finished:
             self.update_goal()
-            xs, ys = self.compute_traj()
+            xs, ys = self.compute_traj(state)
             self.svea.update_traj(xs, ys)
+
+        steering, velocity = self.svea.compute_control()
+        self.svea.send_control(steering, velocity)
 
         self.svea.visualize_data()
 
@@ -137,10 +136,11 @@ class pure_pursuit:
         self.curr += 1
         self.curr %= len(self.POINTS)
         self.goal = self.POINTS[self.curr]
+        self.svea.controller.is_finished = False
 
-    def compute_traj(self):
-        xs = np.linspace(self.state.x, self.goal[0], self.TRAJ_LEN)
-        ys = np.linspace(self.state.y, self.goal[1], self.TRAJ_LEN)
+    def compute_traj(self, state):
+        xs = np.linspace(state.x, self.goal[0], self.TRAJ_LEN)
+        ys = np.linspace(state.y, self.goal[1], self.TRAJ_LEN)
         return xs, ys
 
 

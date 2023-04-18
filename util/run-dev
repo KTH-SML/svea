@@ -32,5 +32,6 @@ istrue DEBUG && fn="echo" || fn="exec"
     -v "/tmp/.X11-unix:/tmp/.X11-unix" \
     -v "/etc/localtime:/etc/localtime:ro" \
     -v "$SHRVOL_SRC:$SHRVOL_DST" \
+    --rm \
     "$@"
 

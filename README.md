@@ -2,7 +2,8 @@
 
 ### Quicklinks:
 - [SVEA website](https://svea.eecs.kth.se)
-- [Tutorials](https://github.com/KTH-SML/svea/tree/main/docs/tutorials)
+- [SVEA Docs](https://kth-sml.github.io/svea)
+- [Tutorials](https://kth-sml.github.io/svea/tutorials/0_intro)
 - [Sim to Real Tips](https://github.com/KTH-SML/svea#going-from-simulation-to-real)
 - [Testing](https://github.com/KTH-SML/svea#testing)
 
@@ -135,7 +136,8 @@ looks like:
 
 ![rviz example](docs/media/floor2_rviz.png)
 
-Now you are ready to read through the tutorials! You can find them in `svea/docs/tutorials`.
+Now you are ready to read through the tutorials! You can find them
+[here](https://kth-sml.github.io/svea/tutorials/0_intro).
 
 ## Going from simulation to real
 

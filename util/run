@@ -32,6 +32,7 @@ istrue DEBUG && fn="echo" || fn="exec"
     -v "/etc/localtime:/etc/localtime:ro" \
     -v "$SHRVOL_SRC:$SHRVOL_DST" \
     -v "/dev:/dev" \
+    --rm \
     --network host \
     --privileged \
     "$@"

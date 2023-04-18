@@ -59,6 +59,29 @@ as RViz) available to you. Currently Docker Desktop for Linux does not
 allow you to run GUI applications and is therefore not suitable. Please
 install Docker Engine.
 
+**Post-Installation steps**
+
+For a pleasant `docker` experience in the terminal you should do the following
+post-installation steps. Reboot your computer after these steps.
+
+1. Add your user to the `docker` group.
+
+```
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+
+2. Start/Enable the docker service
+
+```
+# On most distros (like vanilla Ubuntu)
+sudo systemctl enable docker.service
+sudo systemctl start docker.service
+# ...on other (like WSL-based Ubuntu)
+# This must be done each time you start the computer/session
+sudo service docker start
+```
+
 ---
 
 ### *I’m using Windows*
