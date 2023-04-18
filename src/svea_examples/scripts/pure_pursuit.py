@@ -149,4 +149,3 @@ if __name__ == '__main__':
     ## Start node ##
 
     pure_pursuit().run()
-

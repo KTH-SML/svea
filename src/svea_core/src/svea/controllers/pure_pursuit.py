@@ -31,6 +31,8 @@ class PurePursuitController(object):
         return steering, velocity
 
     def compute_steering(self, state, target=None):
+        if self.is_finished:
+            return 0.0
         if target is None:
             self.find_target(state)
         else:
@@ -48,14 +50,13 @@ class PurePursuitController(object):
     def compute_velocity(self, state):
         if self.is_finished:
             return 0.0
-        else:
-            # speed control
-            error = self.target_velocity - state.v
-            self.error_sum += error * self.dt
-            P = error * self.K_p
-            I = self.error_sum * self.K_i
-            correction = P + I
-            return self.target_velocity + correction
+        # speed control
+        error = self.target_velocity - state.v
+        self.error_sum += error * self.dt
+        P = error * self.K_p
+        I = self.error_sum * self.K_i
+        correction = P + I
+        return self.target_velocity + correction
 
     def find_target(self, state):
         ind = self._calc_target_index(state)
@@ -82,5 +83,6 @@ class PurePursuitController(object):
         # terminating condition
         if dist < 0.1:
             self.is_finished = True
+            pass
 
         return ind

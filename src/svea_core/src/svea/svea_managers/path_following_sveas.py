@@ -12,12 +12,6 @@ from svea.data import TrajDataHandler
 from svea.controllers import pure_pursuit
 from svea.controllers.pure_pursuit import PurePursuitController
 
-## PURE PURSUIT PARAMS ########################################################
-pure_pursuit.k = 0.6  # look forward gain
-pure_pursuit.Lfc = 0.4  # look-ahead distance
-pure_pursuit.L = 0.324  # [m] wheel base of vehicle
-###############################################################################
-
 __license__ = "MIT"
 __maintainer__ = "Frank Jiang, Tobias Bolin"
 __email__ = "frankji@kth.se "
