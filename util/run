@@ -12,7 +12,7 @@
 
 # Setting default arguments
 if [ -z "$*" ]
-then set -- --name "$CONTAINER_NAME" "$IMAGE_TAG"
+then set "$IMAGE_TAG"
 fi
 
 
@@ -30,7 +30,7 @@ istrue DEBUG && fn="echo" || fn="exec"
     -e "QT_X11_NO_MITSHM=1" \
     -v "/tmp/.X11-unix:/tmp/.X11-unix" \
     -v "/etc/localtime:/etc/localtime:ro" \
-    -v "$SHRVOL_SRC:$SHRVOL_DST" \
+    -v "$SHARED_VOLUME_SRC:$SHARED_VOLUME_DST" \
     -v "/dev:/dev" \
     --rm \
     --network host \
