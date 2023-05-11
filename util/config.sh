@@ -3,83 +3,51 @@
 # This dot-script can be sourced for environment variables describing this
 # project.
 #
+# The following variables can be override:
+# * BUILD_FILE
+# * BUILD_IMAGE
+# * BUILD_TAG
+#
+# There are examples of user configs for our normal hardware below. You must
+# choose one of these for e.g. GPU support.
+#
 # Author: Kaj Munhoz Arfvidsson
 
+## ------------------ ##
+## User Configuration ##
+## ------------------ ##
 
-################################################################################
-################################################################################
+## General x86/arm (prebuilt SVEA)
+#BUILD_IMAGE="ghcr.io/kth-sml/svea"
+#BUILD_TAG="latest"
 
+## TODO
+## General x86/arm + NVIDIA GPU (prebuilt, CUDA enabled)
+#BUILD_IMAGE="ghcr.io/kth-sml/svea"
+#BUILD_TAG="cuda"
 
-##
-## https://gist.github.com/kaarmu/123f536abd46fc86b0d720c8137a13a7
-##
+## TODO
+## Jetson TX2 (L4T 4.x)
+#BUILD_IMAGE="ghcr.io/kth-sml/svea"
+#BUILD_TAG="tx2"
 
+## TODO
+## Jetson Xavier AGX (L4T 5.x)
+#BUILD_TAG="xavier-agx"
 
-# Print error and exit
-# > panic [CODE] MESSAGE
-panic() {
-    [ $# -gt 1 ] && CODE=$1 && shift || CODE=1
-    echo "Error ($CODE): $1"
-    usage
-    exit $CODE
-}
+## --------------------------------- ##
+## Automatic Configuration Variables ##
+## --------------------------------- ##
 
-# Assert there exist commands
-# > assert_command [COMMANDS...]
-assert_command() {
-    for cmd in "$@"; do
-        [ ! "$(command -v "$cmd")" ] && panic "Missing command \"$cmd\". Is it installed?"
-    done
-}
-
-# Return the argument at index
-# > index [-]NUM [ARGS...]
-index() {
-    [ $# -lt 2 ] && return 1
-    [ $1 -gt 0 ] && i=$1 || i=$(($# + $1))
-    [ $i -le 0 ] && echo "" || ( shift $i && echo "$1" )
-}
-
-# Replace first substring with something else
-# > replace SUB NEW TEXT
-replace() {
-    case "$3" in
-        *"$1"* ) echo "${3%%$1*}$2${3#*$1}" ;;
-        "$3" ) echo "$3" ;;
-    esac
-}
-
-# Climb directories to find an existing path CHILD
-# > climb CHILD [ PARENT ]
-climb() {
-    CHILD="$1"
-    PARENT="$(realpath "${2:-$PWD}")"
-    [ -e "$PARENT/$CHILD" ] && echo "$PARENT" && return 0
-    [ "$PARENT" = "/" ] && return 1
-    climb "$CHILD" "$PARENT/.."
-    return $?
-}
-
-# Assert shell variable with name NAME is the number one
-# > istrue NAME
-istrue() {
-    VALUE="$(eval echo "\$$1")"
-    test "${VALUE:-0}" -eq 1
-    return $?
-}
-
-
-################################################################################
-################################################################################
-
+. "$(dirname "$0")/snippets.sh"
 
 REPOSITORY_PATH="$(climb .git)"
 REPOSITORY_NAME="$(basename "$REPOSITORY_PATH")"
 
 BUILD_CONTEXT="$REPOSITORY_PATH"
-BUILD_FILE="$REPOSITORY_PATH/docker/${BUILD_FILE:-Dockerfile}"
-BUILD_IMAGE="ghcr.io/kth-sml/svea"
-BUILD_TAG="latest"
+BUILD_FILE="${BUILD_FILE:-"$REPOSITORY_PATH/docker/Dockerfile"}"
+BUILD_IMAGE="${BUILD_IMAGE:-"ros"}"
+BUILD_TAG="${BUILD_TAG:-"noetic"}"
 IMAGE_TAG="$(basename "$BUILD_CONTEXT")"
 IMAGE_TAG="${IMAGE_TAG%%.*}"
 
@@ -92,6 +60,7 @@ if [ -n "$DEBUG" ]; then
     echo "REPOSITORY_PATH=$REPOSITORY_PATH"
     echo "REPOSITORY_NAME=$REPOSITORY_NAME"
     echo "BUILD_CONTEXT=$BUILD_CONTEXT"
+    echo "BUILD_FILE=$BUILD_FILE"
     echo "BUILD_IMAGE=$BUILD_IMAGE"
     echo "BUILD_TAG=$BUILD_TAG"
     echo "IMAGE_TAG=$IMAGE_TAG"
