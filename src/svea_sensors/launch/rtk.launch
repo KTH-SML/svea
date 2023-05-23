@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+    Launch RTK Localization using Ublox F9P reciever and SWEPOS Network-RTK Service
+-->
+
+<launch>
+    <!-- RTK RECEIVER ARGUMENTS -->
+    <arg name="device" default="/dev/ttyACM0"/>
+    <arg name="baud" default="250000" />
+    <!-- NTRIP CLIENT ARGUMENTS -->
+    
+    <!-- TO RTK2GO -->
+    <arg name="host" default="rtk2go.com"/>
+    <arg name="port" default="2101"/>
+    <arg name="authenticate" default="true"/>
+    <arg name="mountpoint" default="SweArbGotHag"/>
+    <arg name="username" default="myuser@mydomain.com"/>
+    <arg name="password" default="password"/>
+    
+    <!-- TO SWEPOS -->
+    <!-- <arg name="host" default="nrtk-swepos.lm.se"/> -->
+    <!-- <arg name="port" default="80"/>  -->
+    <!-- PORT 8500 is also valid -->
+    <!-- <arg name="authenticate" default="true"/> -->
+    <!-- <arg name="username" default="708583036"/> -->
+    <!-- <arg name="password" default="151515"/> -->
+
+    <!-- RTK UBLOX F9P RECEIVER NODE -->
+    <node pkg="svea_sensors" type="rtk_receiver_manager.py" name="rtk_receiver_manager" output="screen">
+        <param name="device" value="$(arg device)"/>
+        <param name="baud" value="$(arg baud)" />
+    </node>
+
+    <!-- START NTRIP CLIENT -->
+    <include file="$(find ntrip_client)/launch/ntrip_client.launch">
+        <arg name="host" value="$(arg host)" />
+        <arg name="port" value="$(arg port)" /> 
+        <arg name="mountpoint" value="$(arg mountpoint)" />
+        <arg name="authenticate" value="$(arg authenticate)" />
+        <arg name="username" value="$(arg username)" />
+        <arg name="password" value="$(arg password)" />
+    </include>
+
+</launch>
