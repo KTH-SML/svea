@@ -10,20 +10,21 @@
     <!-- NTRIP CLIENT ARGUMENTS -->
     
     <!-- TO RTK2GO -->
-    <arg name="host" default="rtk2go.com"/>
-    <arg name="port" default="2101"/>
-    <arg name="authenticate" default="true"/>
-    <arg name="mountpoint" default="SweArbGotHag"/>
-    <arg name="username" default="myuser@mydomain.com"/>
-    <arg name="password" default="password"/>
+    <!-- <arg name="host" default="rtk2go.com"/> -->
+    <!-- <arg name="port" default="2101"/> -->
+    <!-- <arg name="authenticate" default="true"/> -->
+    <!-- <arg name="mountpoint" default="SweArbGotHag"/> -->
+    <!-- <arg name="username" default="myuser@mydomain.com"/> -->
+    <!-- <arg name="password" default="password"/> -->
     
     <!-- TO SWEPOS -->
-    <!-- <arg name="host" default="nrtk-swepos.lm.se"/> -->
-    <!-- <arg name="port" default="80"/>  -->
+    <arg name="host" default="nrtk-swepos.lm.se"/>
+    <arg name="port" default="80"/> 
     <!-- PORT 8500 is also valid -->
-    <!-- <arg name="authenticate" default="true"/> -->
-    <!-- <arg name="username" default="708583036"/> -->
-    <!-- <arg name="password" default="151515"/> -->
+    <arg name="authenticate" default="true"/>
+    <arg name="mountpoint" default="MSM_GNSS"/>
+    <arg name="username" default="708583036"/>
+    <arg name="password" default="151515"/>
 
     <!-- RTK UBLOX F9P RECEIVER NODE -->
     <node pkg="svea_sensors" type="rtk_receiver_manager.py" name="rtk_receiver_manager" output="screen">

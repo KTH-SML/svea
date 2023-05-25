@@ -20,6 +20,8 @@ import rospy
 from threading import Thread
 from sensor_msgs.msg import NavSatFix
 from libnmea_navsat_driver.driver import RosNMEADriver
+from nmea_msgs.msg import Sentence
+from mavros_msgs.msg import RTCM
 
 __author__ = "Mustafa Al-Janabi"
 __email__ = "musaj@kth.se"
@@ -45,11 +47,14 @@ class RTKReceiverManager:
             self.serial, protfilter=UBX_PROTOCOL + NMEA_PROTOCOL
         )  # 1:NEMA 2:UBX 3:NMEA+UBX 4:RTCM 7: NMEA+UBX+RTCM
 
+        self.nmea_pub = rospy.Publisher("/ntrip_client/nmea", Sentence, queue_size=10)
         self.rate = rospy.Rate(self.RATE)
         self.setup_receiver()
         self.nmea_driver = RosNMEADriver()
         self.frame_id = self.nmea_driver.get_frame_id()
-        self.start_read()
+        self.start_serial_read()
+        # Subscribe to RTCM from NTRIP Client
+        rospy.Subscriber("/ntrip_client/rtcm", RTCM, self._handle_rtcm_cb)
 
     def set_config(self, msgClass, msgID, **kwargs):
         cfg = UBXMessage(
@@ -75,10 +80,15 @@ class RTKReceiverManager:
             assert rospy.has_param(name), f'Missing parameter "{name}"'
         return rospy.get_param(name, value)
 
-    def start_read(self):
-        Thread(target=self._read_handler, args=()).start()
+    def start_serial_read(self):
+        Thread(target=self._read_serial_handler, args=()).start()
 
-    def _read_handler(self):
+    def _handle_rtcm_cb(self, msg):
+        raw_rtcm = msg.data
+        self.serial.write(raw_rtcm)
+        # print(type(raw_rtcm), raw_rtcm)
+
+    def _read_serial_handler(self):
         while not rospy.is_shutdown():
             raw_msg, parsed_msg = self.ubx_reader.read()
             msg_protocol = protocol(raw_msg)
@@ -98,10 +108,16 @@ class RTKReceiverManager:
                     # print(lat, lon, height, horz_acc, vert_acc)
 
                     # print(parsed_msg)
-            elif msg_protocol == NMEA_PROTOCOL:
+            if msg_protocol == NMEA_PROTOCOL:
                 try:
                     nmea_str = raw_msg.decode("ascii")
-                    print(nmea_str)
+                    nmea_sentence_msg = Sentence()
+                    nmea_sentence_msg.sentence = nmea_str
+                    nmea_sentence_msg.header.frame_id = self.frame_id
+                    nmea_sentence_msg.header.stamp = rospy.Time().now()
+                    self.nmea_pub.publish(nmea_sentence_msg)
+
+                    # print(nmea_str)
                     self.nmea_driver.add_sentence(nmea_str, self.frame_id)
                     # TODO add publisher of sentence to /ntrip_client/nmea
                     # TODO subscribe to RTCM message from /ntrip_client/RTCM
