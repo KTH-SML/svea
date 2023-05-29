@@ -33,7 +33,6 @@
   <depend>svea_msgs</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
-  <depend>nmea_navsat_driver</depend>
   <depend>ntrip_client</depend>
   <exec_depend>amcl</exec_depend>
   <exec_depend>map_server</exec_depend>
