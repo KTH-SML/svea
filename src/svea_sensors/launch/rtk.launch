@@ -7,6 +7,7 @@
     <!-- RTK RECEIVER ARGUMENTS -->
     <arg name="device" default="/dev/ttyACM0"/>
     <arg name="baud" default="250000" />
+    <arg name="gps_frame" default="gps"/>
     <!-- NTRIP CLIENT ARGUMENTS -->
     
     <!-- TO RTK2GO -->
@@ -25,11 +26,13 @@
     <arg name="mountpoint" default="MSM_GNSS"/>
     <arg name="username" default="708583036"/>
     <arg name="password" default="151515"/>
+    <!-- TODO USE GPS FRAME -->
 
     <!-- RTK UBLOX F9P RECEIVER NODE -->
-    <node pkg="svea_sensors" type="rtk_receiver_manager.py" name="rtk_receiver_manager" output="screen">
+    <node pkg="svea_sensors" type="rtk_receiver_manager.py" name="rtk_receiver_manager" output="screen" ns="$(arg gps_frame)">
         <param name="device" value="$(arg device)"/>
         <param name="baud" value="$(arg baud)" />
+        <param name="gps_frame" value="$(arg gps_frame)" />
     </node>
 
     <!-- START NTRIP CLIENT -->
