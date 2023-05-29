@@ -1,5 +1,24 @@
 # SVEA sensors
 
+## Contents
+
+1. [Overview](#overview)
+    1. [License](#license)
+    2. [Supported Sensors](#supported-sensors)
+2. [Installation](#installation)
+    1. [Building from Source](#building-from-source)
+    2. [ZED mini camera installation](#zed-mini-camera-installation)
+    3. [Realsense T265 installation](#realsense-t265-installation)
+    4. [Hokuyo UST-10LX installation](#hokuyo-ust-10lx-installation)
+3. [Usage](#usage)
+4. [Launch files](#launch-files)
+5. [Config files](#config-files)
+6. [Nodes](#nodes)
+    1. [bnoo055_i2c_node](#bnoo055_i2c_node)
+    2. [odom_to_map](#odom_to_map)
+    3. [actuation_to_twist](#actuation_to_twist)
+    4. [wheel_encoder_reader](#wheel_encoder_reader)
+
 ## Overview
 
 Contains settings and software for all default sensors of the SVEA vehicles.
@@ -15,40 +34,40 @@ released under the [BSD 3-Clause license](svea_sensors/src/imu_bno055/LICENSE.tx
 [imu_bno055](src/imu_bno055) is Copyright (c) 2019, Dheera Venkatraman and
 released under the [BSD 3-Clause license](svea_sensors/src/imu_bno055/LICENSE.txt).
 
-
 ### Supported Sensors
 
 The package includes launch files, transforms, dependencies etc. for the
 following sensors:
 
-- **`ZED mini`**
-  Stereo camera for visual odometry. Publish rate 15-100 Hz depending on
-  resolution. Note that the transform for the ZED is set in
-  [urdf/zedm.urdf](urdf/zedm.urdf), and not in
-  [luanch/transforms.launch](luanch/transforms.launch).
+-   **`ZED mini`**
+    Stereo camera for visual odometry. Publish rate 15-100 Hz depending on
+    resolution. Note that the transform for the ZED is set in
+    [urdf/zedm.urdf](urdf/zedm.urdf), and not in
+    [luanch/transforms.launch](luanch/transforms.launch).
 
-- **`Intel Realsense T265`**
-  Stereo camera for visual odometry. Publish rate 200 Hz (visual odometry at
-  about 30 Hz integrated with IMU data).
+-   **`Intel Realsense T265`**
+    Stereo camera for visual odometry. Publish rate 200 Hz (visual odometry at
+    about 30 Hz integrated with IMU data).
 
-- **`IMU`**
-  BNO055, 9 degrees of freedom IMU. Publish rate ca 100 Hz. (Can also give
-  temperature)
+-   **`IMU`**
+    BNO055, 9 degrees of freedom IMU. Publish rate ca 100 Hz. (Can also give
+    temperature)
 
-- **`Hokuyo UST-10LX`**
-  2D lidar with a publish rate of 40 Hz. Connected through ethernet.
+-   **`Hokuyo UST-10LX`**
+    2D lidar with a publish rate of 40 Hz. Connected through ethernet.
 
-- **`Wheel encoders`**
-  The wheel encoders are a prototype and not available on most SVEAs. The
-  software required for using a pair of encoders is however included in this
-  package.
+-   **`Wheel encoders`**
+    The wheel encoders are a prototype and not available on most SVEAs. The
+    software required for using a pair of encoders is however included in this
+    package.
 
+-   **`ZED-F9P Satellite Navigation and RTK`** Multi-band receiver providing centimeter accuracy for outdoors navigation when connected to the [SWEPOS Network RTK](https://www.lantmateriet.se/en/geodata/gps-geodesi-och-swepos/swepos/swepos-services/network-rtk/connection-to-the-service/) service. We use the following module vendor `MIKROE-3881`. Publish rate 10 Hz.
 
 ## Installation
 
 The package should be downloaded and used as a part of the `svea` package.
 
-The *Hokuyo UST-10LX*, *Realsense T265*, and *ZED mini* requires special
+The _Hokuyo UST-10LX_, _Realsense T265_, _ZED mini_, and _ZED-F9P_ requires special
 installation steps.
 
 **Note:** After installing the package you will have to enable additional
@@ -57,7 +76,7 @@ hardware permisions inorder to connect to the sensors. Do this by running
     roscd svea_sensors
     sudo bash grant_hardware_permisions.sh
 
-and then restar the computer.
+and then restart the computer.
 
 ### Building from Source
 
@@ -74,13 +93,12 @@ rosdep install --from-paths . --ignore-src
 catkin build
 ```
 
-
 ### ZED mini camera installation
 
-- Install the ZED SDK according to the
-  [ZED SDK install instructions](https://www.stereolabs.com/docs/installation/jetson/#download-and-install-the-zed-sdk).
+-   Install the ZED SDK according to the
+    [ZED SDK install instructions](https://www.stereolabs.com/docs/installation/jetson/#download-and-install-the-zed-sdk).
 
-- Install the [ZED ROS wrapper](https://github.com/stereolabs/zed-ros-wrapper#build-the-program).
+-   Install the [ZED ROS wrapper](https://github.com/stereolabs/zed-ros-wrapper#build-the-program).
 
 ### Realsense T265 installation
 
@@ -154,193 +172,212 @@ roslaunch svea_sensors localize.launch rviz:=true
 ```
 
 Rviz should started and display the position of the vehicle. In addition,
-odometry for the vehicle in the *odom* frame of reference will be published
-on `odometry/filtered`, and the same information translated to the *map*
+odometry for the vehicle in the _odom_ frame of reference will be published
+on `odometry/filtered`, and the same information translated to the _map_
 frame will be published on `odometry/corrected`.
-
 
 ## Launch files
 
-- **localize.launch:** Starts the sensors, static transforms, the
-  localization node, and the pose transformation node.
+-   **localize.launch:** Starts the sensors, static transforms, the
+    localization node, and the pose transformation node.
 
     General arguments
 
-    - **`xavier`** If the transform should be as they are on SVEAs with a
-      Xavier AGX. Default: `false`.
+    -   **`xavier`** If the transform should be as they are on SVEAs with a
+        Xavier AGX. Default: `false`.
 
-    - **`use_camera`** Use camera odometry, in contrast to bag file. Default:
-      `true`.
+    -   **`use_camera`** Use camera odometry, in contrast to bag file. Default:
+        `true`.
 
-    - **`camera`** Name of the camera to be used (either `zed` or `rs`).
-      Default: `rs`.
+    -   **`camera`** Name of the camera to be used (either `zed` or `rs`).
+        Default: `rs`.
 
     Localization arguments
 
-    - **`map_file`** Full path to the map file. If empty, don't start map
-      server. Default: empty.
+    -   **`map_file`** Full path to the map file. If empty, don't start map
+        server. Default: empty.
 
-    - **`initial_pose_x`** Initial position guess on the x axis in meters `0.0`.
+    -   **`initial_pose_x`** Initial position guess on the x axis in meters `0.0`.
 
-    - **`initial_pose_y`** Initial position guess on the y axis in meters
-      `map_name`. Default: `0.0`.
+    -   **`initial_pose_y`** Initial position guess on the y axis in meters
+        `map_name`. Default: `0.0`.
 
-    - **`initial_pose_a`** Initial guess for the yaw in radians. Default: `0.0`.
+    -   **`initial_pose_a`** Initial guess for the yaw in radians. Default: `0.0`.
 
     Pose translation arguments
 
-    - **`map_frame`** Name of the corrected map frame. Default: `map`.
+    -   **`map_frame`** Name of the corrected map frame. Default: `map`.
 
-    - **`wait_for_transform`** If false will use the last available
-      transform directly. If true  will wait for another transform to be
-      available and interpolate. Setting `wait_for_transform` to true will
-      increase the delay and is therefore not recommended when controling
-      physical robots. Default: `false`.
+    -   **`wait_for_transform`** If false will use the last available
+        transform directly. If true will wait for another transform to be
+        available and interpolate. Setting `wait_for_transform` to true will
+        increase the delay and is therefore not recommended when controling
+        physical robots. Default: `false`.
 
-    - **`publish_odometry`** If a translated odometry message should be
-      published in addition to the state. Default: `true`.
+    -   **`publish_odometry`** If a translated odometry message should be
+        published in addition to the state. Default: `true`.
 
-    - **`publish_pose`** If a translated pose message should be published in
-      addition to the state. Default: `true`.
+    -   **`publish_pose`** If a translated pose message should be published in
+        addition to the state. Default: `true`.
 
-- **rviz.launch:** Launch `rviz` with a configuration suitable for localization.
+-   **rviz.launch:** Launch `rviz` with a configuration suitable for localization.
 
-
-- **slam.launch:** Start the sensors and a `slam_toolbox` node to do
-  simultaneous localization and mapping (SLAM).
-
-    General arguments
-
-    - **`xavier`** If the transform should be as they are on SVEAs with a
-      Xavier AGX. Default: `false`.
-
-    - **`camera`** Name of the camera to be used (either `zed` or `rs`).
-      Default: `rs`.
-
-    - **`slam_delay`** The launch of the SLAM node will be delayed with this
-      many seconds to give the sensors time to start . Default: `5`.
-
-- **slam_and_bag.launch:** Launches all things that `slam.launch` starts. In
-  addition also launches a `rosbag record` node that records relevant sensor
-  data to do SLAM off line.
+-   **slam.launch:** Start the sensors and a `slam_toolbox` node to do
+    simultaneous localization and mapping (SLAM).
 
     General arguments
 
-    - **`xavier`** If the transform should be as they are on SVEAs with a
-      Xavier AGX. Default: `false`.
+    -   **`xavier`** If the transform should be as they are on SVEAs with a
+        Xavier AGX. Default: `false`.
 
-    - **`camera`** Name of the camera to be used (either `zed` or `rs`).
-      Default: `rs`.
+    -   **`camera`** Name of the camera to be used (either `zed` or `rs`).
+        Default: `rs`.
 
-    - **`slam_delay`** The launch of the SLAM node will be delayed with this
-      many seconds to give the sensors time to start . Default: `5`.
+    -   **`slam_delay`** The launch of the SLAM node will be delayed with this
+        many seconds to give the sensors time to start . Default: `5`.
 
-    - **`output_dir`** Tha bags are stored in this directory. **Will fail if
-      the directory does not exist!** Default: home directory.
-
-
-- **slam_from_bag.launch:** Do SLAM from a bag file recrded with
-  `slam_and_bag.launch`.
+-   **slam_and_bag.launch:** Launches all things that `slam.launch` starts. In
+    addition also launches a `rosbag record` node that records relevant sensor
+    data to do SLAM off line.
 
     General arguments
 
-    - **`file_name`** Name of the file in `file_path` that should be used
-    for. Required.
+    -   **`xavier`** If the transform should be as they are on SVEAs with a
+        Xavier AGX. Default: `false`.
 
-    - **`file_path`** The folder that the bag file is in. Default:
-      `/home/$(env USER)/bagfiles/`.
+    -   **`camera`** Name of the camera to be used (either `zed` or `rs`).
+        Default: `rs`.
 
-    - **`xavier`** If the transform should be as they are on SVEAs with a
-      Xavier AGX. Default: `false`.
+    -   **`slam_delay`** The launch of the SLAM node will be delayed with this
+        many seconds to give the sensors time to start . Default: `5`.
 
-    - **`use_rs`** If the RS T265 should be used instead of the ZED camera.
-      Default: `false`.
+    -   **`output_dir`** Tha bags are stored in this directory. **Will fail if
+        the directory does not exist!** Default: home directory.
 
-    - **`rviz`** Launch rviz together with the localization. Default: `false`.
+-   **slam_from_bag.launch:** Do SLAM from a bag file recrded with
+    `slam_and_bag.launch`.
 
-    - **`slam_delay`** The launch of the SLAM node will be delayed with this
-      many seconds to give the sensors time to start . Default: `5`.
+    General arguments
 
-- **wheel_odometry.launch:** Start the wheel encoder node.
+    -   **`file_name`** Name of the file in `file_path` that should be used
+        for. Required.
 
-    - **`direction_topic`** Topic that will be used for infering direction.
-      Default: `actuation_twist`.
+    -   **`file_path`** The folder that the bag file is in. Default:
+        `/home/$(env USER)/bagfiles/`.
 
-    - **`encoder_frame`** Transform frame id of the encoders. Default:
-      `base_link`.
+    -   **`xavier`** If the transform should be as they are on SVEAs with a
+        Xavier AGX. Default: `false`.
 
-    - **`encoder_topic`** Topic that the encoder node should read from.
-      Default: `lli/encoder`.
+    -   **`use_rs`** If the RS T265 should be used instead of the ZED camera.
+        Default: `false`.
 
-    - **`start_actuation_reader`** Will start an actuation reader node for
-      direction if true. Default: `true`.
+    -   **`rviz`** Launch rviz together with the localization. Default: `false`.
 
-    - **`start_serial`** Will start arosserial node for direction if true.
-      Default: `true`.
+    -   **`slam_delay`** The launch of the SLAM node will be delayed with this
+        many seconds to give the sensors time to start . Default: `5`.
 
-    - **`vehicle_name`** Name of the vehicle. Default: Empty string.
+-   **wheel_odometry.launch:** Start the wheel encoder node.
 
-- **transforms.launch:** Publishes static transforms for the SVEA
+    -   **`direction_topic`** Topic that will be used for infering direction.
+        Default: `actuation_twist`.
 
-    - **`xavier`** Use transforms for the AXG Xavier version of the SVEA if
-      `True` . Default: `false`.
+    -   **`encoder_frame`** Transform frame id of the encoders. Default:
+        `base_link`.
 
-- **rs_odometry.launch:** Start odometry based on the RS T265
+    -   **`encoder_topic`** Topic that the encoder node should read from.
+        Default: `lli/encoder`.
 
-    - **`lidar_ip`** IP address to the Hokuyo LIDAR. Default: `192.168.3.11`.
+    -   **`start_actuation_reader`** Will start an actuation reader node for
+        direction if true. Default: `true`.
 
-    - **`xavier`** Use transforms for the AXG Xavier version of the SVEA if
-      `True`. Default: `false`.
+    -   **`start_serial`** Will start arosserial node for direction if true.
+        Default: `true`.
 
-- **zed_odometry.launch:** Start odometry based on the ZED Mini
+    -   **`vehicle_name`** Name of the vehicle. Default: Empty string.
 
-    - **`lidar_ip`** IP address to the Hokuyo LIDAR. Default: `192.168.3.11`.
+-   **transforms.launch:** Publishes static transforms for the SVEA
 
-    - **`node_name`** Name for the ZED camera node. Default: `zed_node`.
+    -   **`xavier`** Use transforms for the AXG Xavier version of the SVEA if
+        `True` . Default: `false`.
 
-    - **`publish_urdf`** Wheter URDF based transforms for the ZED should be
-      published. Default: `true`.
+-   **rs_odometry.launch:** Start odometry based on the RS T265
 
-    - **`xavier`** Use transforms for the AXG Xavier version of the SVEA if
-      `True`. Default: `false`.
+    -   **`lidar_ip`** IP address to the Hokuyo LIDAR. Default: `192.168.3.11`.
+
+    -   **`xavier`** Use transforms for the AXG Xavier version of the SVEA if
+        `True`. Default: `false`.
+
+-   **zed_odometry.launch:** Start odometry based on the ZED Mini
+
+    -   **`lidar_ip`** IP address to the Hokuyo LIDAR. Default: `192.168.3.11`.
+
+    -   **`node_name`** Name for the ZED camera node. Default: `zed_node`.
+
+    -   **`publish_urdf`** Wheter URDF based transforms for the ZED should be
+        published. Default: `true`.
+
+    -   **`xavier`** Use transforms for the AXG Xavier version of the SVEA if
+        `True`. Default: `false`.
+
+-   **rtk.launch:** Start publishing gps/fix messages and launch the **ntrip_client** which
+    communicates with the services providing _RTCM_ correction data. The overall setup is described in the following diagram
+
+    ```mermaid
+    TODO
+    ```
+
+    General arguments
+
+    -   **`device`** Port to the USB device of the ZED-F9P receiver. Default: `/dev/ttyACM0`.
+    -   **`baud`** Baud rate for USB device. Default: `250000`.
+
+    NTRIP Client arguments (Explained in details [here](http://wiki.ros.org/ntrip_client))
+
+    -   **`host`** Hostname of the _NTRIP_ server that the client will receive corrections from. Default: `ntrt-swepos.lm.se`. Alternatively, you can use [rtk2go.com](http://rtk2go.com:2101/SNIP::STATUS).
+    -   **`port`** Port that the _NTRIP_ server is listening on. Default: `80`.
+    -   **`authenticate`** whether to authenticate with _NTRIP_ server when connecting. Default `true`.
+    -   **`username`** username to authenticate with _NTRIP_ server.
+    -   **`password`** password to authenticate with _NTRIP_ server. For SWEPOS Network RTK Credentials, open [this document](https://kth.sharepoint.com/:w:/s/ITRL/EQpnEBUVJVdMrDuXIj8IMBUBuqc_rFoeRelxt1d4YaZ71Q?e=Q4i3nz) (only for KTH team members).
+    -   **`mountpoint`**
+    -   **`gps_frame`** frame_id of GPS-related messages. Default: `gps`.
 
 ## Config files
 
 AMCL config [params/amcl](params/amcl)
 
-- **loaclize.yaml** Localization configurations for AMCL.
+-   **loaclize.yaml** Localization configurations for AMCL.
 
 Robot localization config [params/robot_localization](params/robot_localization)
 
-- **ekf_template.yaml** Template file with descriptions of parameters.
+-   **ekf_template.yaml** Template file with descriptions of parameters.
 
-- **rs_ekf.yaml** Odometry sensorfusion configurations for the RS T265.
+-   **rs_ekf.yaml** Odometry sensorfusion configurations for the RS T265.
 
-- **zed_ekf.yaml** Odometry sensorfusion configurations for the ZED Mini.
+-   **zed_ekf.yaml** Odometry sensorfusion configurations for the ZED Mini.
 
 Rviz config [params/rviz](params/rviz)
 
-- **slam_toolbox.rviz** Rviz layout to be used with the SLAM toolbox.
+-   **slam_toolbox.rviz** Rviz layout to be used with the SLAM toolbox.
 
 Slam toolbox [params/slam_toolbox](params/slam_toolbox)
 
-- **slam_sync.yaml** Default parameters for SLAM
+-   **slam_sync.yaml** Default parameters for SLAM
 
-- **localize.yaml** Parameters for using SLAM toolbox localization (experimental).
+-   **localize.yaml** Parameters for using SLAM toolbox localization (experimental).
 
 ZED [params/zed](params/zed)
 
-- **common.yaml** Common parametes for ZED and Zed Mini cameras
+-   **common.yaml** Common parametes for ZED and Zed Mini cameras
 
-- **zed.yaml** Parameters for ZED camera
+-   **zed.yaml** Parameters for ZED camera
 
-- **zedm.yaml** Parameters for ZED Mini camera
+-   **zedm.yaml** Parameters for ZED Mini camera
 
 URDF [urdf/](urdf/)
 
-- **zed.urdf** URDF setup for ZED camera
+-   **zed.urdf** URDF setup for ZED camera
 
-- **zedm.urdf** URDF setup (including transform to SVEA base_link) for ZED mini camera
+-   **zedm.urdf** URDF setup (including transform to SVEA base_link) for ZED mini camera
 
 ## Nodes
 
@@ -359,7 +396,7 @@ by [mdrwiega](https://github.com/mdrwiega) instead.
 
 #### Published Topics
 
-- **`data`** ([sensor_msgs/Imu])
+-   **`data`** ([sensor_msgs/Imu])
 
     Acceleration, angular velocity and orientation.
     The orientation is calculated by integrating the angular velocity
@@ -367,44 +404,43 @@ by [mdrwiega](https://github.com/mdrwiega) instead.
     readings due to the inherent problems with magnetometers. The orintation
     is therefore relative to the orientation when the BNO055 was started.
 
-- **`raw`** ([sensor_msgs/Imu])
+-   **`raw`** ([sensor_msgs/Imu])
 
     Un-corrected acceleration and angular velocity.
     The acceleration is not corrected by the BNO055 self calibration, hwever
     it appears to still be heavily filtered. The angular velocity is the same
-    as published on the *data* topic.
+    as published on the _data_ topic.
 
-- **`mag`** ([sensor_msgs/MagneticField])
+-   **`mag`** ([sensor_msgs/MagneticField])
 
     The current magnetic field reading.
 
-- **`temp`** ([sensor_msgs/Temperature])
+-   **`temp`** ([sensor_msgs/Temperature])
 
     The temperature measured by the BNO055.
 
 #### Parameters
 
-- **`rate`** (int, default: 400)
+-   **`rate`** (int, default: 400)
 
     Rate that the BNO055 will be pooled at.
     Data will only be published if any of the values has changed compared to
     the last published values. The BNO055 supports a maximum rate of 100 Hz.
     A higher rate decreases the delay of that reading.
 
-- **`device`** (string, default: "/dev/i2c-1")
+-   **`device`** (string, default: "/dev/i2c-1")
 
     Path to the i2c device. Default is /dev/i2c-1. Use i2cdetect in the
     i2c-tools package to find out which bus your IMU is on. For a TX2 this is
     usually `"/dev/i2c-2"` and for the Xavier AGX it is usually `"/dev/i2c-8"`.
 
-- **`address`** (int, default: 0x28)
+-   **`address`** (int, default: 0x28)
 
     i2c address of the IMU.
 
-- **`frame_id`** (string, default: "imu")
+-   **`frame_id`** (string, default: "imu")
 
     The frame id used in published messages.
-
 
 ### odom_to_map
 
@@ -413,48 +449,45 @@ based on a transform from e. g. AMCL.
 
 #### Subscribed Topics
 
-- **`odometry/filtered`** ([nav_msgs/Odometry])
+-   **`odometry/filtered`** ([nav_msgs/Odometry])
 
     Topic for the odometry messages that will be translated.
 
-
 #### Published Topics
 
-- **`state`** ([svea_msgs/VehicleState])
+-   **`state`** ([svea_msgs/VehicleState])
 
     Kinematic bicycle state of the vehicle in the map frame.
 
-- **`odometry/corrected`** ([nav_msgs/Odometry])
+-   **`odometry/corrected`** ([nav_msgs/Odometry])
 
     Odometry of the vehicle in the map frame.
 
-- **`pose`** ([geometry_msgs/PoseWithCovarianceStamped])
+-   **`pose`** ([geometry_msgs/PoseWithCovarianceStamped])
 
     Pose of the vehicle in the map frame.
 
-
 #### Parameters
 
-- **`map_frame`** (stricng, default: "map")
+-   **`map_frame`** (stricng, default: "map")
 
     Frame of reference that the odometry messages should be translated to.
 
-- **`wait_for_transform`** (bool, default: false)
+-   **`wait_for_transform`** (bool, default: false)
 
-    If set to *false* the last received transform sill be used to translate
-    an odometry message. If *true* the node will wait for the next transform.
+    If set to _false_ the last received transform sill be used to translate
+    an odometry message. If _true_ the node will wait for the next transform.
     Waiting for the transform will cause a delay, but could allow higher
-    accuracy since an  interpolation between two transformes can be used for
+    accuracy since an interpolation between two transformes can be used for
     the translation.
 
-- **`publish_odometry`** (bool, default: true)
+-   **`publish_odometry`** (bool, default: true)
 
     Set to false to stop publishing odometry messages.
 
-- **`publish_pose`** (bool, default: true)
+-   **`publish_pose`** (bool, default: true)
 
     Set to false to stop publishing pose messages.
-
 
 ### actuation_to_twist
 
@@ -463,60 +496,59 @@ The calculation accounts for the current gear and acceleration characteristics o
 
 #### Subscribed Topics
 
-- **`lli/encoder`** ([svea_msgs/lli_encoder])
+-   **`lli/encoder`** ([svea_msgs/lli_encoder])
 
     Raw encoder data that is used to calculate the velocity.
 
 #### Published Topics
 
-- **`actuation_twist`** ([geometry_msgs/TwistWithCovarianceStamped])
+-   **`actuation_twist`** ([geometry_msgs/TwistWithCovarianceStamped])
 
     Approximate velocity of the vehicle based on the actuations.
 
-
 #### Parameters
 
-- **`ctrl_message_topic`** (string, Default: "lli/ctrl_actuated")
+-   **`ctrl_message_topic`** (string, Default: "lli/ctrl_actuated")
 
     Topic where the actuation messages are published.
 
-- **`twist_message_topic`** (string, Default: "actuation_twist")
+-   **`twist_message_topic`** (string, Default: "actuation_twist")
 
     Topic where this node will publish twist messages with the calculated vlocity.
 
-- **`frame_id`** (string, Default: "base_link")
+-   **`frame_id`** (string, Default: "base_link")
 
     Frame of reference of the vehicle.
 
-- **`max_speed_0`** (float, Default: 1.7)
+-   **`max_speed_0`** (float, Default: 1.7)
 
     Max speed of the vehicle in low gear.
 
-- **`max_speed_1`** (float, Default: 3.6)
+-   **`max_speed_1`** (float, Default: 3.6)
 
     Max speed of the vehicle in high gear.
 
-- **`max_steering_angle`** (float, Default: 40 degrees)
+-   **`max_steering_angle`** (float, Default: 40 degrees)
 
     Max steering angle of the vehicle.
 
-- **`linear_covariance`** (float, Default: 0.1)
+-   **`linear_covariance`** (float, Default: 0.1)
 
     Linear covariance that will be published in the twist messages.
 
-- **`angular_covariance`** (float, Default: 0.1)
+-   **`angular_covariance`** (float, Default: 0.1)
 
     Angular covariance that will be published in the twist messages.
 
-- **`rate`** (float, Default: 50)
+-   **`rate`** (float, Default: 50)
 
     Publishing rate of the twist messages.
 
-- **`tau0`** (float, Default: 0.1)
+-   **`tau0`** (float, Default: 0.1)
 
     Time constant of velociy in low gear.
 
-- **`tau1`** (float, Default: 0.4)
+-   **`tau1`** (float, Default: 0.4)
 
     Time constant of velocity in high gear.
 
@@ -528,57 +560,53 @@ the direction of the velocity.
 
 #### Subscribed Topics
 
-- **`lli/encoder`** ([svea_msgs/lli_encoder])
+-   **`lli/encoder`** ([svea_msgs/lli_encoder])
 
     Topic where raw encoder data is published.
 
-
-- **`actuation_twist`** ([geometry_msgs/TwistWithCovarianceStamped])
+-   **`actuation_twist`** ([geometry_msgs/TwistWithCovarianceStamped])
 
     Topic that will be used to infere the direction of the encoders.
 
-
 #### Published Topics
 
-- **`wheel_encoder_twist`** ([geometry_msgs/TwistWithCovarianceStamped])
+-   **`wheel_encoder_twist`** ([geometry_msgs/TwistWithCovarianceStamped])
 
     Velocity of the vehicle as given by the encoders.
 
 #### Parameters
 
-- **`encoder_frame`** (string, Default: "base_link")
+-   **`encoder_frame`** (string, Default: "base_link")
 
     Frame of reference of the encoders.
 
-- **`encoder_topic`** (string, Default: "lli/encoder")
+-   **`encoder_topic`** (string, Default: "lli/encoder")
 
     Topic that publishes the encoder messages read by the node.
 
-- **`direction_topic`** (string, Default: "actuation_twist")
+-   **`direction_topic`** (string, Default: "actuation_twist")
 
     Topic used to infere the direction of the encoders.
     If empty or no messages are published on the topic, the directin will be
     assumed to be forward.
 
-- **`axle_track`** (float, Default: 199.0)
+-   **`axle_track`** (float, Default: 199.0)
 
     Axle track i. e. distance between the wheels of the vehicle in mm.
 
-- **`wheel_radius`** (float, Default: 60.0)
+-   **`wheel_radius`** (float, Default: 60.0)
 
     Radius of the wheels in mm.
 
-- **`linear_covariance`** (float, Default: 0.2)
+-   **`linear_covariance`** (float, Default: 0.2)
 
     Linear coavriance that will be included in the twist message published by
     the node.
 
-- **`angular_covariance`** (float, Deault: 0.4)
+-   **`angular_covariance`** (float, Deault: 0.4)
 
     Angular coavriance that will be included in the twist message published
     by the node.
-
-
 
 [geometry_msgs/PoseWithCovarianceStamped]: http://docs.ros.org/en/api/geometry_msgs/html/msg/PoseWithCovarianceStamped.html
 [geometry_msgs/TwistWithCovarianceStamped]: http://docs.ros.org/en/api/geometry_msgs/html/msg/TwistWithCovarianceStamped.html
@@ -586,4 +614,3 @@ the direction of the velocity.
 [sensor_msgs/Imu]: http://docs.ros.org/en/api/sensor_msgs/html/msg/Imu.html
 [sensor_msgs/Temperature]: http://docs.ros.org/en/api/sensor_msgs/html/msg/Temperature.html
 [sensor_msgs/MagneticField]: http://docs.ros.org/en/api/sensor_msgs/html/msg/MagneticField.html
-
