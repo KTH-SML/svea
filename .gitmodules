@@ -1,3 +1,0 @@
-[submodule "src/ntrip_client"]
-	path = src/ntrip_client
-	url = https://github.com/LORD-MicroStrain/ntrip_client
