@@ -25,12 +25,16 @@ __copyright__ = "Copyright 2023, Mustafa Al-Janabi"
 
 
 class RTKReceiverManager:
-    RATE = 30
+    RATE = 50
 
     def __init__(self):
+        # Read parameters
         self.device = rospy.get_param("~device")
         self.baud = rospy.get_param("~baud")
         self.frame_id = rospy.get_param("~gps_frame")
+        # Setup ROS Rate
+        self.rate = rospy.Rate(self.RATE)
+        #  Open serial port
         try:
             self.serial = Serial(self.device, self.baud, timeout=3)
         except SerialException as ex:
@@ -39,37 +43,57 @@ class RTKReceiverManager:
                     ex.errno, ex.strerror
                 )
             )
+        # Initialise the ubx reader
         self.ubx_reader = UBXReader(
             self.serial, protfilter=UBX_PROTOCOL + NMEA_PROTOCOL
         )  # 1:NEMA 2:UBX 3:NMEA+UBX 4:RTCM 7: NMEA+UBX+RTCM
+        # Create publishers
+        self._init_pub()
+        # Create subscriber
+        self._init_sub()
+        # Configure the receiver
+        self.setup_receiver()
+        # Start reading from serial port and parse messages using ubx_reader
+        self.start_serial_read()
 
+    def _init_pub(self):
+        """Initializes publishers for necessary and sufficient topics"""
+        # Nmea message which get sent to virtual NTRIP servers which give correction message from closes base station based on own location
         self.nmea_pub = rospy.Publisher("/ntrip_client/nmea", Sentence, queue_size=10)
+        # Publish the satellite fix
         self.fix_pub = rospy.Publisher("fix", NavSatFix, queue_size=10)
+        # Heading of 2-D motion in [deg]
         self.heading_motion_pub = rospy.Publisher(
             "heading_motion", Float64, queue_size=10
         )
+        # Heading of vehicle in 2-D in [deg]
         self.heading_vehicle_pub = rospy.Publisher(
             "heading_vehicle", Float64, queue_size=10
         )
+        # Combined heading accuracy of vehicle and motion headings in [deg]
         self.headingAcc_pub = rospy.Publisher(
             "heading_accuracy", Float64, queue_size=10
         )
+        # Ground speed (2-D) in [m/s]
         self.speed_pub = rospy.Publisher("speed", Float64, queue_size=10)
+        # Estimate of ground speed accuracy in [m/s]
         self.speedAcc_pub = rospy.Publisher("speed_accuracy", Float64, queue_size=10)
+        # Magnetic declination in [deg]
         self.magDec_pub = rospy.Publisher(
             "magnetic_declination", Float64, queue_size=10
         )
+        # Accuracy of magnetic declination in [deg]
         self.magDecAcc_pub = rospy.Publisher(
             "magnetic_declination_accuracy", Float64, queue_size=10
         )
-        self.rate = rospy.Rate(self.RATE)
-        self.setup_receiver()
-        self.nav_sat_fix_msg = NavSatFix()
-        self.start_serial_read()
-        # Subscribe to RTCM from NTRIP Client
+
+    def _init_sub(self):
+        """Initialize subscribers"""
+        # Subscribe to RTCM correction messages from NTRIP Client
         rospy.Subscriber("/ntrip_client/rtcm", RTCM, self._handle_rtcm_cb)
 
     def set_config(self, msgClass, msgID, **kwargs):
+        """Utility function which write a configuration message to receiver and awaits an acknowledgement."""
         cfg = UBXMessage(
             "CFG", "CFG-MSG", SET, msgClass=msgClass, msgID=msgID, **kwargs
         )
@@ -89,20 +113,18 @@ class RTKReceiverManager:
         # CFG-MSG-RXM-RTCM set rateUSB to 1
         self.set_config(0x02, 0x32, rateUSB=1)
 
-    @staticmethod
-    def load_param(name, value=None):
-        if value is None:
-            assert rospy.has_param(name), f'Missing parameter "{name}"'
-        return rospy.get_param(name, value)
-
     def start_serial_read(self):
+        """Start new thread which reads from the serial port and handles the incoming messages from the receiver."""
+        self.nav_sat_fix_msg = NavSatFix()
         Thread(target=self._read_serial_handler, args=()).start()
 
     def _handle_rtcm_cb(self, msg):
+        """Callback which listens to RTCM messages from NTRIP clients and writes them to the receiver."""
         raw_rtcm = msg.data
         self.serial.write(raw_rtcm)
 
     def _read_serial_handler(self):
+        """Manager of all incoming messages from Serial port, reads from serial port at self.RATE [Hz]"""
         while not rospy.is_shutdown():
             raw_msg, parsed_msg = self.ubx_reader.read()
             msg_protocol = protocol(raw_msg)
