@@ -61,7 +61,7 @@ following sensors:
     software required for using a pair of encoders is however included in this
     package.
 
--   **`ZED-F9P Satellite Navigation and RTK`** Multi-band receiver providing centimeter accuracy for outdoors navigation when connected to the [SWEPOS Network RTK](https://www.lantmateriet.se/en/geodata/gps-geodesi-och-swepos/swepos/swepos-services/network-rtk/connection-to-the-service/) service. We use the following module vendor `MIKROE-3881`. Publish rate 10 Hz.
+-   **`ZED-F9P Satellite Navigation and RTK`** Multi-band receiver providing centimeter accuracy for outdoors navigation when connected to the [SWEPOS Network RTK](https://www.lantmateriet.se/en/geodata/gps-geodesi-och-swepos/swepos/swepos-services/network-rtk/connection-to-the-service/) service. We use the following module vendor `MIKROE-3881`. Publish rate 1 Hz.
 
 ## Installation
 
