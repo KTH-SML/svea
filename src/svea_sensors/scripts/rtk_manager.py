@@ -11,6 +11,44 @@ from pyubx2 import (
     UBX_PROTOCOL,  # 2
     RTCM3_PROTOCOL,  # 4
 )
+
+# for setting dynamic model
+# "CFG-NAV5": {
+#     "mask": (
+#         X2,
+#         {
+#             "dyn": U1,
+#             "minEl": U1,
+#             "posFixMode": U1,
+#             "drLim": U1,
+#             "posMask": U1,
+#             "timeMask": U1,
+#             "staticHoldMask": U1,
+#             "dgpsMask": U1,
+#             "cnoThreshold": U1,
+#             "reserved0": U1,
+#             "utc": U1,
+#         },
+#     ),
+#     "dynModel": U1,
+#     "fixMode": U1,
+#     "fixedAlt": [I4, SCAL2],
+#     "fixedAltVar": [U4, SCAL4],
+#     "minElev": I1,
+#     "drLimit": U1,
+#     "pDop": [U2, SCAL1],
+#     "tDop": [U2, SCAL1],
+#     "pAcc": U2,
+#     "tAcc": U2,
+#     "staticHoldThresh": U1,
+#     "dgnssTimeOut": U1,
+#     "cnoThreshNumSVs": U1,
+#     "cnoThresh": U1,
+#     "reserved0": U2,
+#     "staticHoldMaxDist": U2,
+#     "utcStandard": U1,
+#     "reserved1": U5,
+# },
 import rospy
 from threading import Thread
 from sensor_msgs.msg import NavSatFix
@@ -24,6 +62,22 @@ __license__ = "MIT"
 __copyright__ = "Copyright 2023, Mustafa Al-Janabi"
 
 
+# MAP dynamic model string to corresponding number
+# source https://github.com/KumarRobotics/ublox/blob/master/ublox_msgs/msg/CfgNAV5.msg
+DYN_MODEL_MAP = {
+    "portable": 0,
+    "stationary": 1,
+    "pedestrian": 3,
+    "automotive": 4,
+    "sea": 5,
+    "airborne_1g": 6,  # Airborne with <1g Acceleration
+    "airborne_2g": 7,  # Airborne with <2g Acceleration
+    "airborne_4g": 8,  # Airborne with <4g Acceleration
+    "wrist_watch": 9,
+    "bike": 10,
+}
+
+
 class RTKReceiverManager:
     RATE = 50
 
@@ -32,6 +86,7 @@ class RTKReceiverManager:
         self.device = rospy.get_param("~device")
         self.baud = rospy.get_param("~baud")
         self.frame_id = rospy.get_param("~gps_frame")
+        self.dynamic_model = rospy.get_param("~dynamic_model")
         # Setup ROS Rate
         self.rate = rospy.Rate(self.RATE)
         #  Open serial port
@@ -103,6 +158,30 @@ class RTKReceiverManager:
             parsed_msg.identity == "ACK-ACK"
         ), f"Failed to set CFG-MSG for msgClass:{msgClass} msgID:{msgID}"
 
+    def set_dynamic_model(self, model):
+        # CFG-MSG-NAV5 set dynModel (dynamic Model) to model
+        # To understand the CFG-NAV5 msg https://github.com/KumarRobotics/ublox/blob/master/ublox_msgs/msg/CfgNAV5.msg
+        # and https://github.com/semuconsulting/pyubx2/blob/935f678a78a1038860d07aa64e600505bdc7ac00/src/pyubx2/ubxtypes_get.py#L566C6-L600
+        if DYN_MODEL_MAP.get(model, None) is None:
+            rospy.logwarn(
+                f'Invalid Dynamic Model Provided: {self.model}. Supported models are {", ".join(DYN_MODEL_MAP.keys())}.'
+            )
+        else:
+            cfg = UBXMessage(
+                "CFG",
+                "CFG-NAV5",
+                SET,
+                msgClass=0x06,
+                msgID=0x24,
+                dynModel=DYN_MODEL_MAP.get(model, 0),
+                dyn=1,  # MASK to update only dynamic model
+            )
+            self.serial.write(cfg.serialize())
+            _, parsed_msg = self.ubx_reader.read()
+            assert (
+                parsed_msg.identity == "ACK-ACK"
+            ), f"Failed to set CFG-NAV5 for dynamic model:{model}."
+
     def setup_receiver(self):
         # CFG-MSG-NAV-STATUS set rateUSB to 0
         self.set_config(0x01, 0x03, rateUSB=0)
@@ -112,6 +191,8 @@ class RTKReceiverManager:
         self.set_config(0x01, 0x36, rateUSB=1)
         # CFG-MSG-RXM-RTCM set rateUSB to 1
         self.set_config(0x02, 0x32, rateUSB=1)
+        # CFG-NAV5 set dynModel to self.dynamic_model
+        self.set_dynamic_model(self.dynamic_model)
 
     def start_serial_read(self):
         """Start new thread which reads from the serial port and handles the incoming messages from the receiver."""
@@ -162,6 +243,14 @@ class RTKReceiverManager:
                             "fix",
                             fix_type,
                         )
+                        print(
+                            "diag 0",
+                            (horz_acc / 1e1) ** 2,
+                            "4",
+                            (horz_acc / 1e1) ** 2,
+                            "9",
+                            (vert_acc / 1e1) ** 2,
+                        )
 
                         # Publish Speed
                         self.speed_pub.publish(
@@ -188,6 +277,7 @@ class RTKReceiverManager:
                             Float64(parsed_msg.magAcc * 1e-2)
                         )  # [deg]
 
+                # https://github.com/KumarRobotics/ublox/blob/master/ublox_msgs/msg/CfgNAV5.msg
                 elif parsed_msg.identity == "NAV-COV":
                     # NAV-COV is always sent directly after NAV-PVT, publish upon NAV-COV arrival
                     # Building a covariance matrix in the ENU frame
@@ -206,7 +296,11 @@ class RTKReceiverManager:
                     nd = parsed_msg.posCovND
                     dd = parsed_msg.posCovDD
                     position_covariance = [ee, ne, -ed, ne, nn, -nd, -ed, -nd, dd]
+                    print("covn 0", ee, "4", nn, "9", dd)
                     self.nav_sat_fix_msg.position_covariance = position_covariance
+                    self.nav_sat_fix_msg.position_covariance_type = (
+                        self.nav_sat_fix_msg.COVARIANCE_TYPE_KNOWN
+                    )
                     # Publish fix data
                     self.fix_pub.publish(self.nav_sat_fix_msg)
                     # Reset fix message after publishing
@@ -231,6 +325,6 @@ class RTKReceiverManager:
 
 
 if __name__ == "__main__":
-    rospy.init_node("rtk_receiver_manager", anonymous=False)
+    rospy.init_node("rtk_manager", anonymous=False)
     rtk_manager = RTKReceiverManager()
     rospy.spin()

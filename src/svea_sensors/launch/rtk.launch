@@ -8,6 +8,10 @@
     <arg name="device" default="/dev/ttyACM0"/>
     <arg name="baud" default="250000" />
     <arg name="gps_frame" default="gps"/>
+    <!-- Allowed values are "portable", "stationary",
+    "pedestrian","automotive","sea","airborne_1g","airborne_2g",
+    "airborne_4g","wrist_watch", and "bike" -->
+    <arg name="dynamic_model" default="portable"/>
     <!-- NTRIP CLIENT ARGUMENTS -->
     
     <!-- TO RTK2GO -->
@@ -29,10 +33,11 @@
     <!-- TODO USE GPS FRAME -->
 
     <!-- RTK UBLOX F9P RECEIVER NODE -->
-    <node pkg="svea_sensors" type="rtk_receiver_manager.py" name="rtk_receiver_manager" output="screen" ns="$(arg gps_frame)">
+    <node pkg="svea_sensors" type="rtk_manager.py" name="rtk_manager" output="screen" ns="$(arg gps_frame)">
         <param name="device" value="$(arg device)"/>
         <param name="baud" value="$(arg baud)" />
         <param name="gps_frame" value="$(arg gps_frame)" />
+        <param name="dynamic_model" value="$(arg dynamic_model)"/>
     </node>
 
     <!-- START NTRIP CLIENT -->
