@@ -8,7 +8,7 @@
     <arg name="device" default="/dev/ttyACM0"/>
     <arg name="baud" default="250000" />
     <arg name="gps_frame" default="gps"/>
-    <arg name="dynamic_model" default="portable"/> <!-- Allowed values are "portable", "stationary", "pedestrian","automotive","sea","airborne_1g","airborne_2g", "airborne_4g","wrist_watch", and "bike" -->
+    <arg name="dynamic_model" default="portable"/> <!-- Allowed values are "portable", "stationary", "pedestrian","automotive","sea","airborne_1g", "airborne_2g", "airborne_4g","wrist_watch", and "bike" -->
 
     <!-- NTRIP CLIENT ARGUMENTS -->
     <!-- for swepos network rtk -->

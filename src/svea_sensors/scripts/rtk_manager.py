@@ -288,9 +288,9 @@ class RTKManager:
                     # see https://github.com/KumarRobotics/ublox/blob/4f107f3b82135160a1aca3ef0689fd119199bbef/ublox_gps/src/node.cpp#LL779C1-L787C62
                     # However, using the NAV-COV message gives more accurate results
                     # and experimentation shows that the diagonal approximation methods gives
-                    # (EE + NN) is approx. 2 * (pvt_msg.hAcc / 1e3) ** 2
+                    # (EE + NN) is approx. (pvt_msg.hAcc / 1e3) ** 2
                     # Ie. the east-east and north-north component add up to the approximated
-                    # diagonal values horizontally.
+                    # diagonal values in the horizontal direction.
                     # DD is almost the same as (pvt_msg.vAcc / 1e3) ** 2 which
                     # means that both methods which approximate the vertical covariance are in agreements.
                     # Of course, the additional benefit of using the NAV-COV message is that we also get
