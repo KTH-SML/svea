@@ -8,32 +8,27 @@
     <arg name="device" default="/dev/ttyACM0"/>
     <arg name="baud" default="250000" />
     <arg name="gps_frame" default="gps"/>
-    <!-- Allowed values are "portable", "stationary",
-    "pedestrian","automotive","sea","airborne_1g","airborne_2g",
-    "airborne_4g","wrist_watch", and "bike" -->
-    <arg name="dynamic_model" default="portable"/>
+    <arg name="dynamic_model" default="portable"/> <!-- Allowed values are "portable", "stationary", "pedestrian","automotive","sea","airborne_1g","airborne_2g", "airborne_4g","wrist_watch", and "bike" -->
+
     <!-- NTRIP CLIENT ARGUMENTS -->
-    
-    <!-- TO RTK2GO -->
+    <!-- for swepos network rtk -->
+    <arg name="host" default="nrtk-swepos.lm.se"/>
+    <arg name="port" default="80"/>  <!-- PORT 8500 is also valid -->
+    <arg name="authenticate" default="true"/>
+    <arg name="mountpoint" default="MSM_GNSS"/>
+    <arg name="username" default=""/>
+    <arg name="password" default=""/>
+    <!-- for rtk2go -->
     <!-- <arg name="host" default="rtk2go.com"/> -->
     <!-- <arg name="port" default="2101"/> -->
     <!-- <arg name="authenticate" default="true"/> -->
     <!-- <arg name="mountpoint" default="SweArbGotHag"/> -->
-    <!-- <arg name="username" default="myuser@mydomain.com"/> -->
-    <!-- <arg name="password" default="password"/> -->
+    <!-- <arg name="username" default=""/> -->
+    <!-- <arg name="password" default=""/> -->
     
-    <!-- TO SWEPOS -->
-    <arg name="host" default="nrtk-swepos.lm.se"/>
-    <arg name="port" default="80"/> 
-    <!-- PORT 8500 is also valid -->
-    <arg name="authenticate" default="true"/>
-    <arg name="mountpoint" default="MSM_GNSS"/>
-    <arg name="username" default="708583036"/>
-    <arg name="password" default="151515"/>
-    <!-- TODO USE GPS FRAME -->
 
-    <!-- RTK UBLOX F9P RECEIVER NODE -->
-    <node pkg="svea_sensors" type="rtk_manager.py" name="rtk_manager" output="screen" ns="$(arg gps_frame)">
+    <!-- START UBLOX ZED-F9P RTK MANAGER NODE -->
+    <node pkg="svea_sensors" type="rtk_manager.py" name="rtk_manager" output="screen" ns="gps">
         <param name="device" value="$(arg device)"/>
         <param name="baud" value="$(arg baud)" />
         <param name="gps_frame" value="$(arg gps_frame)" />

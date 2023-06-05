@@ -319,27 +319,53 @@ frame will be published on `odometry/corrected`.
     -   **`xavier`** Use transforms for the AXG Xavier version of the SVEA if
         `True`. Default: `false`.
 
--   **rtk.launch:** Start publishing gps/fix messages and launch the **ntrip_client** which
-    communicates with the services providing _RTCM_ correction data. The overall setup is described in the following diagram
+-   **rtk.launch:** Start publishing `gps/fix` messages and launch the **ntrip_client** which
+    communicates with the services providing _RTCM_ correction data to the receiver via serial port. The overall setup is described in the following diagram
 
     ```mermaid
-    TODO
+        flowchart LR
+            A[Swepos NTRIP Server]
+            AA[NTRIP Client Node]
+            B[RTK Manager Node]
+            C[ZED-F9P]
+            T1{{/gps/fix}}
+            T2{{/gps/heading_accuracy}}
+            T3{{/gps/heading_motion}}
+            T4{{/gps/heading_vehicle}}
+            T5{{/gps/magnetic_declination}}
+            T6{{/gps/speed}}
+            T7{{/gps/speed_accuracy}}
+
+            AA -->|1. Send NMEA| A
+            A -->|2. Receive RTCM| AA
+            B -->|publish /ntrip_client/nmea|AA
+            AA -->|subscribe /ntrip_client/rtcm | B
+            B -->|write RTCM over serial|C
+            C -->|read NMEA, NAV-PVT, and NAV-COV over serial|B
+            B -->|pub|T1
+            B -->|pub|T2
+            B -->|pub|T3
+            B -->|pub|T4
+            B -->|pub|T5
+            B -->|pub|T6
+            B -->|pub|T7
     ```
 
     General arguments
 
     -   **`device`** Port to the USB device of the ZED-F9P receiver. Default: `/dev/ttyACM0`.
     -   **`baud`** Baud rate for USB device. Default: `250000`.
+    -   **`gps_frame`** frame_id of all GPS messages. Default: `gps`.
+    -   **`dynamic_model`** sets dynamic model for ZED-F9P RTK receiver. Default `portable`. Allowed values are: `portable`, `stationary`, `pedestrian`,`automotive`,`sea`, `airborne_1g`, `airborne_2g`, `airborne_4g`,`wrist_watch`, and `bike`.
 
     NTRIP Client arguments (Explained in details [here](http://wiki.ros.org/ntrip_client))
 
     -   **`host`** Hostname of the _NTRIP_ server that the client will receive corrections from. Default: `ntrt-swepos.lm.se`. Alternatively, you can use [rtk2go.com](http://rtk2go.com:2101/SNIP::STATUS).
     -   **`port`** Port that the _NTRIP_ server is listening on. Default: `80`.
     -   **`authenticate`** whether to authenticate with _NTRIP_ server when connecting. Default `true`.
+    -   **`mountpoint`**
     -   **`username`** username to authenticate with _NTRIP_ server.
     -   **`password`** password to authenticate with _NTRIP_ server. For SWEPOS Network RTK Credentials, open [this document](https://kth.sharepoint.com/:w:/s/ITRL/EQpnEBUVJVdMrDuXIj8IMBUBuqc_rFoeRelxt1d4YaZ71Q?e=Q4i3nz) (only for KTH team members).
-    -   **`mountpoint`**
-    -   **`gps_frame`** frame_id of GPS-related messages. Default: `gps`.
 
 ## Config files
 
@@ -614,3 +640,71 @@ the direction of the velocity.
 [sensor_msgs/Imu]: http://docs.ros.org/en/api/sensor_msgs/html/msg/Imu.html
 [sensor_msgs/Temperature]: http://docs.ros.org/en/api/sensor_msgs/html/msg/Temperature.html
 [sensor_msgs/MagneticField]: http://docs.ros.org/en/api/sensor_msgs/html/msg/MagneticField.html
+
+### rtk_manager
+
+Reads `NAV_PVT`, `NAV_COV`, and `NMEA` messages over serial port and publishes `gps` topics. It also publishes `NMEA` messages to the `ntrip_client` node and subscribes to `RTCM` messages from the `ntrip_client` which it writes to the ZED-F9P receiver.
+
+#### Subscribed Topics
+
+from mavros_msgs.msg import RTCM
+
+-   **`/ntrip_client/rtcm`** ([mavros_msgs/RTCM])
+
+    Topic where the NTRIP client publishes the correction messages from the NTRIP server.
+
+#### Published Topics
+
+-   **`/gps/fix`** ([sensor_msgs/NavSatFix])
+
+    GPS fix message
+
+-   **`/gps/speed`** ([std_msgs/Float64])
+
+    Ground speend in 2-D in [m/s]
+
+-   **`/gps/speed_accuracy`** ([std_msgs/Float64])
+
+    Estimate of ground speed accuracy in [m/s]
+
+-   **`/gps/heading_motion`** ([std_msgs/Float64])
+
+    Heading of 2-D motion in [deg]
+
+-   **`/gps/heading_vehicle`** ([std_msgs/Float64])
+
+    Heading of vehicle in 2-D in [deg]
+
+-   **`/gps/heading_accuracy`** ([std_msgs/Float64])
+
+    Combined heading accuracy of vehicle and motion heading in [deg]
+
+-   **`/gps/magnetic_declination`** ([std_msgs/Float64])
+
+    Magnetic declination in [deg]
+
+-   **`/gps/magnetic_declinantion_accuracy`** ([std_msgs/Float64])
+
+    Accuracy of magnetic declination in [deg]
+
+-   **`/ntrip_client/nmea`** ([nmea_msgs/Sentence])
+
+    NMEA message used by the NTRIP Client to annouce location to a virtual NTRIP server.
+
+#### Parameters
+
+-   **`device`** (string, Default: "ttyACM0")
+
+    Serial device port to the ZED-F9P receiver connected via USB.
+
+-   **`baud`** (int, Default: "45000")
+
+    Rate of serial port
+
+-   **`gps_frame`** (string, Default: "gps")
+
+    Name of frame_id for the gps topics published from node.
+
+-   **`dynamic_model`** (string, Default: "portable")
+
+    Dynamic model to use by the RTK receiver. Allowed values are "portable", "stationary", "pedestrian", "automotive", "sea", "airborne_1g", "airborne_2g", "airborne_4g", "wrist_watch", and "bike"

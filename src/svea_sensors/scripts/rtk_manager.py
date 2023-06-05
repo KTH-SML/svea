@@ -12,46 +12,9 @@ from pyubx2 import (
     RTCM3_PROTOCOL,  # 4
 )
 
-# for setting dynamic model
-# "CFG-NAV5": {
-#     "mask": (
-#         X2,
-#         {
-#             "dyn": U1,
-#             "minEl": U1,
-#             "posFixMode": U1,
-#             "drLim": U1,
-#             "posMask": U1,
-#             "timeMask": U1,
-#             "staticHoldMask": U1,
-#             "dgpsMask": U1,
-#             "cnoThreshold": U1,
-#             "reserved0": U1,
-#             "utc": U1,
-#         },
-#     ),
-#     "dynModel": U1,
-#     "fixMode": U1,
-#     "fixedAlt": [I4, SCAL2],
-#     "fixedAltVar": [U4, SCAL4],
-#     "minElev": I1,
-#     "drLimit": U1,
-#     "pDop": [U2, SCAL1],
-#     "tDop": [U2, SCAL1],
-#     "pAcc": U2,
-#     "tAcc": U2,
-#     "staticHoldThresh": U1,
-#     "dgnssTimeOut": U1,
-#     "cnoThreshNumSVs": U1,
-#     "cnoThresh": U1,
-#     "reserved0": U2,
-#     "staticHoldMaxDist": U2,
-#     "utcStandard": U1,
-#     "reserved1": U5,
-# },
 import rospy
 from threading import Thread
-from sensor_msgs.msg import NavSatFix
+from sensor_msgs.msg import NavSatFix, NavSatStatus
 from nmea_msgs.msg import Sentence
 from std_msgs.msg import Float64
 from mavros_msgs.msg import RTCM
@@ -76,17 +39,36 @@ DYN_MODEL_MAP = {
     "wrist_watch": 9,
     "bike": 10,
 }
+# MAP UBlox GPS quality to NAVSatMessage Quality
+# from https://github.com/KumarRobotics/ublox/blob/master/ublox_msgs/msg/NavPVT.msg
+# and https://github.com/ros-drivers/nmea_navsat_driver/blob/b168f499349e5f26e3aed9982deb44ed2f41f8e2/src/libnmea_navsat_driver/driver.py#L108-L149
+GPS_QUALITIES = {
+    # Unknown
+    -1: NavSatStatus.STATUS_NO_FIX,
+    # Invalid
+    0: NavSatStatus.STATUS_NO_FIX,
+    # SPS
+    1: NavSatStatus.STATUS_FIX,
+    # DGPS
+    2: NavSatStatus.STATUS_SBAS_FIX,  # Signal from only 3 SVs, constant altitude assumed
+    # DGPS
+    3: NavSatStatus.STATUS_SBAS_FIX,
+    # RTK Fix
+    4: NavSatStatus.STATUS_GBAS_FIX,  # GNSS + Dead reckoning
+    # RTK Float
+    5: NavSatStatus.STATUS_GBAS_FIX,  # Time only fix (High precision devices)
+}
 
 
-class RTKReceiverManager:
+class RTKManager:
     RATE = 50
 
     def __init__(self):
         # Read parameters
-        self.device = rospy.get_param("~device")
-        self.baud = rospy.get_param("~baud")
-        self.frame_id = rospy.get_param("~gps_frame")
-        self.dynamic_model = rospy.get_param("~dynamic_model")
+        self.device = rospy.get_param("~device", "ttyACM0")
+        self.baud = rospy.get_param("~baud", 250000)
+        self.frame_id = rospy.get_param("~gps_frame", "gps")
+        self.dynamic_model = rospy.get_param("~dynamic_model", "portable")
         # Setup ROS Rate
         self.rate = rospy.Rate(self.RATE)
         #  Open serial port
@@ -220,36 +202,38 @@ class RTKReceiverManager:
 
                     # Only use Ok messages
                     if parsed_msg.gnssFixOk:
-                        lon = parsed_msg.lon
-                        lat = parsed_msg.lat
-                        height = parsed_msg.height / 1e6  # [m]
-                        horz_acc = parsed_msg.hAcc / 1e3  # [cm]
-                        vert_acc = parsed_msg.vAcc / 1e3  # [cm]
-                        fix_type = parsed_msg.fixType
+                        # Comment out the following to debug with a print
+                        # lon = parsed_msg.lon
+                        # lat = parsed_msg.lat
+                        # height = parsed_msg.height / 1e3  # [m]
+                        # horz_acc = parsed_msg.hAcc / 1e3  # [m]
+                        # vert_acc = parsed_msg.vAcc / 1e3  # [m]
+                        # fix_type = parsed_msg.fixType
+                        # print(
+                        #     parsed_msg.iTOW,
+                        #     lat,
+                        #     lon,
+                        #     height,
+                        #     "m",
+                        #     parsed_msg.hAcc / 10,
+                        #     "cm",
+                        #     parsed_msg.vAcc / 10,
+                        #     "cm",
+                        #     "fix",
+                        #     fix_type,
+                        # )
 
-                        self.nav_sat_fix_msg.latitude = parsed_msg.lat
-                        self.nav_sat_fix_msg.longitude = parsed_msg.lon
-                        self.nav_sat_fix_msg.altitude = parsed_msg.height / 1e6  # [m]
-
-                        print(
-                            lat,
-                            lon,
-                            height,
-                            "m",
-                            horz_acc,
-                            "cm",
-                            vert_acc,
-                            "cm",
-                            "fix",
-                            fix_type,
+                        self.nav_sat_fix_msg.latitude = parsed_msg.lat  # [deg]
+                        self.nav_sat_fix_msg.longitude = parsed_msg.lon  # [deg]
+                        self.nav_sat_fix_msg.altitude = parsed_msg.height / 1e3  # [m]
+                        # set status status
+                        self.nav_sat_fix_msg.status.status = GPS_QUALITIES.get(
+                            parsed_msg.fixType,
+                            self.nav_sat_fix_msg.status.STATUS_NO_FIX,
                         )
-                        print(
-                            "diag 0",
-                            (horz_acc / 1e1) ** 2,
-                            "4",
-                            (horz_acc / 1e1) ** 2,
-                            "9",
-                            (vert_acc / 1e1) ** 2,
+                        # Set status service to GPS
+                        self.nav_sat_fix_msg.status.service = (
+                            self.nav_sat_fix_msg.status.SERVICE_GPS
                         )
 
                         # Publish Speed
@@ -261,20 +245,25 @@ class RTKReceiverManager:
                         )  # [m/s] convert from mm/s to m/s
                         # Publish Heading
                         self.heading_motion_pub.publish(
-                            Float64(parsed_msg.headMot * 1e-5)
+                            # Float64(parsed_msg.headMot * 1e-5)
+                            Float64(parsed_msg.headMot)
                         )  # [deg]
                         self.heading_vehicle_pub.publish(
-                            Float64(parsed_msg.headVeh * 1e-5)
+                            # Float64(parsed_msg.headVeh * 1e-5)
+                            Float64(parsed_msg.headVeh)
                         )  # [deg]
                         self.headingAcc_pub.publish(
-                            Float64(parsed_msg.headAcc * 1e-5)
+                            # Float64(parsed_msg.headAcc * 1e-5)
+                            Float64(parsed_msg.headAcc)
                         )  # [deg]
                         # Publish magDec
                         self.magDec_pub.publish(
-                            Float64(parsed_msg.magDec * 1e-2)
+                            # Float64(parsed_msg.magDec * 1e-2)
+                            Float64(parsed_msg.magDec)
                         )  # [deg]
                         self.magDecAcc_pub.publish(
-                            Float64(parsed_msg.magAcc * 1e-2)
+                            # Float64(parsed_msg.magAcc * 1e-2)
+                            Float64(parsed_msg.magAcc)
                         )  # [deg]
 
                 # https://github.com/KumarRobotics/ublox/blob/master/ublox_msgs/msg/CfgNAV5.msg
@@ -289,6 +278,24 @@ class RTKReceiverManager:
                     #   NE  NN -ND
                     #  -DE -DN  DD]
 
+                    # In some other Ublox GPS library the covariance is estimated by
+                    # computing the diagonal elements using the hAcc, and vAcc values in the
+                    # PVT message. In such case we convert the values to meters and raise by 2 to get
+                    # an approximation of the
+                    # positive_covariance[0] = (pvt_msg.hAcc / 1e3) ** 2
+                    # positive_covariance[4] = (pvt_msg.hAcc / 1e3) ** 2
+                    # positive_covariance[4] = (pvt_msg.vAcc / 1e3) ** 2
+                    # see https://github.com/KumarRobotics/ublox/blob/4f107f3b82135160a1aca3ef0689fd119199bbef/ublox_gps/src/node.cpp#LL779C1-L787C62
+                    # However, using the NAV-COV message gives more accurate results
+                    # and experimentation shows that the diagonal approximation methods gives
+                    # (EE + NN) is approx. 2 * (pvt_msg.hAcc / 1e3) ** 2
+                    # Ie. the east-east and north-north component add up to the approximated
+                    # diagonal values horizontally.
+                    # DD is almost the same as (pvt_msg.vAcc / 1e3) ** 2 which
+                    # means that both methods which approximate the vertical covariance are in agreements.
+                    # Of course, the additional benefit of using the NAV-COV message is that we also get
+                    # the covariance values for the cross-terms.
+
                     ee = parsed_msg.posCovEE
                     ne = parsed_msg.posCovNE
                     ed = parsed_msg.posCovED
@@ -296,8 +303,9 @@ class RTKReceiverManager:
                     nd = parsed_msg.posCovND
                     dd = parsed_msg.posCovDD
                     position_covariance = [ee, ne, -ed, ne, nn, -nd, -ed, -nd, dd]
-                    print("covn 0", ee, "4", nn, "9", dd)
+                    # Set covariance
                     self.nav_sat_fix_msg.position_covariance = position_covariance
+                    # Set covariance type to known
                     self.nav_sat_fix_msg.position_covariance_type = (
                         self.nav_sat_fix_msg.COVARIANCE_TYPE_KNOWN
                     )
@@ -326,5 +334,5 @@ class RTKReceiverManager:
 
 if __name__ == "__main__":
     rospy.init_node("rtk_manager", anonymous=False)
-    rtk_manager = RTKReceiverManager()
+    rtk_manager = RTKManager()
     rospy.spin()
