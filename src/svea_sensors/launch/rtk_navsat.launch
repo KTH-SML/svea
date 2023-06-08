@@ -6,7 +6,7 @@
 
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
         <param name="publish_filtered_gps" value="true"/>
-        <param name="magnetic_declination_radians" value="0"/>
+        <param name="magnetic_declination_radians" value="0.1460841"/>
         <param name="wait_for_datum" value="false"/>
         <param name="yaw_offset" value="0"/>
         <remap from="/imu/data" to="/imu/data" />

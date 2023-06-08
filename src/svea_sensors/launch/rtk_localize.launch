@@ -30,6 +30,11 @@
         </include>
         <node pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true">
             <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/global_ekf.yaml"/>
+            <rosparam param="initial_state">[-2.5,  -1.9,  0.0,
+                                 0.0,  0.0,  1.57,
+                                 0.0,  0.0,  0.0,
+                                 0.0,  0.0,  0.0,
+                                 0.0,  0.0,  0.0]</rosparam>
             <param name="publish_tf"    value="true"/>
             <param name="odom0"         value="rs/t265_camera/odom/sample"/>
             <param name="odom1"         value="/odometry/gps"/>

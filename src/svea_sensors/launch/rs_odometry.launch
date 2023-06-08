@@ -45,6 +45,11 @@
     <!-- Robot localization-->
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_rs" clear_params="true" output="screen">
         <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/rs_ekf.yaml" />
+        <rosparam param="initial_state">[0.0,  0.0,  0.0,
+                                 0.0,  0.0,  0.0,
+                                 0.0,  0.0,  0.0,
+                                 0.0,  0.0,  0.0,
+                                 0.0,  0.0,  0.0]</rosparam>
         <param name="publish_tf"    value="true"/>
         <param name="odom0"         value="rs/t265_camera/odom/sample"/>
         <param name="imu0"          value="imu/data"/>
