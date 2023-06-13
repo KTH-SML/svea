@@ -8,7 +8,7 @@
         <param name="publish_filtered_gps" value="true"/>
         <param name="wait_for_datum" value="false"/>
         <param name="magnetic_declination_radians" value="0.1460841"/>
-        <param name="yaw_offset" value="1.57"/>
+        <param name="yaw_offset" value="0"/>
         <param name="zero_altitude" value="true" />
         <remap from="/imu/data" to="/imu/data" />
         <remap from="/gps/fix" to="/gps/fix" />
@@ -18,7 +18,7 @@
     <!-- <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
         <param name="publish_filtered_gps" value="true"/>
         <param name="wait_for_datum" value="true"/>
-        <param name="yaw_offset" value="-1.57"/>
+        <param name="yaw_offset" value="0"/>
         <param name="zero_altitude" value="true" />
         <rosparam param="datum">[59.350951322823875, 18.06792096631517, 0.872665]</rosparam>
         <remap from="/odometry/filtered" to="/odometry/filtered/global" />

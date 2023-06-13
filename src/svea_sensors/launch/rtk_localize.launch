@@ -40,9 +40,7 @@
 
     <!-- Start wheel encoders -->
     <group if="$(arg use_wheel_encoders)">
-        <include file="$(find svea_sensors)/launch/wheel_odometry.launch">
-            <arg name="start_serial" value="false"/>
-        </include>
+        <include file="$(find svea_sensors)/launch/wheel_odometry.launch" />
     </group>
     
 
