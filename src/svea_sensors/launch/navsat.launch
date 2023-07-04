@@ -1,9 +1,5 @@
 <?xml version="1.0"?>
 <launch>
-
-    <!-- Start the RTK -->
-    <include file="$(find svea_sensors)/launch/rtk.launch" />
-
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
         <param name="publish_filtered_gps" value="true"/>
         <param name="wait_for_datum" value="false"/>
