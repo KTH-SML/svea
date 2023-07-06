@@ -17,13 +17,15 @@
     <arg name="initial_pose_x" default="0.0" />
     <arg name="initial_pose_y" default="0.0" />
     <arg name="initial_pose_a" default="0.0" />
-    <arg name="use_wheel_encoders" default="false" />
+    <arg name="use_wheel_encoders" default="true" />
+    <arg name="is_indoors" default="true" />
 
     <!-- Start the stereo camera -->
     <group if="$(arg use_camera)">
         <param name="use_sim_time" value="false"/>
         <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/rs_odometry.launch">
             <arg name="xavier" value="$(arg xavier)"/>
+            <arg name="is_indoors" value="$(arg is_indoors)"/>
         </include>
         <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
             <arg name="xavier" value="$(arg xavier)"/>
@@ -33,7 +35,7 @@
     <!-- Start wheel encoders -->
     <group if="$(arg use_wheel_encoders)">
         <include file="$(find svea_sensors)/launch/wheel_odometry.launch">
-            <arg name="start_serial" value="false"/>
+            <arg name="start_serial" value="true"/>
         </include>
     </group>
     

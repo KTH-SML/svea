@@ -8,6 +8,7 @@
     <!-- Launch file arguments -->
     <arg name="xavier"      default="false"/>
     <arg name="lidar_ip"    default="192.168.3.11" />
+    <arg name="is_indoors"  default="true" />
 
 
     <!-- IMU -->
@@ -24,7 +25,7 @@
     </include>
 
     <!-- RS T265 -->
-    <group ns="rs">
+    <group if="$(arg is_indoors)" ns="rs">
         <!-- Setings to turn of the SLAM capabilities of the RS T265 -->
         <rosparam>
             realsense_camera/tracking_module/enable_relocalization: false
