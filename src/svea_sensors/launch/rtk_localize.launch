@@ -27,7 +27,7 @@
         <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
             <arg name="xavier" value="$(arg xavier)"/>
         </include>
-        <node pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true">
+        <node pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true" output="screen">
             <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/global_ekf.yaml"/>
             <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/initial_state.yaml"/>
             <param name="publish_tf"    value="true"/>

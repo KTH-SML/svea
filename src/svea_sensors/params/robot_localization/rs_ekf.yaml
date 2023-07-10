@@ -4,7 +4,7 @@ sensor_timeout: 0.1
 
 two_d_mode: false
 
-transform_time_offset: 0.0
+transform_time_offset: 0.1
 
 transform_timeout: 0.0
 
