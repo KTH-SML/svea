@@ -13,12 +13,6 @@
     <arg name="encoder_topic" default="lli/encoder" />
     <arg name="direction_topic" default="actuation_twist" />
 
-
-    <!-- Velocity estimation -->
-    <group if="$(arg start_serial)">
-        <node pkg="svea_sensors" type="actuation_to_twist.py" output="screen" name="actuation_to_twist" />
-    </group>
-
     <!-- Read from encoder -->
     <node pkg="svea_sensors" type="wheel_encoder_reader.py" output="screen" name="wheel_encoder_reader">
         <param name="vehicle_name" value="$(arg vehicle_name)" />

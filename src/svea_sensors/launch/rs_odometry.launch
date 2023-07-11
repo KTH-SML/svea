@@ -8,6 +8,7 @@
     <!-- Launch file arguments -->
     <arg name="xavier"      default="false"/>
     <arg name="lidar_ip"    default="192.168.3.11" />
+    <arg name="is_indoors"  default="true" />
 
 
     <!-- IMU -->
@@ -24,7 +25,7 @@
     </include>
 
     <!-- RS T265 -->
-    <group ns="rs">
+    <group if="$(arg is_indoors)" ns="rs">
         <!-- Setings to turn of the SLAM capabilities of the RS T265 -->
         <rosparam>
             realsense_camera/tracking_module/enable_relocalization: false
@@ -42,14 +43,27 @@
     <!-- Velocity estimation -->
     <node pkg="svea_sensors" type="actuation_to_twist.py" name="actuation_to_twist" output="screen"/>
 
-    <!-- Robot localization-->
+    <!-- Robot localization (Local EKF)-->
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_rs" clear_params="true" output="screen">
         <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/rs_ekf.yaml" />
+        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/initial_state.yaml"/>
         <param name="publish_tf"    value="true"/>
         <param name="odom0"         value="rs/t265_camera/odom/sample"/>
         <param name="imu0"          value="imu/data"/>
         <param name="twist0"        value="actuation_twist"/>
         <param name="twist1"        value="wheel_encoder_twist"/>
+    </node>
+
+    <!-- Global EKF -->
+    <node unless="$(arg is_indoors)" pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true" output="screen">
+        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/global_ekf.yaml"/>
+        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/initial_state.yaml"/>
+        <param name="publish_tf"    value="true"/>
+        <param name="odom0"         value="odometry/gps"/>
+        <param name="imu0"          value="imu/data"/>
+        <param name="twist0"        value="actuation_twist"/>
+        <param name="twist1"        value="wheel_encoder_twist"/>
+        <remap from="/odometry/filtered" to="/odometry/filtered/global"/>
     </node>
 
     <!-- Hokuyo LIDAR -->
@@ -62,5 +76,4 @@
         <param name="angle_min"         value="-2.355"/>
         <param name="angle_max"         value="2.355"/>
     </node>
-
 </launch>
