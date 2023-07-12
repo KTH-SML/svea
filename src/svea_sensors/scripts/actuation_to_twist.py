@@ -99,7 +99,7 @@ class Republish():
 
     def cov_matrix_build(self):
         self.cov_matrix = [self.lin_cov, 0.0, 0.0, 0.0, 0.0, 0.0,
-                           0.0, self.lin_cov, 0.0, 0.0, 0.0, 0.0,
+                           0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                            0.0, 0.0, self.lin_cov, 0.0, 0.0, 0.0,
                            0.0, 0.0, 0.0, self.ang_cov, 0.0, 0.0,
                            0.0, 0.0, 0.0, 0.0, self.ang_cov, 0.0,
