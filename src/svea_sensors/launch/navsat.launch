@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="delay" default="5.0" />
+    <arg name="delay" default="2.0" />
 
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
         <param name="publish_filtered_gps" value="true"/>
