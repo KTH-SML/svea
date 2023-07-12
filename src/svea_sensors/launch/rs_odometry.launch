@@ -6,9 +6,12 @@
 <launch>
 
     <!-- Launch file arguments -->
-    <arg name="xavier"      default="false"/>
-    <arg name="lidar_ip"    default="192.168.3.11" />
-    <arg name="is_indoors"  default="true" />
+    <arg name="xavier"         default="false"/>
+    <arg name="lidar_ip"       default="192.168.3.11" />
+    <arg name="is_indoors"     default="true" />
+    <arg name="initial_pose_x" default="0.0" />
+    <arg name="initial_pose_y" default="0.0" />
+    <arg name="initial_pose_a" default="0.0" />
 
 
     <!-- IMU -->
@@ -46,7 +49,18 @@
     <!-- Robot localization (Local EKF)-->
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_rs" clear_params="true" output="screen">
         <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/rs_ekf.yaml" />
-        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/initial_state.yaml"/>
+        <!-- initial_state: [x,          y,          z, 
+                             roll,       pitch,      yaw, 
+                             x_dot,      y_dot,      z_dot, 
+                             roll_dot,   pitch_dot,  yaw_dot, 
+                             x_dot_dot,  y_dot_dot,  z_dot_dot]-->
+        <rosparam subst_value="true">
+        initial_state: [$(arg initial_pose_x),  $(arg initial_pose_y),  0.0, 
+                        0.0,                    0.0,                    $(arg initial_pose_a), 
+                        0.0,                    0.0,                    0.0, 
+                        0.0,                    0.0,                    0.0, 
+                        0.0,                    0.0,                    0.0]
+        </rosparam>
         <param name="publish_tf"    value="true"/>
         <param name="odom0"         value="rs/t265_camera/odom/sample"/>
         <param name="imu0"          value="imu/data"/>
@@ -57,7 +71,18 @@
     <!-- Global EKF -->
     <node unless="$(arg is_indoors)" pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true" output="screen">
         <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/global_ekf.yaml"/>
-        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/initial_state.yaml"/>
+        <!-- initial_state: [x,          y,          z, 
+                             roll,       pitch,      yaw, 
+                             x_dot,      y_dot,      z_dot, 
+                             roll_dot,   pitch_dot,  yaw_dot, 
+                             x_dot_dot,  y_dot_dot,  z_dot_dot]-->
+        <rosparam subst_value="true">
+        initial_state: [$(arg initial_pose_x),  $(arg initial_pose_y),  0.0, 
+                        0.0,                    0.0,                    $(arg initial_pose_a), 
+                        0.0,                    0.0,                    0.0, 
+                        0.0,                    0.0,                    0.0, 
+                        0.0,                    0.0,                    0.0]
+        </rosparam>
         <param name="publish_tf"    value="true"/>
         <param name="odom0"         value="odometry/gps"/>
         <param name="imu0"          value="imu/data"/>
