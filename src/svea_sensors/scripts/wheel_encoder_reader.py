@@ -30,14 +30,15 @@ DEFAULT_ANGULAR_COVARIANCE = 0.4
 
 def set_covariance(cov_matrix, linear_covariance, angular_covariance):
     """Setup the covariance matrix of the twist message"""
-    cov_step = 7 # Index step in covariance matrix
-    lin_cov_end = cov_step + 1
-    for i in range(0, lin_cov_end, cov_step):
-        cov_matrix[i] = linear_covariance
-    ang_cov_start = lin_cov_end + cov_step - 1
-    ang_cov_end = lin_cov_end + 3*cov_step
-    for i in range(ang_cov_start, ang_cov_end, cov_step):
-        cov_matrix[i] = angular_covariance
+    cov_step = 7
+    for i in range(0, len(cov_matrix), cov_step):
+        if i == cov_step:
+            cov_matrix[i] = 0.0
+        elif i <= cov_step * 2:
+            cov_matrix[i] = linear_covariance
+        else:
+            cov_matrix[i] = angular_covariance 
+
 
 
 def main():

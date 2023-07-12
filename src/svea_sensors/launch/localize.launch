@@ -22,6 +22,7 @@
     <!-- Should be set to true, if only the localization is running (i.e. this is needed in order to have wheel encoders
     and actuation_to_twist working) -->
     <arg name="start_serial" default="false" />
+    <arg name="device" default="/dev/ttyACM0" />
 
     <!-- Start the stereo camera -->
     <group if="$(arg use_camera)">
@@ -113,6 +114,14 @@
         <param name="initial_pose_y" value="$(arg initial_pose_y)" />
         <param name="initial_pose_a" value="$(arg initial_pose_a)" />
     </node>
+
+    <!-- Start GPS if outdoor localization -->
+    <group unless="$(arg is_indoors)">
+        <include file="$(find svea_sensors)/launch/rtk.launch">
+            <param name="device" value="$(arg device)" />
+        </include>
+        <include file="$(find svea_sensors)/launch/navsat.launch" />
+    </group>
 
     <node pkg="svea_sensors" type="odom_to_map" name="odom_to_map" output="screen">
         <param name="map_frame" value="$(arg map_frame)"/>
