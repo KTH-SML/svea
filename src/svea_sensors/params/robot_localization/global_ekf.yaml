@@ -44,7 +44,7 @@ odom0_config: [true, true, true,
 #               R_dot, P_dot, Y_dot,
 #               x_dot_dot, y_dot_dot, z_dot_dot]
 
-odom0_queue_size: 10
+odom0_queue_size: 8
 odom0_nodelay: true
 odom0_relative: false
 odom0_differential: false
