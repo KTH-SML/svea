@@ -85,16 +85,6 @@ Visualization Manager:
           Value: true
         odom:
           Value: true
-        t265_camera_accel_frame:
-          Value: true
-        t265_camera_accel_optical_frame:
-          Value: true
-        t265_camera_gyro_frame:
-          Value: true
-        t265_camera_gyro_optical_frame:
-          Value: true
-        t265_camera_link:
-          Value: true
         t265_camera_odom_frame:
           Value: true
         t265_camera_pose_frame:
@@ -116,13 +106,7 @@ Visualization Manager:
               laser:
                 {}
               t265_camera_pose_frame:
-                t265_camera_link:
-                  t265_camera_accel_frame:
-                    t265_camera_accel_optical_frame:
-                      {}
-                  t265_camera_gyro_frame:
-                    t265_camera_gyro_optical_frame:
-                      {}
+                {}
             t265_camera_odom_frame:
               {}
       Update Interval: 0
@@ -143,9 +127,9 @@ Visualization Manager:
           Color: 204; 51; 204
           Scale: 1
           Value: true
-        Value: true
+        Value: false
       Enabled: true
-      Keep: 100
+      Keep: 1
       Name: OdometryGPS
       Position Tolerance: 0.10000000149011612
       Queue Size: 10
@@ -179,8 +163,8 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: false
-      Enabled: true
-      Keep: 100
+      Enabled: false
+      Keep: 1
       Name: OdometryLocal
       Position Tolerance: 0.10000000149011612
       Queue Size: 10
@@ -196,7 +180,7 @@ Visualization Manager:
         Value: Arrow
       Topic: /odometry/filtered
       Unreliable: false
-      Value: true
+      Value: false
     - Angle Tolerance: 0.10000000149011612
       Class: rviz/Odometry
       Covariance:
@@ -214,8 +198,8 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: false
-      Enabled: true
-      Keep: 100
+      Enabled: false
+      Keep: 1
       Name: OdometryGlobal
       Position Tolerance: 0.10000000149011612
       Queue Size: 10
@@ -231,7 +215,7 @@ Visualization Manager:
         Value: Arrow
       Topic: /odometry/filtered/global
       Unreliable: false
-      Value: true
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -260,7 +244,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 8.525260925292969
+      Distance: 2.5459775924682617
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -268,17 +252,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -1.3327562808990479
-        Y: -0.9709077477455139
-        Z: -0.6602625250816345
+        X: 3.013423204421997
+        Y: 4.778467178344727
+        Z: 3.4687576293945312
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7403969764709473
+      Pitch: 0.9553964734077454
       Target Frame: <Fixed Frame>
-      Yaw: 4.310401439666748
+      Yaw: 3.4554011821746826
     Saved: ~
 Window Geometry:
   Displays:
@@ -296,5 +280,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 3840
-  X: 285
+  X: 243
   Y: 0
