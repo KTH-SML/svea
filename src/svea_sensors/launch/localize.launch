@@ -69,7 +69,6 @@
                             0.0,                    0.0,                    0.0, 
                             0.0,                    0.0,                    0.0]
             </rosparam>
-            <rosparam command="load"    file="$(find svea_sensors)/params/robot_localization/initial_state.yaml"/>
             <param name="publish_tf"    value="true"/>
             <param name="odom0"         value="rs/t265_camera/odom/sample"/>
             <param name="imu0"          value="imu/data"/>
