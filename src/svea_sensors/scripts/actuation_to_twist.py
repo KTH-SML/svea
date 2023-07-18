@@ -98,8 +98,9 @@ class Republish():
         rospy.spin()
 
     def cov_matrix_build(self):
+        # sigma_yy = 0 given svea's kinematics
         self.cov_matrix = [self.lin_cov, 0.0, 0.0, 0.0, 0.0, 0.0,
-                           0.0, self.lin_cov, 0.0, 0.0, 0.0, 0.0,
+                           0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                            0.0, 0.0, self.lin_cov, 0.0, 0.0, 0.0,
                            0.0, 0.0, 0.0, self.ang_cov, 0.0, 0.0,
                            0.0, 0.0, 0.0, 0.0, self.ang_cov, 0.0,

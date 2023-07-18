@@ -1,4 +1,4 @@
-frequency: 30
+frequency: 10
 
 sensor_timeout: 0.1
 
@@ -29,30 +29,28 @@ history_length: 0.00
 map_frame: map              # Defaults to "map" if unspecified
 odom_frame: odom            # Defaults to "odom" if unspecified
 base_link_frame: base_link  # Defaults to "base_link" if unspecified
-world_frame: odom           # Defaults to the value of odom_frame if unspecified
-
+world_frame: map           # Defaults to the value of odom_frame if unspecified
 
 ##########################################
-# RS T265 ################################
-odom0: /rs/t265_camera/odom/sample
+# GPS Odometry ################################
+odom0: /odometry/gps
 
-odom0_config: [false, false, false,
+odom0_config: [true, true, true,
                false, false, false,
                false, false, false,
-               true, true, true,
-               true, true, true]
+               false, false, false,
+               false, false, false]
 
-#odom0_config: [x, y, z,
+#odom1_config: [x, y, z,
 #               R, P, Y,
 #               x_dot, y_dot, z_dot,
 #               R_dot, P_dot, Y_dot,
 #               x_dot_dot, y_dot_dot, z_dot_dot]
 
-odom0_queue_size: 10
+odom0_queue_size: 8
 odom0_nodelay: true
-
+odom0_relative: false
 odom0_differential: false
-odom0_relative: true
 
 
 ##########################################
@@ -80,7 +78,7 @@ gravitational_acceleration: -0.35
 twist0: /actuation_twist
 twist0_config: [false, false, false,
                 false, false, false,
-                true,  false, false,
+                true,  true, false,
                 false, false, false,
                 false, false, false]
 twist0_nodelay: true
@@ -95,7 +93,7 @@ twist0_queue_size: 8
 twist1: /wheel_encoder_twist
 twist1_config: [false, false, false,
                 false, false, false,
-                true,  false, false,
+                true,  true, false,
                 false, false, true,
                 false, false, false]
 twist1_nodelay: true
