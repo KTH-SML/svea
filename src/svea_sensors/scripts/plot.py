@@ -89,11 +89,12 @@ if __name__ == '__main__':
             same += 1
         else:
             same = 0
-        if (rospy.Time.now() - time_start).to_sec() > 135 and not entered:
+        print((rospy.Time.now() - time_start).to_sec())
+        if (rospy.Time.now() - time_start).to_sec() > 5 and not entered:
             plot_obj.final_plot()
             entered = True
             df = pd.DataFrame({"lat" : plot_obj.lat, "long" : plot_obj.long})
-            df.to_csv("auto_7_21_2.csv", index=False)
+            df.to_csv("auto_7_21_5.csv", index=False)
         else:
             last_counter = plot_obj.counter
         rate.sleep()

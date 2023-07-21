@@ -56,7 +56,7 @@ class pure_pursuit:
 
     DELTA_TIME = 0.01
     TRAJ_LEN = 10
-    TARGET_VELOCITY = 0.5
+    TARGET_VELOCITY = 1
     RATE = 1e9
 
     def __init__(self):

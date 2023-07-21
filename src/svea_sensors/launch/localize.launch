@@ -23,6 +23,7 @@
     and actuation_to_twist working) -->
     <arg name="start_serial" default="false" />
     <arg name="device" default="/dev/ttyACM0" />
+    <arg name="port" default="/dev/ttyACM0"/>
 
     <node pkg="svea_sensors" type="generate_waypoint.py" name="generate_waypoints"/>
 
