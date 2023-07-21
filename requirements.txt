@@ -4,3 +4,5 @@
 pyserial
 pyubx2
 pyrtcm
+geopy
+nats-py==2.2.0

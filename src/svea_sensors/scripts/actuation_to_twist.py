@@ -137,7 +137,7 @@ class Republish():
         if self._last_calc_time is not None:
             dt = (time_now - self._last_calc_time).to_sec()
         else:
-            dt = 0.1
+            dt = 0.01 #0.1
         self._last_calc_time = time_now
         if (abs(act_values.velocity) < act_values.valid_range):
             setpoint_velocity = self._vel_actuation_to_mps(act_values.velocity)
@@ -149,7 +149,8 @@ class Republish():
 
     def _sim_esc(self, velocity, target_velocity):
         # simulates esc dynamics
-        tau = self.tau1 if self._actuation_values.velocity else self.tau0
+        #!!!!!!tau = self.tau1 if self._actuation_values.velocity else self.tau0
+        tau = self.tau1 if self._actuation_values.gear else self.tau0
         return 1/tau * (target_velocity - velocity)
 
     def _steer_actuation_to_rad(self, steering):

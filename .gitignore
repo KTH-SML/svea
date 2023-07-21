@@ -13,3 +13,5 @@ src/.vscode/
 
 venv/
 site/
+
+*.bag

@@ -51,7 +51,6 @@ odom0_nodelay: true
 odom0_differential: false
 odom0_relative: true
 
-
 ##########################################
 # BNO055 IMU #############################
 imu0: /imu/data
