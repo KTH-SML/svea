@@ -13,54 +13,52 @@ from sensor_msgs.msg import NavSatFix
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float64MultiArray
 from visualization_msgs.msg import MarkerArray, Marker
+from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
 #import plotly.graph_objects as go
 
 class generate():
     #lat, long
-#    default_corners = [[59.35090600000875, 18.068049400004035], 
-#                [59.35087019986695, 18.067948899970027] ,
-#                [59.350880999981385, 18.067930400101968] ,
-#                [59.35091747278197, 18.06802886626117]]
+    '''#    default_corners = [[59.35090600000875, 18.068049400004035], 
+    #                [59.35087019986695, 18.067948899970027] ,
+    #                [59.350880999981385, 18.067930400101968] ,
+    #                [59.35091747278197, 18.06802886626117]]
 
-#    default_corners = [[59.35090538359178,18.068052862349326], 
-#                [59.35088159984089, 18.06798270093596] ,
-#                [59.350893398289955, 18.06796449531501] ,
-#                [59.35091946020317, 18.068035701770267]]
+    #    default_corners = [[59.35090538359178,18.068052862349326], 
+    #                [59.35088159984089, 18.06798270093596] ,
+    #                [59.350893398289955, 18.06796449531501] ,
+    #                [59.35091946020317, 18.068035701770267]]
 
-#    default_corners = [[59.3508205 , 18.0679565],
-#                       [59.350855, 18.0680513], 
-#                       [59.350878, 18.0680259],
-#                       [59.3508457, 18.0679246]] #carpark
+    #    default_corners = [[59.3508205 , 18.0679565],
+    #                       [59.350855, 18.0680513], 
+    #                       [59.350878, 18.0680259],
+    #                       [59.3508457, 18.0679246]] #carpark
+    #    default_corners = [[59.350703089697824, 18.067884361913592],
+    #                       [59.35066237301757, 18.067937795070453],
+    #                       [59.35067459897018, 18.067979029770026],
+    #                       [59.35072082906835, 18.06792115256776]] #padestrian
 
-    default_corners = [[59.3508068, 18.0679704],
-                    [59.3508488, 18.0680664], 
-                    [59.3508927, 18.0680166],
-                    [59.3508579, 18.0679108]] #carpark2
+    #    default_corners = [[59.350712, 18.0678711],
+    #                    [59.3506577, 18.0679434]] # straight line on padertrain
+
+    #    default_corners = [[59.3507694, 18.0678011],
+    #                    [59.3507132, 18.0678728]] # straight line on padertrain
+        
+    #    default_corners = [[59.3507715, 18.0677963],
+    #                    [59.3507224, 18.0678608]] # straight line on padertrain
+
+    #59.3507331
+    #longitude: 18.0678454
 
 
-#    default_corners = [[59.350703089697824, 18.067884361913592],
-#                       [59.35066237301757, 18.067937795070453],
-#                       [59.35067459897018, 18.067979029770026],
-#                       [59.35072082906835, 18.06792115256776]] #padestrian
-
-#    default_corners = [[59.350712, 18.0678711],
-#                    [59.3506577, 18.0679434]] # straight line on padertrain
-
-#    default_corners = [[59.3507694, 18.0678011],
-#                    [59.3507132, 18.0678728]] # straight line on padertrain
+    #59.3507141,18.067871
+    #59.3506717
+    #longitude: 18.0679268'''
     
-#    default_corners = [[59.3507715, 18.0677963],
-#                    [59.3507224, 18.0678608]] # straight line on padertrain
-
-#59.3507331
-#longitude: 18.0678454
-
-
-#59.3507141,18.067871
-#59.3506717
-#longitude: 18.0679268
-
+    default_corners = [[59.3508579, 18.0679108],
+                       [59.3508927, 18.0680166],
+                       [59.3508488, 18.0680664],
+                        [59.3508068, 18.0679704]] #carpark2
 
     def __init__(self):
 
@@ -81,6 +79,7 @@ class generate():
         #params
         self.start = None
         self.coor = None
+        self.starting_ori = None
         self.rate = rospy.Rate(10)
 
         while not rospy.is_shutdown() and (self.coor is None or self.start is None):
@@ -91,8 +90,11 @@ class generate():
     def gps_odometry_callback(self,msg):
         if self.coor is None:
             self.coor = [[msg.pose.pose.position.x, msg.pose.pose.position.y]]
+            roll, pitch, self.starting_ori = euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
+            print("==================================================================================================self.starting_ori", self.starting_ori)
     def starting_location_callback(self, msg):
         if self.start is None:
+            #self.start = [59.3507979, 18.0679703]
             self.start = [msg.latitude, msg.longitude]
             print(self.start)
 
@@ -145,7 +147,7 @@ class generate():
         for count, point in enumerate(default_corners_r):
             y = np.sin(point[1]-start_r[1])*np.cos(point[0])
             x = np.cos(start_r[0])*np.sin(point[0])-np.sin(start_r[0])*np.cos(point[0])*np.cos(point[1]-start_r[1])
-            brng = np.pi/2 - np.arctan2(y, x)
+            brng = np.pi/2 - np.arctan2(y, x) + self.starting_ori
             distance = geodistnace.geodesic(np.degrees(point), self.start, ellipsoid='GRS-80').m
             coor_x = distance * np.cos(brng) + self.coor[0][0]
             coor_y = distance * np.sin(brng) + self.coor[0][1]
@@ -164,6 +166,7 @@ class generate():
 
             self.coor.append([coor_x, coor_y])
             print(brng, distance, self.coor[-1])'''
+        
         pub_points = Float64MultiArray()
         pub_points.data = list(chain.from_iterable(self.coor[1:]))
         self.visualize()

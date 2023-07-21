@@ -28,6 +28,8 @@ def plot91011():
     lat_long_csv7_21_4 = '/home/annika/svea_rtk_navsat/rosbag/auto_7_21_4.csv'
     lat_long_csv7_21_5 = '/home/annika/svea_rtk_navsat/rosbag/auto_7_21_5.csv'
     lat_long_csv7_21_6 = '/home/annika/svea_rtk_navsat/rosbag/auto_7_21_6.csv'
+    lat_long_csv7_21_7 = '/home/annika/svea_rtk_navsat/rosbag/auto_7_21_7.csv'
+    lat_long_csv7_21_8 = '/home/annika/svea_rtk_navsat/rosbag/auto_7_21_8.csv'
     data11 = pd.read_csv(lat_long_csv7_20)
     data12 = pd.read_csv(lat_long_csv7_21)
     data13 = pd.read_csv(lat_long_csv7_21_2)
@@ -35,20 +37,22 @@ def plot91011():
     data15 = pd.read_csv(lat_long_csv7_21_4)
     data16 = pd.read_csv(lat_long_csv7_21_5)
     data17 = pd.read_csv(lat_long_csv7_21_6)
+    data18 = pd.read_csv(lat_long_csv7_21_7)
+    data19 = pd.read_csv(lat_long_csv7_21_8)
 
     default_corners = [[59.3508068, 18.0679704],
                     [59.3508488, 18.0680664], 
                     [59.3508927, 18.0680166],
                     [59.3508579, 18.0679108]] #carpark2
     target = np.array(default_corners)
+    size = 5
     fig = px.scatter_geo(data11, lat='lat', lon='long')
-
     fig = go.Figure(go.Scattermapbox(
         name= "11",
         mode = "markers",
         lon = data11.long,
         lat = data11.lat,
-        marker = {'size': 3}))
+        marker = {'size': size}))
 
 
     fig.add_trace(go.Scattermapbox(
@@ -56,21 +60,21 @@ def plot91011():
         mode = "markers",
         lon = data12.long,
         lat = data12.lat,
-        marker = {'size': 3}))
+        marker = {'size': size}))
     
     fig.add_trace(go.Scattermapbox(
         name= "13",
         mode = "markers",
         lon = data13.long,
         lat = data13.lat,
-        marker = {'size': 3}))
+        marker = {'size': size}))
     
     fig.add_trace(go.Scattermapbox(
         name= "14",
         mode = "markers",
         lon = data14.long,
         lat = data14.lat,
-        marker = {'size': 3}))
+        marker = {'size': size}))
 
     fig.add_trace(go.Scattermapbox(
         name= "target",
@@ -84,22 +88,36 @@ def plot91011():
         mode = "markers",
         lon = data15.long,
         lat = data15.lat,
-        marker = {'size': 3}))
+        marker = {'size': size}))
     
     fig.add_trace(go.Scattermapbox(
         name= "16",
         mode = "markers",
         lon = data16.long,
         lat = data16.lat,
-        marker = {'size': 3}))
+        marker = {'size': size}))
     
     fig.add_trace(go.Scattermapbox(
         name= "self drive",
         mode = "markers",
         lon = data17.long,
         lat = data17.lat,
-        marker = {'size': 3}))
+        marker = {'size': size}))
     
+    fig.add_trace(go.Scattermapbox(
+        name= "18",
+        mode = "markers",
+        lon = data18.long,
+        lat = data18.lat,
+        marker = {'size': size}))
+    
+    fig.add_trace(go.Scattermapbox(
+        name= "19",
+        mode = "markers",
+        lon = data19.long,
+        lat = data19.lat,
+        marker = {'size': size}))
+
     fig.update_layout(
         margin ={'l':10,'t':10,'b':10,'r':10},
         mapbox = {
