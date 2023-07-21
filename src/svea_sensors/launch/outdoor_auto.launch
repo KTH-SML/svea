@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Launch file arguments -->
+    <arg name="xavier" default="false"/>
+    <arg name="use_camera" default="true"/>
+    <arg name="camera" default="rs"/>
+    <arg name="map_file" default=""/>
+    <arg name="map_frame" default="map"/>
+    <arg name="wait_for_transform" default="false"/>
+    <arg name="publish_odometry" default="true"/>
+    <arg name="publish_pose" default="true"/>
+    <arg name="initial_pose_x" default="0.0" />
+    <arg name="initial_pose_y" default="0.0" />
+    <arg name="initial_pose_a" default="0.0" />
+    <arg name="use_wheel_encoders" default="false" />
+    <arg name="is_indoors" default="true" />
+    <arg name="start_serial" default="false" />
+    <arg name="device" default="/dev/ttyACM0" />
+    <arg name="is_sim"          default="false"/>
+    <arg name="use_rviz"        default="true"/>
+
+    <!-- If is_sim equal to false, then include all these tags-->
+    <group unless="$(arg is_sim)">
+
+        <!-- Start localization -->
+        <include file="$(find svea_sensors)/launch/localize.launch">
+            <arg name="xavier"              value="$(arg xavier)"/>
+            <arg name="use_camera"          value="$(arg use_camera)"/>
+            <arg name="camera"              value="$(arg camera)"/>
+            <arg name="map_file"            value="$(arg map_file)"/>
+            <arg name="map_frame"           value="map"/>
+            <arg name="wait_for_transform"  value="$(arg wait_for_transform)"/>
+            <arg name="publish_odometry"    value="$(arg publish_odometry)"/>
+            <arg name="publish_pose"        value="$(arg publish_pose)"/>
+            <arg name="initial_pose_x"      value="$(arg initial_pose_x)" />
+            <arg name="initial_pose_y"      value="$(arg initial_pose_y)" />
+            <arg name="initial_pose_a"      value="$(arg initial_pose_a)" />
+            <arg name="use_wheel_encoders"  value="$(arg use_wheel_encoders)" />
+            <arg name="is_indoors"          value="$(arg is_indoors)" />
+            <!-- Should be set to true, if only the localization is running (i.e. this is needed in order to have wheel encoders
+            and actuation_to_twist working) -->
+            <arg name="start_serial"        value="$(arg start_serial)" />
+            <arg name="device"              value="$(arg device)" />
+        </include>
+    </group>
+
+    <!-- Start pure_pursuit -->
+    <node name="pure_pursuit" pkg="svea_examples" type="pure_pursuit_outdoor.py" output="screen">
+        <param name="is_sim"            value="$(arg is_sim)"/>
+        <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
+        <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
+        <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
+    </node>
+</launch>

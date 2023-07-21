@@ -7,7 +7,7 @@
         <param name="wait_for_datum" value="false"/>
         <param name="delay" value="$(arg delay)" />
         <param name="magnetic_declination_radians" value="0.1460841"/>
-        <param name="yaw_offset" value="0"/>
+        <param name="yaw_offset" value="0"/> <!--0.45-->
         <param name="zero_altitude" value="true" />
         <remap from="/imu/data" to="/imu/data" />
         <remap from="/gps/fix" to="/gps/fix" />
