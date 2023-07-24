@@ -6,9 +6,9 @@ import math
 
 class PurePursuitController(object):
 
-    k = 0.6  # look forward gain
-    Lfc = 0.2  # look-ahead distance
-    K_p = 0.8 #1.0  # speed control propotional gain
+    k = 0.6*0.1  # look forward gain
+    Lfc = 0.4  # look-ahead distance
+    K_p = 1.0  # speed control propotional gain
     K_i = 0.2  # speed control integral gain
     #K_d = 0.1  # diff gain
     terminating_condition = 0.2

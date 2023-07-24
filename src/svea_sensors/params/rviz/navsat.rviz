@@ -74,22 +74,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        base_link:
-          Value: true
-        gps:
-          Value: true
-        imu:
-          Value: true
-        laser:
-          Value: true
-        map:
-          Value: true
-        odom:
-          Value: true
-        t265_camera_odom_frame:
-          Value: true
-        t265_camera_pose_frame:
-          Value: true
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -97,19 +81,7 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          odom:
-            base_link:
-              gps:
-                {}
-              imu:
-                {}
-              laser:
-                {}
-              t265_camera_pose_frame:
-                {}
-            t265_camera_odom_frame:
-              {}
+        {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -117,7 +89,7 @@ Visualization Manager:
       Marker Topic: /waypoints
       Name: MarkerArray
       Namespaces:
-        waypoints: true
+        {}
       Queue Size: 100
       Value: true
     - Angle Tolerance: 0.10000000149011612
@@ -225,23 +197,6 @@ Visualization Manager:
       Topic: /odometry/filtered/global
       Unreliable: false
       Value: true
-    - Alpha: 1
-      Blocks: 3
-      Class: rviz_plugins/AerialMapDisplay
-      Draw Behind: false
-      Enabled: false
-      Map Frame: map
-      Map transform type: NavSatFix Messages and Map Frame
-      Name: AerialMapDisplay
-      Object URI: https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png
-      Topic: /gps/fix
-      UTM Frame: utm
-      UTM Zone: -1
-      Value: false
-      XY Reference: <NavSatFix Message>
-      Z Offset: 0
-      Z Reference: <NavSatFix Message>
-      Zoom: 16
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -270,7 +225,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 30.707355499267578
+      Distance: 30.265169143676758
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -278,9 +233,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.07326640188694
-        Y: -0.1396426111459732
-        Z: -4.3714189529418945
+        X: 3.2913174629211426
+        Y: -7.714441299438477
+        Z: -4.368044853210449
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false

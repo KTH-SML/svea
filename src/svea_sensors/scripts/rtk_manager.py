@@ -29,7 +29,7 @@ __copyright__ = "Copyright 2023, Mustafa Al-Janabi"
 # source https://github.com/KumarRobotics/ublox/blob/master/ublox_msgs/msg/CfgNAV5.msg
 DYN_MODEL_MAP = {
     "portable": 0,
-    "stationary": 1,
+    "stationary": 1,    
     "pedestrian": 3,
     "automotive": 4,
     "sea": 5,

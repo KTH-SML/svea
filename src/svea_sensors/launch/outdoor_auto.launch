@@ -19,6 +19,8 @@
     <arg name="device" default="/dev/ttyACM0" />
     <arg name="is_sim"          default="false"/>
     <arg name="use_rviz"        default="true"/>
+    <arg name="run_lidar"        default="false"/>
+    <arg name="controller"        default="pure_pursuit"/>
 
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(arg is_sim)">
@@ -46,10 +48,25 @@
     </group>
 
     <!-- Start pure_pursuit -->
-    <node name="pure_pursuit" pkg="svea_examples" type="pure_pursuit_outdoor.py" output="screen">
-        <param name="is_sim"            value="$(arg is_sim)"/>
-        <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
-        <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
-        <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
-    </node>
+    <group if="$(eval controller == 'pure_pursuit')">
+        <node name="pure_pursuit" pkg="svea_examples" type="pure_pursuit_outdoor.py" output="screen">
+            <param name="is_sim"            value="$(arg is_sim)"/>
+            <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
+            <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
+            <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
+        </node>
+    </group>
+
+    <!-- Start mpc -->
+    <group if="$(eval controller == 'mpc')">
+        <node name="state_machine" pkg="svea_core" type="state_machine.py" output="screen">
+            <param name="is_sim"    value="$(arg is_sim)"/>
+            <param name="run_lidar"    value="$(arg run_lidar)"/>
+            <param name="use_rviz"  value="$(arg use_rviz)"/>
+            <param name="initial_pose_x" value="$(arg initial_pose_x)" />
+            <param name="initial_pose_y" value="$(arg initial_pose_y)" />
+            <param name="initial_pose_a" value="$(arg initial_pose_a)" />
+        </node>
+    </group>
+
 </launch>

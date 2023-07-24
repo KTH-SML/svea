@@ -10,6 +10,7 @@ import rospy
 from svea.interfaces import ActuationInterface
 from svea.sensors import Lidar
 from svea.data import BasicDataHandler
+from svea.park.nonlinear_mpc import NonlinearMPC
 
 __license__ = "MIT"
 __maintainer__ = "Frank Jiang"

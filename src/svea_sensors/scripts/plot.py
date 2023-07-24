@@ -67,12 +67,12 @@ class plot_localization():
             marker = {'size': 10}))
 
         fig.update_layout(
-            margin ={'l':0,'t':0,'b':0,'r':0},
-            mapbox = {
-                'center': {'lon': 10, 'lat': 10},
-                'style': "open-street-map",
-                'center': {'lon': -20, 'lat': -20},
-                'zoom': 1})
+                margin ={'l':10,'t':10,'b':10,'r':10},
+                mapbox = {
+                    'center': {'lon': 18.07, 'lat': 59.35},
+                    'style': "open-street-map",
+                    'zoom': 15
+                    })
 
         fig.show()
 if __name__ == '__main__':
@@ -90,11 +90,11 @@ if __name__ == '__main__':
         else:
             same = 0
         print((rospy.Time.now() - time_start).to_sec())
-        if (rospy.Time.now() - time_start).to_sec() > 7 and not entered:
+        if (rospy.Time.now() - time_start).to_sec() > 11 and not entered:
             plot_obj.final_plot()
             entered = True
             df = pd.DataFrame({"lat" : plot_obj.lat, "long" : plot_obj.long})
-            df.to_csv("auto_7_21_8.csv", index=False)
+            df.to_csv("auto_7_24_2.csv", index=False)
         else:
             last_counter = plot_obj.counter
         rate.sleep()
