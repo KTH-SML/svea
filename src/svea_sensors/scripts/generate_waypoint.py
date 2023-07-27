@@ -55,11 +55,24 @@ class generate():
     #59.3506717
     #longitude: 18.0679268'''
     
-    default_corners = [[59.3508579, 18.0679108],
-                       [59.3508927, 18.0680166],
-                       [59.3508488, 18.0680664],
-                        [59.3508068, 18.0679704]] #carpark2
+#    default_corners = [[59.3508579, 18.0679108],
+#                       [59.3508927, 18.0680166],
+#                       [59.3508488, 18.0680664],
+#                        [59.3508068, 18.0679704]] #carpark2
+    
+    default_corners = [[59.3508586, 18.0679122],
+                       [59.3508938, 18.0680175],
+                       [59.3508563, 18.0680577],
+                        [59.3508059, 18.0679789]] #carpark3
 
+#    default_corners = [[59.3508059, 18.0679789],
+#                       [59.3508563, 18.0680577],
+#                       [59.3508938, 18.0680175],
+#                       [59.3508586, 18.0679122]] #carpark3 revrese
+
+#    default_corners = [[59.3508586, 18.0679122],
+#                       [59.3508938, 18.0680175]] #carpark3 first 2 points
+    
     def __init__(self):
 
         self.waypoint_topic = rospy.get_param("~waypoints_topic", "/outdoor_localization_waypoint")
@@ -81,7 +94,6 @@ class generate():
         self.coor = None
         self.starting_ori = None
         self.rate = rospy.Rate(10)
-
         while not rospy.is_shutdown() and (self.coor is None or self.start is None):
             self.rate.sleep()
 
@@ -91,7 +103,7 @@ class generate():
         if self.coor is None:
             self.coor = [[msg.pose.pose.position.x, msg.pose.pose.position.y]]
             roll, pitch, self.starting_ori = euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
-            print("==================================================================================================self.starting_ori", self.starting_ori)
+
     def starting_location_callback(self, msg):
         if self.start is None:
             #self.start = [59.3507979, 18.0679703]
@@ -143,7 +155,6 @@ class generate():
     def generate_waypoints(self):
         default_corners_r = np.radians(self.default_corners)
         start_r = np.radians(self.start)
-
         for count, point in enumerate(default_corners_r):
             y = np.sin(point[1]-start_r[1])*np.cos(point[0])
             x = np.cos(start_r[0])*np.sin(point[0])-np.sin(start_r[0])*np.cos(point[0])*np.cos(point[1]-start_r[1])
@@ -153,8 +164,9 @@ class generate():
             coor_y = distance * np.sin(brng) + self.coor[0][1]
 
             self.coor.append([coor_x, coor_y])
+            #self.coor.append(temp[count])
             print(brng, distance, self.coor[-1])
-        
+    
         #working
         '''for count, point in enumerate(default_corners_r):
             y = np.sin(point[1]-default_corners_r[0][1])*np.cos(point[0])

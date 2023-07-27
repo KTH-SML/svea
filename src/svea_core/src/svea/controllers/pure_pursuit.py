@@ -7,11 +7,11 @@ import math
 class PurePursuitController(object):
 
     k = 0.6*0.1  # look forward gain
-    Lfc = 0.4  # look-ahead distance
-    K_p = 1.0  # speed control propotional gain
-    K_i = 0.2  # speed control integral gain
-    #K_d = 0.1  # diff gain
-    terminating_condition = 0.2
+    Lfc = 0.7 #0.5  # look-ahead distance
+    K_p = 0.8 # 0.5  # speed control propotional gain
+    K_i = 0.05  # speed control integral gain
+    K_d = 0 #0.01 # 0.03  # diff gain
+    terminating_condition = 0.7 #0.5 #0.4
      
     L = 0.324  # [m] wheel base of vehicle
 
@@ -60,8 +60,7 @@ class PurePursuitController(object):
         self.error_sum += error * self.dt
         P = error * self.K_p
         I = self.error_sum * self.K_i
-        D = 0.0
-        #D = (error - self.old_error)/self.dt*self.K_d
+        D = (error - self.old_error)*self.K_d
         correction = P + I + D
         self.old_error = error
         return self.target_velocity + correction
