@@ -156,10 +156,8 @@ class pure_pursuit:
         self.svea.controller.is_finished = False
 
     def compute_traj(self, state):
-        print("=====================================================")
         xs = np.linspace(state.x, self.goal[0], self.TRAJ_LEN)
         ys = np.linspace(state.y, self.goal[1], self.TRAJ_LEN)
-        print(xs, ys)   
         return xs, ys
 
 

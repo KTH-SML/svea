@@ -89,6 +89,7 @@ class generate():
         #Publisher
         self.pub_waypoints = rospy.Publisher(self.waypoint_topic, Float64MultiArray, queue_size=10)
         self.pub_visualization = rospy.Publisher(self.vis_topic, MarkerArray, queue_size=10)
+        
         #params
         self.start = None
         self.coor = None
