@@ -31,9 +31,12 @@
   <depend>rosserial_msgs</depend>
   <depend>rosserial_python</depend>
   <depend>svea_msgs</depend>
+  <depend>aruco_msgs</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
+  <depend>tf_conversions</depend>
   <depend>ntrip_client</depend>
+  <depend>cv_camera</depend>
   <exec_depend>amcl</exec_depend>
   <exec_depend>map_server</exec_depend>
   <exec_depend>slam_toolbox</exec_depend>

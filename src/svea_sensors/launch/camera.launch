@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Consumed topics -->
+    <arg name="image"           default="/camera/image_raw"/>
+
+    <!-- Produced topics -->
+    <arg name="aruco_pose"      default="aruco_pose"/>
+
+    <!-- Auxiliary -->
+    <arg name="aruco_dict"      default="DICT_4X4_250"/>
+    <arg name="aruco_size"      default="0.365"/>
+    <arg name="aruco_tf_name"   default="aruco"/>
+
+    <!-- Argument for camera -->
+    <arg name="device_id"       default="device_id"/>
+
+    <!-- Nodes -->
+    <node name="camera" pkg="cv_camera" type="cv_camera_node" output="screen">
+        <param name="device_id"         value="$(arg device_id)"/>
+    </node>
+
+    <node name="aruco_detect" pkg="svea_sensors" type="aruco_detect.py" output="screen">
+        <!-- Topics -->
+        <param name="sub_image"         value="$(arg image)"/>
+        <param name="pub_aruco_pose"    value="$(arg aruco_pose)"/>
+        <!-- Auxiliary -->
+        <param name="aruco_dict_name"   value="$(arg aruco_dict)"/>
+        <param name="aruco_size"        value="$(arg aruco_size)"/>
+        <param name="aruco_tf_name"     value="$(arg aruco_tf_name)"/>
+    </node>
+
+</launch>

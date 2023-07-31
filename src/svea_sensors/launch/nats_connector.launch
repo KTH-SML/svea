@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Start NATS -->
+    <node name="nats_connector" pkg="nats_ros_connector" type="nats_connector.py" output="screen">
+        <rosparam>
+        host: nats://sml-wan.asuscomm.com:4222
+        subscribers:
+          - svea2/aruco_pose
+        </rosparam>
+    </node>
+</launch>
+
+<!--
+    svea2
+    <?xml version="1.0"?>
+<launch>-->
+    <!-- Start NATS -->
+<!--    <node name="nats_connector2" pkg="nats_ros_connector" type="nats_connector.py" output="screen">
+        <param name="host" value="nats://sml-wan.asuscomm.com:4222"/>
+        <remap from="svea/gps/fix" to="gps/fix"/>
+        <rosparam>
+            publishers:
+            - svea/gps/fix
+        </rosparam>
+    </node>
+</launch>
+
+
+-->
+
+<!--
+    svea7
+    <?xml version="1.0"?>
+<launch>
+     Start NATS -->
+<!--     <node name="nats_connector7" pkg="nats_ros_connector" type="nats_connector.py" output="screen">
+        <param name="host" value="nats://sml-wan.asuscomm.com:4222"/>
+        <rosparam>
+        subscribers:
+          - svea/gps/fix
+        </rosparam>
+    </node>
+</launch>
+-->
