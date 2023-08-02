@@ -1,0 +1,190 @@
+frequency: 10
+
+sensor_timeout: 0.1
+
+two_d_mode: false
+
+# Future proofing transform timestamp of 0.1 sec
+# Added to solve warning by navsat_transform node 
+# (i.e. "could not retrieve transform from odom to base_link using latest instead")
+transform_time_offset: 0.1
+
+transform_timeout: 0.0
+
+print_diagnostics: true
+
+# Debug settings. Not for the faint of heart. Outputs a ludicrous amount of information to the file specified by
+# debug_out_file. I hope you like matrices! Please note that setting this to true will have strongly deleterious
+# effects on the performance of the node. Defaults to false if unspecified.
+debug: false
+debug_out_file: /home/nvidia/bagfiles/localizationlog.txt
+
+publish_tf: false
+
+publish_acceleration: false
+
+smooth_lagged_data: false
+history_length: 0.00
+
+map_frame: map              # Defaults to "map" if unspecified
+odom_frame: odom            # Defaults to "odom" if unspecified
+base_link_frame: base_link  # Defaults to "base_link" if unspecified
+world_frame: map           # Defaults to the value of odom_frame if unspecified
+
+##########################################
+# GPS Odometry ################################
+odom0: /odometry/gps
+
+odom0_config: [true, true, true,
+               false, false, false,
+               false, false, false,
+               false, false, false,
+               false, false, false]
+
+#odom1_config: [x, y, z,
+#               R, P, Y,
+#               x_dot, y_dot, z_dot,
+#               R_dot, P_dot, Y_dot,
+#               x_dot_dot, y_dot_dot, z_dot_dot]
+
+odom0_queue_size: 8
+odom0_nodelay: true
+odom0_relative: false
+odom0_differential: false
+
+
+##########################################
+# BNO055 IMU #############################
+#imu0: /imu/data
+#imu0_config: [false, false, false,
+#              true,  true, true,
+#              false, false, false,
+#              false, false,  false,
+#              false,  false,  false]
+#imu0_nodelay: true # true #default false
+#imu0_differential: false
+#imu0_relative: true
+#imu0_queue_size: 8
+##imu0_pose_rejection_threshold: 0.8                 # Note the difference in parameter names
+##imu0_twist_rejection_threshold: 1.0                #
+##imu0_linear_acceleration_rejection_threshold: 1.0  #
+#
+#imu0_remove_gravitational_acceleration: false #default true
+#gravitational_acceleration: -0.35
+
+
+##########################################
+# Twist based on actuation ###############
+twist0: /actuation_twist
+twist0_config: [false, false, false,
+                false, false, false,
+                true,  true, false,
+                false, false, false,
+                false, false, false]
+twist0_nodelay: true
+twist0_differential: true
+twist0_relative: false
+twist0_queue_size: 8
+#twist0_rejection_threshold: 2.0                # Note the difference in parameter names
+#imu0_linear_acceleration_rejection_threshold: 1.0  #
+
+##########################################
+# Twist based on wheel encoders ##########
+twist1: /wheel_encoder_twist
+twist1_config: [false, false, false,
+                false, false, false,
+                true,  true, false,
+                false, false, true,
+                false, false, false]
+twist1_nodelay: true
+twist1_differential: true
+twist1_relative: false
+twist1_queue_size: 8
+
+# Control input is not used 
+# (and you should not try to use it)
+# (trust me)
+# (seriously, don't waste your time here)
+use_control: false #default true
+stamped_control: false
+control_timeout: 0.2
+control_config: [true, false, false, false, false, true]
+acceleration_limits: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+deceleration_limits: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+acceleration_gains: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+deceleration_gains: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+# [ADVANCED] The process noise covariance matrix can be difficult to tune, and can vary for each application, so it is
+# exposed as a configuration parameter. This matrix represents the noise we add to the total error after each
+# prediction step. The better the omnidirectional motion model matches your system, the smaller these values can be.
+# However, if users find that a given variable is slow to converge, one approach is to increase the
+# process_noise_covariance diagonal value for the variable in question, which will cause the filter's predicted error
+# to be larger, which will cause the filter to trust the incoming measurement more during correction. The values are
+# ordered as x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az. Defaults to the matrix below if
+# unspecified.
+#process_noise_covariance: [0.05, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+#                           0,    0.05, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+#                           0,    0,    0.06, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+#                           0,    0,    0,    0.03, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+#                           0,    0,    0,    0,    0.03, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+#                           0,    0,    0,    0,    0,    0.06, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+#                           0,    0,    0,    0,    0,    0,    0.025, 0,     0,    0,    0,    0,    0,    0,    0,
+#                           0,    0,    0,    0,    0,    0,    0,     0.025, 0,    0,    0,    0,    0,    0,    0,
+#                           0,    0,    0,    0,    0,    0,    0,     0,     0.04, 0,    0,    0,    0,    0,    0,
+#                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0.01, 0,    0,    0,    0,    0,
+#                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0.01, 0,    0,    0,    0,
+#                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0.02, 0,    0,    0,
+#                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.01, 0,    0,
+#                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.01, 0,
+#                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.015]
+
+process_noise_covariance:    [0.1,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0.1,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0.1,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    1,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    1,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    1,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    1,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    1,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    1,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    10,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     10,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     10,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     100,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    100,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    100]
+# [ADVANCED] This represents the initial value for the state estimate error covariance matrix. Setting a diagonal
+# value (variance) to a large value will result in rapid convergence for initial measurements of the variable in
+# question. Users should take care not to use large values for variables that will not be measured directly. The values
+# are ordered as x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az. Defaults to the matrix below
+#if unspecified.
+initial_estimate_covariance: [1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    1e-9, 0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    1e-9, 0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    1e-9, 0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    1e-9, 0,    0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    1e-9, 0,    0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    1e-9, 0,    0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    1e-9, 0,     0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    1e-9,  0,     0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     1e-9,  0,     0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     1e-9,  0,    0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     1e-9, 0,    0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    1e-9, 0,
+                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1e-9]
+#initial_estimate_covariance: [1,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+#                              0,    1,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+#                              0,    0,    1,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+#                              0,    0,    0,    1,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+#                              0,    0,    0,    0,    1,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+#                              0,    0,    0,    0,    0,    1,    0,    0,    0,    0,     0,     0,     0,    0,    0,
+#                              0,    0,    0,    0,    0,    0,    1,    0,    0,    0,     0,     0,     0,    0,    0,
+#                              0,    0,    0,    0,    0,    0,    0,    1,    0,    0,     0,     0,     0,    0,    0,
+#                              0,    0,    0,    0,    0,    0,    0,    0,    1,    0,     0,     0,     0,    0,    0,
+#                              0,    0,    0,    0,    0,    0,    0,    0,    0,    1,     0,     0,     0,    0,    0,
+#                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     1,     0,    0,    0,
+#                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     1,    0,    0,
+#                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    1,    0,
+#                              0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1]
+#

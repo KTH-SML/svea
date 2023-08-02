@@ -9,14 +9,15 @@
 
     <!-- Auxiliary -->
     <arg name="aruco_dict"      default="DICT_4X4_250"/>
-    <arg name="aruco_size"      default="0.365"/>
+    <arg name="aruco_size"      default="0.1"/>
     <arg name="aruco_tf_name"   default="aruco"/>
 
     <!-- Argument for camera -->
-    <arg name="device_id"       default="device_id"/>
+    <arg name="device_id"       default="1"/>
 
     <!-- Nodes -->
     <node name="camera" pkg="cv_camera" type="cv_camera_node" output="screen">
+        <param name="camera_info_url" value="file://$(find svea_sensors)/params/robot_localization/web_camera.yaml" />
         <param name="device_id"         value="$(arg device_id)"/>
     </node>
 

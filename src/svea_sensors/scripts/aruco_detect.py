@@ -105,7 +105,7 @@ class aruco_detect:
 
             t = TransformStamped()
             t.header = image.header
-            t.child_frame_id = self.ARUCO_TF_NAME + str(aruco_id)
+            t.child_frame_id = self.ARUCO_TF_NAME + str(aruco_id[0])
             t.transform.translation = Point(*translation)
             t.transform.rotation = Quaternion(*rotation)
 
