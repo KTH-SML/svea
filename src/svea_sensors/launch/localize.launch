@@ -25,7 +25,7 @@
     <arg name="device" default="/dev/GPS" />
     <arg name="port" default="/dev/ttyACM0"/>
 
-    <!--<node pkg="svea_sensors" type="generate_waypoint.py" name="generate_waypoints" output="screen"/>-->
+    <node pkg="svea_sensors" type="generate_waypoint.py" name="generate_waypoints" output="screen"/>
 
     <!-- Start the stereo camera -->
     <group if="$(arg use_camera)">

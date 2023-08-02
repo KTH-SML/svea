@@ -9,7 +9,7 @@
 
     <!-- Auxiliary -->
     <arg name="aruco_dict"      default="DICT_4X4_250"/>
-    <arg name="aruco_size"      default="0.1"/>
+    <arg name="aruco_size"      default="0.365"/>
     <arg name="aruco_tf_name"   default="aruco"/>
 
     <!-- Argument for camera -->
