@@ -98,6 +98,19 @@ twist1_differential: true
 twist1_relative: false
 twist1_queue_size: 8
 
+##########################################
+# Pose based on aruco marker ##########
+pose0: /static/pose
+pose0_config: [true, true, false,
+               false, false, false,
+               false, false, false,
+               false, false, false,
+               false, false, false]
+pose0_nodelay: true
+pose0_differential: false
+pose0_relative: false
+pose0_queue_size: 8
+
 # Control input is not used 
 # (and you should not try to use it)
 # (trust me)
