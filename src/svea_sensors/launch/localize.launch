@@ -6,26 +6,49 @@
 <launch>
 
     <!-- Launch file arguments -->
-    <arg name="xavier" default="false"/>
-    <arg name="use_camera" default="true"/>
-    <arg name="camera" default="rs"/>
-    <arg name="map_file" default=""/>
-    <arg name="map_frame" default="map"/>
-    <arg name="wait_for_transform" default="false"/>
-    <arg name="publish_odometry" default="true"/>
-    <arg name="publish_pose" default="true"/>
-    <arg name="initial_pose_x" default="0.0" />
-    <arg name="initial_pose_y" default="0.0" />
-    <arg name="initial_pose_a" default="0.0" />
-    <arg name="use_wheel_encoders" default="false" />
-    <arg name="is_indoors" default="true" />
+    <arg name="xavier"                  default="false"/>
+    <arg name="use_camera"              default="true"/>
+    <arg name="camera"                  default="rs"/>
+    <arg name="map_file"                default=""/>
+    <arg name="map_frame"               default="map"/>
+    <arg name="wait_for_transform"      default="false"/>
+    <arg name="publish_odometry"        default="true"/>
+    <arg name="publish_pose"            default="true"/>
+
+    <arg name="initial_pose_x"          default="0.0" />
+    <arg name="initial_pose_y"          default="0.0" />
+    <arg name="initial_pose_a"          default="0.0" />
+
+    <arg name="use_wheel_encoders"      default="false" />
+    <arg name="is_indoors"              default="true" />
     <!-- Should be set to true, if only the localization is running (i.e. this is needed in order to have wheel encoders
     and actuation_to_twist working) -->
-    <arg name="start_serial" default="false" />
-    <arg name="device" default="/dev/GPS" />
-    <arg name="port" default="/dev/ttyACM0"/>
+    <arg name="start_serial"            default="false" />
+    <arg name="device"                  default="/dev/GPS" />
+    <arg name="port"                    default="/dev/ttyACM0"/>
 
-    <node pkg="svea_sensors" type="generate_waypoint.py" name="generate_waypoints" output="screen"/>
+    <!-- Generate waypoints -->
+    <arg name="generate_waypoints"      default="true"/>
+    <arg name="waypoints_topic"         default="/outdoor_localization_waypoint"/>
+    <arg name="resolution"              default="10"/>
+    <arg name="location_topic"          default="/gps/filtered"/>
+    <arg name="marker_topic"            default="/waypoints"/>
+    <arg name="gps_odometry_topic"      default="/odometry/filtered/global"/>
+
+    <!-- For camera and aruco detection-->
+    <arg name="use_web_camera"          default="True"/>
+    <arg name="image"                   default="/camera/image_raw"/>
+    <arg name="aruco_pose"              default="aruco_pose"/>
+    <arg name="aruco_dict"              default="DICT_4X4_250"/>
+    <arg name="aruco_size"              default="0.365"/>
+    <arg name="aruco_tf_name"           default="aruco"/>
+    <arg name="device_id"               default="0"/> 
+    <arg name="static_gps_fix_topic"    default="static/gps/fix"/>
+    <arg name="odometry_gps_topic"      default="static/odometry/gps"/>
+    <arg name="aruco_pose_topic"        default="aruco_pose"/>
+    <arg name="aruco_id"                default="11"/>    
+
+
 
     <!-- Start the stereo camera -->
     <group if="$(arg use_camera)">
@@ -38,7 +61,7 @@
             <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
         </include>
         <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
-            <arg name="xavier" value="$(arg xavier)"/>
+            <arg name="xavier"  value="$(arg xavier)"/>
         </include>
     </group>
 
@@ -98,9 +121,9 @@
             <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
         </node>
         <node if="$(eval camera == 'zed')" pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
-            <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/zed_ekf.yaml"/>
-            <param name="imu0" value="/imu/data"/>
-            <param name="odom0" value="/zed/zed_node/odom"/>
+            <rosparam command="load"    file="$(find svea_sensors)/params/robot_localization/zed_ekf.yaml"/>
+            <param name="imu0"          value="/imu/data"/>
+            <param name="odom0"         value="/zed/zed_node/odom"/>
         </node>
         <include file="$(find svea_sensors)/launch/transforms.launch">
             <arg name="xavier" value="$(arg xavier)"/>
@@ -113,11 +136,11 @@
 
     <!-- Start localization (AMCL) -->
     <node if="$(arg is_indoors)" pkg="amcl" type="amcl" name="amcl_localization" output="screen">
-        <rosparam command="load" file="$(find svea_sensors)/params/amcl/localize.yaml"/>
-        <param name="scan" value="scan"/>
-        <param name="initial_pose_x" value="$(arg initial_pose_x)" />
-        <param name="initial_pose_y" value="$(arg initial_pose_y)" />
-        <param name="initial_pose_a" value="$(arg initial_pose_a)" />
+        <rosparam command="load"        file="$(find svea_sensors)/params/amcl/localize.yaml"/>
+        <param name="scan"              value="scan"/>
+        <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
+        <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
+        <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
     </node>
 
     <!-- Start GPS if outdoor localization -->
@@ -129,12 +152,47 @@
     </group>
 
     <node pkg="svea_sensors" type="odom_to_map" name="odom_to_map" output="screen">
-        <param name="map_frame" value="$(arg map_frame)"/>
-        <param name="wait_for_transform" value="$(arg wait_for_transform)"/>
-        <param name="publish_odometry" value="$(arg publish_odometry)"/>
-        <param name="publish_pose" value="$(arg publish_pose)"/>
+        <param name="map_frame"             value="$(arg map_frame)"/>
+        <param name="wait_for_transform"    value="$(arg wait_for_transform)"/>
+        <param name="publish_odometry"      value="$(arg publish_odometry)"/>
+        <param name="publish_pose"          value="$(arg publish_pose)"/>
     </node>
 
-    <include file="$(find svea_sensors)/launch/camera.launch"/>
+
+    <!-- For generating waypoints based on gps for svea to follow-->
+    <group if="$(arg generate_waypoints)">
+        <node pkg="svea_sensors" type="generate_waypoint.py" name="generate_waypoints" output="screen"/>
+            <param name="waypoints_topic"       value="$(arg waypoints_topic)"/>
+            <rosparam subst_value="true">
+            corners: [[59.3508586, 18.0679122],
+                        [59.3508938, 18.0680175],
+                        [59.3508563, 18.0680577],
+                        [59.3508059, 18.0679789]] 
+            </rosparam>
+            <!-- The four points inside the carpark -->
+            <param name="resolution"            value="$(arg resolution)"/>
+            <param name="location_topic"        value="$(arg location_topic)"/>
+            <param name="marker_topic"          value="$(arg marker_topic)"/>
+            <param name="gps_odometry_topic"    value="$(arg gps_odometry_topic)"/>
+    </group>
+
+    <!-- Use web_camera to detect aruco -->
+    <group if="$(arg use_web_camera)">    
+        <include file="$(find svea_sensors)/launch/camera.launch">
+            <arg name="image"           value="$(arg image)"/>
+            <arg name="aruco_pose"      value="$(arg aruco_pose)"/>
+            <arg name="aruco_dict"      value="$(arg aruco_dict)"/>
+            <arg name="aruco_size"      value="$(arg aruco_size)"/>
+            <arg name="aruco_tf_name"   value="$(arg aruco_tf_name)"/>
+            <arg name="device_id"       value="$(arg device_id)"/>
+        </include>
+        
+        <node name="static_svea_pose" pkg="svea_sensors" type="static_svea_pose.py" output="screen">
+            <param name="static_gps_fix_topic"  value="$(arg static_gps_fix_topic)"/>
+            <param name="odometry_gps_topic"    value="$(arg odometry_gps_topic)"/>
+            <param name="aruco_pose_topic"      value="$(arg aruco_pose_topic)"/>
+            <param name="aruco_id"              value="$(arg aruco_id)"/>
+        </node>
+    </group>
 
 </launch>

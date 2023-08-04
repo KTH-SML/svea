@@ -13,7 +13,7 @@
     <arg name="aruco_tf_name"   default="aruco"/>
 
     <!-- Argument for camera -->
-    <arg name="device_id"       default="1"/>
+    <arg name="device_id"       default="0"/>
 
     <!-- Nodes -->
     <node name="camera" pkg="cv_camera" type="cv_camera_node" output="screen">
