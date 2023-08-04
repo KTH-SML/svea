@@ -97,7 +97,7 @@ class generate():
             marker.action = Marker().ADD
             marker.pose.position.x = point[0]
             marker.pose.position.y = point[1]
-            marker.pose.position.z = 0
+            marker.pose.position.z = 0.0
             marker.pose.orientation.x = 0.0
             marker.pose.orientation.y = 0.0
             marker.pose.orientation.z = 0.0

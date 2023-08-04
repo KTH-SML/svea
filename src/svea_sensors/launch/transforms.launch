@@ -24,6 +24,7 @@
         <arg name="base_link" value="svea_$(arg svea_number)_base_link" />
         <arg name="odom" value="svea_$(arg svea_number)_odom" />
         <arg name="gps" value="svea_$(arg svea_number)_gps" />
+
         <node pkg="tf2_ros" type="static_transform_publisher" name="imulink_broadcaster"    args="0.17 0.074 0.2 0 0 0 1 base_link imu" />
         <node pkg="tf2_ros" type="static_transform_publisher" name="lidarlink_broadcaster"  args="0.284 0 0.2 0 0 0 1 base_link laser" />
         <node pkg="tf2_ros" type="static_transform_publisher" name="t265_link_broadcaster"  args="0.09 0 0.215 0 -1.57 3.14 base_link t265_camera_pose_frame" />

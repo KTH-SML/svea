@@ -66,10 +66,10 @@ class static_svea_gps:
     def aruco_callback(self, msg):
         if msg.id == self.aruco_id:
             try:
-                transform = self.buffer.lookup_transform('base_link', self.frame, self.aruco_header, rospy.Duration(0.5))
+                transform = self.buffer.lookup_transform('base_link', self.frame, msg.header.stamp, rospy.Duration(0.5))
 
-                self.broadcast_aruco(transform.transform.translation, transform.transform.rotation, self.aruco_header)
-                self.publish_pose(transform.transform.translation, transform.transform.rotation, self.aruco_header)
+                self.broadcast_aruco(transform.transform.translation, transform.transform.rotation, msg.header.stamp)
+                self.publish_pose(transform.transform.translation, transform.transform.rotation, msg.header.stamp)
 
             except Exception as e: 
                 rospy.loginfo(f"Error, {e}")
