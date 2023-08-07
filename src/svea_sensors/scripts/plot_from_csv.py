@@ -37,6 +37,7 @@ def plot91011():
     lat_long_csv7_27_3 = '/home/annika/svea_rtk_navsat/rosbag/auto_7_27_15_55.csv'
     lat_long_csv7_27_4 = '/home/annika/svea_rtk_navsat/rosbag/auto_7_27_16_52.csv'
     lat_long_csv7_27_5 = '/home/annika/svea_rtk_navsat/rosbag/auto_7_27_straight.csv'
+    lat_long_csv_test13 = '/home/annika/svea_rtk_navsat/rosbag/test13.csv'
 
     data11 = pd.read_csv(lat_long_csv7_20)
     data12 = pd.read_csv(lat_long_csv7_21)
@@ -54,6 +55,7 @@ def plot91011():
     data24 = pd.read_csv(lat_long_csv7_27_3)
     data25 = pd.read_csv(lat_long_csv7_27_4)
     data26 = pd.read_csv(lat_long_csv7_27_5)
+    data27 = pd.read_csv(lat_long_csv_test13)
 
     default_corners = [[59.3508586, 18.0679122],
                        [59.3508938, 18.0680175],
@@ -62,13 +64,19 @@ def plot91011():
     target = np.array(default_corners)
     size = 5
     fig = px.scatter_geo(data11, lat='lat', lon='long')
-
+    '''fig = go.Figure(go.Scattermapbox(
+        name= "target",
+        mode = "markers",
+        lon = data27.long,
+        lat = data27.lat,
+        marker = {'size': size}))'''
+    
     fig = go.Figure(go.Scattermapbox(
         name= "target",
         mode = "markers",
         lon = target[:,1],
         lat = target[:,0],
-        marker = {'size': 10}))
+        marker = {'size': 20}))
 
     '''ig.add_trace(go.Scattermapbox(
         name= "15",
@@ -152,7 +160,7 @@ def plot91011():
         mode = "markers",
         lon = data26.long,
         lat = data26.lat,
-        marker = {'size': size}))     
+        marker = {'size': size}))
 
     fig.update_layout(
         margin ={'l':10,'t':10,'b':10,'r':10},
