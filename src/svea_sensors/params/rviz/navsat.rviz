@@ -1,19 +1,20 @@
 Panels:
   - Class: rviz/Displays
-    Help Height: 138
+    Help Height: 70
     Name: Displays
     Property Tree Widget:
       Expanded:
         - /Global Options1
         - /Status1
         - /Grid1
+        - /TF1
         - /TF1/Frames1
         - /OdometryGPS1/Shape1
         - /OdometryLocal1/Shape1
         - /OdometryLocal1/Covariance1
         - /OdometryGlobal1/Shape1
       Splitter Ratio: 0.5411764979362488
-    Tree Height: 627
+    Tree Height: 695
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -71,29 +72,25 @@ Visualization Manager:
       Enabled: true
       Filter (blacklist): ""
       Filter (whitelist): ""
-      Frame Timeout: 15
+      Frame Timeout: 1500
       Frames:
-        All Enabled: true
-        aruco11:
-          Value: true
+        All Enabled: false
         base_link:
           Value: true
         camera:
           Value: true
         gps:
-          Value: true
+          Value: false
         imu:
-          Value: true
+          Value: false
         laser:
-          Value: true
-        map:
-          Value: true
+          Value: false
         odom:
           Value: true
         t265_camera_odom_frame:
-          Value: true
+          Value: false
         t265_camera_pose_frame:
-          Value: true
+          Value: false
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -101,22 +98,20 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          odom:
-            base_link:
-              camera:
-                aruco11:
-                  {}
-              gps:
-                {}
-              imu:
-                {}
-              laser:
-                {}
-              t265_camera_pose_frame:
-                {}
-            t265_camera_odom_frame:
-              {}
+        base_link:
+          camera:
+            {}
+          gps:
+            {}
+          imu:
+            {}
+          laser:
+            {}
+          t265_camera_pose_frame:
+            {}
+        odom:
+          t265_camera_odom_frame:
+            {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -260,7 +255,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 30.265169143676758
+      Distance: 10.116122245788574
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -268,9 +263,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 3.4312243461608887
-        Y: 7.7356367111206055
-        Z: -4.367922306060791
+        X: 0.019611772149801254
+        Y: 1.7368463277816772
+        Z: -1.4432132244110107
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -278,7 +273,7 @@ Visualization Manager:
       Near Clip Distance: 0.009999999776482582
       Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
-      Yaw: 3.1403980255126953
+      Yaw: 3.130401134490967
     Saved: ~
 Window Geometry:
   Displays:

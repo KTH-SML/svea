@@ -7,6 +7,7 @@ import rospy
 import tf
 import tf2_ros
 import tf2_geometry_msgs
+from tf import transformations 
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
 from tf2_msgs.msg import TFMessage
@@ -50,6 +51,9 @@ class static_svea_gps:
         self.listener = tf2_ros.TransformListener(self.buffer)
         self.br = tf2_ros.TransformBroadcaster()
 
+        self.lin_cov = 0.6
+        self.ang_cov = 0.6
+
     def run(self):
         rospy.spin()
 
@@ -63,16 +67,53 @@ class static_svea_gps:
             self.location.header = msg.header
             self.location.pose = msg.pose
 
-    def aruco_callback(self, msg):
+    def aruco_callback(self, msg):    
         if msg.id == self.aruco_id:
-            try:
-                transform = self.buffer.lookup_transform('base_link', self.frame, msg.header.stamp, rospy.Duration(0.5))
+#            rospy.loginfo("Received ARUCO")
+            transform = self.buffer.lookup_transform("base_link", "camera", msg.header.stamp, rospy.Duration(0.5)) #frame_id: baselink, child_frame_id: camera
+            
+            position = tf2_geometry_msgs.do_transform_pose(msg.pose, transform) #frame_id = baselink child_frame: aruco
+            rospy.loginfo(f"position \n {position}")
+            translation_mat = transformations.translation_matrix([position.pose.position.x,
+                                                        position.pose.position.y,
+                                                        position.pose.position.z])
+            rotation_mat = transformations.quaternion_matrix([position.pose.orientation.x,
+                                                position.pose.orientation.y,
+                                                position.pose.orientation.z,
+                                                position.pose.orientation.w])
+            transform_mat = transformations.concatenate_matrices(translation_mat, rotation_mat)
+            inversed_trans = transformations.inverse_matrix(transform_mat)
 
-                self.broadcast_aruco(transform.transform.translation, transform.transform.rotation, msg.header.stamp)
-                self.publish_pose(transform.transform.translation, transform.transform.rotation, msg.header.stamp)
+            inv_transla = Point(*transformations.translation_from_matrix(inversed_trans)) #frame_id = aruco child_frame: baselink
+            inv_rotate = Quaternion(*transformations.quaternion_from_matrix(inversed_trans))
+#            self.publish_pose(inv_transla, inv_rotate, msg.header.stamp)
 
-            except Exception as e: 
-                rospy.loginfo(f"Error, {e}")
+            transform2 = self.buffer.lookup_transform("map", self.frame, msg.header.stamp, rospy.Duration(0.5)) #frame_id: map , child_frame_id: aruco
+            transform2.transform.translation = Point(*[0, 0, 0])
+            
+            temp = PoseStamped()
+            temp.pose.position = inv_transla
+            temp.pose.orientation = inv_rotate
+
+            #rospy.loginfo(f"position2_before \n {temp}")
+            position2 = tf2_geometry_msgs.do_transform_pose(temp, transform2) #frame_id = map child_frame: baselink
+
+            position2.pose.position.z = 0.0
+            self.publish_pose(position2.pose.position, position2.pose.orientation, msg.header.stamp)
+            #try:
+            #    #do the inverse transform for orientation?
+            #    transform = self.buffer.lookup_transform(self.frame, 'base_link', msg.header.stamp, rospy.Duration(0.5))
+            #    yaw = np.arctan2(transform.transform.translation.y, transform.transform.translation.x)
+            #    angle = quaternion_from_euler(0, 0, yaw)
+            #    transform.transform.rotation = Quaternion(*angle)
+            #    rospy.loginfo(f"Transform: \n {transform.transform.translation} \n {transform.transform.rotation} \n ========================")
+            #    
+            #    self.broadcast_aruco(transform.transform.translation, transform.transform.rotation, msg.header.stamp)
+            #    self.publish_pose(transform.transform.translation, transform.transform.rotation, msg.header.stamp)
+#
+            #except Exception as e: 
+            #    rospy.loginfo(f"Error, {e}")
+
 
     def publish_pose(self, translation, quaternion, time):
         msg = PoseWithCovarianceStamped()
@@ -80,6 +121,13 @@ class static_svea_gps:
         msg.header.frame_id = "map"
         msg.pose.pose.position = translation
         msg.pose.pose.orientation = quaternion
+        self.cov_matrix = [self.lin_cov, 0.0, 0.0, 0.0, 0.0, 0.0,
+                           0.0, self.lin_cov, 0.0, 0.0, 0.0, 0.0,
+                           0.0, 0.0, self.lin_cov, 0.0, 0.0, 0.0,
+                           0.0, 0.0, 0.0, self.ang_cov, 0.0, 0.0,
+                           0.0, 0.0, 0.0, 0.0, self.ang_cov, 0.0,
+                           0.0, 0.0, 0.0, 0.0, 0.0, self.ang_cov]
+        msg.pose.covariance = self.cov_matrix
         self.pose_pub.publish(msg)
 
     def broadcast_aruco(self, translation, quaternion, time):
