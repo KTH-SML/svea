@@ -15,9 +15,6 @@ from sensor_msgs.msg import NavSatFix
 from geometry_msgs.msg import PoseWithCovarianceStamped, TransformStamped, Point, Quaternion, PoseStamped
 from aruco_msgs.msg import Marker
 
-#TODO: add the transform from svea to aruco marker 
-#TODO: publish a statiic/pose for EKF global 
-
 #TODO: conditions for static gps and active gps
 
 class static_svea_gps:

@@ -75,22 +75,6 @@ Visualization Manager:
       Frame Timeout: 1500
       Frames:
         All Enabled: false
-        base_link:
-          Value: true
-        camera:
-          Value: true
-        gps:
-          Value: false
-        imu:
-          Value: false
-        laser:
-          Value: false
-        odom:
-          Value: true
-        t265_camera_odom_frame:
-          Value: false
-        t265_camera_pose_frame:
-          Value: false
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -98,20 +82,7 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        base_link:
-          camera:
-            {}
-          gps:
-            {}
-          imu:
-            {}
-          laser:
-            {}
-          t265_camera_pose_frame:
-            {}
-        odom:
-          t265_camera_odom_frame:
-            {}
+        {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -255,7 +226,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 10.116122245788574
+      Distance: 15.917914390563965
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -263,8 +234,8 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.019611772149801254
-        Y: 1.7368463277816772
+        X: 0.01871866174042225
+        Y: 1.6570279598236084
         Z: -1.4432132244110107
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
@@ -273,7 +244,7 @@ Visualization Manager:
       Near Clip Distance: 0.009999999776482582
       Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
-      Yaw: 3.130401134490967
+      Yaw: 3.1404013633728027
     Saved: ~
 Window Geometry:
   Displays:
