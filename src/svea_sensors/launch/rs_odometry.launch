@@ -90,6 +90,7 @@
         <param name="twist1"                value="wheel_encoder_twist"/>
         <param name="pose0"                 value="static/pose"/>
         <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
+        <remap from="/set_pose"    to="/global/set_pose"/>
     </node>
 
     <!-- Hokuyo LIDAR -->

@@ -75,6 +75,22 @@ Visualization Manager:
       Frame Timeout: 1500
       Frames:
         All Enabled: false
+        base_link:
+          Value: true
+        camera:
+          Value: true
+        gps:
+          Value: true
+        imu:
+          Value: true
+        laser:
+          Value: true
+        odom:
+          Value: true
+        t265_camera_odom_frame:
+          Value: true
+        t265_camera_pose_frame:
+          Value: true
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -82,7 +98,20 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        base_link:
+          camera:
+            {}
+          gps:
+            {}
+          imu:
+            {}
+          laser:
+            {}
+          t265_camera_pose_frame:
+            {}
+        odom:
+          t265_camera_odom_frame:
+            {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -234,9 +263,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.01871866174042225
-        Y: 1.6570279598236084
-        Z: -1.4432132244110107
+        X: 0.13354811072349548
+        Y: 4.227207660675049
+        Z: -1.443101406097412
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false

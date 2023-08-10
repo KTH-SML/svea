@@ -36,7 +36,7 @@
     <arg name="gps_odometry_topic"      default="/odometry/filtered/global"/>
 
     <!-- For camera and aruco detection-->
-    <!-- <arg name="use_web_camera"          default="True"/>
+    <arg name="use_web_camera"          default="True"/>
     <arg name="image"                   default="/camera/image_raw"/>
     <arg name="aruco_pose"              default="aruco_pose"/>
     <arg name="aruco_dict"              default="DICT_4X4_250"/>
@@ -46,7 +46,7 @@
     <arg name="static_gps_fix_topic"    default="static/gps/fix"/>
     <arg name="odometry_gps_topic"      default="static/odometry/gps"/>
     <arg name="aruco_pose_topic"        default="aruco_pose"/>
-    <arg name="aruco_id"                default="11"/>     -->
+    <arg name="aruco_id"                default="11"/>    
 
 
     <!-- Start the stereo camera -->
@@ -175,7 +175,7 @@
     </group>
 
     <!-- Use web_camera to detect aruco -->
-    <!-- <group if="$(arg use_web_camera)">    
+    <group if="$(arg use_web_camera)">    
         <include file="$(find svea_sensors)/launch/camera.launch">
             <arg name="image"           value="$(arg image)"/>
             <arg name="aruco_pose"      value="$(arg aruco_pose)"/>
@@ -191,6 +191,6 @@
             <param name="aruco_pose_topic"      value="$(arg aruco_pose_topic)"/>
             <param name="aruco_id"              value="$(arg aruco_id)"/>
         </node>
-    </group> -->
+    </group>
 
 </launch>

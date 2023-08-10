@@ -9,7 +9,7 @@ import tf2_ros
 import tf2_geometry_msgs
 from tf import transformations 
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
-
+from nav_msgs.msg import Odometry
 from tf2_msgs.msg import TFMessage
 from sensor_msgs.msg import NavSatFix
 from geometry_msgs.msg import PoseWithCovarianceStamped, TransformStamped, Point, Quaternion, PoseStamped
@@ -33,10 +33,13 @@ class static_svea_gps:
         rospy.Subscriber(self.gps_fix_topic, NavSatFix, self.gps_callback) # gps signal (lat long) of static svea
         rospy.Subscriber(self.odometry_gps_topic, TFMessage, self.odom_gps_callback) # position of static svea
         rospy.Subscriber(self.aruco_pose_topic, Marker, self.aruco_callback)
+        rospy.Subscriber('/odometry/filtered/global', Odometry, self.current_pose_callback)
         
         #Publisher
         self.pose_pub = rospy.Publisher("static/pose", PoseWithCovarianceStamped, queue_size=10) #publish to pose0 in ekf
-        
+        self.global_set_pose_pub = rospy.Publisher("/global/set_pose", PoseWithCovarianceStamped, queue_size=1) #publish to set_pose service provided by robot localization to reset the position
+        self.set_pose_pub = rospy.Publisher("/set_pose", PoseWithCovarianceStamped, queue_size=1) #publish to set_pose service provided by robot localization to reset the position
+
         #Variable
         self.gps_msg = None
         self.location = None
@@ -48,8 +51,10 @@ class static_svea_gps:
         self.listener = tf2_ros.TransformListener(self.buffer)
         self.br = tf2_ros.TransformBroadcaster()
 
-        self.lin_cov = 0.1
-        self.ang_cov = 0.1
+        self.lin_cov = 1e-6
+        self.ang_cov = 1e-6
+
+        self.current_ori = None
 
     def run(self):
         rospy.spin()
@@ -64,32 +69,12 @@ class static_svea_gps:
             self.location.header = msg.header
             self.location.pose = msg.pose
 
-    def aruco_callback(self, msg):    
+    def aruco_callback(self, msg):
         if msg.id == self.aruco_id:
 #            rospy.loginfo("Received ARUCO")
 
-        ####################### INVERSE TRANSFORM, SAME AS LOOKUP FROM ARUCO TO BASELINK ##############################
-            '''transform = self.buffer.lookup_transform("base_link", "camera", msg.header.stamp, rospy.Duration(0.5)) #frame_id: baselink, child_frame_id: camera
-            
-            position = tf2_geometry_msgs.do_transform_pose(msg.pose, transform) #frame_id = baselink child_frame: aruco
-            translation_mat = transformations.translation_matrix([position.pose.position.x,
-                                                        position.pose.position.y,
-                                                        position.pose.position.z])
-            rotation_mat = transformations.quaternion_matrix([position.pose.orientation.x,
-                                                position.pose.orientation.y,
-                                                position.pose.orientation.z,
-                                                position.pose.orientation.w])
-            transform_mat = transformations.concatenate_matrices(translation_mat, rotation_mat)
-            inversed_trans = transformations.inverse_matrix(transform_mat)
-
-            inv_transla = Point(*transformations.translation_from_matrix(inversed_trans)) #frame_id = aruco child_frame: baselink
-            inv_rotate = Quaternion(*transformations.quaternion_from_matrix(inversed_trans))
-            rospy.loginfo(f"inv \n {inv_transla} \n {inv_rotate}")'''
-            
-        ##
-
             transform = self.buffer.lookup_transform(self.frame, "base_link", msg.header.stamp, rospy.Duration(0.5)) #frame_id: aruco, child_frame_id: baselink
-
+            
             transform2 = self.buffer.lookup_transform("odom", self.frame, msg.header.stamp, rospy.Duration(0.5)) #frame_id: odom , child_frame_id: aruco
             transform2.transform.translation = Point(*[0, 0, 0])
             
@@ -99,11 +84,14 @@ class static_svea_gps:
 
             position = tf2_geometry_msgs.do_transform_pose(temp, transform2) #frame_id = odom child_frame: baselink
             position.pose.position.z = 0.0
-            self.publish_pose(position.pose.position, position.pose.orientation, msg.header.stamp)
+            
+            self.publish_pose(position.pose.position, position.pose.orientation, self.current_ori, msg.header.stamp)
 #            self.broadcast_aruco(position.pose.position, position.pose.orientation, msg.header.stamp)
 
+    def current_pose_callback(self, msg):
+        self.current_ori = msg.pose.pose.orientation
 
-    def publish_pose(self, translation, quaternion, time):
+    def publish_pose(self, translation, quaternion, current_ori, time):
         msg = PoseWithCovarianceStamped()
         msg.header.stamp = time
         msg.header.frame_id = "map"
@@ -117,6 +105,11 @@ class static_svea_gps:
                            0.0, 0.0, 0.0, 0.0, 0.0, self.ang_cov]
         msg.pose.covariance = self.cov_matrix
         self.pose_pub.publish(msg)
+
+#        msg.pose.pose.orientation = current_ori
+#        self.set_pose_pub.publish(msg)
+#        self.global_set_pose_pub.publish(msg)
+        
 
     def broadcast_aruco(self, translation, quaternion, time):
         msg = TransformStamped()
