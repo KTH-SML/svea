@@ -72,25 +72,39 @@ Visualization Manager:
       Enabled: true
       Filter (blacklist): ""
       Filter (whitelist): ""
-      Frame Timeout: 1500
+      Frame Timeout: 10
       Frames:
         All Enabled: false
+        aruco10:
+          Value: false
+        aruco11:
+          Value: true
+        aruco12:
+          Value: false
+        aruco13:
+          Value: true
+        aruco190:
+          Value: false
+        aruco2:
+          Value: false
         base_link:
           Value: true
         camera:
           Value: true
         gps:
-          Value: true
+          Value: false
         imu:
-          Value: true
+          Value: false
         laser:
+          Value: false
+        map:
           Value: true
         odom:
           Value: true
         t265_camera_odom_frame:
-          Value: true
+          Value: false
         t265_camera_pose_frame:
-          Value: true
+          Value: false
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -98,20 +112,32 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        base_link:
-          camera:
-            {}
-          gps:
-            {}
-          imu:
-            {}
-          laser:
-            {}
-          t265_camera_pose_frame:
-            {}
-        odom:
-          t265_camera_odom_frame:
-            {}
+        map:
+          odom:
+            base_link:
+              camera:
+                aruco10:
+                  {}
+                aruco11:
+                  {}
+                aruco12:
+                  {}
+                aruco13:
+                  {}
+                aruco190:
+                  {}
+                aruco2:
+                  {}
+              gps:
+                {}
+              imu:
+                {}
+              laser:
+                {}
+              t265_camera_pose_frame:
+                {}
+            t265_camera_odom_frame:
+              {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -140,7 +166,7 @@ Visualization Manager:
           Value: true
         Value: false
       Enabled: true
-      Keep: 100
+      Keep: 10
       Name: OdometryGPS
       Position Tolerance: 0.10000000149011612
       Queue Size: 10
@@ -151,7 +177,7 @@ Visualization Manager:
         Color: 255; 25; 0
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
-        Shaft Length: 0.5
+        Shaft Length: 0.20000000298023224
         Shaft Radius: 0.05000000074505806
         Value: Arrow
       Topic: /odometry/gps
@@ -175,7 +201,7 @@ Visualization Manager:
           Value: true
         Value: false
       Enabled: true
-      Keep: 100
+      Keep: 10
       Name: OdometryLocal
       Position Tolerance: 0.10000000149011612
       Queue Size: 10
@@ -186,7 +212,7 @@ Visualization Manager:
         Color: 233; 185; 110
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
-        Shaft Length: 0.5
+        Shaft Length: 0.20000000298023224
         Shaft Radius: 0.05000000074505806
         Value: Arrow
       Topic: /odometry/filtered
@@ -210,7 +236,7 @@ Visualization Manager:
           Value: true
         Value: false
       Enabled: true
-      Keep: 100
+      Keep: 10
       Name: OdometryGlobal
       Position Tolerance: 0.10000000149011612
       Queue Size: 10
@@ -221,7 +247,7 @@ Visualization Manager:
         Color: 32; 74; 135
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
-        Shaft Length: 0.5
+        Shaft Length: 0.20000000298023224
         Shaft Radius: 0.05000000074505806
         Value: Arrow
       Topic: /odometry/filtered/global
@@ -255,7 +281,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 15.917914390563965
+      Distance: 9.618054389953613
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -263,9 +289,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.13354811072349548
-        Y: 4.227207660675049
-        Z: -1.443101406097412
+        X: 0.6337841749191284
+        Y: -0.7754194736480713
+        Z: -1.442594289779663
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false

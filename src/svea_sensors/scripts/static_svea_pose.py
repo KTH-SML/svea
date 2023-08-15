@@ -12,7 +12,7 @@ from tf.transformations import euler_from_quaternion, quaternion_from_euler
 from nav_msgs.msg import Odometry
 from tf2_msgs.msg import TFMessage
 from sensor_msgs.msg import NavSatFix
-from geometry_msgs.msg import PoseWithCovarianceStamped, TransformStamped, Point, Quaternion, PoseStamped
+from geometry_msgs.msg import PoseWithCovarianceStamped, TransformStamped, Point, Quaternion, PoseStamped, Vector3
 from aruco_msgs.msg import Marker
 
 #TODO: conditions for static gps and active gps
@@ -25,8 +25,11 @@ class static_svea_gps:
 
         #get parameters
         self.aruco_pose_topic = rospy.get_param("~aruco_pose_topic", "aruco_pose")
-        self.aruco_id = rospy.get_param("~aruco_id", 11)
-
+        #self.aruco_id = rospy.get_param("~aruco_id", [[11, 13]])
+        self.aruco_id = [11, 13]
+        #self.aruco_pose = rospy.get_param("") #TODO: set the pose for aruco marker
+        self.aruco_pose = [[-2.615, 0, 0], [1.17, 2.305, 0]]
+        self.aruco_ori = [[1.57, 0, 1.57], [1.57, 0, 0]]
         #Subscriber
         rospy.Subscriber(self.aruco_pose_topic, Marker, self.aruco_callback)
         
@@ -47,16 +50,18 @@ class static_svea_gps:
         rospy.spin()
 
     def aruco_callback(self, msg):
-        if msg.id == self.aruco_id:
+        if msg.id in self.aruco_id:
             try:
     #            rospy.loginfo("Received ARUCO")
 
-                inverse_transform = self.buffer.lookup_transform(self.frame, "base_link", msg.header.stamp, rospy.Duration(0.5)) #frame_id: aruco, child_frame_id: baselink
+                inverse_transform = self.buffer.lookup_transform('aruco' + str(msg.id), "base_link", msg.header.stamp, rospy.Duration(0.5)) #frame_id: aruco, child_frame_id: baselink
                 adjust_orientation = TransformStamped()
                 adjust_orientation.header = msg.header
                 adjust_orientation.header.frame_id = "map"
-                adjust_orientation.child_frame_id = self.frame
-                q = quaternion_from_euler(1.57, 0.0, 1.57)
+                adjust_orientation.child_frame_id = 'aruco' + str(msg.id)
+                rospy.loginfo(f"translation used: index{self.aruco_id.index(msg.id)} \t {self.aruco_pose[self.aruco_id.index(msg.id)]}")
+                adjust_orientation.transform.translation = Vector3(*self.aruco_pose[self.aruco_id.index(msg.id)])
+                q = quaternion_from_euler(*self.aruco_ori[self.aruco_id.index(msg.id)])
                 adjust_orientation.transform.rotation = Quaternion(*q)
 
                 inverse_posestamped = PoseStamped()
