@@ -35,6 +35,7 @@ class static_svea_gps:
         
         #Publisher
         self.global_set_pose_pub = rospy.Publisher("/global/set_pose", PoseWithCovarianceStamped, queue_size=1) #publish to set_pose service provided by robot localization to reset the position
+        #self.global_set_pose_pub = rospy.Publisher("/static/pose", PoseWithCovarianceStamped, queue_size=1) #publish to set_pose service provided by robot localization to reset the position
 
         #Variable
         self.frame = 'aruco' + str(self.aruco_id)
@@ -51,31 +52,30 @@ class static_svea_gps:
 
     def aruco_callback(self, msg):
         if msg.id in self.aruco_id:
-            try:
-    #            rospy.loginfo("Received ARUCO")
+            if np.sqrt(msg.pose.pose.position.x**2 + msg.pose.pose.position.y**2 + msg.pose.pose.position.z**2) <= 3:
+                try:
+        #            rospy.loginfo("Received ARUCO")
 
-                inverse_transform = self.buffer.lookup_transform('aruco' + str(msg.id), "base_link", msg.header.stamp, rospy.Duration(0.5)) #frame_id: aruco, child_frame_id: baselink
-                adjust_orientation = TransformStamped()
-                adjust_orientation.header = msg.header
-                adjust_orientation.header.frame_id = "map"
-                adjust_orientation.child_frame_id = 'aruco' + str(msg.id)
-                rospy.loginfo(f"translation used: index{self.aruco_id.index(msg.id)} \t {self.aruco_pose[self.aruco_id.index(msg.id)]}")
-                adjust_orientation.transform.translation = Vector3(*self.aruco_pose[self.aruco_id.index(msg.id)])
-                q = quaternion_from_euler(*self.aruco_ori[self.aruco_id.index(msg.id)])
-                adjust_orientation.transform.rotation = Quaternion(*q)
+                    inverse_transform = self.buffer.lookup_transform('aruco' + str(msg.id), "base_link", msg.header.stamp, rospy.Duration(0.5)) #frame_id: aruco, child_frame_id: baselink
+                    adjust_orientation = TransformStamped()
+                    adjust_orientation.header = msg.header
+                    adjust_orientation.header.frame_id = "map"
+                    adjust_orientation.child_frame_id = 'aruco' + str(msg.id)
+                    adjust_orientation.transform.translation = Vector3(*self.aruco_pose[self.aruco_id.index(msg.id)])
+                    q = quaternion_from_euler(*self.aruco_ori[self.aruco_id.index(msg.id)])
+                    adjust_orientation.transform.rotation = Quaternion(*q)
 
-                inverse_posestamped = PoseStamped()
-                inverse_posestamped.pose.position = inverse_transform.transform.translation
-                inverse_posestamped.pose.orientation = inverse_transform.transform.rotation   
+                    inverse_posestamped = PoseStamped()
+                    inverse_posestamped.pose.position = inverse_transform.transform.translation
+                    inverse_posestamped.pose.orientation = inverse_transform.transform.rotation   
 
-                position = tf2_geometry_msgs.do_transform_pose(inverse_posestamped, adjust_orientation) #frame_id = map child_frame: baselink
-                position.pose.position.z = 0.0
-    #            rospy.loginfo(f"position \n {position}")
-                
-                self.publish_pose(position.pose.position, position.pose.orientation, msg.header.stamp)
-    #            self.broadcast_aruco(position.pose.position, position.pose.orientation, msg.header.stamp)
-            except Exception as e:
-                rospy.loginfo(f"Exception: \n {e}")
+                    position = tf2_geometry_msgs.do_transform_pose(inverse_posestamped, adjust_orientation) #frame_id = map child_frame: baselink
+                    position.pose.position.z = 0.0
+        #            rospy.loginfo(f"position \n {position}")
+                    
+                    self.publish_pose(position.pose.position, position.pose.orientation, msg.header.stamp)
+                except Exception as e:
+                    rospy.loginfo(f"Exception: \n {e}")
                 
     def publish_pose(self, translation, quaternion, time):
         msg = PoseWithCovarianceStamped()
