@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
 <launch>
     <!-- Start NATS -->
-    <node name="nats_connector2" pkg="nats_ros_connector" type="nats_connector.py" output="screen">
+    <node name="nats_connector_static" pkg="nats_ros_connector" type="nats_connector.py" output="screen">
         <param name="host" value="nats://sml-wan.asuscomm.com:4222"/>
-        <remap to="gps/fix" from="static/gps/fix"/>
-        <remap to="odometry/gps" from="static/odometry/gps"/>
+        <remap to="gps/fix" from="gps/fix/static"/>
+        <remap to="odometry/gps" from="odometry/gps/static"/>
+        <remap to="gps/filtered" from="gps/filtered/static"/>
         <rosparam>
             publishers:
-            - static/gps/fix
-            - static/odometry/gps
+            - gps/fix/static
+            - odometry/gps/static
+            - gps/filtered/static
         </rosparam>
     </node>
 </launch>

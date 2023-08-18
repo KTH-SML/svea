@@ -17,7 +17,7 @@
 
     <!-- Nodes -->
     <node name="camera" pkg="cv_camera" type="cv_camera_node" output="screen">
-        <param name="camera_info_url" value="file://$(find svea_sensors)/params/robot_localization/web_camera.yaml" />
+        <param name="camera_info_url" value="file://$(find svea_sensors)/params/robot_localization/usbc_web_camera.yaml" />
         <param name="device_id"         value="$(arg device_id)"/>
     </node>
 

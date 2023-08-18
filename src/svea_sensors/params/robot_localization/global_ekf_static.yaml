@@ -2,11 +2,8 @@ frequency: 10
 
 sensor_timeout: 0.1
 
-two_d_mode: false
+two_d_mode: true
 
-# Future proofing transform timestamp of 0.1 sec
-# Added to solve warning by navsat_transform node 
-# (i.e. "could not retrieve transform from odom to base_link using latest instead")
 transform_time_offset: 0.1
 
 transform_timeout: 0.0
@@ -33,7 +30,8 @@ world_frame: map           # Defaults to the value of odom_frame if unspecified
 
 ##########################################
 # GPS Odometry ################################
-odom0: /odometry/gps
+#odom0: /odometry/gps
+odom0: odometry/gps/aruco
 
 odom0_config: [true, true, true,
                false, false, false,
@@ -51,26 +49,26 @@ odom0_queue_size: 8
 odom0_nodelay: true
 odom0_relative: false
 odom0_differential: false
-
+odom0_pose_rejection_threshold: 0.1
 
 ##########################################
 # BNO055 IMU #############################
-#imu0: /imu/data
-#imu0_config: [false, false, false,
-#              true,  true, true,
-#              false, false, false,
-#              false, false,  false,
-#              false,  false,  false]
-#imu0_nodelay: true # true #default false
-#imu0_differential: false
-#imu0_relative: true
-#imu0_queue_size: 8
-##imu0_pose_rejection_threshold: 0.8                 # Note the difference in parameter names
-##imu0_twist_rejection_threshold: 1.0                #
-##imu0_linear_acceleration_rejection_threshold: 1.0  #
-#
-#imu0_remove_gravitational_acceleration: false #default true
-#gravitational_acceleration: -0.35
+imu0: /imu/data
+imu0_config: [false, false, false,
+              true,  true, true,
+              false, false, false,
+              false, false,  false,
+              false,  false,  false]
+imu0_nodelay: true # true #default false
+imu0_differential: true
+imu0_relative: false
+imu0_queue_size: 8
+#imu0_pose_rejection_threshold: 0.8                 # Note the difference in parameter names
+#imu0_twist_rejection_threshold: 1.0                #
+#imu0_linear_acceleration_rejection_threshold: 1.0  #
+
+imu0_remove_gravitational_acceleration: false #default true
+gravitational_acceleration: -0.35
 
 
 ##########################################
@@ -100,6 +98,19 @@ twist1_nodelay: true
 twist1_differential: true
 twist1_relative: false
 twist1_queue_size: 8
+
+##########################################
+# Pose based on aruco marker ##########
+pose0: /static/pose
+pose0_config: [true, true, true,
+               false, false, false,
+               false, false, false,
+               false, false, false,
+               false, false, false]
+pose0_nodelay: true
+pose0_differential: false
+pose0_relative: false
+pose0_queue_size: 8
 
 # Control input is not used 
 # (and you should not try to use it)
