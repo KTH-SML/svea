@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="device"                  default="/dev/GPS" />
+
+    <include file="$(find svea_sensors)/launch/rtk.launch">
+        <param name="device" value="$(arg device)" />
+    </include>
+    <include file="$(find svea_sensors)/launch/navsat.launch" />
+</launch>

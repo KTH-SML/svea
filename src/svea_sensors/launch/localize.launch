@@ -184,13 +184,13 @@
             <arg name="aruco_tf_name"   value="$(arg aruco_tf_name)"/>
             <arg name="device_id"       value="$(arg device_id)"/>
         </include>
-        
-        <node name="static_svea_pose" pkg="svea_sensors" type="static_svea_pose.py" output="screen">
+        <node name="static_aruco_pose" pkg="svea_sensors" type="aruco_pose.py" output="screen"/>
+        <!-- <node name="static_svea_pose" pkg="svea_sensors" type="static_svea_pose.py" output="screen">
             <param name="static_gps_fix_topic"  value="$(arg static_gps_fix_topic)"/>
             <param name="odometry_gps_topic"    value="$(arg odometry_gps_topic)"/>
             <param name="aruco_pose_topic"      value="$(arg aruco_pose_topic)"/>
             <param name="aruco_id"              value="$(arg aruco_id)"/>
-        </node>
+        </node> -->
     </group>
 
-</launch>
+</launch>   

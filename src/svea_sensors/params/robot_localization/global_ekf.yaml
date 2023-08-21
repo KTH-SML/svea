@@ -30,7 +30,7 @@ world_frame: map           # Defaults to the value of odom_frame if unspecified
 
 ##########################################
 # GPS Odometry ################################
-odom0: /odometry/gps
+odom0: odometry/gps
 
 odom0_config: [true, true, true,
                false, false, false,
@@ -48,7 +48,7 @@ odom0_queue_size: 8
 odom0_nodelay: true
 odom0_relative: false
 odom0_differential: false
-
+odom0_pose_rejection_threshold: 0.5
 
 ##########################################
 # BNO055 IMU #############################
