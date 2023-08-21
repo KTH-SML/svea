@@ -80,9 +80,7 @@ Visualization Manager:
           Value: true
         aruco11:
           Value: true
-        aruco216:
-          Value: true
-        aruco226:
+        aruco11_actual:
           Value: true
         base_link:
           Value: true
@@ -114,6 +112,8 @@ Visualization Manager:
       Show Names: true
       Tree:
         utm:
+          aruco11_actual:
+            {}
           map:
             basebase:
               {}
@@ -123,10 +123,6 @@ Visualization Manager:
                   aruco10:
                     {}
                   aruco11:
-                    {}
-                  aruco216:
-                    {}
-                  aruco226:
                     {}
                 gps:
                   {}
@@ -145,7 +141,7 @@ Visualization Manager:
       Marker Topic: /waypoints
       Name: MarkerArray
       Namespaces:
-        waypoints: true
+        {}
       Queue Size: 100
       Value: true
     - Angle Tolerance: 0.10000000149011612
@@ -165,7 +161,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: false
-      Enabled: false
+      Enabled: true
       Keep: 10
       Name: OdometryGPS
       Position Tolerance: 0.10000000149011612
@@ -182,7 +178,7 @@ Visualization Manager:
         Value: Arrow
       Topic: /odometry/gps
       Unreliable: false
-      Value: false
+      Value: true
     - Angle Tolerance: 0.10000000149011612
       Class: rviz/Odometry
       Covariance:
@@ -281,7 +277,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 13.010831832885742
+      Distance: 6.740237712860107
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -289,9 +285,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.48781394958496094
-        Y: -4.370639324188232
-        Z: 0.00042746547842398286
+        X: 0.142022967338562
+        Y: -0.6470476388931274
+        Z: 0.00012129866081522778
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -299,7 +295,7 @@ Visualization Manager:
       Near Clip Distance: 0.009999999776482582
       Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
-      Yaw: 3.1553940773010254
+      Yaw: 3.1353840827941895
     Saved: ~
 Window Geometry:
   Displays:
