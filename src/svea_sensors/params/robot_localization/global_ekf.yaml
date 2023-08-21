@@ -48,7 +48,7 @@ odom0_queue_size: 8
 odom0_nodelay: true
 odom0_relative: false
 odom0_differential: false
-odom0_pose_rejection_threshold: 0.5
+odom0_pose_rejection_threshold: 1
 
 ##########################################
 # BNO055 IMU #############################
@@ -102,7 +102,7 @@ twist1_queue_size: 8
 # Pose based on aruco marker ##########
 pose0: /static/pose
 pose0_config: [true, true, true,
-               false, false, false,
+               false, false, true,
                false, false, false,
                false, false, false,
                false, false, false]
