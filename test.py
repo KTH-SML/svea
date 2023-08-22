@@ -1,4 +1,4 @@
-import math
+'''import math
 
 def quaternion_to_euler(q):
     """
@@ -33,4 +33,15 @@ def quaternion_to_euler(q):
 # Example usage
 quaternion = (0.924, 0.383, 0.0, 0.0)  # Replace with your quaternion values (w, x, y, z)
 euler_angles_degrees = quaternion_to_euler(quaternion)
-print("Euler Angles (roll, pitch, yaw) in degrees:", euler_angles_degrees)
+print("Euler Angles (roll, pitch, yaw) in degrees:", euler_angles_degrees)'''
+import numpy as np
+
+a = [9,0,1,2,3,4,5,6]
+if 7 in a:
+    print("yo", a.index(1))
+else:
+    try:
+        print("yo", a.index(7))
+    except:
+        print("no 7")
+        pass

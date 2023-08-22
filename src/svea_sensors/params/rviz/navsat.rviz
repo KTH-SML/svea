@@ -76,15 +76,9 @@ Visualization Manager:
       Frame Timeout: 10
       Frames:
         All Enabled: false
-        aruco10:
-          Value: true
-        aruco11:
-          Value: true
-        aruco11_actual:
+        RSU:
           Value: true
         base_link:
-          Value: true
-        basebase:
           Value: true
         camera:
           Value: true
@@ -97,6 +91,18 @@ Visualization Manager:
         map:
           Value: true
         odom:
+          Value: true
+        peds0:
+          Value: true
+        peds0SVEA:
+          Value: true
+        peds1:
+          Value: true
+        peds1SVEA:
+          Value: true
+        peds2:
+          Value: true
+        peds2SVEA:
           Value: true
         t265_camera_odom_frame:
           Value: false
@@ -112,28 +118,35 @@ Visualization Manager:
       Show Names: true
       Tree:
         utm:
-          aruco11_actual:
+          RSU:
             {}
           map:
-            basebase:
-              {}
             odom:
               base_link:
                 camera:
-                  aruco10:
-                    {}
-                  aruco11:
-                    {}
+                  {}
                 gps:
                   {}
                 imu:
                   {}
                 laser:
                   {}
+                peds0SVEA:
+                  {}
+                peds1SVEA:
+                  {}
+                peds2SVEA:
+                  {}
                 t265_camera_pose_frame:
                   {}
               t265_camera_odom_frame:
                 {}
+          peds0:
+            {}
+          peds1:
+            {}
+          peds2:
+            {}
       Update Interval: 0
       Value: true
     - Class: rviz/MarkerArray
@@ -277,7 +290,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.740237712860107
+      Distance: 9.865545272827148
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -285,9 +298,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.142022967338562
-        Y: -0.6470476388931274
-        Z: 0.00012129866081522778
+        X: 0.2852182984352112
+        Y: -2.43737530708313
+        Z: 0.0002780407958198339
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -295,7 +308,7 @@ Visualization Manager:
       Near Clip Distance: 0.009999999776482582
       Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
-      Yaw: 3.1353840827941895
+      Yaw: 3.14038348197937
     Saved: ~
 Window Geometry:
   Displays:

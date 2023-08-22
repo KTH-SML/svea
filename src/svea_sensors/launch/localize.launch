@@ -27,8 +27,8 @@
     <arg name="device"                  default="/dev/GPS" />
     <arg name="port"                    default="/dev/ttyACM0"/>
 
-    <!-- Generate waypoints -->
-    <arg name="generate_waypoints"      default="true"/>
+    <!-- Generate waypoints for driving to different gps location-->
+    <arg name="generate_waypoints"      default="false"/>
     <arg name="waypoints_topic"         default="/outdoor_localization_waypoint"/>
     <arg name="resolution"              default="10"/>
     <arg name="location_topic"          default="/gps/filtered"/>
@@ -36,7 +36,7 @@
     <arg name="gps_odometry_topic"      default="/odometry/filtered/global"/>
 
     <!-- For camera and aruco detection-->
-    <arg name="use_web_camera"          default="True"/>
+    <arg name="use_web_camera"          default="false"/>
     <arg name="image"                   default="/camera/image_raw"/>
     <arg name="aruco_pose"              default="aruco_pose"/>
     <arg name="aruco_dict"              default="DICT_4X4_250"/>
@@ -48,7 +48,10 @@
     <arg name="aruco_pose_topic"        default="aruco_pose"/>
     <arg name="aruco_id"                default="11"/>    
 
-
+    <!-- For pedestrain demo -->
+    <arg name="pedestrain_demo"         default="false"/>
+    <arg name="testing_pedestrain_demo" default="false"/>
+    
     <!-- Start the stereo camera -->
     <group if="$(arg use_camera)">
         <param name="use_sim_time" value="false"/>
@@ -193,4 +196,8 @@
         </node> -->
     </group>
 
+    <group if="$(arg pedestrain_demo)">
+        <node name="pedestrian_pose" pkg="svea_sensors" type="pedestrain_location.py" output="screen"/>
+        <node if="$(arg testing_pedestrian_demo)" name="rsu_msg_pub" pkg="svea_sensors" type="publish_rsu_msg.py" output="screen"/>
+    </group>
 </launch>
