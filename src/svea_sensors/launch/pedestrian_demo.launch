@@ -26,6 +26,7 @@
     <arg name="port"                    default="/dev/ttyACM0"/>
 
     <!-- For running the dummy publisher -->
+    <arg name="pedestrian_demo"          default="false"/>
     <arg name="testing_pedestrian_demo" default="false"/>
 
     <!-- Start localization -->
@@ -47,11 +48,13 @@
         and actuation_to_twist working) -->
         <arg name="start_serial"        value="$(arg start_serial)" />
         <arg name="device"              value="$(arg device)" />
-        <arg name="port"                value="/dev/ttyACM0"/>
+        <arg name="port"                value="$(arg port)"/>
+        <arg name="pedestrian_demo"     value="$(arg pedestrian_demo)"/>
+
 
     </include>
 
-    <node name="pedestrian_pose" pkg="svea_sensors" type="pedestrain_location.py" output="screen"/>
+    <node name="pedestrian_pose" pkg="svea_sensors" type="pedestrian_location.py" output="screen"/>
     
     <node if="$(arg testing_pedestrian_demo)" name="rsu_msg_pub" pkg="svea_sensors" type="publish_rsu_msg.py" output="screen"/>
 </launch>
