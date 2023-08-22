@@ -1,10 +1,15 @@
 <?xml version="1.0"?>
-<!-- Work better if run the following nodes directly, instead of using this launch file -->
+
+<!-- This launch file is for getting a static transform for rtk-gps to utm frame -->
+
 <launch>
     <arg name="device"          default="/dev/GPS" />
+    <arg name="delay"           default="2.0" />
 
     <include file="$(find svea_sensors)/launch/rtk.launch">
-        <param name="device"    value="$(arg device)" />
+        <arg name="device"    value="$(arg device)" />
     </include>
-    <include file="$(find svea_sensors)/launch/navsat.launch" />
+    <include file="$(find svea_sensors)/launch/navsat.launch">
+        <arg name="delay"     value="$(arg delay)"/>
+    </include>
 </launch>

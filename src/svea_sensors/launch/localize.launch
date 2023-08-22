@@ -25,18 +25,14 @@
     and actuation_to_twist working) -->
     <arg name="start_serial"            default="false" />
     <arg name="device"                  default="/dev/GPS" />
+    <arg name="delay"                   default="2.0"/>
+    <!-- yaw_offset is set to 0 if the robot is facing East during initialization -->
+    <arg name="yaw_offset"              default="0"/>
     <arg name="port"                    default="/dev/ttyACM0"/>
-
-    <!-- Generate waypoints for driving to different gps location-->
-    <arg name="generate_waypoints"      default="false"/>
-    <arg name="waypoints_topic"         default="/outdoor_localization_waypoint"/>
-    <arg name="resolution"              default="10"/>
-    <arg name="location_topic"          default="/gps/filtered"/>
-    <arg name="marker_topic"            default="/waypoints"/>
-    <arg name="gps_odometry_topic"      default="/odometry/filtered/global"/>
 
     <!-- For camera and aruco detection-->
     <arg name="use_web_camera"          default="false"/>
+    <arg name="camera_info_file"        default="usbc_web_camera.yaml"/>
     <arg name="image"                   default="/camera/image_raw"/>
     <arg name="aruco_pose"              default="aruco_pose"/>
     <arg name="aruco_dict"              default="DICT_4X4_250"/>
@@ -47,10 +43,6 @@
     <arg name="odometry_gps_topic"      default="static/odometry/gps"/>
     <arg name="aruco_pose_topic"        default="aruco_pose"/>
     <arg name="aruco_id"                default="11"/>    
-
-    <!-- For pedestrain demo -->
-    <arg name="pedestrain_demo"         default="false"/>
-    <arg name="testing_pedestrain_demo" default="false"/>
     
     <!-- Start the stereo camera -->
     <group if="$(arg use_camera)">
@@ -137,7 +129,6 @@
     <!-- Start map server -->
     <node if="$(eval map_file != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
 
-
     <!-- Start localization (AMCL) -->
     <node if="$(arg is_indoors)" pkg="amcl" type="amcl" name="amcl_localization" output="screen">
         <rosparam command="load"        file="$(find svea_sensors)/params/amcl/localize.yaml"/>
@@ -149,10 +140,14 @@
 
     <!-- Start GPS if outdoor localization -->
     <group unless="$(arg is_indoors)">
-        <!-- <include file="$(find svea_sensors)/launch/rtk.launch">
-            <param name="device" value="$(arg device)" />
-        </include> -->
-        <include file="$(find svea_sensors)/launch/navsat.launch" />
+        <include file="$(find svea_sensors)/launch/rtk.launch">
+            <arg name="device"      value="$(arg device)" />
+        </include>
+        <include file="$(find svea_sensors)/launch/navsat.launch">
+            <arg name="delay"       value="$(arg delay)"/>
+            <arg name="yaw_offset"  value="$(arg yaw_offset)"/>
+        </include>
+
     </group>
 
     <node pkg="svea_sensors" type="odom_to_map" name="odom_to_map" output="screen">
@@ -162,49 +157,18 @@
         <param name="publish_pose"          value="$(arg publish_pose)"/>
     </node>
 
-    <!-- For generating waypoints based on gps for svea to follow-->
-    <group if="$(arg generate_waypoints)">
-        <node pkg="svea_sensors" type="generate_waypoint.py" name="generate_waypoints" output="screen"/>
-            <param name="waypoints_topic"       value="$(arg waypoints_topic)"/>
-            <rosparam subst_value="true">
-            corners: [[59.3508586, 18.0679122],
-                        [59.3508938, 18.0680175],
-                        [59.3508563, 18.0680577],
-                        [59.3508059, 18.0679789]] 
-            </rosparam>
-            <!-- The four points inside the carpark -->
-            <param name="resolution"            value="$(arg resolution)"/>
-            <param name="location_topic"        value="$(arg location_topic)"/>
-            <param name="marker_topic"          value="$(arg marker_topic)"/>
-            <param name="gps_odometry_topic"    value="$(arg gps_odometry_topic)"/>
-    </group>
-
     <!-- Use web_camera to detect aruco -->
     <group if="$(arg use_web_camera)">    
         <include file="$(find svea_sensors)/launch/camera.launch">
-            <arg name="image"           value="$(arg image)"/>
-            <arg name="device_id"       value="$(arg device_id)"/>
+            <arg name="image"               value="$(arg image)"/>
+            <arg name="camera_info_file"    value="$(arg camera_info_file)"/>
+            <arg name="aruco_pose"          value="$(arg aruco_pose)"/>
+            <arg name="aruco_dict"          value="$(arg aruco_dict)"/>
+            <arg name="aruco_size"          value="$(arg aruco_size)"/>
+            <arg name="aruco_tf_name"       value="$(arg aruco_tf_name)"/>
+            <arg name="device_id"           value="$(arg device_id)"/>
         </include>
-
-        <node name="aruco_detect" pkg="svea_sensors" type="aruco_detect.py" output="screen">
-            <param name="sub_image"         value="$(arg image)"/>
-            <param name="pub_aruco_pose"    value="$(arg aruco_pose)"/>
-            <param name="aruco_dict"        value="$(arg aruco_dict)"/>
-            <param name="aruco_size"        value="$(arg aruco_size)"/>
-            <param name="aruco_tf_name"     value="$(arg aruco_tf_name)"/>
-        </node>
-
         <node name="static_aruco_pose" pkg="svea_sensors" type="aruco_pose.py" output="screen"/>
-        <!-- <node name="static_svea_pose" pkg="svea_sensors" type="static_svea_pose.py" output="screen">
-            <param name="static_gps_fix_topic"  value="$(arg static_gps_fix_topic)"/>
-            <param name="odometry_gps_topic"    value="$(arg odometry_gps_topic)"/>
-            <param name="aruco_pose_topic"      value="$(arg aruco_pose_topic)"/>
-            <param name="aruco_id"              value="$(arg aruco_id)"/>
-        </node> -->
     </group>
 
-    <group if="$(arg pedestrain_demo)">
-        <node name="pedestrian_pose" pkg="svea_sensors" type="pedestrain_location.py" output="screen"/>
-        <node if="$(arg testing_pedestrian_demo)" name="rsu_msg_pub" pkg="svea_sensors" type="publish_rsu_msg.py" output="screen"/>
-    </group>
 </launch>
