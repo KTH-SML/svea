@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
+<!-- Work better if run the following nodes directly, instead of using this launch file -->
 <launch>
-    <arg name="device"                  default="/dev/GPS" />
+    <arg name="device"          default="/dev/GPS" />
 
     <include file="$(find svea_sensors)/launch/rtk.launch">
-        <param name="device" value="$(arg device)" />
+        <param name="device"    value="$(arg device)" />
     </include>
     <include file="$(find svea_sensors)/launch/navsat.launch" />
 </launch>

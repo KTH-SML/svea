@@ -20,15 +20,4 @@
         <param name="camera_info_url" value="file://$(find svea_sensors)/params/robot_localization/usbc_web_camera.yaml" />
         <param name="device_id"         value="$(arg device_id)"/>
     </node>
-
-    <node name="aruco_detect" pkg="svea_sensors" type="aruco_detect.py" output="screen">
-        <!-- Topics -->
-        <param name="sub_image"         value="$(arg image)"/>
-        <param name="pub_aruco_pose"    value="$(arg aruco_pose)"/>
-        <!-- Auxiliary -->
-        <param name="aruco_dict_name"   value="$(arg aruco_dict)"/>
-        <param name="aruco_size"        value="$(arg aruco_size)"/>
-        <param name="aruco_tf_name"     value="$(arg aruco_tf_name)"/>
-    </node>
-
 </launch>

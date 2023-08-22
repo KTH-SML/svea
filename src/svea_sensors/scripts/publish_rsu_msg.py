@@ -4,19 +4,24 @@ import numpy as np
 
 import rospy
 
-import tf2_ros
-import tf2_geometry_msgs
-from tf import transformations 
-from tf.transformations import euler_from_quaternion, quaternion_from_euler
+# import tf2_ros
+# import tf2_geometry_msgs
+# from tf import transformations 
+# from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
-from sensor_msgs.msg import NavSatFix
-from aruco_msgs.msg import Marker
+# from sensor_msgs.msg import NavSatFix
+# from aruco_msgs.msg import Marker
 
 
 import tf
 from tf2_msgs.msg import TFMessage
 from geometry_msgs.msg import PoseWithCovariance, Pose, Quaternion, Point
 from rsu_msgs.msg import Object, ObjectPose, StampedObjectArray, StampedObjectPoseArray
+
+####################################################
+###Dummy publisher to test pedestrian_location.py###
+###Publish 3 pedestrians to sensor/objects topic####
+####################################################
 
 class publish_rsu:
 

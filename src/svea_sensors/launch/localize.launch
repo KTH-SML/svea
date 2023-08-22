@@ -128,7 +128,9 @@
             <param name="odom0"         value="/zed/zed_node/odom"/>
         </node>
         <include file="$(find svea_sensors)/launch/transforms.launch">
-            <arg name="xavier" value="$(arg xavier)"/>
+            <arg name="xavier"          value="$(arg xavier)"/>
+            <arg name="use_web_camera"  value="$(arg use_web_camera)"/>
+            <arg name="pedestrain_demo" value="$(arg pedestrain_demo)"/>
         </include>
     </group>
 
@@ -181,12 +183,17 @@
     <group if="$(arg use_web_camera)">    
         <include file="$(find svea_sensors)/launch/camera.launch">
             <arg name="image"           value="$(arg image)"/>
-            <arg name="aruco_pose"      value="$(arg aruco_pose)"/>
-            <arg name="aruco_dict"      value="$(arg aruco_dict)"/>
-            <arg name="aruco_size"      value="$(arg aruco_size)"/>
-            <arg name="aruco_tf_name"   value="$(arg aruco_tf_name)"/>
             <arg name="device_id"       value="$(arg device_id)"/>
         </include>
+
+        <node name="aruco_detect" pkg="svea_sensors" type="aruco_detect.py" output="screen">
+            <param name="sub_image"         value="$(arg image)"/>
+            <param name="pub_aruco_pose"    value="$(arg aruco_pose)"/>
+            <param name="aruco_dict"        value="$(arg aruco_dict)"/>
+            <param name="aruco_size"        value="$(arg aruco_size)"/>
+            <param name="aruco_tf_name"     value="$(arg aruco_tf_name)"/>
+        </node>
+
         <node name="static_aruco_pose" pkg="svea_sensors" type="aruco_pose.py" output="screen"/>
         <!-- <node name="static_svea_pose" pkg="svea_sensors" type="static_svea_pose.py" output="screen">
             <param name="static_gps_fix_topic"  value="$(arg static_gps_fix_topic)"/>

@@ -18,6 +18,10 @@ from tf2_msgs.msg import TFMessage
 from geometry_msgs.msg import PoseWithCovariance, Pose, TransformStamped
 from rsu_msgs.msg import Object, ObjectPose, StampedObjectArray, StampedObjectPoseArray
 
+##################################################################
+###Transform the pose of pedestrain to utm frame and SVEA frame###
+##################################################################
+
 class pedestrian_location:
 
     def __init__(self):

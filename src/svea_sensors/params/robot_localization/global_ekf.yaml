@@ -29,7 +29,7 @@ base_link_frame: base_link  # Defaults to "base_link" if unspecified
 world_frame: map           # Defaults to the value of odom_frame if unspecified
 
 ##########################################
-# GPS Odometry ################################
+# GPS Odometry ###########################
 odom0: odometry/gps
 
 odom0_config: [true, true, true,
@@ -99,7 +99,7 @@ twist1_relative: false
 twist1_queue_size: 8
 
 ##########################################
-# Pose based on aruco marker ##########
+# Pose based on aruco marker detection ###
 pose0: /static/pose
 pose0_config: [true, true, true,
                false, false, true,

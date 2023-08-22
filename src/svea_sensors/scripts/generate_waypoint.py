@@ -13,16 +13,21 @@ from sensor_msgs.msg import NavSatFix
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float64MultiArray
 from visualization_msgs.msg import MarkerArray, Marker
-from tf.transformations import euler_from_quaternion, quaternion_from_euler
+from tf.transformations import euler_from_quaternion #, quaternion_from_euler
+
+########################################################################################
+###Transform the gps location into map frame (x,y) based on the starting pose of SVEA###
+########################################################################################
 
 class generate():
+    # The coordinates below are 4 points inside the carpark outside of ITRL
     corners = [[59.3508586, 18.0679122],
-                       [59.3508938, 18.0680175],
-                       [59.3508563, 18.0680577],
-                        [59.3508059, 18.0679789]] #carpark3
+               [59.3508938, 18.0680175],
+               [59.3508563, 18.0680577],
+               [59.3508059, 18.0679789]]
 
     def __init__(self):
-    
+        # Initalize the node 
         rospy.init_node("generate_waypoints", anonymous=False)
 
         self.waypoint_topic = rospy.get_param("~waypoints_topic", "/outdoor_localization_waypoint")
@@ -32,19 +37,20 @@ class generate():
         self.vis_topic = rospy.get_param("~marker_topic", "/waypoints")
         self.gps_odometry_topic = rospy.get_param("~gps_odometry_topic", "/odometry/filtered/global")
 
-        #Subscriber
+        # Subscriber
         rospy.Subscriber(self.location_topic, NavSatFix, self.starting_location_callback)
         rospy.Subscriber(self.gps_odometry_topic, Odometry, self.gps_odometry_callback)
 
-        #Publisher
+        # Publisher
         self.pub_waypoints = rospy.Publisher(self.waypoint_topic, Float64MultiArray, queue_size=10)
         self.pub_visualization = rospy.Publisher(self.vis_topic, MarkerArray, queue_size=10)
         
-        #params
+        # Variable
         self.start = None
         self.coor = None
         self.starting_ori = None
         self.rate = rospy.Rate(10)
+
         while not rospy.is_shutdown() and (self.coor is None or self.start is None):
             self.rate.sleep()
 
