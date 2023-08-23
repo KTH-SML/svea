@@ -55,7 +55,7 @@
     as well as this launch file
     describe it and means of evaluation
     -->
-    <node pkg="svea_sensors" type="generate_waypoint.py" name="generate_waypoints" output="screen">
+    <node pkg="svea_examples" type="relative_waypoints.py" name="relative_waypoints" output="screen">
         <param name="waypoints_topic"       value="$(arg waypoints_topic)"/>
         <rosparam subst_value="true">
         corners: [[59.3508586, 18.0679122],
@@ -81,6 +81,7 @@
     </group>
 
     <!-- Start mpc -->
+    <!-- MPC is not working -->
     <group if="$(eval controller == 'mpc')">
         <node name="state_machine" pkg="svea_core" type="state_machine.py" output="screen">
             <param name="is_sim"    value="$(arg is_sim)"/>
