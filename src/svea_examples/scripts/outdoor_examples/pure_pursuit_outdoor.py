@@ -60,23 +60,21 @@ class pure_pursuit:
     RATE = 1e9
 
     def __init__(self):
-
         ## Initialize node
-
         rospy.init_node('pure_pursuit')
 
         ## Parameters
-
-        #self.POINTS = load_param('~points')
         self.POINTS = None
         self.IS_SIM = load_param('~is_sim', False)
         self.USE_RVIZ = load_param('~use_rviz', False)
-        #self.STATE = load_param('~state', [0, 0, 0, 0])
-        self.temp_x = rospy.get_param('~initial_pose_x', 0.0)        
-        self.temp_y = rospy.get_param('~initial_pose_y', 0.0)
-        self.temp_a = rospy.get_param('~initial_pose_a', 0.0)
-        self.STATE = [self.temp_x, self.temp_y, self.temp_a]
-        rospy.Subscriber("/outdoor_localization_waypoint", Float64MultiArray, self.get_pts_callback)
+        self.waypoints_topic = rospy.get_param('~waypoints_topic', '/outdoor_localization_waypoint')        
+        temp_x = rospy.get_param('~initial_pose_x', 0.0)        
+        temp_y = rospy.get_param('~initial_pose_y', 0.0)
+        temp_a = rospy.get_param('~initial_pose_a', 0.0)
+        self.STATE = [temp_x, temp_y, temp_a]
+
+        ## Subscriber
+        rospy.Subscriber(self.waypoints_topic, Float64MultiArray, self.get_pts_callback)
 
         ## Set initial values for node
 
@@ -162,7 +160,5 @@ class pure_pursuit:
 
 
 if __name__ == '__main__':
-
     ## Start node ##
-
     pure_pursuit().run()

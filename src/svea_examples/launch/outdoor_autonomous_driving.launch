@@ -2,24 +2,24 @@
 <launch>
 
     <!-- Launch file arguments -->
-    <arg name="xavier" default="false"/>
-    <arg name="use_camera" default="true"/>
-    <arg name="camera" default="rs"/>
-    <arg name="map_file" default=""/>
-    <arg name="map_frame" default="map"/>
-    <arg name="wait_for_transform" default="false"/>
-    <arg name="publish_odometry" default="true"/>
-    <arg name="publish_pose" default="true"/>
-    <arg name="initial_pose_x" default="0.0" />
-    <arg name="initial_pose_y" default="0.0" />
-    <arg name="initial_pose_a" default="0.0" />
-    <arg name="use_wheel_encoders" default="false" />
-    <arg name="is_indoors" default="true" />
-    <arg name="start_serial" default="false" />
-    <arg name="device" default="/dev/ttyACM0" />
-    <arg name="use_rviz"        default="true"/>
-    <arg name="run_lidar"        default="false"/>
-    <arg name="controller"        default="pure_pursuit"/>
+    <arg name="xavier"                  default="false"/>
+    <arg name="use_camera"              default="true"/>
+    <arg name="camera"                  default="rs"/>
+    <arg name="map_file"                default=""/>
+    <arg name="map_frame"               default="map"/>
+    <arg name="wait_for_transform"      default="false"/>
+    <arg name="publish_odometry"        default="true"/>
+    <arg name="publish_pose"            default="true"/>
+    <arg name="initial_pose_x"          default="0.0" />
+    <arg name="initial_pose_y"          default="0.0" />
+    <arg name="initial_pose_a"          default="0.0" />
+    <arg name="use_wheel_encoders"      default="false" />
+    <arg name="is_indoors"              default="true" />
+    <arg name="start_serial"            default="false" />
+    <arg name="device"                  default="/dev/ttyACM0" />
+    <arg name="use_rviz"                default="true"/>
+    <arg name="run_lidar"               default="false"/>
+    <arg name="controller"              default="pure_pursuit"/>
 
     <!-- Generate waypoints for driving to different gps location-->
     <arg name="waypoints_topic"         default="/outdoor_localization_waypoint"/>
@@ -50,9 +50,6 @@
     </include>
 
     <!-- For generating waypoints based on gps for svea to follow
-    relative waypoints
-    move to svea_example 
-    as well as this launch file
     describe it and means of evaluation
     -->
     <node pkg="svea_examples" type="relative_waypoints.py" name="relative_waypoints" output="screen">
@@ -77,6 +74,7 @@
             <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
             <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
             <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
+            <param name="waypoints_topic"   value="$(arg waypoints_topic)"/>
         </node>
     </group>
 
@@ -84,12 +82,12 @@
     <!-- MPC is not working -->
     <group if="$(eval controller == 'mpc')">
         <node name="state_machine" pkg="svea_core" type="state_machine.py" output="screen">
-            <param name="is_sim"    value="$(arg is_sim)"/>
-            <param name="run_lidar"    value="$(arg run_lidar)"/>
-            <param name="use_rviz"  value="$(arg use_rviz)"/>
-            <param name="initial_pose_x" value="$(arg initial_pose_x)" />
-            <param name="initial_pose_y" value="$(arg initial_pose_y)" />
-            <param name="initial_pose_a" value="$(arg initial_pose_a)" />
+            <param name="is_sim"            value="$(arg is_sim)"/>
+            <param name="run_lidar"         value="$(arg run_lidar)"/>
+            <param name="use_rviz"          value="$(arg use_rviz)"/>
+            <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
+            <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
+            <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
         </node>
     </group>
 
