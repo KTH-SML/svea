@@ -4,9 +4,7 @@
     <!-- Launch file arguments -->
     <arg name="xavier"                  default="false"/>
     <arg name="use_camera"              default="true"/>
-    <arg name="camera"                  default="rs"/>
     <arg name="map_file"                default=""/>
-    <arg name="map_frame"               default="map"/>
     <arg name="wait_for_transform"      default="false"/>
     <arg name="publish_odometry"        default="true"/>
     <arg name="publish_pose"            default="true"/>
@@ -14,13 +12,7 @@
     <arg name="initial_pose_y"          default="0.0" />
     <arg name="initial_pose_a"          default="0.0" />
     <arg name="use_wheel_encoders"      default="false" />
-    <arg name="is_indoors"              default="true" />
-    <arg name="start_serial"            default="false" />
     <arg name="device"                  default="/dev/ttyACM0" />
-    <arg name="use_rviz"                default="true"/>
-    <arg name="run_lidar"               default="false"/>
-    <arg name="controller"              default="pure_pursuit"/>
-    <arg name="is_sim"                  default="false"/>
     <arg name="yaw_offset"              default="0"/>
 
     <!-- Generate waypoints for driving to different gps location-->
@@ -34,7 +26,7 @@
     <include file="$(find svea_sensors)/launch/localize.launch">
         <arg name="xavier"              value="$(arg xavier)"/>
         <arg name="use_camera"          value="$(arg use_camera)"/>
-        <arg name="camera"              value="$(arg camera)"/>
+        <arg name="camera"              value="rs"/>
         <arg name="map_file"            value="$(arg map_file)"/>
         <arg name="map_frame"           value="map"/>
         <arg name="wait_for_transform"  value="$(arg wait_for_transform)"/>
@@ -44,18 +36,15 @@
         <arg name="initial_pose_y"      value="$(arg initial_pose_y)" />
         <arg name="initial_pose_a"      value="$(arg initial_pose_a)" />
         <arg name="use_wheel_encoders"  value="$(arg use_wheel_encoders)" />
-        <arg name="is_indoors"          value="$(arg is_indoors)" />
         <!-- Should be set to true, if only the localization is running (i.e. this is needed in order to have wheel encoders
         and actuation_to_twist working) -->
-        <arg name="start_serial"        value="$(arg start_serial)" />
+        <arg name="start_serial"        value="true" />
         <arg name="device"              value="$(arg device)" />
         <arg name="yaw_offset"          value="$(arg yaw_offset)"/>
 
     </include>
 
-    <!-- For generating waypoints based on gps for svea to follow
-    describe it and means of evaluation
-    -->
+    <!-- For generating waypoints based on gps for svea to follow -->
     <node pkg="svea_examples" type="relative_waypoints.py" name="relative_waypoints" output="screen">
         <param name="waypoints_topic"       value="$(arg waypoints_topic)"/>
         <rosparam subst_value="true">
@@ -74,24 +63,11 @@
     <!-- Start pure_pursuit -->
     <group if="$(eval controller == 'pure_pursuit')">
         <node name="pure_pursuit" pkg="svea_examples" type="pure_pursuit_outdoor.py" output="screen">
-            <param name="is_sim"            value="$(arg is_sim)"/>
+            <param name="is_sim"            value="false"/>
             <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
             <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
             <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
             <param name="waypoints_topic"   value="$(arg waypoints_topic)"/>
-        </node>
-    </group>
-
-    <!-- Start mpc -->
-    <!-- MPC is not working -->
-    <group if="$(eval controller == 'mpc')">
-        <node name="state_machine" pkg="svea_core" type="state_machine.py" output="screen">
-            <param name="is_sim"            value="$(arg is_sim)"/>
-            <param name="run_lidar"         value="$(arg run_lidar)"/>
-            <param name="use_rviz"          value="$(arg use_rviz)"/>
-            <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
-            <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
-            <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
         </node>
     </group>
 

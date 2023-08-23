@@ -19,7 +19,7 @@ from tf.transformations import euler_from_quaternion #, quaternion_from_euler
 ###Transform the gps location into map frame (x,y) based on the starting pose of SVEA###
 ########################################################################################
 
-class generate():
+class relative_waypoints():
     # The coordinates below are 4 points inside the carpark outside of ITRL
     corners = [[59.3508586, 18.0679122],
                [59.3508938, 18.0680175],
@@ -28,7 +28,7 @@ class generate():
 
     def __init__(self):
         # Initalize the node 
-        rospy.init_node("generate_waypoints", anonymous=False)
+        rospy.init_node("relative_waypoints", anonymous=False)
 
         self.waypoint_topic = rospy.get_param("~waypoints_topic", "/outdoor_localization_waypoint")
         self.default_corners = rospy.get_param("~corners", self.corners)
@@ -121,4 +121,4 @@ class generate():
         self.pub_visualization.publish(marker_array)
 
 if __name__ == '__main__':
-    generate().run()
+    relative_waypoints().run()

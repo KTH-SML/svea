@@ -19,9 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   tf2
   tf2_ros
-  aruco_msgs
   tf_conversions
-  cv_camera
 )
 
 ## System dependencies are found with CMake's conventions

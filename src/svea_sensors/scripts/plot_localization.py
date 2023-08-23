@@ -76,7 +76,7 @@ class plot_localization():
 
         fig.show()
 if __name__ == '__main__':
-    rospy.init_node('plot_outdoor_localization', anonymous=False)
+    rospy.init_node('plot_localization', anonymous=False)
     time_start = rospy.Time.now()
     rate = rospy.Rate(10)
     plot_obj = plot_localization()

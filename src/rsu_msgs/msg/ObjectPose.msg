@@ -1,2 +1,0 @@
-geometry_msgs/PoseWithCovariance pose
-Object object

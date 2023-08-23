@@ -30,21 +30,6 @@
     <arg name="yaw_offset"              default="0"/>
     <arg name="port"                    default="/dev/ttyACM0"/>
 
-    <!-- For camera and aruco detection-->
-    <arg name="use_web_camera"          default="false"/>
-    <arg name="camera_info_file"        default="usbc_web_camera.yaml"/>
-    <arg name="image"                   default="/camera/image_raw"/>
-    <arg name="aruco_pose"              default="aruco_pose"/>
-    <arg name="aruco_dict"              default="DICT_4X4_250"/>
-    <arg name="aruco_size"              default="0.365"/>
-    <arg name="aruco_tf_name"           default="aruco"/>
-    <arg name="device_id"               default="1"/> 
-    <arg name="static_gps_fix_topic"    default="static/gps/fix"/>
-    <arg name="odometry_gps_topic"      default="static/odometry/gps"/>
-    <arg name="aruco_pose_topic"        default="aruco_pose"/>
-    <arg name="aruco_id"                default="11"/>    
-    <arg name="pedestrian_demo"         default="false"/>
-
     <!-- Start the stereo camera -->
     <group if="$(arg use_camera)">
         <param name="use_sim_time" value="false"/>
@@ -54,7 +39,6 @@
             <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
             <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
             <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
-            <arg name="pedestrian_demo" value="$(arg pedestrian_demo)"/>
             
         </include>
         <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
@@ -124,8 +108,6 @@
         </node>
         <include file="$(find svea_sensors)/launch/transforms.launch">
             <arg name="xavier"          value="$(arg xavier)"/>
-            <arg name="use_web_camera"  value="$(arg use_web_camera)"/>
-            <arg name="pedestrian_demo" value="$(arg pedestrian_demo)"/>
         </include>
     </group>
 
@@ -159,19 +141,5 @@
         <param name="publish_odometry"      value="$(arg publish_odometry)"/>
         <param name="publish_pose"          value="$(arg publish_pose)"/>
     </node>
-
-    <!-- Use web_camera to detect aruco -->
-    <group if="$(arg use_web_camera)">    
-        <include file="$(find svea_sensors)/launch/camera.launch">
-            <arg name="image"               value="$(arg image)"/>
-            <arg name="camera_info_file"    value="$(arg camera_info_file)"/>
-            <arg name="aruco_pose"          value="$(arg aruco_pose)"/>
-            <arg name="aruco_dict"          value="$(arg aruco_dict)"/>
-            <arg name="aruco_size"          value="$(arg aruco_size)"/>
-            <arg name="aruco_tf_name"       value="$(arg aruco_tf_name)"/>
-            <arg name="device_id"           value="$(arg device_id)"/>
-        </include>
-        <node name="static_aruco_pose" pkg="svea_sensors" type="aruco_pose.py" output="screen"/>
-    </group>
 
 </launch>
