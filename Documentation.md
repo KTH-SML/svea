@@ -22,6 +22,7 @@ To check the covariance and the GPS reading, use
 ```
 rostopic echo /gps/fix
 ```
+The GPS reading is accurate enough when the covariance has a magnitude of less than 1e-4.
 
 The GPS unit does not work well with the 4K Logitech camera and the realsense camera due to interference.
 
@@ -32,10 +33,10 @@ To start the outdoor localization stack, use
 roslaunch svea_sensors localize.launch
 ```
 
-**localize.launch**
+### localize.launch
 
 -   **`use_wheel_encoders`**: Set to be true if you are using svea7. Default: ``. 
--   **`start_serial`**: Must be set to true for wheel encoder. Default: ``.
+-   **`start_serial`**: Must be set to true for motor. Default: ``.
 -   **`is_indoors`**: Must be set to false. Default: ``.
 -   **`device`**: The port where RTK-GPS is. Default:`/dev/GPS`.
 -   **`yaw_offset`**: The offset that define the strating heading of SVEA. 0 when facing East. Default:`0`. 
@@ -52,7 +53,7 @@ Sensor fusion with ArUco marker
 -   **`aruco_pose_topic`**: . Default: ``.
 -   **`aruco_id`**: The aruco id that you will use for detection. Default: ``.
 
-**outdoor_auto.launch**
+### outdoor_auto.launch
 
 Autonomous driving with outdoor localization stack.
 On top of the parameters mentioned above for localize.launch
@@ -63,7 +64,7 @@ On top of the parameters mentioned above for localize.launch
 -   **`marker_topic`**: . Default: ``.
 -   **`gps_odometry_topic`**: . Default: ``.
 
-**pedestrian_demo.launch**
+### pedestrian_demo.launch
 
 Demo for Kista Mobility Day.
 On top of the parameters mentioned above for localize.launch
