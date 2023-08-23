@@ -49,7 +49,12 @@
         <arg name="device"              value="$(arg device)" />
     </include>
 
-    <!-- For generating waypoints based on gps for svea to follow-->
+    <!-- For generating waypoints based on gps for svea to follow
+    relative waypoints
+    move to svea_example 
+    as well as this launch file
+    describe it and means of evaluation
+    -->
     <node pkg="svea_sensors" type="generate_waypoint.py" name="generate_waypoints" output="screen">
         <param name="waypoints_topic"       value="$(arg waypoints_topic)"/>
         <rosparam subst_value="true">
