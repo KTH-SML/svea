@@ -20,6 +20,8 @@
     <arg name="use_rviz"                default="true"/>
     <arg name="run_lidar"               default="false"/>
     <arg name="controller"              default="pure_pursuit"/>
+    <arg name="is_sim"                  default="false"/>
+    <arg name="yaw_offset"              default="0"/>
 
     <!-- Generate waypoints for driving to different gps location-->
     <arg name="waypoints_topic"         default="/outdoor_localization_waypoint"/>
@@ -47,6 +49,8 @@
         and actuation_to_twist working) -->
         <arg name="start_serial"        value="$(arg start_serial)" />
         <arg name="device"              value="$(arg device)" />
+        <arg name="yaw_offset"          value="$(arg yaw_offset)"/>
+
     </include>
 
     <!-- For generating waypoints based on gps for svea to follow
