@@ -52,7 +52,7 @@ def publish_initialpose(state, n=10):
         rate.sleep()
 
 
-class pure_pursuit:
+class outdoor_test:
 
     DELTA_TIME = 0.01
     TRAJ_LEN = 10
@@ -61,7 +61,7 @@ class pure_pursuit:
 
     def __init__(self):
         ## Initialize node
-        rospy.init_node('pure_pursuit')
+        rospy.init_node('outdoor_test')
 
         ## Parameters
         self.POINTS = None
@@ -161,4 +161,4 @@ class pure_pursuit:
 
 if __name__ == '__main__':
     ## Start node ##
-    pure_pursuit().run()
+    outdoor_test().run()

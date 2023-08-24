@@ -27,7 +27,6 @@
     <arg name="device"                  default="/dev/GPS" />
     <arg name="delay"                   default="2.0"/>
     <!-- yaw_offset is set to 0 if the robot is facing East during initialization -->
-    <arg name="yaw_offset"              default="0"/>
     <arg name="port"                    default="/dev/ttyACM0"/>
 
     <!-- Start the stereo camera -->
@@ -130,7 +129,6 @@
         </include>
         <include file="$(find svea_sensors)/launch/navsat.launch">
             <arg name="delay"       value="$(arg delay)"/>
-            <arg name="yaw_offset"  value="$(arg yaw_offset)"/>
         </include>
 
     </group>

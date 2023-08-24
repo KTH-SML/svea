@@ -3,17 +3,12 @@
 
     <!-- Launch file arguments -->
     <arg name="xavier"                  default="false"/>
-    <arg name="use_camera"              default="true"/>
     <arg name="map_file"                default=""/>
-    <arg name="wait_for_transform"      default="false"/>
-    <arg name="publish_odometry"        default="true"/>
-    <arg name="publish_pose"            default="true"/>
     <arg name="initial_pose_x"          default="0.0" />
     <arg name="initial_pose_y"          default="0.0" />
     <arg name="initial_pose_a"          default="0.0" />
     <arg name="use_wheel_encoders"      default="false" />
     <arg name="device"                  default="/dev/ttyACM0" />
-    <arg name="yaw_offset"              default="0"/>
 
     <!-- Generate waypoints for driving to different gps location-->
     <arg name="waypoints_topic"         default="/outdoor_localization_waypoint"/>
@@ -25,13 +20,8 @@
     <!-- Start localization -->
     <include file="$(find svea_sensors)/launch/localize.launch">
         <arg name="xavier"              value="$(arg xavier)"/>
-        <arg name="use_camera"          value="$(arg use_camera)"/>
-        <arg name="camera"              value="rs"/>
         <arg name="map_file"            value="$(arg map_file)"/>
         <arg name="map_frame"           value="map"/>
-        <arg name="wait_for_transform"  value="$(arg wait_for_transform)"/>
-        <arg name="publish_odometry"    value="$(arg publish_odometry)"/>
-        <arg name="publish_pose"        value="$(arg publish_pose)"/>
         <arg name="initial_pose_x"      value="$(arg initial_pose_x)" />
         <arg name="initial_pose_y"      value="$(arg initial_pose_y)" />
         <arg name="initial_pose_a"      value="$(arg initial_pose_a)" />
@@ -40,7 +30,6 @@
         and actuation_to_twist working) -->
         <arg name="start_serial"        value="true" />
         <arg name="device"              value="$(arg device)" />
-        <arg name="yaw_offset"          value="$(arg yaw_offset)"/>
 
     </include>
 
@@ -62,7 +51,7 @@
     
     <!-- Start pure_pursuit -->
     <group if="$(eval controller == 'pure_pursuit')">
-        <node name="pure_pursuit" pkg="svea_examples" type="pure_pursuit_outdoor.py" output="screen">
+        <node name="outdoor_test" pkg="svea_examples" type="outdoor_test.py" output="screen">
             <param name="is_sim"            value="false"/>
             <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
             <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
