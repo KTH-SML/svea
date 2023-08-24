@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-from pyrtcm import RTCMReader, RTCMMessage, datadesc
 from serial import Serial, SerialException
-
 from pyubx2 import (
     UBXReader,
     SET,

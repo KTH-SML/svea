@@ -25,7 +25,6 @@
         <node pkg="tf2_ros" type="static_transform_publisher" name="t265_link_broadcaster"  args="0.09 0 0.215 0 -1.57 3.14 base_link t265_camera_pose_frame" />
         <node pkg="tf2_ros" type="static_transform_publisher" name="t265_odom_broadcaster"  args="0.09 0 0.215 0 -1.57 3.14 odom t265_camera_odom_frame" />
         <node pkg="tf2_ros" type="static_transform_publisher" name="gps_broadcaster"        args="0.215 0 0.215 0 0 0 base_link gps" />
-        <node pkg="tf2_ros" type="static_transform_publisher" name="webcamlink_broadcaster" args="0.345 0 0.250 -1.57 0 -1.57 base_link camera" />
     </group>
 
 </launch>

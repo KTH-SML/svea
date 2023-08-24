@@ -3,5 +3,4 @@
 # on this repository can use this to easily modify the build.
 pyserial
 pyubx2
-pyrtcm
 geopy
