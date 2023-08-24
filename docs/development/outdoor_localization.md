@@ -57,7 +57,7 @@ This launch file is fro starting the navsat_transform_node, which is used to tra
 This launch file is for starting the IMU, statc transforms, actuation_to_twist, EKF local and global. 
 
 ### transforms.launch
-This lauch file is for starting all the required static transform for the SVEA. 
+This lauch file is for starting all the required static transforms for the SVEA. 
 
 ### localize.launch
 This launch file is for starting the rs_odometry.launch, serial_node, wheel_encoder, map, rtk.launch, navsat.launch and odom_to_map. 
@@ -76,7 +76,7 @@ Autonomous driving with outdoor localization stack.
     -   **`corners`**: This parameter contains all the GPS coordinates (List of list that contains the lat, long of each point) that are the target points for the SVEA. To collect the GPS location for the target points, simply start the rtk.launch file, and drive the SVEA to the target positin in the physical environment. Make sure when you collect the GPS location, the rtk has a low covariance (magnitude of 1e-4 or smaller).
     -   **`use_wheel_encoders`**: true if the script is running on SVEA7.
     -   **`initial_pose_x`**, **`initial_pose_y`**, **`initial_pose_a`**: initial pose of SVEA (x,y,theta)
-    -   *Below are for your reference, in most cases, you do not need to change these paramters*
+    -   *Below are for your reference, in most cases, you do not need to change these parameters*
         -   **`waypoints_topic`**: The topic which the target points to form the path are published to. Default: `/outdoor_localization_waypoint`.
         -   **`location_topic`**: The topic that publishes the GPS location of the SVEA. Default: `/gps/filtered`.
         -   **`marker_topic`**: The topic that publishes the visualization markers (The position of the target points and the initial pose of SVEA) in rViz. Default: `/waypoints`.
@@ -93,9 +93,9 @@ Sensor fusion for EKF global. This includes `/odometry/gps`, `/imu/data`, `/actu
     -   **`odom0_pose_rejection_threshold`**: To rejct inaccurate RTK-GPS measurement. If the RTK-GPS measurement is too far away (larger than the threshold) from the current location, the RTK-GPS data will be ignored. If wheel encoder is used, this value can be smaller.
 
 ### rs_ekf.yaml
-Sensor fusion for EKF loval. This includes `/imu/data`, /`actuation_twist`, `/wheel_encoder_twist`.
+Sensor fusion for EKF loval. This includes `/imu/data`, `/actuation_twist`, `/wheel_encoder_twist`.
 -   Notes:
-    -   **`/rs/t265_camera/odom/sample`**: This topic is used for indoor localization, or when the RTK-GPS is not used.
+    -   **`/rs/t265_camera/odom/sample`**: This parameter is used for indoor localization, or when the RTK-GPS is not used.
 
 ## Nodes
 
