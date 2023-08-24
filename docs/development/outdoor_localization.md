@@ -1,10 +1,15 @@
 # Outdoor Localization for SVEA
 
-## Contents
+## Content
+1. [Overview](#overview)
+2. [Usage](#usage)
+3. [Launch files](#launch-files)
+4. [Config files](#config-files)
+5. [Nodes](#nodes)
 
 ## Overview
 
-Description for all the scripts that is related to the outdoor localization stack.
+Description for all the scripts that are related to the outdoor localization stack.
 
 ## Usage
 1. Go to [this document](https://kth.sharepoint.com/:w:/s/ITRL/EQpnEBUVJVdMrDuXIj8IMBUBuqc_rFoeRelxt1d4YaZ71Q?e=Q4i3nz) (only for KTH team members) and copy one of the usersname and password to the rtk.launch file
@@ -80,7 +85,7 @@ Autonomous driving with outdoor localization stack.
     -   **ALWAYS UNPLUG THE REALSENSE CAMERA AND THE 4K LOGITECH CAMERA (THE ONE WITH THE USBC CONNECTION) IF YOU ARE USING THE RTK-GPS**
     -   It might take a few trials before the RTK-GPS connects to the service.
 
-## Config file
+## Config files
 
 ### global_ekf.yaml
 Sensor fusion for EKF global. This includes `/odometry/gps`, `/imu/data`, `/actuation_twist`, `/wheel_encoder_twist`.
@@ -92,7 +97,7 @@ Sensor fusion for EKF loval. This includes `/imu/data`, /`actuation_twist`, `/wh
 -   Notes:
     -   **`/rs/t265_camera/odom/sample`**: This topic is used for indoor localization, or when the RTK-GPS is not used.
 
-## Node
+## Nodes
 
 ### relative_waypoints.py
 This node takes in the target points (in GPS coordinate) and calculates the relative distance between the target points and the initial position of the SVEA, and publishes this points in map frame (x,y) to `/outdoor_localization_waypoint`.
