@@ -7,16 +7,18 @@
 Description for all the scripts that is related to the outdoor localization stack.
 
 ## Usage
-Start the outdoor localization stack wtith  
+1. Go to [this document](https://kth.sharepoint.com/:w:/s/ITRL/EQpnEBUVJVdMrDuXIj8IMBUBuqc_rFoeRelxt1d4YaZ71Q?e=Q4i3nz) (only for KTH team members) and copy one of the usersname and password to the rtk.launch file
+2. Make sure the RTK-GPS is connected, and the realsense camera and 4K Logitech camera with the usb-c connection are disconnected. Ensure the SVEA is connected to the remote controller, so that you can always stop it when needed.
+3. Start the outdoor localization stack with  
 ```
-roslaunch svea_sensors localize.launch
+roslaunch svea_examples outdoor_autonomous_driving.launch device:=<port_location_for_rtk_gps>
 ```
 
 ## Launch files
 ### rtk.launch
-This part is only useful if you would like to run RTK-GPS independently. This launch file is already included in the `localize.launch`.
+This launch file is for starting the RTK-GPS unit.
 
-The RTK-GPS has to be plugged in and run the following to startup
+Run the following to startup:
 ```
 roslaunch svea_sensors rtk.launch device:=<port_location>
 ```
@@ -35,84 +37,68 @@ The GPS reading is accurate enough when the covariance has a magnitude of less t
 -   Notes:
     -   The GPS unit does not work well with the 4K Logitech camera and the realsense camera due to interference.
     -   The GPS must be placed far from the building, trees or other huge obstacles in order to obtain a more accurate reading.
-
-### camera.launch
-
-For starting the web camera
-
-### get_aruco_utm.launch (change to static_utm_transform.launch)
-
+    -   The username and password can be found in [this document](https://kth.sharepoint.com/:w:/s/ITRL/EQpnEBUVJVdMrDuXIj8IMBUBuqc_rFoeRelxt1d4YaZ71Q?e=Q4i3nz) (only for KTH team members).
 
 ### navsat.launch
+This launch file is fro starting the navsat_transform_node, which is used to transform the RTK-GPS location to usable data for EKF global.
+
+-   Notes:
+    -   **`yaw_offset`**: The IMU has a default mapping for cardinal directions, i.e. for our IMU, 0 -> North. The assumption used for the navsat_transform_node is 0 -> East. Thus, this paramter should be set to pi/2. Unless the IMU is changed, you don't need to adjust this parameter.
+
+    -   **`broadcast_utm_transform_as_parent_frame`**: To add the UTM frame as a parent of map frame.
+    -    **`broadcast_utm_transform`**: To add the UTM frame. This parameter has to be set to true in order to use `broadcast_utm_transform_as_parent_frame`.
 
 ### rs_odometry.launch
+This launch file is for starting the IMU, statc transforms, actuation_to_twist, EKF local and global. 
 
 ### transforms.launch
+This lauch file is for starting all the required static transform for the SVEA. 
 
 ### localize.launch
-Starts the sensors, static transforms, the localization node, and the pose transformation node.
+This launch file is for starting the rs_odometry.launch, serial_node, wheel_encoder, map, rtk.launch, navsat.launch and odom_to_map. 
 
 General parameters
 
 -   **`use_wheel_encoders`**: Set to be true if you are using svea7. Default: ``. 
--   **`start_serial`**: Must be set to true for motor. Default: ``.
--   **`is_indoors`**: Must be set to false. Default: ``.
+-   **`start_serial`**: Must be set to true for motor. Default: `false`.
+-   **`is_indoors`**: Must be set to false. Default: `true`.
 -   **`device`**: The port where RTK-GPS is. Default:`/dev/GPS`.
--   **`yaw_offset`**: The offset that define the strating heading of SVEA. 0 when facing East. Default:`0`.
 
-Parameters for sensor fusion with ArUco marker (To be continued)
-
--   **`use_web_camera`**: Set to true if you want to use the web camera on SVEA for aruco detection. Default: ``.
--   **`image`**: . Default: ``.
--   **`aruco_pose`**:. Default: ``.
--   **`aruco_dict`**: . Default: ``.
--   **`aruco_size`**: The width/height of the ArUco marker that you will use. Default: ``.
--   **`aruco_tf_name`**: . Default: ``.
--   **`device_id`**: The port for the video input (check with ```ls /dev```). Default: ``.
--   **`static_gps_fix_topic`**: . Default: ``.
--   **`odometry_gps_topic`**: . Default: ``.
--   **`aruco_pose_topic`**: . Default: ``.
--   **`aruco_id`**: The aruco id that you will use for detection. Default: ``.
-
-### outdoor_autonomous_driving.launch
-
+### outdoor_test.launch
 Autonomous driving with outdoor localization stack.
-On top of the parameters mentioned above for localize.launch
--   **`generate_waypoints`**: Set to true if you want to run the SVEA autonomously with outdoor localization stack. Default: ``.
--   **`waypoints_topic`**: . Default: ``.
--   **`resolution`**: The number of division for each path. Default: ``.
--   **`location_topic`**: . Default: ``.
--   **`marker_topic`**: . Default: ``.
--   **`gps_odometry_topic`**: . Default: ``.
+-   Parameters
+    -   **`resolution`**: The number of division for each path. Default: `10`.
+    -   **`corners`**: This parameter contains all the GPS coordinates (List of list that contains the lat, long of each point) that are the target points for the SVEA. To collect the GPS location for the target points, simply start the rtk.launch file, and drive the SVEA to the target positin in the physical environment. Make sure when you collect the GPS location, the rtk has a low covariance (magnitude of 1e-4 or smaller).
+    -   **`use_wheel_encoders`**: true if the script is running on SVEA7.
+    -   **`initial_pose_x`**, **`initial_pose_y`**, **`initial_pose_a`**: initial pose of SVEA (x,y,theta)
+    -   *Below are for your reference, in most cases, you do not need to change these paramters*
+        -   **`waypoints_topic`**: The topic which the target points to form the path are published to. Default: `/outdoor_localization_waypoint`.
+        -   **`location_topic`**: The topic that publishes the GPS location of the SVEA. Default: `/gps/filtered`.
+        -   **`marker_topic`**: The topic that publishes the visualization markers (The position of the target points and the initial pose of SVEA) in rViz. Default: `/waypoints`.
+        -   **`gps_odometry_topic`**: The topic that publishes the SVEA pose (x,y) in map frame. Default: `/odometry/filtered/global`.
+-   Note:
+    -   **ALWAYS UNPLUG THE REALSENSE CAMERA AND THE 4K LOGITECH CAMERA (THE ONE WITH THE USBC CONNECTION) IF YOU ARE USING THE RTK-GPS**
+    -   It might take a few trials before the RTK-GPS connects to the service.
 
-### pedestrian_demo.launch
-
-Demo for Kista Mobility Day.
-On top of the parameters mentioned above for localize.launch
--   **`pedestrian_demo`**: Set to true if you want to run together with the sidewalk_monility_demo. Default: ``.
--   **`testing_pedestrian_demo`**: . Default: ``.
-
-
-## Yaml file
+## Config file
 
 ### global_ekf.yaml
+Sensor fusion for EKF global. This includes `/odometry/gps`, `/imu/data`, `/actuation_twist`, `/wheel_encoder_twist`.
+-   Parameters
+    -   **`odom0_pose_rejection_threshold`**: To rejct inaccurate RTK-GPS measurement. If the RTK-GPS measurement is too far away (larger than the threshold) from the current location, the RTK-GPS data will be ignored. If wheel encoder is used, this value can be smaller.
 
 ### rs_ekf.yaml
+Sensor fusion for EKF loval. This includes `/imu/data`, /`actuation_twist`, `/wheel_encoder_twist`.
+-   Notes:
+    -   **`/rs/t265_camera/odom/sample`**: This topic is used for indoor localization, or when the RTK-GPS is not used.
 
-### usb_web_camera.yaml
-
-### web_camera.yaml
-
-## Script
+## Node
 
 ### relative_waypoints.py
+This node takes in the target points (in GPS coordinate) and calculates the relative distance between the target points and the initial position of the SVEA, and publishes this points in map frame (x,y) to `/outdoor_localization_waypoint`.
 
-### pure_pursuit_outdoor.py
+### outdoor_test.py
+A node that has a very similar functionalities as the pure_pursuit.py, but it subscribes to `/outdoor_localization_waypoint` and use these points to generate the trajectory for pure pursuit.
 
-### aruco_detect.py
-
-### aruco_pose.py
-
-### pedestrian_location.py
-
-### publish_rsu_msg.py
+### plot_localization.py
+This node is for plotting the SVEA's path recorded by the RTK-GPS and EKF. It is best used for reviewing a rosbag. (Foxglove studio is also useful)

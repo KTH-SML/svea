@@ -97,7 +97,6 @@
             <param name="imu0"                  value="imu/data"/>
             <param name="twist0"                value="actuation_twist"/>
             <param name="twist1"                value="wheel_encoder_twist"/>
-            <param name="pose0"                 value="static/pose"/>
             <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
         </node>
         <node if="$(eval camera == 'zed')" pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">

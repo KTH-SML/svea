@@ -26,6 +26,8 @@
         <arg name="initial_pose_y"      value="$(arg initial_pose_y)" />
         <arg name="initial_pose_a"      value="$(arg initial_pose_a)" />
         <arg name="use_wheel_encoders"  value="$(arg use_wheel_encoders)" />
+        <arg name="is_indoors"          value="false" />
+        
         <!-- Should be set to true, if only the localization is running (i.e. this is needed in order to have wheel encoders
         and actuation_to_twist working) -->
         <arg name="start_serial"        value="true" />

@@ -12,8 +12,6 @@
     <arg name="initial_pose_x" default="0.0" />
     <arg name="initial_pose_y" default="0.0" />
     <arg name="initial_pose_a" default="0.0" />
-    <arg name="use_web_camera"  default="false"/>
-    <arg name="pedestrian_demo" default="false"/>
 
     <!-- IMU -->
     <node ns="imu" name="imu_node" pkg="svea_sensors" type="bno055_i2c_node" respawn="true" respawn_delay="2">
@@ -26,8 +24,6 @@
     <!-- Static transforms for sensors -->
     <include file="$(find svea_sensors)/launch/transforms.launch">
         <arg name="xavier"          value="$(arg xavier)"/>
-        <arg name="use_web_camera"  value="$(arg use_web_camera)"/>
-        <arg name="pedestrian_demo" value="$(arg pedestrian_demo)"/>
     </include>
 
     <!-- RS T265 -->
@@ -91,7 +87,6 @@
         <param name="imu0"                  value="imu/data"/>
         <param name="twist0"                value="actuation_twist"/>
         <param name="twist1"                value="wheel_encoder_twist"/>
-        <param name="pose0"                 value="static/pose"/>
         <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
         <remap from="/set_pose"             to="/global/set_pose"/>
     </node>
