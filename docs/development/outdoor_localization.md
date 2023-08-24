@@ -16,7 +16,7 @@ Description for all the scripts that are related to the outdoor localization sta
 2. Make sure the RTK-GPS is connected, and the realsense camera and 4K Logitech camera with the usb-c connection are disconnected. Ensure the SVEA is connected to the remote controller, so that you can always stop it when needed.
 3. Start the outdoor localization stack with  
 ```
-roslaunch svea_examples outdoor_autonomous_driving.launch device:=<port_location_for_rtk_gps>
+roslaunch svea_examples outdoor_test.launch device:=<port_location_for_rtk_gps>
 ```
 
 ## Launch files
