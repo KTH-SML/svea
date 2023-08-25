@@ -14,6 +14,7 @@ from svea.interfaces import LocalizationInterface
 from svea.controllers.pure_pursuit import PurePursuitController
 from svea.svea_managers.path_following_sveas import SVEAPurePursuit
 from svea.data import TrajDataHandler, RVIZPathHandler
+from std_msgs.msg import Float64MultiArray
 
 
 def load_param(name, value=None):
@@ -51,27 +52,29 @@ def publish_initialpose(state, n=10):
         rate.sleep()
 
 
-class pure_pursuit:
+class outdoor_test:
 
     DELTA_TIME = 0.01
     TRAJ_LEN = 10
-    TARGET_VELOCITY = 1.0
+    TARGET_VELOCITY = 0.5
     RATE = 1e9
 
     def __init__(self):
-
         ## Initialize node
-
-        rospy.init_node('pure_pursuit')
+        rospy.init_node('outdoor_test')
 
         ## Parameters
-
-        self.POINTS = load_param('~points')
+        self.POINTS = None
         self.IS_SIM = load_param('~is_sim', False)
         self.USE_RVIZ = load_param('~use_rviz', False)
-        self.STATE = load_param('~state', [0, 0, 0, 0])
+        self.waypoints_topic = rospy.get_param('~waypoints_topic', '/outdoor_localization_waypoint')        
+        temp_x = rospy.get_param('~initial_pose_x', 0.0)        
+        temp_y = rospy.get_param('~initial_pose_y', 0.0)
+        temp_a = rospy.get_param('~initial_pose_a', 0.0)
+        self.STATE = [temp_x, temp_y, temp_a]
 
-        assert_points(self.POINTS)
+        ## Subscriber
+        rospy.Subscriber(self.waypoints_topic, Float64MultiArray, self.get_pts_callback)
 
         ## Set initial values for node
 
@@ -80,6 +83,9 @@ class pure_pursuit:
         publish_initialpose(state)
 
         # create goal state
+        self.rate = rospy.Rate(10)
+        while self.POINTS is None:
+            self.rate.sleep()
         self.curr = 0
         self.goal = self.POINTS[self.curr]
         xs, ys = self.compute_traj(state)
@@ -109,6 +115,15 @@ class pure_pursuit:
         # everything ready to go -> unpause simulator
         if self.IS_SIM:
             self.simulator.toggle_pause_simulation()
+    
+
+    def get_pts_callback(self, msg):
+        temp = msg.data
+        self.POINTS=[]
+        for count, item in enumerate(temp):
+            if count%2 == 0:
+                self.POINTS.append([item, temp[count+1]])
+        assert_points(self.POINTS)
 
     def run(self):
         while self.keep_alive():
@@ -145,7 +160,5 @@ class pure_pursuit:
 
 
 if __name__ == '__main__':
-
     ## Start node ##
-
-    pure_pursuit().run()
+    outdoor_test().run()

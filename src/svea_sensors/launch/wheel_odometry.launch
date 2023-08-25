@@ -18,5 +18,4 @@
         <param name="encoder_topic" value="$(arg encoder_topic)" />
         <param name="direction_topic" value="$(arg direction_topic)" />
     </node>
-
 </launch>

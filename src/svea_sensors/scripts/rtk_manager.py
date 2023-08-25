@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-from pyrtcm import RTCMReader, RTCMMessage, datadesc
 from serial import Serial, SerialException
-
 from pyubx2 import (
     UBXReader,
     SET,
@@ -29,7 +27,7 @@ __copyright__ = "Copyright 2023, Mustafa Al-Janabi"
 # source https://github.com/KumarRobotics/ublox/blob/master/ublox_msgs/msg/CfgNAV5.msg
 DYN_MODEL_MAP = {
     "portable": 0,
-    "stationary": 1,
+    "stationary": 1,    
     "pedestrian": 3,
     "automotive": 4,
     "sea": 5,
@@ -290,7 +288,7 @@ class RTKManager:
                     # and experimentation shows that the diagonal approximation methods gives
                     # (EE + NN) is approx. (pvt_msg.hAcc / 1e3) ** 2
                     # Ie. the east-east and north-north component add up to the approximated
-                    # diagonal values in the horizontal direction.
+                    # diagonal values horizontally.
                     # DD is almost the same as (pvt_msg.vAcc / 1e3) ** 2 which
                     # means that both methods which approximate the vertical covariance are in agreements.
                     # Of course, the additional benefit of using the NAV-COV message is that we also get

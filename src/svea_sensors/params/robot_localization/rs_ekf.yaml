@@ -4,9 +4,6 @@ sensor_timeout: 0.1
 
 two_d_mode: false
 
-# Future proofing transform timestamp of 0.1 sec
-# Added to solve warning by navsat_transform node 
-# (i.e. "could not retrieve transform from odom to base_link using latest instead")
 transform_time_offset: 0.1
 
 transform_timeout: 0.0
@@ -53,7 +50,6 @@ odom0_nodelay: true
 
 odom0_differential: false
 odom0_relative: true
-
 
 ##########################################
 # BNO055 IMU #############################
