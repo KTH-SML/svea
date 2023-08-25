@@ -28,7 +28,7 @@
     <arg name="delay"                   default="2.0"/>
     <!-- yaw_offset is set to 0 if the robot is facing East during initialization -->
     <arg name="port"                    default="/dev/ttyACM0"/>
-
+  
     <!-- Start the stereo camera -->
     <group if="$(arg use_camera)">
         <param name="use_sim_time" value="false"/>
@@ -38,7 +38,7 @@
             <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
             <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
             <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
-            
+
         </include>
         <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
             <arg name="xavier"  value="$(arg xavier)"/>
@@ -75,7 +75,6 @@
                             0.0,                    0.0,                    0.0, 
                             0.0,                    0.0,                    0.0]
             </rosparam>
-            <rosparam command="load"    file="$(find svea_sensors)/params/robot_localization/initial_state.yaml"/>
             <param name="publish_tf"    value="true"/>
             <param name="odom0"         value="rs/t265_camera/odom/sample"/>
             <param name="imu0"          value="imu/data"/>
@@ -129,7 +128,6 @@
         <include file="$(find svea_sensors)/launch/navsat.launch">
             <arg name="delay"       value="$(arg delay)"/>
         </include>
-
     </group>
 
     <node pkg="svea_sensors" type="odom_to_map" name="odom_to_map" output="screen">

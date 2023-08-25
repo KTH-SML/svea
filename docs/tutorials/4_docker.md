@@ -162,7 +162,7 @@ distribution, not only Ubuntu.
   able to launch your project.
 
     ```
-    > roslunch ...
+    > roslaunch ...
     ```
 
 ---

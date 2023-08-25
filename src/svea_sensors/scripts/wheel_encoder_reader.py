@@ -28,7 +28,7 @@ DEFAULT_LINEAR_COVARIANCE = 0.2
 DEFAULT_ANGULAR_COVARIANCE = 0.4
 
 
-def set_covariance(cov_matrix, linear_covariance, angular_covariance):
+def set_covariance(linear_covariance, angular_covariance):
     """Setup the covariance matrix of the twist message"""
     cov_step = 7
     for i in range(0, len(cov_matrix), cov_step):
@@ -38,8 +38,6 @@ def set_covariance(cov_matrix, linear_covariance, angular_covariance):
             cov_matrix[i] = linear_covariance
         else:
             cov_matrix[i] = angular_covariance 
-
-
 
 def main():
     rospy.init_node('wheel_encoder_reader', anonymous=False)
@@ -61,8 +59,7 @@ def main():
         tcp_nodelay=True)
 
     twist_msg = TwistWithCovarianceStamped()
-    set_covariance(
-        twist_msg.twist.covariance,
+    twist_msg.twist.covariance = set_covariance(
         linear_covariance=encoder_interface.linear_covariance,
         angular_covariance=encoder_interface.angular_covariance,
     )
