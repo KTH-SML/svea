@@ -76,6 +76,7 @@ istrue() {
 REPOSITORY_PATH="$(climb .git)"
 REPOSITORY_NAME="$(basename "$REPOSITORY_PATH")"
 
+CONTAINER_REPOSITORY="docker.io/library"
 BUILD_CONTEXT="$REPOSITORY_PATH"
 BUILD_FILE="$REPOSITORY_PATH/docker/${BUILD_FILE:-Dockerfile}"
 BUILD_IMAGE="ros"
