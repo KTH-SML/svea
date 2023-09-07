@@ -28,7 +28,7 @@ class state_publisher:
         ## Create node resources
 
         # spin rate
-        self.rate = rospy.Rate(SPIN_RATE)
+        self.rate = rospy.Rate(self.SPIN_RATE)
 
         # Visualization tool
         self.rviz = RVIZPathHandler()
