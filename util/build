@@ -22,5 +22,6 @@ istrue DEBUG && fn="echo" || fn="exec"
     --build-arg "BUILD_TAG=$BUILD_TAG" \
     --build-arg "ROSDISTRO=$ROSDISTRO" \
     --build-arg "WORKSPACE=$WORKSPACE" \
+    --build-arg "CONTAINER_REPOSITORY=$CONTAINER_REPOSITORY" \
     "$@"
 
