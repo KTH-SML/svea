@@ -4,3 +4,5 @@
 pyserial
 pyubx2
 geopy
+arducam_config_parser #for Arducam_ros_node.py in arducam_usb2_ros
+ArducamSDK #for Arducam_ros_node.py, ImageConvert.py in arducam_usb2_ros
