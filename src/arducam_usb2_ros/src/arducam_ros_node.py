@@ -136,9 +136,9 @@ def captureImage():
             image = cv2.flip(image, 0)
 
         try:    
-            # img_msg = bridge.cv2_to_imgmsg(image, "bgr8")
+            img_msg = bridge.cv2_to_imgmsg(image, "bgr8")
             # img_msg = bridge.cv2_to_imgmsg(image, "passthrough") #format:4
-            img_msg = bridge.cv2_to_imgmsg(image)
+            # img_msg = bridge.cv2_to_imgmsg(image)
             img_msg.header.stamp = rospy.Time.now()
             img_msg.header.frame_id = id_frame
             pub.publish(img_msg)
