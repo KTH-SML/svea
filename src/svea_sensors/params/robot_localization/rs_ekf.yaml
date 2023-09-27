@@ -76,7 +76,7 @@ gravitational_acceleration: -0.35
 twist0: /actuation_twist
 twist0_config: [false, false, false,
                 false, false, false,
-                true,  false, false,
+                true,  true,  false,
                 false, false, false,
                 false, false, false]
 twist0_nodelay: true
@@ -91,7 +91,7 @@ twist0_queue_size: 8
 twist1: /wheel_encoder_twist
 twist1_config: [false, false, false,
                 false, false, false,
-                true,  false, false,
+                true,  true,  false,
                 false, false, true,
                 false, false, false]
 twist1_nodelay: true
