@@ -122,11 +122,12 @@
 
     <!-- Start GPS if outdoor localization -->
     <group unless="$(arg is_indoors)">
-        <include file="$(find svea_sensors)/launch/rtk.launch">
-            <arg name="device"      value="$(arg device)" />
-        </include>
+        <!-- <include file="$(find svea_sensors)/launch/rtk.launch"> -->
+            <!-- <arg name="device"      value="$(arg device)" /> -->
+        <!-- </include> -->
         <include file="$(find svea_sensors)/launch/navsat.launch">
             <arg name="delay"       value="$(arg delay)"/>
+            <arg name="yaw_offset"       value="$(arg initial_pose_a)"/>
         </include>
     </group>
 
