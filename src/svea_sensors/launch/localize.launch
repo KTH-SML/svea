@@ -9,7 +9,7 @@
     <arg name="xavier"                  default="false"/>
     <arg name="use_camera"              default="true"/>
     <arg name="camera"                  default="rs"/>
-    <arg name="map_file"                default=""/>
+    <arg name="map_file"                default=" "/>
     <arg name="map_frame"               default="map"/>
     <arg name="wait_for_transform"      default="false"/>
     <arg name="publish_odometry"        default="true"/>
@@ -24,7 +24,7 @@
     <!-- Should be set to true, if only the localization is running (i.e. this is needed in order to have wheel encoders
     and actuation_to_twist working) -->
     <arg name="start_serial"            default="false" />
-    <arg name="device"                  default="/dev/GPS" />
+    <arg name="device"                  default="/dev/ttyACM0" />
     <arg name="delay"                   default="2.0"/>
     <arg name="run_rtk"                 default="false"/>
     
