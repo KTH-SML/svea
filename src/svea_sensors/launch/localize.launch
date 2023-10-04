@@ -9,7 +9,7 @@
     <arg name="xavier"                  default="false"/>
     <arg name="use_camera"              default="true"/>
     <arg name="camera"                  default="rs"/>
-    <arg name="map_file"                default=" "/>
+    <arg name="map_file"                default=""/>
     <arg name="map_frame"               default="map"/>
     <arg name="wait_for_transform"      default="false"/>
     <arg name="publish_odometry"        default="true"/>
@@ -130,8 +130,8 @@
             </include>
         </group>
         <include file="$(find svea_sensors)/launch/navsat.launch">
-            <arg name="delay"       value="$(arg delay)"/>
-            <arg name="yaw_offset"       value="$(arg initial_pose_a)"/>
+            <arg name="delay"           value="$(arg delay)"/>
+            <arg name="yaw_offset"      value="$(arg initial_pose_a)"/>
         </include>
     </group>
 
