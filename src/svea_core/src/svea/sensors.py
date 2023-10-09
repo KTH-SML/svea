@@ -215,7 +215,7 @@ class WheelEncoder():
         # Angular velocity
         angular_velocity = (right_wheel_velocity - left_wheel_velocity)
         angular_velocity /= self.axle_track
-        angular_velocity *= direction
+        # angular_velocity *= direction
         self.angular_velocity = angular_velocity
         for cb in self.callbacks:
             cb(self)

@@ -27,9 +27,11 @@ class Republish():
     # assumed max velocity
     # By testing, the max velocity in Gear 0 is around 1.7 m/s.
     # The max velocity in Gear 1 is around 3.6 m/s.
-    MAX_SPEED_0 = 1.7 # [m/s]
-    MAX_SPEED_1 = 3.6 # [m/s]
-    MAX_STEERING_ANGLE = 40*math.pi/180
+    # 2.24 and 4.02 are obtained from web and 45 steering also from web
+    # https://www.bigsquidrc.com/traxxas-trx-4-scale-trail-crawler-review/
+    MAX_SPEED_0 = 1.7 #2.24 #[m/s]
+    MAX_SPEED_1 = 3.6 #4.02 #[m/s]
+    MAX_STEERING_ANGLE = 50*math.pi/180 #40*math.pi/180 #
     VELOCITY_DEAD_ZONE = 15
     TAU0 = 0.1
     TAU1 = 0.4
