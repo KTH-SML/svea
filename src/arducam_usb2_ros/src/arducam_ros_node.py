@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import json
 from ImageConvert import *
+from publish_camera_info import *
 import ArducamSDK
 import arducam_config_parser
 
@@ -15,7 +16,6 @@ from sensor_msgs.msg import Image
 from arducam_usb2_ros.srv import WriteReg, WriteRegResponse
 from arducam_usb2_ros.srv import ReadReg, ReadRegResponse
 from arducam_usb2_ros.srv import Capture, CaptureResponse
-
 
 global cfg,handle,Width,Heigth,color_mode
 cfg = {}
@@ -142,6 +142,7 @@ def captureImage():
             img_msg.header.stamp = rospy.Time.now()
             img_msg.header.frame_id = id_frame
             pub.publish(img_msg)
+            publish_camera_info.publish_msg_camera_info(pub_obj, img_msg.header)
             cv2.waitKey(10)
         except CvBridgeError as e:
             print(e)
@@ -218,6 +219,7 @@ if __name__ == "__main__":
     pub = rospy.Publisher("arducam/camera/image_raw", Image, queue_size=1)
     pub_capture = rospy.Publisher("arducam/captured/camera/image_raw", Image, queue_size=1)
     bridge = CvBridge()
+    pub_obj = publish_camera_info()
     try:
         config_file_name = rospy.get_param("~config_file")
         if not os.path.exists(config_file_name):

@@ -1,11 +1,11 @@
 <launch>
 
-    <group ns="cam0" clear_params="true">
-        <arg name="camera_config" value="MT9V034_VGA_10bit.cfg" /> <!-- Config file in camera_config_files folder of your camera. -->
+    <group ns="camera" clear_params="true">
+        <arg name="camera_config" value="MT9V034_RAW_8b_640x480_64fps.cfg" /> <!-- Config file in camera_config_files folder of your camera. -->
         <arg name="serial_number" value="AU2S-1939-0006" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
         <arg name="horizontal_flip" value="false" /> <!-- Flip image horizontally. -->
         <arg name="vertical_flip" value="true" /> <!-- Flip image vertically. -->
-        <arg name="frame_id" value="cam0" /> <!--Topic frame_id. -->
+        <arg name="frame_id" value="camera" /> <!--Topic frame_id. -->
 
         <node name="arducam_ros_node" pkg="arducam_usb2_ros" type="arducam_ros_node.py" output="screen">
             <param name="config_file" value="$(find arducam_usb2_ros)/camera_config_files/$(arg camera_config)" />
@@ -14,6 +14,8 @@
             <param name="vertical_flip" value="$(arg vertical_flip)" />
             <param name="frame_id" value="$(arg frame_id)" />
         </node>
+        <!-- <node name="publish_camera_info" pkg="arducam_usb2_ros" type="publish_camera_info.py" output="screen"> -->
+        <!-- </node> -->
     </group>
 
 </launch>
