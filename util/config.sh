@@ -5,52 +5,43 @@
 #
 # Author: Kaj Munhoz Arfvidsson
 
+# Set these however you like
+
 ROSDISTRO="noetic"
+WORKSPACE="/svea_ws"
+BUILD_FILE="Dockerfile.base"
 
 main() {
-    if [ "$BUILD_CONFIG" = "base" ]; then
-        BUILD_FILE="Dockerfile.base"
-        BUILD_TAG="ros:$ROSDISTRO"
-        IMAGE_TAG="ghcr.io/kth-sml/svea:$(uname -m)-base"
-    elif [ "$BUILD_CONFIG" = "desktop" ]; then
-        BUILD_FILE="Dockerfile.base"
-        BUILD_TAG="osrf/ros:$ROSDISTRO-desktop"
-        IMAGE_TAG="ghcr.io/kth-sml/svea:$(uname -m)-desktop"
-    fi
 
     REPOSITORY_PATH="$(climb entrypoint)"
     REPOSITORY_NAME="$(basename "$REPOSITORY_PATH")"
 
     BUILD_CONTEXT="$REPOSITORY_PATH"
     BUILD_FILE="$BUILD_CONTEXT/docker/${BUILD_FILE:-"Dockerfile"}"
-    BUILD_TAG="${BUILD_TAG:-"ghcr.io/kth-sml/svea"}"
-    IMAGE_TAG="${IMAGE_TAG:-$REPOSITORY_NAME}"
+    [ "$(basename "$0")" = "build" ] \
+        && BUILD_TAG="${BUILD_TAG:-"ros:$ROSDISTRO"}" \
+	|| BUILD_TAG="${BUILD_TAG:-"ghcr.io/kth-sml/svea"}"
+
+    [ "$(basename "$0")" = "build" ] \
+        && IMAGE_TAG="${IMAGE_TAG:-"ghcr.io/kth-sml/svea"}" \
+        || IMAGE_TAG="${IMAGE_TAG:-"$REPOSITORY_NAME"}"
+
     CONTAINER_NAME="$REPOSITORY_NAME"
 
-    WORKSPACE="/svea_ws"
-    SHRVOL_SRC="$BUILD_CONTEXT/src"
-    SHRVOL_DST="$WORKSPACE/src"
-
-    if istrue DESKTOP; then
-        BUILD_TAG="ghcr.io/kth-sml/svea:$(uname -m)-desktop"
-    fi
+    SHARED_VOLUME="$BUILD_CONTEXT/src:$WORKSPACE/src"
 
     if [ -n "$DEBUG" ]; then
-        if [ -n "$BUILD_CONFIG" ]; then
-            echo ""
-            echo "BUILD_CONFIG=$BUILD_CONFIG"
-        fi
         echo ""
+        echo "ROSDISTRO=$ROSDISTRO"
+        echo "WORKSPACE=$WORKSPACE"
         echo "REPOSITORY_PATH=$REPOSITORY_PATH"
         echo "REPOSITORY_NAME=$REPOSITORY_NAME"
         echo "BUILD_CONTEXT=$BUILD_CONTEXT"
+	echo "BUILD_FILE=$BUILD_FILE"
         echo "BUILD_TAG=$BUILD_TAG"
         echo "IMAGE_TAG=$IMAGE_TAG"
         echo "CONTAINER_NAME=$CONTAINER_NAME"
-        echo "ROSDISTRO=$ROSDISTRO"
-        echo "WORKSPACE=$WORKSPACE"
-        echo "SHRVOL_SRC=$SHRVOL_SRC"
-        echo "SHRVOL_DST=$SHRVOL_DST"
+        echo "SHARED_VOLUME=$SHARED_VOLUME"
         echo
     fi
 }
