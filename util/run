@@ -6,19 +6,12 @@
 #
 # Author: Kaj Munhoz Arfvidsson
 
-
 . "$(dirname "$0")/config.sh"
 
-
 # Setting default arguments
-if [ -z "$*" ]
-then set -- --name "$CONTAINER_NAME" "$IMAGE_TAG"
+if [ -z "$*" ]; then
+    set -- --name "$CONTAINER_NAME" "$IMAGE_TAG"
 fi
-
-
-# enable X11 access if DESKTOP is true
-istrue DESKTOP && ! istrue DEBUG && xhost +local:docker
-
 
 istrue DEBUG && fn="echo" || fn="exec"
 
@@ -28,12 +21,11 @@ istrue DEBUG && fn="echo" || fn="exec"
     -e "DISPLAY" \
     -e "LIBGL_ALWAYS_SOFTWARE=1" \
     -e "QT_X11_NO_MITSHM=1" \
+    -v "/dev:/dev" \
     -v "/tmp/.X11-unix:/tmp/.X11-unix" \
     -v "/etc/localtime:/etc/localtime:ro" \
-    -v "$SHRVOL_SRC:$SHRVOL_DST" \
-    -v "/dev:/dev" \
+    -v "$SHARED_VOLUME" \
     --rm \
     --network host \
     --privileged \
     "$@"
-

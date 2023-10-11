@@ -1,6 +1,13 @@
 # The docker build will install pip packages from this requirements file.
-# Currently it is empty but it exist in case there is a future need. Projects based
-# on this repository can use this to easily modify the build.
+#
+# If you've added a package that has a requirements file then it is 
+# possible to nest requirements, e.g.
+#
+#   -r src/svea_core/requirements.txt
+#
+# You can read more here: https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format
+
+# These are for RTK-GPS
 pyserial
 pyubx2
 geopy
