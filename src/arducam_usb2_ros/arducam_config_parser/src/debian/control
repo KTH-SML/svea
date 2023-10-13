@@ -1,0 +1,13 @@
+Source: arducam-config-parser-dev
+Section: admin
+Priority: optional
+Maintainer: Arducam <support@arducam.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 4.1.2
+Homepage: https://www.arducam.com
+
+Package: arducam-config-parser-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, 
+Description: Arducam config parser SDK
+ This is a C library.

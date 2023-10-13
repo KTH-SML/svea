@@ -1,0 +1,11 @@
+arducam-config-parser-dev (0.1.1-1) groovy; urgency=medium
+
+  * support armv6
+
+ -- Arducam <support@arducam.com>  Tue, 15 Aug 2023 16:53:02 +0800
+
+arducam-config-parser-dev (0.1.1) groovy; urgency=medium
+
+  * Initial release. 
+
+ -- Arducam <support@arducam.com>  Mon, 29 Aug 2022 13:53:29 +0800
