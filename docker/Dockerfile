@@ -20,10 +20,7 @@ RUN apt-get update -y
 
 # This is for any added ROS packages
 COPY src ./src
-RUN rosdep update \
-        --rosdistro $ROSDISTRO \
-        && \
-    rosdep install \
+RUN rosdep install \
         --rosdistro $ROSDISTRO \
         --from-paths src \
         --ignore-src \
