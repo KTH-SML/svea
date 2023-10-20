@@ -5,26 +5,25 @@
 #
 # Author: Kaj Munhoz Arfvidsson
 
-# Set these however you like
-
-ROSDISTRO="noetic"
-WORKSPACE="/svea_ws"
-BUILD_FILE="Dockerfile.base"
+## Uncomment to build base image
+#ROSDISTRO="noetic"
+#BUILD_FILE="Dockerfile.base"
+#BUILD_TAG="ros:$ROSDISTRO"
+#IMAGE_TAG="ghcr.io/kth-sml/svea"
 
 main() {
+
+    ROSDISTRO="${ROSDISTRO:-"noetic"}"
+    WORKSPACE="${WORKSPACE:-"/svea_ws"}"
 
     REPOSITORY_PATH="$(climb entrypoint)"
     REPOSITORY_NAME="$(basename "$REPOSITORY_PATH")"
 
     BUILD_CONTEXT="$REPOSITORY_PATH"
     BUILD_FILE="$BUILD_CONTEXT/docker/${BUILD_FILE:-"Dockerfile"}"
-    [ "$(basename "$0")" = "build" ] \
-        && BUILD_TAG="${BUILD_TAG:-"ros:$ROSDISTRO"}" \
-	|| BUILD_TAG="${BUILD_TAG:-"ghcr.io/kth-sml/svea"}"
+    BUILD_TAG="${BUILD_TAG:-"ghcr.io/kth-sml/svea"}"
 
-    [ "$(basename "$0")" = "build" ] \
-        && IMAGE_TAG="${IMAGE_TAG:-"ghcr.io/kth-sml/svea"}" \
-        || IMAGE_TAG="${IMAGE_TAG:-"$REPOSITORY_NAME"}"
+    IMAGE_TAG="${IMAGE_TAG:-"$REPOSITORY_NAME"}"
 
     CONTAINER_NAME="$REPOSITORY_NAME"
 
@@ -37,7 +36,7 @@ main() {
         echo "REPOSITORY_PATH=$REPOSITORY_PATH"
         echo "REPOSITORY_NAME=$REPOSITORY_NAME"
         echo "BUILD_CONTEXT=$BUILD_CONTEXT"
-	echo "BUILD_FILE=$BUILD_FILE"
+        echo "BUILD_FILE=$BUILD_FILE"
         echo "BUILD_TAG=$BUILD_TAG"
         echo "IMAGE_TAG=$IMAGE_TAG"
         echo "CONTAINER_NAME=$CONTAINER_NAME"

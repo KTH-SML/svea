@@ -1,11 +1,9 @@
 <?xml version="1.0"?>
 <launch>
-
     <!-- Launch file arguments -->
     <arg name="map"             default="floor2"/>
     <arg name="is_sim"          default="true"/>
-    <arg name="use_rviz"        default="true"/>
-    <arg name="remote_rviz"     default="false"/>
+    <arg name="use_foxglove"    default="true"/>
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="initial_pose_x"  default="-2.65488696"/>
     <arg name="initial_pose_y"  default="-1.64422277"/>
@@ -18,7 +16,6 @@
 
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(arg is_sim)">
-
         <!-- Start low-level interface -->
         <node name="serial_node" pkg="rosserial_python" type="serial_node.py">
             <param name="port" value="/dev/ttyACM0"/>
@@ -33,11 +30,14 @@
         </include>
     </group>
 
-    <!-- Start RViz -->
-    <node if="$(eval use_rviz and not remote_rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(find svea_core)/rviz/SVEA_floor2.rviz"/>
+    <!-- Start Foxglove -->
+    <include if="$(eval use_foxglove)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
+        <arg name="port" value="8765" />
+    </include>
+
     <!-- Start pure_pursuit -->
     <node name="pure_pursuit" pkg="svea_examples" type="pure_pursuit.py" output="screen">
-        <param name="use_rviz" value="$(arg use_rviz)"/>
+        <param name="use_rviz" value="$(arg use_foxglove)"/>
         <param name="is_sim" value="$(arg is_sim)"/>
         <!-- Waypoints for floo2 map -->
         <rosparam>
