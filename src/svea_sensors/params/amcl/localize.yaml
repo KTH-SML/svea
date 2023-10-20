@@ -17,7 +17,7 @@ initial_cov_yy: 0.5
 initial_cov_aa: 0.25
 # gui_publish_rate
 # save_pose_rate
-# use_map_topic: true #doesn't matter-https://answers.ros.org/question/238388/explanation-of-use_map_topic-in-amcl/
+# use_map_topic: true 
 # first_map_only
 selective_resampling: true
 

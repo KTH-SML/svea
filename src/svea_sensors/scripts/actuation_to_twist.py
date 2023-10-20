@@ -29,7 +29,6 @@ class Republish():
     # The max velocity in Gear 1 is around 3.6 m/s.
     MAX_SPEED_0 = 1.4 #1.7 # [m/s]
     MAX_SPEED_1 = 3.6 # [m/s]
-    # MAX_STEERING_ANGLE = 40*math.pi/180
     MAX_STEERING_ANGLE = 45*math.pi/180
     VELOCITY_DEAD_ZONE = 23
     TAU0 = 0.1
