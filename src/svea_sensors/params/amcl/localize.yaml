@@ -1,35 +1,46 @@
-laser_max_beams: 50 
-odom_model_type: diff-corrected
-update_min_d: -1
-update_min_a: -1
-transform_tolerance: 0.01
-    
-min_particles: 100
-max_particles: 500
+#Overall filter parameters
+min_particles: 100 
+max_particles: 800
+kld_err: 0.01
+# kld_z:
+update_min_d: 0.01
+update_min_a: 0.01
 resample_interval: 1
-selective_resampling: true
-    
+transform_tolerance: 0.01
+recovery_alpha_slow: 0.001 #0.005
+recovery_alpha_fast: 0.1 #0.005
 initial_pose_x: 0.0
 initial_pose_y: 0.0
 initial_pose_a: 0.0
-initial_cov_xx: 2.0
-initial_cov_yy: 2.0
-initial_cov_aa: 1.0
-    
+initial_cov_xx: 0.5
+initial_cov_yy: 0.5
+initial_cov_aa: 0.25
+# gui_publish_rate
+# save_pose_rate
+# use_map_topic: true 
+# first_map_only
+selective_resampling: true
+
+#Laser model parameters
+# laser_min_range
+# laser_max_range
+laser_max_beams: 50 
+laser_z_hit: 0.85   #likelihood_field only uses z_hit and z_rand (should be sum to 1)
+# laser_z_short: 0.05
+# laser_z_max: 0.05
+laser_z_rand: 0.15
+laser_sigma_hit: 0.1
+laser_lambda_short: 0.2
+laser_likelihood_max_dist: 2.0
+laser_model_type: likelihood_field
+
+#Odometry model parameters
+odom_model_type: diff-corrected
 odom_alpha1: 0.4 # Rot from rot
 odom_alpha2: 0.4 # Rot from trans
 odom_alpha3: 1.6  # Trans from trans
 odom_alpha4: 0.8  # Trans from rot
 #odom_alpha5: 0.2  Side slipp (not used unless odom_model_type is omni)
-    
-laser_model_type: likelihood_field
-laser_sigma_hit: 0.04
-laser_z_hit: 0.8
-laser_z_rand: 0.2
-laser_z_short: 0.05
-laser_z_max: 0.05
-laser_lambda_short: 0.2
-laser_likelihood_max_dist: 2.0
-
-recovery_alpha_slow: 0.0
-revovery_alpha_fast: 0.0
+# odom_frame_id
+# global_frame_id
+# tf_broadcast
