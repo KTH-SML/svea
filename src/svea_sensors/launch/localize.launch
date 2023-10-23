@@ -31,6 +31,21 @@
     <!-- yaw_offset is set to 0 if the robot is facing East during initialization -->
     <arg name="port"                    default="/dev/ttyACM0"/>
   
+    <!-- For camera and aruco detection-->
+    <arg name="use_web_camera"          default="true"/>
+    <!-- <arg name="image"                   default="/camera/image_raw"/>  -->
+    <arg name="image"                   default="/camera/arducam/camera/image_raw"/> 
+    
+    <!-- <arg name="camera_info_file"        default="usbc_web_camera.yaml"/> -->
+    <arg name="camera_info_file"        default="/camera/arducam/camera/camera_info"/>
+    <arg name="aruco_pose"              default="aruco_pose"/>
+    <arg name="aruco_dict"              default="DICT_4X4_250"/>
+    <arg name="aruco_size"              default="0.365"/>
+    <arg name="aruco_tf_name"           default="aruco"/>
+    <arg name="aruco_pose_topic"        default="aruco_pose"/>
+    <arg name="aruco_id"                default="10"/>    
+    <arg name="device_id"               default="2"/> 
+
     <!-- Start the stereo camera -->
     <group if="$(arg use_camera)">
         <param name="use_sim_time" value="false"/>
@@ -84,8 +99,8 @@
             <param name="twist1"        value="wheel_encoder_twist"/>
         </node>
         <!-- Global EKF -->
-        <node unless="$(arg is_indoors)" pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true" output="screen">
-            <rosparam command="load"            file="$(find svea_sensors)/params/robot_localization/global_ekf.yaml"/>
+         <node unless="$(arg is_indoors)" pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true" output="screen">
+           <rosparam command="load"            file="$(find svea_sensors)/params/robot_localization/global_ekf.yaml"/>
             <rosparam subst_value="true">
             initial_state: [$(arg initial_pose_x),  $(arg initial_pose_y),  0.0, 
                             0.0,                    0.0,                    $(arg initial_pose_a), 
@@ -142,4 +157,15 @@
         <param name="publish_pose"          value="$(arg publish_pose)"/>
     </node>
 
+    <!-- <include file="$(find svea_sensors)/launch/camera.launch">
+        <arg name="camera_info_file"    value="$(arg camera_info_file)"/>
+        <arg name="device_id"           value="$(arg device_id)"/>
+    </include> -->
+
+    <node name="aruco_detect" pkg="svea_sensors" type="aruco_detect.py" output="screen"/>
+        <param name="sub_image" value="$(arg image)"/>
+        <param name="camera_info" value="$(arg camera_info_file)"/>
+        <param name="aruco_dict" value="$(arg aruco_dict)"/>
+        <param name="aruco_size" value="$(arg aruco_size)"/>
+        <param name="aruco_tf_name" value="$(arg aruco_tf_name)"/>
 </launch>
