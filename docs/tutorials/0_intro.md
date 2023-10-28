@@ -20,14 +20,14 @@ The SVEA platform consists of the following hardware components:
 
 As described in the diagram above, the TX2 is the main computer where all sensor
 data goes and where all high-level decision+control is made. The TX2 runs NVIDIA's
-JetPack SDK which includes their implementation of Ubuntu 20.04 for ARM.
+JetPack SDK which includes their implementation of Ubuntu 18.04 for ARM.
 
 The original RC remote still works to control the chassis, with some additional
 features added on. In particular, in addition to the RC remote's standard
 features, we have also added a override to the RC remote. By putting the metal
 switch on top of the remote into the most forward position, the Teensy will
-start ignoring any actuation commands from ROS nodes on the TX2 and only listen
-to the RC remote. Thus it's a good idea to always keep the remote around in case
+start ignoring any actuation commands from ROS nodes on the TX2 and **only listen
+to the RC remote**. Thus it's a good idea to always keep the remote around in case
 you need to stop the vehicle from doing something unsafe.
 
 To interface with the vehicle chassis, the TX2 communicates with the Teensy
@@ -54,16 +54,15 @@ For `steering`, this corresponds to a steering range between about 45 degrees
 respectively. The resultant heading change of the vehicle will also be affected
 by whether the front and/or rear differential locks are locked or not. For
 `velocity`, this corresponds to a range between max speed forward and max speed
-backward/braking, respectively. The ESC will decide whether to implemet negative
-velocity or brake based on the previous velocities. The absolute resulting
-velocity mostly depends on what gear the vehicle is in and how discharged the
-battery is. However, you can expect the vehicle to move at speeds between 1.7
-m/s and -1.7 m/s on low gear+full battery and at speeds between 3.6 m/s and -3.6
-m/s on high gear+full
-battery.
+backward/braking, respectively. The Electronic Speed Controller (ESC) will
+decide whether to implemet negative velocity or brake based on the previous
+velocities. The absolute resulting velocity mostly depends on what gear the
+vehicle is in and how discharged the battery is. However, you can expect the
+vehicle to move at speeds between 1.7 m/s and -1.7 m/s on low gear+full battery
+and at speeds between 3.6 m/s and -3.6 m/s on high gear+full battery.
 `trans_diff` can be used to affect what gear the vehicle is in and which
-differetial locks are on. Finally, `ctrl` is a field that is only important when
-receiving reports from the Teensy where it is used to communicate whether:
+differetial locks are on. Finally, `ctrl` is a field that is only important
+when receiving reports from the Teensy where it is used to communicate whether:
 1. the TX2 has been detected by the Teensy to be idle
 2. the RC remote is disconnected
 3. the RC remote is in override mode

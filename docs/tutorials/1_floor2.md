@@ -10,6 +10,9 @@ into walls. However, the quality of your solution is up for you to
 judge. Ultimately, this tutorial is designed for you to start getting your hands
 dirty with your own automated driving system.
 
+If you haven't installed ROS on your system, please checkout our 
+[docker setup](tutorials/4_docker.md).
+
 We will use the Floor 2 example, so please make sure they work before proceeding
 with this tutorial. Check this by running the following without any errors:
 
@@ -18,15 +21,14 @@ roslaunch svea_examples floor2.launch
 ```
 
 This launch file uses the python script called `pure_pursuit.py` which can be
-can be found in `svea/src/svea_examples/scripts`. This python script will be
+can be found in `svea_examples/scripts`. This python script will be
 your starting point for this tutorial.
 
-Before you get started with implementing improvements to the Floor 2 example, you
-should first create your own version of the example that you can edit. You can do
-this by copying `svea/src/svea_examples/launch/floor2.launch` into
-`svea/src/<your project package>/launch/` and
-`svea/src/svea_examples/scripts/pure_pursuit.py` into
-`svea/src/<your project package>/scripts/`.
+Before you get started with implementing improvements to the Floor 2 example,
+you should first create your own version of the example that you can edit. You
+can do this by copying `svea_examples/launch/floor2.launch` into `<your
+project package>/launch/` and `svea_examples/scripts/pure_pursuit.py` into
+`<your project package>/scripts/`.
 
 ## Task 1: Addressing overshoot
 
@@ -73,12 +75,12 @@ these points. We will leave the definition of being "too close" up to you.
 We recommend that you try to visualize these obstacle points to make it
 easier for you to develop this functionality and to make it easier to show
 to others. To make your life easier, there's already a number of visualization
-functions in `svea/src/svea_core/src/svea/simulators/viz_utils.py`.
+functions in `svea_core/src/svea/simulators/viz_utils.py`.
 
 If this is "too easy" for you, then consider the following enhancements:
 
 1. Use the RVIZ "Publish Point" button to create obstacles through the `/clicked_point` ROS topic
-2. Add the walls to the obstacle points by using the map (see `svea/src/svea_core/scripts/plot_map.py` to see how to work with the map)
+2. Add the walls to the obstacle points by using the map (see `svea_core/scripts/plot_map.py` to see how to work with the map)
 
 **Tip**: To find the points you want for your trajectory, you can use the
 "Publish Point" tool in the toolbar of the RVIZ window. If you click on the
