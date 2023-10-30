@@ -37,7 +37,7 @@ To read up on OOP, check out Real Python's
 
 In the instructions below, we describe the system requirements, installation
 process, and run instructions using Docker. If you want to set up this code
-base natively, then check out our [Building the SVEA Stack Natively](https://github.com/KTH-SML/svea/blob/docs/docs/development/native_build.md)
+base natively, then check out our [Building the SVEA Stack Natively](docs/development/native_build.md)
 instructions.
 
 ## Install Docker Engine
