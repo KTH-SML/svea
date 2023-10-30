@@ -11,7 +11,7 @@ judge. Ultimately, this tutorial is designed for you to start getting your hands
 dirty with your own automated driving system.
 
 If you haven't already, please checkout the [installation instructions](../../README.md#installation).
-Then, enter into a Docker container by calling the `util/run` script.
+Then, enter into a Docker container by calling with the `util/run-dev` script.
 
 We will use the Floor 2 example, so please make sure they work before proceeding
 with this tutorial. Check this by running the following without any errors:

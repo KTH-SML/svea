@@ -104,7 +104,7 @@ Start by entering into the installed Docker image by going to the root of `svea`
 and running
 
 ```bash
-util/run
+util/run-dev
 ```
 
 Then, for a simulated, pure pursuit example, call:
@@ -146,6 +146,16 @@ Running the localization amounts to adding `localize.launch` to your project lau
 
 ```xml
 <include file="$(find svea_sensors)/launch/localize.launch"/>
+```
+
+### Using priviliged run script
+
+Instead of using `util/run-dev`, which is intended for development environments
+and simulation, to access all hardware on the real SVEA you must start
+a container with the priviliged run script:
+
+```bash
+util/run
 ```
 
 # Documentation

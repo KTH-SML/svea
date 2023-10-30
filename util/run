@@ -18,12 +18,7 @@ istrue DEBUG && fn="echo" || fn="exec"
 "$fn" docker run \
     -it \
     -e "TERM=xterm-256color" \
-    -e "DISPLAY" \
-    -e "LIBGL_ALWAYS_SOFTWARE=1" \
-    -e "QT_X11_NO_MITSHM=1" \
     -v "/dev:/dev" \
-    -v "/tmp/.X11-unix:/tmp/.X11-unix" \
-    -v "/etc/localtime:/etc/localtime:ro" \
     -v "$SHARED_VOLUME" \
     --rm \
     --network host \
