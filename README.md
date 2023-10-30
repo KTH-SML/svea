@@ -35,35 +35,23 @@ To read up on OOP, check out Real Python's
 
 # Installation
 
-## System Requirements
-This library is developed on and intended for systems running:
+In the instructions below, we describe the system requirements, installation
+process, and run instructions using Docker. If you want to set up this code
+base natively, then check out our [Building the SVEA Stack Natively](docs/development/native_build.md)
+instructions.
 
-1. Ubuntu 20.04 (installation tutorial [here](https://ubuntu.com/tutorials/tutorial-install-ubuntu-desktop#1-overview))
-2. ROS Noetic (installation instructions [here](http://wiki.ros.org/noetic/Installation/Ubuntu))
+## Install Docker Engine
+For the instructions below to work, you need to first install Docker Engine.
 
-If you do not want to install Ubuntu onto your computer, consider installing a
-[virtual machine](https://www.osboxes.org/ubuntu/) or use
-[docker](https://docs.docker.com/install/) with Ubuntu 20.04 images.
+For Windows users, you will need to first install WSL 2 and set it's distribution to
+Ubuntu (either 18 or 20). Use the commands listed [here](https://learn.microsoft.com/en-us/windows/wsl/basic-commands)
+to "Install", "List available Linux distributions", and "Set default WSL Version" to
+Ubuntu 18 or 20.
 
-Install python dependencies by calling:
+To install Docker Engine, follow the instructions for your operating system
+[here](https://docs.docker.com/engine/).
 
-```
-pip install -r requirements.txt
-```
-
-The installation instructions later on will use `catkin build` instead of
-`catkin_make`, so you should also [install catkin tools using apt-get](https://catkin-tools.readthedocs.io/en/latest/installing.html#installing-on-ubuntu-with-apt-get).
-
-If you had a pre-existing ROS Noetic installation, please run:
-
-```bash
-sudo apt update
-sudo apt upgrade
-```
-
-before continuing onto installing the library.
-
-## Installing the library
+## Installing the Docker image
 Start by going to the folder where you want the code to reside.
 For example, choose the home directory or a directory for keeping projects in.
 Once you are in the chosen directory, use the command:
@@ -79,32 +67,23 @@ to download the library. Then, a new directory will appear called
 cd svea
 ```
 
-To install all of the ROS dependencies that you are missing for this library run:
+To install the Docker image containing the entire codebase run:
 
 ```bash
-rosdep install --from-paths src --ignore-src -r -y
+util/build
 ```
 
-Finally, compile and link the libraries using:
+If it all runs without an error, you have installed the Docker image!
 
-```bash
-catkin build
-source devel/setup.bash
-```
+## Installing Foxglove Studio
+Although this code base supports matplotlib and rviz, the main visualization
+tool used is Foxglove Studio. To install Foxglove Studio, follow the instructions
+for your operating system [here](https://foxglove.dev/download)
 
-To make sure the libraries are linked in the future, also call (**you need to replace
-`<path-to-svea>` with the file path to wherever you cloned "svea", e.g.
-`/home/nvidia/svea/devel/setup.bash`**):
-
-```bash
-echo "source <path-to-svea>/devel/setup.bash" >> ~/.bashrc
-source ~/.bashrc
-```
-
-**Note, you only need to do this once.**
+**Note**: alternatively, you can use the Web version of Foxglove Studio which is
+also available from the installation link.
 
 # Usage
-
 The intended workflow with the code base is as follows:
 1. Write new features/software
 2. Debug the new contributions in simulation
@@ -121,20 +100,26 @@ There are pre-written scripts to serve as examples of how to use the
 core library. See and read the source code in
 `svea_examples/scripts`.
 
-For a pure pursuit example, call:
+Start by entering into the installed Docker image by going to the root of `svea`
+and running
 
 ```bash
-roslaunch svea_examples floor2.launch use_rviz:=false
+util/run-dev
 ```
 
-where you should see a matplotlib visualization that looks like:
+Then, for a simulated, pure pursuit example, call:
 
-![purepursuit example](docs/media/purepursuit.png)
+```bash
+roslaunch svea_examples floor2.launch
+```
 
-or you can run with RViz, `use_rviz:=true`, then you should see something that
-looks like:
+Then, open Foxglove Studio natively or in the browser, and on the first prompt
+click "Open connection", then click "Open" with the default settings. Next,
+click on the "Layout" dropdown menu and select "Import from file...". Finally,
+navigate to `svea/foxglove` and select `Floor2 Pure Pursuit.json`. After it
+finishes loading, you should see something that looks like this:
 
-![rviz example](docs/media/floor2_rviz.png)
+![purepursuit_foxglove](docs/media/foxglove_pure_pursuit.png)
 
 Now you are ready to read through the tutorials! You can find them
 [here](https://kth-sml.github.io/svea/tutorials/0_intro).
@@ -163,36 +148,15 @@ Running the localization amounts to adding `localize.launch` to your project lau
 <include file="$(find svea_sensors)/launch/localize.launch"/>
 ```
 
-### RC Remote
+### Using priviliged run script
 
-When the RC remote is not in override mode, it's inputs will still be received by the SVEA platform. This gives you the opportunity to use the remote in your project scripts, whether it's for debugging, data collection, or even imitation learning. The RC input is published to ```/lli/remote```.
-
-### Listening to ROS on another computer
-
-Since you will not be able to drive the SVEA cars with a display plugged in, it
-can be useful to link a computer that does have a display to the SVEA car's ROS
-network. This will let you use [RVIZ](http://wiki.ros.org/rviz) and
-[PlotJuggler](http://wiki.ros.org/plotjuggler) on the computer with a display
-while accessing the data streams on the SVEA car. This amounts to telling the
-computer with a display where the ROS master it should be listening to (in this
-case, it should listen to the ROS master running on the SVEA car) is located on
-the network. We do this with a the SVEA's hostname, e.g. `svea3`. On the SVEA
-car and the computer with a display, run:
+Instead of using `util/run-dev`, which is intended for development environments
+and simulation, to access all hardware on the real SVEA you must start
+a container with the priviliged run script:
 
 ```bash
-# on SVEA
-. <svea_root>/util/remote_ros.sh
-
-# on computer
-. <svea_root>/util/remote_ros.sh <hostname>
+util/run
 ```
-
-You can test if this worked by launching something on the SVEA car in the same terminal where the export commands were run and then calling ```rostopic list``` on the computer with a display in the same terminal where the export commands were run. You should see the topics you expect to be on the SVEA car also available on the computer with a display. If this worked, you have some options for how you want to use it. You can either:
-1. call this script everytime you want to link the SVEA car and the computer with a display togther (the script only links the terminal window you run it in),
-2. add an [alias](https://mijingo.com/blog/creating-bash-aliases) to the end of the SVEA car and the computer's ```~/.bashrc``` to create a new bash command,
-3. you can add the contents of ```remote_ros.sh``` directly to the end of your ```~/.bashrc```,
-
-or some other preferred approach.
 
 # Documentation
 After cloning the repository, you can open the core library's documentation by opening `docs/library/_build/index.html` in your favorite browser.
