@@ -11,7 +11,7 @@ judge. Ultimately, this tutorial is designed for you to start getting your hands
 dirty with your own automated driving system.
 
 If you haven't already, please checkout the [installation instructions](../../README.md#installation).
-Then, enter into a Docker container by calling the `svea/util/run` script.
+Then, enter into a Docker container by calling the `util/run` script.
 
 We will use the Floor 2 example, so please make sure they work before proceeding
 with this tutorial. Check this by running the following without any errors:
@@ -27,7 +27,7 @@ your starting point for this tutorial.
 Before you get started with implementing improvements to the Floor 2 example,
 you should first create your own version of the example that you can edit. You
 can do this by copying `svea_examples/launch/floor2.launch` into `<your
-project package>/launch/` and `svea_examples/scripts/pure_pursuit.py` into
+project package>/launch/floor2.launch` and `svea_examples/scripts/pure_pursuit.py` into
 `<your project package>/scripts/`.
 
 ## Task 1: Addressing overshoot
