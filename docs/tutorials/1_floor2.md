@@ -79,7 +79,7 @@ functions in `svea_core/src/svea/simulators/viz_utils.py`.
 
 If this is "too easy" for you, then consider the following enhancements:
 
-1. Use the Foxglove to "Publish Point" button to create obstacles through the `/clicked_point` ROS topic
+1. Use the Foxglove "Publish Point" button to create obstacles through the `/clicked_point` ROS topic
 2. Add the walls to the obstacle points by using the map (see `svea_core/scripts/plot_map.py` to see how to work with the map)
 
 ## Task 3: Park the vehicle
