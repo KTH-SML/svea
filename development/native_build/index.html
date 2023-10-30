@@ -13,10 +13,6 @@
       
       
       
-        <link rel="prev" href="../..">
-      
-      
-        <link rel="next" href="../1_floor2/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -24,7 +20,7 @@
     
     
       
-        <title>0. Introduction - SVEA</title>
+        <title>Building the SVEA Stack Natively - SVEA</title>
       
     
     
@@ -71,7 +67,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#introduction" class="md-skip">
+        <a href="#building-the-svea-stack-natively" class="md-skip">
           Skip to content
         </a>
       
@@ -107,7 +103,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              0. Introduction
+              Building the SVEA Stack Natively
             
           </span>
         </div>
@@ -200,20 +196,18 @@
       
   
   
-    
-  
   
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -227,7 +221,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Tutorial
@@ -238,29 +232,9 @@
                 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    0. Introduction
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../tutorials/0_intro/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -269,40 +243,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#hardware" class="md-nav__link">
-    Hardware
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#software" class="md-nav__link">
-    Software
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -314,7 +254,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../1_floor2/" class="md-nav__link">
+      <a href="../../tutorials/1_floor2/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -334,7 +274,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../2_lidar_sim/" class="md-nav__link">
+      <a href="../../tutorials/2_lidar_sim/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -354,7 +294,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../3_svea_operation/" class="md-nav__link">
+      <a href="../../tutorials/3_svea_operation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -374,7 +314,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../4_docker/" class="md-nav__link">
+      <a href="../../tutorials/4_docker/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -394,7 +334,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../5_more_docker/" class="md-nav__link">
+      <a href="../../tutorials/5_more_docker/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -457,7 +397,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../development/documentation/" class="md-nav__link">
+      <a href="../documentation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -588,15 +528,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#hardware" class="md-nav__link">
-    Hardware
+  <a href="#system-requirements" class="md-nav__link">
+    System Requirements
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#software" class="md-nav__link">
-    Software
+  <a href="#installing-the-library" class="md-nav__link">
+    Installing the library
   </a>
   
 </li>
@@ -619,110 +559,50 @@
   
 
 
-<h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h1>
-<p>In this tutorial, we will introduce the SVEA hardware and software, and discuss
-some of the organization around the SVEA software stack.</p>
-<h2 id="hardware">Hardware<a class="headerlink" href="#hardware" title="Permanent link">&para;</a></h2>
-<p><img alt="svea hardware" src="../../media/svea_hardware.png" /></p>
-<p>The SVEA platform consists of the following hardware components:</p>
+<h1 id="building-the-svea-stack-natively">Building the SVEA Stack Natively<a class="headerlink" href="#building-the-svea-stack-natively" title="Permanent link">&para;</a></h1>
+<h2 id="system-requirements">System Requirements<a class="headerlink" href="#system-requirements" title="Permanent link">&para;</a></h2>
+<p>This library is developed on and intended for systems running:</p>
 <ol>
-<li><a href="https://www.hokuyo-usa.com/products/lidar-obstacle-detection/ust-10lx">Single-channel LiDAR</a></li>
-<li><a href="https://www.adafruit.com/product/2472">IMU</a></li>
-<li><a href="https://www.intelrealsense.com/tracking-camera-t265/">Stereo tracking camera</a> (outputs only odometry)</li>
-<li><a href="https://traxxas.com/products/landing/trx-4/">RC-vehicle chassis</a></li>
-<li>RC Remote</li>
-<li><a href="https://www.pjrc.com/store/teensy40.html">Teensy arduino</a></li>
-<li>Signal and Power Management Board (SPMB)</li>
-<li><a href="https://developer.nvidia.com/buy-jetson?product=jetson_tx2&amp;location=US">NVIDIA TX2</a></li>
+<li>Ubuntu 20.04 (installation tutorial <a href="https://ubuntu.com/tutorials/tutorial-install-ubuntu-desktop#1-overview">here</a>)</li>
+<li>ROS Noetic (installation instructions <a href="http://wiki.ros.org/noetic/Installation/Ubuntu">here</a>)</li>
 </ol>
-<p>As described in the diagram above, the TX2 is the main computer where all sensor
-data goes and where all high-level decision+control is made. The TX2 runs NVIDIA&rsquo;s
-JetPack SDK which includes their implementation of Ubuntu 18.04 for ARM.</p>
-<p>The original RC remote still works to control the chassis, with some additional
-features added on. In particular, in addition to the RC remote&rsquo;s standard
-features, we have also added a override to the RC remote. By putting the metal
-switch on top of the remote into the most forward position, the Teensy will
-start ignoring any actuation commands from ROS nodes on the TX2 and <strong>only listen
-to the RC remote</strong>. Thus it&rsquo;s a good idea to always keep the remote around in case
-you need to stop the vehicle from doing something unsafe.</p>
-<p>To interface with the vehicle chassis, the TX2 communicates with the Teensy
-arduino, which is connected to and manages the SPMB board. The Teensy&rsquo;s firmware
-provides a ROS interface, dubbed the low-level interface (lli), which can be
-used by other ROS nodes running on the TX2 to actuate the vehicle chassis (the
-motor, servo, transmission, etc.) and to get reports on what is <em>actually</em>
-being actuated on the chassis (it could be the case that the requested actuation
-by a ROS node may not be implemented by the Teensy). A good way to see what the lli
-interface can handle is to look at the <code>lli_ctrl.msg</code>, which is the message that
-is used for both sending commands to and receiving reports from the Teensy:</p>
-<div class="highlight"><pre><span></span><code>int8 steering
-int8 velocity
-int8 trans_diff
-int8 ctrl
+<p>If you do not want to install Ubuntu onto your computer, consider installing a
+<a href="https://www.osboxes.org/ubuntu/">virtual machine</a> or use
+<a href="https://docs.docker.com/install/">docker</a> with Ubuntu 20.04 images.</p>
+<p>Install python dependencies by calling:</p>
+<div class="highlight"><pre><span></span><code>pip install -r requirements.txt
 </code></pre></div>
-<p>Here, <code>steering</code> and <code>velocity</code> do not have the typical units. Instead of [rad]
-and [m/s] both have integer values from 127 to -127.
-For <code>steering</code>, this corresponds to a steering range between about 45 degrees
-(<span class="arithmatex">\(\pi/4\)</span> radians) to the left and -45 degrees (<span class="arithmatex">\(-\pi/4\)</span> radians) to the right,
-respectively. The resultant heading change of the vehicle will also be affected
-by whether the front and/or rear differential locks are locked or not. For
-<code>velocity</code>, this corresponds to a range between max speed forward and max speed
-backward/braking, respectively. The Electronic Speed Controller (ESC) will
-decide whether to implemet negative velocity or brake based on the previous
-velocities. The absolute resulting velocity mostly depends on what gear the
-vehicle is in and how discharged the battery is. However, you can expect the
-vehicle to move at speeds between 1.7 m/s and -1.7 m/s on low gear+full battery
-and at speeds between 3.6 m/s and -3.6 m/s on high gear+full battery.
-<code>trans_diff</code> can be used to affect what gear the vehicle is in and which
-differetial locks are on. Finally, <code>ctrl</code> is a field that is only important
-when receiving reports from the Teensy where it is used to communicate whether:
-1. the TX2 has been detected by the Teensy to be idle
-2. the RC remote is disconnected
-3. the RC remote is in override mode</p>
-<p>Since it&rsquo;s a bit complicated to write controllers that compute steering and
-velocity in a range from [-127, 127] and set the right bit in <code>trans_diff</code> we
-have added methods to the <code>ActuationInterface</code> class in
-<code>svea_core/src/svea/interfaces/actuation.py</code> so you can conveniently affect these
-mechanics. In most cases, the <code>ActuationInterface</code> should satisfy your actuation
-requirements.</p>
-<h2 id="software">Software<a class="headerlink" href="#software" title="Permanent link">&para;</a></h2>
-<p>In general, many of the basic funcions needed on the SVEA platform have
-convenient python interfaces. You can see them in
-<code>svea_core/src/svea/</code>.</p>
-<p>For the SVEA platform&rsquo;s library, we have focused on wrapping ROS-related tasks
-with clean python interface objects. To handle ROS&rsquo; asynchronous nature, we
-always thread the callback functions inside of these interface objects. This
-means that once an interface object has been initialized and started (using a
-method that&rsquo;s always called <code>start()</code>), a callback that is running on a separate
-thread will take data that is communicated via ROS and update an object variable
-that is accessible to the scope where the object was instanstiated. Since each
-of these object&rsquo;s callbacks run on a separate thread, we can run the interface
-objects in the same thread and access all of their data from one script. This
-has many benefits, but the most important ones are:</p>
-<ol>
-<li>We can program/script in the more common Python OOP style, instead of
-   conforming to the traditional rospy style of designing a web of ROS nodes</li>
-<li>We can do a task with a single script</li>
-<li>We only need to debug from a single script</li>
-<li>We can actually use debuggers like <code>pdb</code> in this single script</li>
-<li>We can write this script to look more like how we view problems on a
-   high-level.</li>
-</ol>
-<p>In addition, we have written these python interface objects to be agnostic to
-whether you are running your script in simulation or on the real vehicle. To do
-this, we have designed the simulation environment to match the information
-signals of the actual vehicle. This means that after testing your script in
-simulation, to test it on the real car, you simply need to stop running the
-simulation node and include some hardware-related launch files in your project
-launch. For more details, see the <strong>Going from simulation to real</strong> section in
-the repo&rsquo;s README. Note, even though we have put in the effort to match the
-simulation information signals to the real cars, the real car will still run
-differently than the simulation. This is could be due to the real car&rsquo;s physics
-being different/more rich than our model and low level software phenomenon in
-the Arduino and speed controller firmware that we have deemed both too complex
-and too inconsequential to include in the simulation.</p>
-<p>Instead of taking my word for it, take a look for yourself! In the next
-tutorial, we will guide you through an example where you will adjust a script in
-simulation and then run it on a real vehicle.</p>
+<p>The installation instructions later on will use <code>catkin build</code> instead of
+<code>catkin_make</code>, so you should also <a href="https://catkin-tools.readthedocs.io/en/latest/installing.html#installing-on-ubuntu-with-apt-get">install catkin tools using apt-get</a>.</p>
+<p>If you had a pre-existing ROS Noetic installation, please run:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>upgrade
+</code></pre></div>
+<p>before continuing onto installing the library.</p>
+<h2 id="installing-the-library">Installing the library<a class="headerlink" href="#installing-the-library" title="Permanent link">&para;</a></h2>
+<p>Start by going to the folder where you want the code to reside.
+For example, choose the home directory or a directory for keeping projects in.
+Once you are in the chosen directory, use the command:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/KTH-SML/svea
+</code></pre></div>
+<p>to download the library. Then, a new directory will appear called
+<code>./svea</code>. Go into the directory with command:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>svea
+</code></pre></div>
+<p>To install all of the ROS dependencies that you are missing for this library run:</p>
+<div class="highlight"><pre><span></span><code>rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>--ignore-src<span class="w"> </span>-r<span class="w"> </span>-y
+</code></pre></div>
+<p>Finally, compile and link the libraries using:</p>
+<div class="highlight"><pre><span></span><code>catkin<span class="w"> </span>build
+<span class="nb">source</span><span class="w"> </span>devel/setup.bash
+</code></pre></div>
+<p>To make sure the libraries are linked in the future, also call (<strong>you need to replace
+<code>&lt;path-to-svea&gt;</code> with the file path to wherever you cloned &ldquo;svea&rdquo;, e.g.
+<code>/home/nvidia/svea/devel/setup.bash</code></strong>):</p>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;source &lt;path-to-svea&gt;/devel/setup.bash&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.bashrc
+<span class="nb">source</span><span class="w"> </span>~/.bashrc
+</code></pre></div>
+<p><strong>Note, you only need to do this once.</strong></p>
 
 
 
