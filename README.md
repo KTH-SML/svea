@@ -44,7 +44,7 @@ instructions.
 For the instructions below to work, you need to first install Docker Engine.
 
 For Windows users, you will need to first install WSL 2 and set it's distribution to
-Ubuntu (either 18 or 20). Use the commands listed [here](https://learn.microsoft.com/en-us/windows/wsl/basic-commands#list-available-linux-distributions)
+Ubuntu (either 18 or 20). Use the commands listed [here](https://learn.microsoft.com/en-us/windows/wsl/basic-commands)
 to "Install", "List available Linux distributions", and "Set default WSL Version" to
 Ubuntu 18 or 20.
 
@@ -117,8 +117,7 @@ Then, open Foxglove Studio natively or in the browser, and on the first prompt
 click "Open connection", then click "Open" with the default settings. Next,
 click on the "Layout" dropdown menu and select "Import from file...". Finally,
 navigate to `svea/foxglove` and select `Floor2 Pure Pursuit.json`. After it
-finishes loading, you can click on the "Car Data" tab and you should see
-something that looks like this:
+finishes loading, you should see something that looks like this:
 
 ![purepursuit_foxglove](docs/media/foxglove_pure_pursuit.png)
 
