@@ -4,9 +4,9 @@
 
 Docker is the solution to standardized, reproducible developer environments.
 With its integration, developers do not need to worry about running projects no
-one has touched since forever ago. Now will SVEA also run using docker!
-This new worklow seek to create a an effortless and powerful developer
-experience by combining ROS and docker.
+one has touched since forever ago. Now SVEA will also run using docker! This
+new workflow seeks to create an effortless and powerful developer experience by
+combining ROS and docker.
 
 ## Background
 
@@ -21,7 +21,7 @@ ROS is a large and complex software stack. It is released in "distributions"
 (Kinetic, Melodic, Noetic, …) that are tightly coupled with a targeted OS.
 For instance, ROS Noetic is released on Ubuntu 20.04 and cannot be installed
 on any other Ubuntu version. At writing moment, SVEA requires ROS Noetic. As
-a consequence, the SVEA developer must run Ubuntu 20.04. Beside OS contraints
+a consequence, the SVEA developer must run Ubuntu 20.04. Besides OS constraints
 the installation of ROS and any project dependencies can be highly error prone.
 It is also important to consider how a software environment degenerate over
 time. All of these problems are easily avoided with containerization. Needless
@@ -30,16 +30,21 @@ with no manual configuration at all, using as little as one command…
 
 ## Setup & Workflow
 
+### *Installing Docker*
+
+See the [next page](tutorials/5_more_docker.md).
+
 ### *I'm starting a new project*
 
 **Workflow**
 
-The `svea` repository is a template for new SVEA projects. When starting a
-new project you should go to [`svea`](https://github.com/kth-sml/svea) and click
-"Use this template". When doing so GitHub will copy `svea`, all of its content
-and history, to a new separate repository. This is very similar to forking but
-the difference being that `svea` and your new project will not be linked, i.e.
-`svea` is copied but will not be an "upstream" source you can push to.
+The `svea` repository can be used as a template for new SVEA projects. When
+starting a new project you should go to
+[`svea`](https://github.com/kth-sml/svea) and click "Use this template". When
+doing so GitHub will copy `svea`, all of its content and history, to a new
+separate repository. This is very similar to forking but the difference being
+that `svea` and your new project will not be linked, i.e. `svea` is copied but
+will not be an "upstream" source you can push to.
 
 ```mermaid
 %%{init: {'gitGraph': {'mainBranchName': 'KTH-SML/svea', 'showCommitLabel': false}}}%%
@@ -71,18 +76,15 @@ gitGraph
 
 - Change `README`, `LICENSE`, or `.gitignore` if necessary.
 
-- Add ROS packages in `src`.
+- Add any additional ROS packages in `src` for your project.
 
-- Add python dependencies in `requirements.txt`
+- Add any additional python dependencies in `requirements.txt`.
 
 - Build image (this will take a few minutes depending on your machine) using
 
     ```
-    > DESKTOP=1 util/build
+    > util/build
     ```
-
-    **Note:** You cannot use `DESKTOP=1` on SVEA, it will only work on `amd64`
-    (normal) computers.
 
 - Continue to [I’m ready to start development](#im-ready-to-start-development).
 
@@ -90,20 +92,17 @@ gitGraph
 
 ### *I’m ready to start development*
 
-This workflow allow us to deploy *and* develop inside container. In fact, it
-might be easier for you to develop inside a container as you can work from any
-distribution, not only Ubuntu.
+This workflow allow us to deploy *and* develop inside the container. In fact,
+it might be easier for you to develop inside the container as you can work from
+any distribution, not only Ubuntu.
 
 **Instructions**
 
 - Run a container using
 
     ```
-    > DESKTOP=1 util/run
+    > util/run
     ```
-
-    **Note:** You cannot use `DESKTOP=1` on SVEA, it will only work on `amd64`
-    (normal) computers.
 
 - Do development.
 
