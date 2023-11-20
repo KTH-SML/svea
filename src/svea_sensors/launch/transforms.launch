@@ -27,7 +27,8 @@
         <node pkg="tf2_ros" type="static_transform_publisher" name="t265_link_broadcaster"  args="0.09 0 0.215 0 -1.57 3.14 base_link t265_camera_pose_frame" />
         <node pkg="tf2_ros" type="static_transform_publisher" name="t265_odom_broadcaster"  args="0.09 0 0.215 0 -1.57 3.14 odom t265_camera_odom_frame" />
         <node pkg="tf2_ros" type="static_transform_publisher" name="gpslink_broadcaster"    args="-0.058 -0.015  0.115 0 0 0 base_link gps" />
-        <node pkg="tf2_ros" type="static_transform_publisher" name="cameralink_broadcaster"    args="0.41 0 0.145 -1.57 0 -1.57 base_link camera" />
+        <node pkg="tf2_ros" type="static_transform_publisher" name="cameralink_broadcaster"    args="0.36 0.05 0.225 -1.57 0 -1.57 base_link camera" />  <!-- for e-com-4k -->
+        <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="cameralink_broadcaster"    args="0.41 0 0.145 -1.57 0 -1.57 base_link camera" /> -->
         <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="cameralink_broadcaster"    args="0.41 0 0.2 -1.57 0 -1.57 base_link camera" /> -->
     </group>
 

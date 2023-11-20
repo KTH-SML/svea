@@ -27,12 +27,10 @@ class Republish():
     # assumed max velocity
     # By testing, the max velocity in Gear 0 is around 1.7 m/s.
     # The max velocity in Gear 1 is around 3.6 m/s.
-    # 2.24 and 4.02 are obtained from web and 45 steering also from web
-    # https://www.bigsquidrc.com/traxxas-trx-4-scale-trail-crawler-review/
-    MAX_SPEED_0 = 1.7 #2.24 #[m/s]
-    MAX_SPEED_1 = 3.6 #4.02 #[m/s]
-    MAX_STEERING_ANGLE = 40*math.pi/180 #50*math.pi/180 #
-    VELOCITY_DEAD_ZONE = 15
+    MAX_SPEED_0 = 1.4 #1.7 # [m/s]
+    MAX_SPEED_1 = 3.6 # [m/s]
+    MAX_STEERING_ANGLE = 45*math.pi/180
+    VELOCITY_DEAD_ZONE = 23
     TAU0 = 0.1
     TAU1 = 0.4
 
@@ -81,7 +79,7 @@ class Republish():
             if self._actuation_values.gear is not None:
                 c_ang = self._steer_actuation_to_rad(self._actuation_values.steering)
                 # Apply Bicycyle Model
-                wheelbase = .32 # in meters
+                wheelbase = 0.324 # in meters
                 vel = self.calc_current_velocity()
                 B = math.atan2(math.tan(c_ang), 2)
                 ang_vel = (vel/(wheelbase/2)) * math.sin(B)
@@ -140,7 +138,7 @@ class Republish():
         if self._last_calc_time is not None:
             dt = (time_now - self._last_calc_time).to_sec()
         else:
-            dt = 0.01 #0.1
+            dt = 0.01
         self._last_calc_time = time_now
         if (abs(act_values.velocity) < act_values.valid_range):
             setpoint_velocity = self._vel_actuation_to_mps(act_values.velocity)
@@ -152,7 +150,6 @@ class Republish():
 
     def _sim_esc(self, velocity, target_velocity):
         # simulates esc dynamics
-        #!!!!!!tau = self.tau1 if self._actuation_values.velocity else self.tau0
         tau = self.tau1 if self._actuation_values.gear else self.tau0
         return 1/tau * (target_velocity - velocity)
 
