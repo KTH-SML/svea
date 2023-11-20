@@ -6,7 +6,7 @@
 <launch>
     <!-- Launch file arguments -->
     <arg name="imu_device" default="/dev/i2c-1" />
-    <arg name="imu_adress" default="40" />
+    <arg name="imu_address" default="40" />
     <arg name="imu_frame_id" default="imu" />
 
     <node ns="imu" name="imu_node" pkg="svea_sensors" type="bno055_i2c_node" respawn="true" respawn_delay="2">

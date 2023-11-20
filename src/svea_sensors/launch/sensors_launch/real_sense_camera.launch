@@ -19,7 +19,7 @@
 
     <!-- Launch the RS T265 -->
     <include file="$(find realsense2_camera)/launch/rs_t265.launch">
-        <arg name="publish_odom_tf" value="$(arg rs_publish_odom_tf)"/>
-        <arg name="rs_camera"          value="$(arg t265_camera)"/>
+        <arg name="publish_odom_tf"     value="$(arg rs_publish_odom_tf)"/>
+        <arg name="camera"          value="$(arg rs_camera)"/>
     </include>
 </launch>
