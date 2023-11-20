@@ -20,7 +20,6 @@ find_package(catkin REQUIRED COMPONENTS
   tf2
   tf2_ros
   tf_conversions
-  aruco_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -115,7 +114,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
    INCLUDE_DIRS include
    #LIBRARIES noetic_tf2_ros
-   CATKIN_DEPENDS geometry_msgs nav_msgs svea_msgs robot_localization roscpp rospy tf2 tf2_ros tf_conversions aruco_msgs
+   CATKIN_DEPENDS geometry_msgs nav_msgs svea_msgs robot_localization roscpp rospy tf2 tf2_ros tf_conversions
 #  DEPENDS system_lib
 )
 
