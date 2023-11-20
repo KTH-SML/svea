@@ -7,7 +7,7 @@ from svea.sensors import WheelEncoder
 """ Node for reading a wheel encoder
 """
 
-    
+
 __author__ = "Tobias Bolin"
 __copyright__ = "Copyright 2020, Tobias Bolin"
 __credits__ = ["Tobias Bolin"]
@@ -19,9 +19,9 @@ __status__ = "Development"
 
 
 # Axle track in mm
-DEFAULT_AXLE_TRACK = 201.0 #199.0
+DEFAULT_AXLE_TRACK = 199.0
 # Wheel radius in mm
-DEFAULT_WHEEL_RADIUS = 59.0 #60.0
+DEFAULT_WHEEL_RADIUS = 60.0
 TICKS_PER_REVOLUTION = 60
 
 DEFAULT_LINEAR_COVARIANCE = 0.2

@@ -12,14 +12,8 @@
 
 
     <!-- Start the stereo camera -->
-    <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/localize.launch">
+    <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/rs_odometry.launch">
         <arg name="xavier" value="$(arg xavier)"/>
-        <arg name="camera" value="rs"/>
-        <arg name="start_serial" value="true"/> 
-        <arg name="initial_pose_x" value="0"/> 
-        <arg name="initial_pose_y" value="0"/> 
-        <arg name="initial_pose_a" value="0"/>
-
     </include>
     <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
         <arg name="xavier" value="$(arg xavier)"/>
@@ -31,4 +25,3 @@
     </node>
 
 </launch>
-
