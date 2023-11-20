@@ -10,6 +10,9 @@ into walls. However, the quality of your solution is up for you to
 judge. Ultimately, this tutorial is designed for you to start getting your hands
 dirty with your own automated driving system.
 
+If you haven't already, please checkout the [installation instructions](../../README.md#installation).
+Then, enter into a Docker container by calling with the `util/run-dev` script.
+
 We will use the Floor 2 example, so please make sure they work before proceeding
 with this tutorial. Check this by running the following without any errors:
 
@@ -18,15 +21,14 @@ roslaunch svea_examples floor2.launch
 ```
 
 This launch file uses the python script called `pure_pursuit.py` which can be
-can be found in `svea/src/svea_examples/scripts`. This python script will be
+can be found in `svea_examples/scripts`. This python script will be
 your starting point for this tutorial.
 
-Before you get started with implementing improvements to the Floor 2 example, you
-should first create your own version of the example that you can edit. You can do
-this by copying `svea/src/svea_examples/launch/floor2.launch` into
-`svea/src/<your project package>/launch/` and
-`svea/src/svea_examples/scripts/pure_pursuit.py` into
-`svea/src/<your project package>/scripts/`.
+Before you get started with implementing improvements to the Floor 2 example,
+you should first create your own version of the example that you can edit. You
+can do this by copying `svea_examples/launch/floor2.launch` into `<your
+project package>/launch/floor2.launch` and `svea_examples/scripts/pure_pursuit.py` into
+`<your project package>/scripts/`.
 
 ## Task 1: Addressing overshoot
 
@@ -73,21 +75,30 @@ these points. We will leave the definition of being "too close" up to you.
 We recommend that you try to visualize these obstacle points to make it
 easier for you to develop this functionality and to make it easier to show
 to others. To make your life easier, there's already a number of visualization
-functions in `svea/src/svea_core/src/svea/simulators/viz_utils.py`.
+functions in `svea_core/src/svea/simulators/viz_utils.py`.
 
 If this is "too easy" for you, then consider the following enhancements:
 
-1. Use the RVIZ "Publish Point" button to create obstacles through the `/clicked_point` ROS topic
-2. Add the walls to the obstacle points by using the map (see `svea/src/svea_core/scripts/plot_map.py` to see how to work with the map)
+1. Use the Foxglove "Publish Point" button to create obstacles through the `/clicked_point` ROS topic
+2. Add the walls to the obstacle points by using the map (see `svea_core/scripts/plot_map.py` to see how to work with the map)
 
-**Tip**: To find the points you want for your trajectory, you can use the
-"Publish Point" tool in the toolbar of the RVIZ window. If you click on the
-"Pubilsh Point" button to activate the tool, when you hover around the map,
-you will see the XY coordinate of where your cursor is hovering in the bottom
-of the RVIZ window. If you want to know the heading information of a specific
-point, use the "2D Nav Goal" tool instead. If you open a new terminal and run
-`rostopic echo /move_base_simple/goal`, then when you click using the nav goal
-tool, you will see the data you want.
+## Task 3: Park the vehicle
+
+Currently, the vehicle will continuously goes around the paths until you halt
+the launch or if the vehicle encounters an obstacle (if you completed the previous task).
+In this taks, we'd like you to give the vehicle the ability to stop at a desginated
+location, what we will refer to as a "parking spot".
+
+We recommend you start by adding a point in the trajectory where, if the vehicle
+is close enough, or if no more points come after it, the vehicle will switch
+to being finished. In other words, when `self.svea.is_finished` switches to being `true`.
+Develop an approach that allows the vehicle to park at a good angle.
+
+Similar to the previous task, if this is "too easy" for you, consider the following
+enhancements:
+
+1. Add an angle error tolerance and make sure the vehicle can park within that error tolerance
+2. Combine the approach with the previous task and make sure the vehicle can park even when there are obstacles around the parking spot
 
 ## Testing the solution
 
@@ -95,20 +106,11 @@ Finally, you are ready to try out your initial solution on the real vehicles!
 Also, make sure you have read the "Hardware" section in the introductory tutorial,
 so you understand how the hardware and software are connected to each other.
 
-Then, try linking an external laptop to a real SVEA vehicle's ROS network, by
-following the instructions in the "Listening to ROS on another computer" section
-of the repo's README. Once you have established a connection, place the SVEA
-vehicle in the area you want it to start in and **turn off the motor** by
+Place the SVEA vehicle in the area you want it to start in and **turn off the motor** by
 switching off the ESC. You can try launching the launch file on the SVEA vehicle
-while running an RVIZ client on your laptop. To run the RVIZ client on your
-laptop using the same configuration as the floor2 simulator, from
-`svea_core/rviz/` run:
+while running Foxglove Studio on your laptop.
 
-```bash
-rviz -d SVEA_floor2.rviz
-```
-
-Now, confirm that all the data is publishing to RVIZ as you expect it to. Once,
+Now, confirm that all the data is publishing to Foxglove Studio as you expect it to. Once,
 you have confirmed everything runs as you expect it to, then shutdown the
 launch to try out the controller. If you try turning on the motor before
 shutting down the launch, then, depending on your speed controller

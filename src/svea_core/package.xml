@@ -31,6 +31,7 @@
   <depend>rosserial_python</depend>
   <depend>std_msgs</depend>
   <depend>svea_msgs</depend>
+  <depend>foxglove_bridge</depend>
   <test_depend>rosunit</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->

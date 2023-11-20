@@ -4,23 +4,18 @@
 #
 # Author: Kaj Munhoz Arfvidsson
 
-
 . "$(dirname "$0")/config.sh"
 
-
 # Set default arguments
-if [ -z "$*" ]
-then set -- --tag "$IMAGE_TAG" --file "$BUILD_FILE" "$BUILD_CONTEXT"
+if [ -z "$*" ]; then
+    set -- --tag "$IMAGE_TAG" --file "$BUILD_FILE" "$BUILD_CONTEXT"
 fi
-
 
 istrue DEBUG && fn="echo" || fn="exec"
 
 "$fn" docker build \
     --network host \
-    --build-arg "BUILD_IMAGE=$BUILD_IMAGE" \
     --build-arg "BUILD_TAG=$BUILD_TAG" \
     --build-arg "ROSDISTRO=$ROSDISTRO" \
     --build-arg "WORKSPACE=$WORKSPACE" \
     "$@"
-

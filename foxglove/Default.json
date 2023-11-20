@@ -1,0 +1,138 @@
+{
+  "configById": {
+    "3D!18i6zy7": {
+      "layers": {
+        "845139cb-26bc-40b3-8161-8ab60af4baf5": {
+          "visible": true,
+          "frameLocked": true,
+          "label": "Grid",
+          "instanceId": "845139cb-26bc-40b3-8161-8ab60af4baf5",
+          "layerId": "foxglove.Grid",
+          "size": 15,
+          "divisions": 15,
+          "lineWidth": 1,
+          "color": "#248eff40",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "order": 1
+        }
+      },
+      "cameraState": {
+        "perspective": true,
+        "distance": 15.475618749997148,
+        "phi": 59.99999999999909,
+        "thetaOffset": 44.99999999999991,
+        "targetOffset": [
+          -1.3389763497157556,
+          -0.9583011194752876,
+          1.4108814098981802e-16
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "followTf": "map",
+      "scene": {
+        "enableStats": false,
+        "meshUpAxis": "y_up",
+        "transforms": {
+          "lineWidth": 0
+        }
+      },
+      "transforms": {
+        "frame:laser": {
+          "visible": true
+        },
+        "frame:map": {
+          "visible": true
+        },
+        "frame:odom": {
+          "visible": true
+        },
+        "frame:base_link": {
+          "visible": true
+        }
+      },
+      "topics": {
+        "/map": {
+          "visible": true
+        },
+        "/initialpose": {
+          "visible": false
+        },
+        "/scan": {
+          "visible": false,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/vis_pose": {
+          "visible": true
+        },
+        "/viz_edges": {
+          "visible": true
+        },
+        "/viz_lidar_rays": {
+          "visible": true
+        },
+        "/3D_car": {
+          "visible": true,
+          "color": "#3333ffff",
+          "lineWidth": 0.05
+        },
+        "/past_path": {
+          "visible": true,
+          "lineWidth": 0.05,
+          "gradient": [
+            "#3333ffff",
+            "rgba(124, 107, 255, 0.5)"
+          ]
+        },
+        "/path_plan": {
+          "visible": true,
+          "gradient": [
+            "#66ff8880",
+            "#66ff88ff"
+          ],
+          "lineWidth": 0.1
+        }
+      },
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {}
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": "3D!18i6zy7"
+}

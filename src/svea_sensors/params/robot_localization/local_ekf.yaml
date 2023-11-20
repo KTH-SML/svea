@@ -31,7 +31,7 @@ world_frame: odom           # Defaults to the value of odom_frame if unspecified
 
 ##########################################
 # RS T265 ################################
-odom0: /rs/t265_camera/odom/sample
+odom0: rs/t265_camera/odom/sample
 
 odom0_config: [false, false, false,
                false, false, false,
