@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!--
+    RS T265 odometry launch file
+-->
+
+<launch>
+    <!-- Velocity estimation -->
+    <node pkg="svea_sensors" type="actuation_to_twist.py" name="actuation_to_twist" output="screen"/>
+</launch>
