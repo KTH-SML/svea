@@ -51,6 +51,13 @@ terminal.
 For Ubuntu you can install Docker Engine by following
 [these](https://docs.docker.com/engine/install/ubuntu/) steps.
 
+A quick and easy way (but not recommended) is to run
+```
+sudo util/get-docker
+```
+This will download and run a script that installs Docker Engine for you. Read
+more [here](https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script).
+
 **Installing Docker Desktop**
 
 Since a huge part of the SVEA workflow is to simulate before moving onto

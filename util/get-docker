@@ -1,0 +1,16 @@
+#! /bin/sh
+#
+# Install Docker using the convenience script.
+#
+# This may not be the best way to install Docker. We provide it here as a fast
+# way to get Docker installed on Ubuntu.
+#
+# OBS: You must run this script as root.
+#
+# Author: Kaj Munhoz Arfvidsson
+
+. "$(dirname "$0")/config.sh"
+
+istrue DEBUG && fn="echo" || fn="exec"
+
+"$fn" curl -fsSL https://get.docker.com | sh 
