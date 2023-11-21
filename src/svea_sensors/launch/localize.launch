@@ -25,14 +25,11 @@
     <!-- Lidar  -->
     <arg name="lidar_ip"                default="192.168.3.11" />
 
-    <!-- AMCL -->
-    <!-- use the arguments init_pose_x, init_pose_y, init_pose_a if needed -->
-
     <!-- Wheel encoder -->
     <arg name="start_wheel_encoders"    default="false" />
 
     <!-- GPS -->
-    <arg name="run_rtk"                 default="false"/>
+    <arg name="start_rtk"                 default="false"/>
     <arg name="gps_device"              default="/dev/ttyACM0" />
     <arg name="delay"                   default="2.0"/>
     <!-- yaw offest = initial_pose_a -->
@@ -79,7 +76,7 @@
 
         <!-- Start GPS if outdoor localization -->
         <group unless="$(arg is_indoors)">
-            <group if="$(arg run_rtk)">
+            <group if="$(arg start_rtk)">
                 <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
                     <arg name="gps_device"      value="$(arg gps_device)" />
                 </include>
