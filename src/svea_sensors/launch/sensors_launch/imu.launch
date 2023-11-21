@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+    IMU launch file
+-->
+
+<launch>
+    <!-- Launch file arguments -->
+    <arg name="imu_device" default="/dev/i2c-1" />
+    <arg name="imu_address" default="40" />
+    <arg name="imu_frame_id" default="imu" />
+
+    <node ns="imu" name="imu_node" pkg="svea_sensors" type="bno055_i2c_node" respawn="true" respawn_delay="2">
+        <param name="device"                    value="$(arg imu_device)" />
+        <param name="address"   type="int"      value="$(arg imu_address)"/>
+        <param name="frame_id"  type="string"   value="$(arg imu_frame_id)"/>
+    </node>
+</launch>

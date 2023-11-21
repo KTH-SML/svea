@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+    Hokuyo LIDAR launch file
+-->
+
+<launch>
+    <!-- Launch file arguments -->
+    <arg name="lidar_ip"                    default="192.168.3.11" />
+    <arg name="lidar_frame_id"              default="laser"/>
+    <arg name="lidar_calibrate_time"        default="true"/>
+    <arg name="lidar_publish_intensity"     default="true"/>
+    <arg name="lidar_publish_multiecho"     default="false"/>
+    <arg name="lidar_angle_min"             default="-2.355"/>
+    <arg name="lidar_angle_max"             default="2.355"/>
+
+    <node pkg="urg_node" type="urg_node" name="Hokyoulidar">
+        <param name="ip_address"        value="$(arg lidar_ip)" />
+        <param name="frame_id"          value="$(arg lidar_frame_id)"/>
+        <param name="calibrate_time"    value="$(arg lidar_calibrate_time)"/>
+        <param name="publish_intensity" value="$(arg lidar_publish_intensity)"/>
+        <param name="publish_multiecho" value="$(arg lidar_publish_multiecho)"/>
+        <param name="angle_min"         value="$(arg lidar_angle_min)"/>
+        <param name="angle_max"         value="$(arg lidar_angle_max)"/>
+    </node>
+</launch>

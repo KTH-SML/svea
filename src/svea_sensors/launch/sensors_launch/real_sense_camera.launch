@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+    Real Sense T265 camera launch file
+-->
+
+<launch>
+    <!-- Launch file arguments -->
+    <arg name="rs_camera"                   default="t265_camera"/>
+    <arg name="rs_publish_odom_tf"          default="false" />
+
+    <!-- RS T265 -->
+    <!-- Setings to turn of the SLAM capabilities of the RS T265 -->
+    <rosparam>
+        realsense_camera/tracking_module/enable_relocalization: false
+        realsense_camera/tracking_module/enable_pose_jumping: false
+        realsense_camera/tracking_module/hold_back_imu_for_frames: false
+        realsense_camera/tracking_module/odom_frame_id: "odom"
+    </rosparam>
+
+    <!-- Launch the RS T265 -->
+    <include file="$(find realsense2_camera)/launch/rs_t265.launch">
+        <arg name="publish_odom_tf"     value="$(arg rs_publish_odom_tf)"/>
+        <arg name="camera"          value="$(arg rs_camera)"/>
+    </include>
+</launch>

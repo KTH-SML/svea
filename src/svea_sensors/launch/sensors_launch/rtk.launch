@@ -5,7 +5,7 @@
 
 <launch>
     <!-- RTK RECEIVER ARGUMENTS -->
-    <arg name="device"          default="/dev/ttyACM0"/>
+    <arg name="gps_device"          default="/dev/ttyACM0"/>
     <arg name="baud"            default="250000" />
     <arg name="gps_frame"       default="gps"/>
     <arg name="dynamic_model"   default="portable"/> <!-- Allowed values are "portable", "stationary", "pedestrian","automotive","sea","airborne_1g","airborne_2g", "airborne_4g","wrist_watch", and "bike" -->
@@ -18,7 +18,6 @@
     <arg name="mountpoint"      default="MSM_GNSS"/>
     <arg name="username"        default=""/>
     <arg name="password"        default=""/>
-
     <!-- for rtk2go -->
     <!-- <arg name="host"            default="rtk2go.com"/> -->
     <!-- <arg name="port"            default="2101"/> -->
@@ -30,7 +29,7 @@
 
     <!-- START UBLOX ZED-F9P RTK MANAGER NODE -->
     <node pkg="svea_sensors" type="rtk_manager.py" name="rtk_manager" output="screen" ns="gps">
-        <param name="device"        value="$(arg device)"/>
+        <param name="device"        value="$(arg gps_device)"/>
         <param name="baud"          value="$(arg baud)" />
         <param name="gps_frame"     value="$(arg gps_frame)" />
         <param name="dynamic_model" value="$(arg dynamic_model)"/>

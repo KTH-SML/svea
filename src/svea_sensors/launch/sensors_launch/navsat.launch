@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="delay"           default="2.0" />
+    <arg name="yaw_offset"      default="0" />
+
+    <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
+        <param name="publish_filtered_gps"                              value="true"/>
+        <param name="wait_for_datum"                                    value="false"/>
+        <param name="delay"                                             value="$(arg delay)" />
+        <param name="magnetic_declination_radians"                      value="0"/>
+        <param name="yaw_offset"                                        value="$(arg yaw_offset)"/>
+        <param name="zero_altitude"                                     value="true" />
+        <param name="broadcast_cartesian_transform_as_parent_frame"     value="true"/>
+        <param name="broadcast_cartesian_transform"                     value="true"/>
+        <remap from="/imu/data"                                         to="/imu/data" />
+        <remap from="/gps/fix"                                          to="/gps/fix" />
+        <remap from="/odometry/filtered"                                to="/odometry/filtered/global" />
+    </node> 
+</launch>

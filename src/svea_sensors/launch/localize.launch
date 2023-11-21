@@ -4,129 +4,101 @@
 -->
 
 <launch>
-
     <!-- Launch file arguments -->
-    <arg name="xavier"                  default="false"/>
-    <arg name="use_camera"              default="true"/>
-    <arg name="camera"                  default="rs"/>
+
+    <!-- Main argument -->
+    <arg name="is_sim"                  default="false"/>
+    <arg name="is_indoors"              default="true" />
+    <arg name="initial_pose_x"          default="0.0" />
+    <arg name="initial_pose_y"          default="0.0" />
+    <arg name="initial_pose_a"          default="0.0" />
+
+    <!-- low-level interface (serial) -->
+    <arg name="start_serial"            default="false" /> 
+    <!-- Should be set to true, if only the localization is running 
+    (i.e. this is needed in order to have wheel encoders and actuation_to_twist working) -->
+    <arg name="lli_port"                default="/dev/ttyACM0"/>
+
+    <!-- map server -->
     <arg name="map_file"                default=""/>
+
+    <!-- Lidar  -->
+    <arg name="lidar_ip"                default="192.168.3.11" />
+
+    <!-- Wheel encoder -->
+    <arg name="start_wheel_encoders"    default="false" />
+
+    <!-- GPS -->
+    <arg name="start_rtk"                 default="false"/>
+    <arg name="gps_device"              default="/dev/ttyACM0" />
+    <arg name="delay"                   default="2.0"/>
+    <!-- yaw offest = initial_pose_a -->
+
+    <!-- odom to map node -->
     <arg name="map_frame"               default="map"/>
     <arg name="wait_for_transform"      default="false"/>
     <arg name="publish_odometry"        default="true"/>
     <arg name="publish_pose"            default="true"/>
 
-    <arg name="initial_pose_x"          default="0.0" />
-    <arg name="initial_pose_y"          default="0.0" />
-    <arg name="initial_pose_a"          default="0.0" />
-
-    <arg name="use_wheel_encoders"      default="false" />
-    <arg name="is_indoors"              default="true" />
-    <!-- Should be set to true, if only the localization is running (i.e. this is needed in order to have wheel encoders
-    and actuation_to_twist working) -->
-    <arg name="start_serial"            default="false" />
-    <arg name="device"                  default="/dev/GPS" />
-    <arg name="delay"                   default="2.0"/>
-    <!-- yaw_offset is set to 0 if the robot is facing East during initialization -->
-    <arg name="port"                    default="/dev/ttyACM0"/>
-  
-    <!-- Start the stereo camera -->
-    <group if="$(arg use_camera)">
-        <param name="use_sim_time" value="false"/>
-        <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/rs_odometry.launch">
-            <arg name="xavier"         value="$(arg xavier)"/>
-            <arg name="is_indoors"     value="$(arg is_indoors)"/>
-            <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
-            <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
-            <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
-
-        </include>
-        <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
-            <arg name="xavier"  value="$(arg xavier)"/>
-        </include>
-    </group>
+    <!-- Nodes -->
 
     <!-- Start low-level interface -->
     <group if="$(arg start_serial)">
         <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
-            <param name="port" value="$(arg port)"/>
-            <param name="baud" value="250000" />
+            <param name="lli_port" value="$(arg lli_port)"/>
         </node>
-    </group>
-
-    <!-- Start wheel encoders -->
-    <group if="$(arg use_wheel_encoders)">
-        <include file="$(find svea_sensors)/launch/wheel_odometry.launch" />
-    </group>
-    
-    <!-- Do not start the sensors, useful when running from a bag file -->
-    <group unless="$(arg use_camera)">
-        <param name="use_sim_time" value="true" />
-        <node if="$(eval camera == 'rs')" pkg="robot_localization" type="ekf_localization_node" name="ekf_rs" clear_params="true">
-            <rosparam command="load"    file="$(find svea_sensors)/params/robot_localization/rs_ekf.yaml" />
-            <!-- initial_state: [x,          y,          z, 
-                                 roll,       pitch,      yaw, 
-                                 x_dot,      y_dot,      z_dot, 
-                                 roll_dot,   pitch_dot,  yaw_dot, 
-                                 x_dot_dot,  y_dot_dot,  z_dot_dot]-->
-            <rosparam subst_value="true">
-            initial_state: [$(arg initial_pose_x),  $(arg initial_pose_y),  0.0, 
-                            0.0,                    0.0,                    $(arg initial_pose_a), 
-                            0.0,                    0.0,                    0.0, 
-                            0.0,                    0.0,                    0.0, 
-                            0.0,                    0.0,                    0.0]
-            </rosparam>
-            <param name="publish_tf"    value="true"/>
-            <param name="odom0"         value="rs/t265_camera/odom/sample"/>
-            <param name="imu0"          value="imu/data"/>
-            <param name="twist0"        value="actuation_twist"/>
-            <param name="twist1"        value="wheel_encoder_twist"/>
-        </node>
-        <!-- Global EKF -->
-        <node unless="$(arg is_indoors)" pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true" output="screen">
-            <rosparam command="load"            file="$(find svea_sensors)/params/robot_localization/global_ekf.yaml"/>
-            <rosparam subst_value="true">
-            initial_state: [$(arg initial_pose_x),  $(arg initial_pose_y),  0.0, 
-                            0.0,                    0.0,                    $(arg initial_pose_a), 
-                            0.0,                    0.0,                    0.0, 
-                            0.0,                    0.0,                    0.0, 
-                            0.0,                    0.0,                    0.0]
-            </rosparam>
-            <param name="publish_tf"            value="true"/>
-            <param name="odom0"                 value="odometry/gps"/>
-            <param name="imu0"                  value="imu/data"/>
-            <param name="twist0"                value="actuation_twist"/>
-            <param name="twist1"                value="wheel_encoder_twist"/>
-            <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
-        </node>
-        <node if="$(eval camera == 'zed')" pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
-            <rosparam command="load"    file="$(find svea_sensors)/params/robot_localization/zed_ekf.yaml"/>
-            <param name="imu0"          value="/imu/data"/>
-            <param name="odom0"         value="/zed/zed_node/odom"/>
-        </node>
-        <include file="$(find svea_sensors)/launch/transforms.launch">
-            <arg name="xavier"          value="$(arg xavier)"/>
-        </include>
     </group>
 
     <!-- Start map server -->
-    <node if="$(eval map_file != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
+    <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
 
-    <!-- Start localization (AMCL) -->
-    <node if="$(arg is_indoors)" pkg="amcl" type="amcl" name="amcl_localization" output="screen">
-        <rosparam command="load"        file="$(find svea_sensors)/params/amcl/localize.yaml"/>
-        <param name="scan"              value="scan"/>
-        <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
-        <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
-        <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
-    </node>
+    <!-- start all sensors if this is not a simulation -->
+    <group unless="$(arg is_sim)">
+        <param name="use_sim_time" value="false"/>
+        <group if="$(arg is_indoors)">
+            <!-- Start the Real Sense camera -->
+            <include file="$(find svea_sensors)/launch/sensors_launch/real_sense_camera.launch"></include>
 
-    <!-- Start GPS if outdoor localization -->
-    <group unless="$(arg is_indoors)">
-        <include file="$(find svea_sensors)/launch/rtk.launch">
-            <arg name="device"      value="$(arg device)" />
-        </include>
-        <include file="$(find svea_sensors)/launch/navsat.launch">
-            <arg name="delay"       value="$(arg delay)"/>
+            <!-- Start Lidar -->
+            <include file="$(find svea_sensors)/launch/sensors_launch/lidar.launch">
+                <arg name="lidar_ip"                    value="$(arg lidar_ip)" />
+            </include>
+
+            <!-- Start AMCL -->
+            <node pkg="amcl" type="amcl" name="amcl_localization" output="screen">
+                <rosparam command="load"        file="$(find svea_sensors)/params/amcl/localize.yaml"/>
+                <param name="scan"              value="scan"/>
+                <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
+                <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
+                <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
+            </node>
+        </group>
+
+        <!-- Start GPS if outdoor localization -->
+        <group unless="$(arg is_indoors)">
+            <group if="$(arg start_rtk)">
+                <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
+                    <arg name="gps_device"      value="$(arg gps_device)" />
+                </include>
+            </group>
+            <include file="$(find svea_sensors)/launch/sensors_launch/navsat.launch">
+                <arg name="delay"           value="$(arg delay)"/>
+                <arg name="yaw_offset"      value="$(arg initial_pose_a)"/>
+            </include>
+        </group>
+
+        <!-- Start IMU -->
+        <include file="$(find svea_sensors)/launch/sensors_launch/imu.launch"></include>
+
+        <!-- Start controller -->
+        <include file="$(find svea_sensors)/launch/sensors_launch/controller.launch"></include>
+
+        <!-- Start wheel encoder -->
+        <include if="$(arg start_wheel_encoders)" file="$(find svea_sensors)/launch/sensors_launch/wheel_encoder.launch"></include>
+
+        <!-- Static transforms for sensors -->
+        <include file="$(find svea_sensors)/launch/transforms.launch">
+            <arg name="is_indoors"  value="$(arg is_indoors)"/>
         </include>
     </group>
 
@@ -137,4 +109,54 @@
         <param name="publish_pose"          value="$(arg publish_pose)"/>
     </node>
 
+    <!-- Do not start the sensors, useful when running from a bag file -->
+    <group if="$(arg is_sim)">
+        <param name="use_sim_time"          value="true" />
+    </group>
+
+    <!-- Robot localization (Local EKF)-->
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_local" clear_params="true" output="screen">
+        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/local_ekf.yaml" />
+        <!-- initial_state: [x,          y,          z, 
+                             roll,       pitch,      yaw, 
+                             x_dot,      y_dot,      z_dot, 
+                             roll_dot,   pitch_dot,  yaw_dot, 
+                             x_dot_dot,  y_dot_dot,  z_dot_dot]-->
+        <rosparam subst_value="true">
+        initial_state: [$(arg initial_pose_x),  $(arg initial_pose_y),  0.0, 
+                        0.0,                    0.0,                    $(arg initial_pose_a), 
+                        0.0,                    0.0,                    0.0, 
+                        0.0,                    0.0,                    0.0, 
+                        0.0,                    0.0,                    0.0]
+        </rosparam>
+        <param name="publish_tf"            value="true"/>
+        <param name="odom0"                 value="rs/t265_camera/odom/sample"/>
+        <param name="imu0"                  value="imu/data"/>
+        <param name="twist0"                value="actuation_twist"/>
+        <param name="twist1"                value="wheel_encoder_twist"/>
+    </node>
+
+    <!-- Global EKF -->
+    <node unless="$(arg is_indoors)" pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true" output="screen">
+        <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/global_ekf.yaml"/>
+        <!-- initial_state: [x,          y,          z, 
+                             roll,       pitch,      yaw, 
+                             x_dot,      y_dot,      z_dot, 
+                             roll_dot,   pitch_dot,  yaw_dot, 
+                             x_dot_dot,  y_dot_dot,  z_dot_dot]-->
+        <rosparam subst_value="true">
+        initial_state: [$(arg initial_pose_x),  $(arg initial_pose_y),  0.0, 
+                        0.0,                    0.0,                    $(arg initial_pose_a), 
+                        0.0,                    0.0,                    0.0, 
+                        0.0,                    0.0,                    0.0, 
+                        0.0,                    0.0,                    0.0]
+        </rosparam>
+        <param name="publish_tf"            value="true"/>
+        <param name="odom0"                 value="odometry/gps"/>
+        <param name="imu0"                  value="imu/data"/>
+        <param name="twist0"                value="actuation_twist"/>
+        <param name="twist1"                value="wheel_encoder_twist"/>
+        <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
+        <remap from="/set_pose"             to="/global/set_pose"/>
+    </node>
 </launch>
