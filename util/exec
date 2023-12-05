@@ -1,0 +1,20 @@
+#! /bin/sh
+#
+# Execute a command in a container.
+#
+# This starts a new session inside the container.
+#
+# Author: Kaj Munhoz Arfvidsson
+
+. "$(dirname "$0")/config.sh"
+
+# Setting default arguments
+if [ -z "$*" ]; then
+    set -- "$CONTAINER_NAME" bash
+fi
+
+istrue DEBUG && fn="echo" || fn="exec"
+
+"$fn" docker exec \
+    -it \
+    "$@"
