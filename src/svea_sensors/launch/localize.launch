@@ -89,7 +89,7 @@
         </group>
 
         <!-- Start IMU -->
-        <include file="$(find svea_sensors)/launch/sensors_launch/imu.launch"></include>
+        <!-- <include file="$(find svea_sensors)/launch/sensors_launch/imu.launch"></include> -->
 
         <!-- Start controller -->
         <include file="$(find svea_sensors)/launch/sensors_launch/controller.launch"></include>
@@ -160,4 +160,7 @@
         <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
         <remap from="/set_pose"             to="/global/set_pose"/>
     </node>
+
+    <node name="fixedframestate" pkg="svea_sensors" type="fixedframestate.py" output="screen"/>
+    
 </launch>
