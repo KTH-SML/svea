@@ -11,3 +11,4 @@
 pyserial
 pyubx2
 geopy
+pyproj

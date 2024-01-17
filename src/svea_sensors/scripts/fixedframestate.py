@@ -5,8 +5,8 @@ import tf2_ros
 import numpy as np
 
 from geopy.distance import geodesic
+from pyproj import Proj
 
-from std_msgs.msg import Float64
 from sensor_msgs.msg import NavSatFix
 from svea_msgs.msg import VehicleState
 from geometry_msgs.msg import TransformStamped, Vector3, Quaternion
@@ -18,25 +18,40 @@ class FixedFrameState:
         rospy.init_node('FixedFrameState')
 
         # Subscriber
-        rospy.Subscriber('/gps/filtered', NavSatFix, self.gpsFilteredCallback)
+        rospy.Subscriber('/gps/filtered', NavSatFix, self.GpsFilteredCallback)
 
         # Publisher
-        self.FixedFrameState = rospy.Publisher('/FixedFrameState', VehicleState, queue_size=10)
+        self.FixedFrameState = rospy.Publisher('/fixedgps/state', VehicleState, queue_size=10)
 
         # Fixed GPS latitude, Longitude
-        self.fixed_gps = (59.350791, 18.067825) #ITRL pose
+        self.fixed_gps = rospy.get_param("~fixed_gps", (59.350791, 18.067825))
+        self.show_frame = rospy.get_param("~show_frame", True)
+        # self.fixed_gps = (59.350791, 18.067825) #(latitude, longitude) #ITRL pose
 
         # Transformation
         self.buffer = tf2_ros.Buffer(rospy.Duration(10))
         self.listener = tf2_ros.TransformListener(self.buffer)
         self.br = tf2_ros.TransformBroadcaster()
+        self.static_br = tf2_ros.StaticTransformBroadcaster()
+
+        self.PublishFixedGpsFrame()
 
     def run(self):
         rospy.spin()
 
-    def gpsFilteredCallback(self, msg):
-        filtered_gps = (msg.latitude, msg.longitude)
-        x, y = self.LatLongToXY(filtered_gps)
+    def PublishFixedGpsFrame(self):
+        projection = Proj(proj='utm', zone=34, ellps='WGS84')
+        utm = projection(self.fixed_gps[1], self.fixed_gps[0])
+        FixedGpsFrame = TransformStamped()
+        FixedGpsFrame.header.stamp = rospy.Time.now()
+        FixedGpsFrame.header.frame_id = "utm"
+        FixedGpsFrame.child_frame_id = "Fixed_gps"
+        FixedGpsFrame.transform.translation = Vector3(*[utm[0], utm[1], 0.0])
+        FixedGpsFrame.transform.rotation = Quaternion(*[0.0, 0.0, 0.0, 1.0])
+        self.static_br.sendTransform(FixedGpsFrame)
+    
+    def GpsFilteredCallback(self, msg):
+        x, y = self.LatLongToXY((msg.latitude, msg.longitude))
         self.StateMsg(msg.header, x,y)
 
     def LatLongToXY(self, filtered_gps):
@@ -44,7 +59,6 @@ class FixedFrameState:
 
         bearing = self.CalculateBearing(filtered_gps)
 
-        # Convert bearing and distance to x, y coordinates
         x = distance * np.sin(np.radians(bearing))
         y = distance * np.cos(np.radians(bearing))
 
@@ -68,7 +82,8 @@ class FixedFrameState:
     def StateMsg(self, header, x, y):
         msg = VehicleState()
         msg.header = header
-        msg.child_frame_id = "base_link_fixed"
+        msg.header.frame_id = "Fixed_gps"
+        msg.child_frame_id = "base_link_fixed_gps"
         msg.x = x
         msg.y = y
         msg.yaw = 0 
@@ -79,11 +94,14 @@ class FixedFrameState:
                           0, 0, 0, 0]
         self.FixedFrameState.publish(msg)
 
-        msgT = TransformStamped()
-        msgT.header = header
-        msgT.child_frame_id = "base_link_fixed"
-        msgT.transform.translation = Vector3(*[x,y,0.0])
-        msgT.transform.rotation = Quaternion(*[0.0, 0.0, 0.0, 1.0])
-        self.br.sendTransform(msgT)
+        if self.show_frame:
+            msgT = TransformStamped()
+            msgT.header = header
+            msgT.header.frame_id = "Fixed_gps"
+            msgT.child_frame_id = "base_link_fixed_gps"
+            msgT.transform.translation = Vector3(*[x,y,0.0])
+            msgT.transform.rotation = Quaternion(*[0.0, 0.0, 0.0, 1.0])
+            self.br.sendTransform(msgT)
+
 if __name__ == '__main__':
     FixedFrameState().run()
