@@ -13,3 +13,4 @@ src/.vscode/
 
 venv/
 site/
+rosbag/
