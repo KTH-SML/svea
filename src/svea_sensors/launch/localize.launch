@@ -161,6 +161,13 @@
         <remap from="/set_pose"             to="/global/set_pose"/>
     </node>
 
-    <node name="fixedframestate" pkg="svea_sensors" type="fixedframestate.py" output="screen"/>
+    <node name="reference_gps_frame" pkg="svea_sensors" type="reference_gps_frame.py" output="screen">
+        <rosparam subst_value="true"> 
+            reference_gps: [59.350791, 18.067825]
+        </rosparam>
+    </node>
+
+    <node name="latlong_to_xy" pkg="svea_sensors" type="latlong_to_xy.py" output="screen"/>
+    
     
 </launch>
