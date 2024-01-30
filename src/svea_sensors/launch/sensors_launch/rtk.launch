@@ -16,12 +16,8 @@
     <arg name="port"            default="80"/>  <!-- PORT 8500 is also valid -->
     <arg name="authenticate"    default="true"/>
     <arg name="mountpoint"      default="MSM_GNSS"/>
-    <!-- <arg name="username"        default="ITRL03"/> -->
-    <!-- <arg name="password"        default="171488"/> -->
-    <arg name="username"        default="707886204"/>
-    <arg name="password"        default="115544"/>
-    <!-- <arg name="username"        default="708583036"/> -->
-    <!-- <arg name="password"        default="151515"/> -->
+    <arg name="username"        default=""/>
+    <arg name="password"        default=""/>
 
     
     <!-- for rtk2go -->
