@@ -70,7 +70,7 @@ class latlong_to_xy:
     def StateMsg(self, header, x, y):
         msg = VehicleState()
         msg.header = header
-        msg.header.frame_id = "Reference_gps"
+        msg.header.frame_id = "reference_gps"
         msg.child_frame_id = "base_link_fixed_gps"
         msg.x = x
         msg.y = y
@@ -84,7 +84,7 @@ class latlong_to_xy:
 
         msgT = TransformStamped()
         msgT.header = header
-        msgT.header.frame_id = "Reference_gps"
+        msgT.header.frame_id = "reference_gps"
         msgT.child_frame_id = "base_link_fixed_gps"
         msgT.transform.translation = Vector3(*[x,y,0.0])
         msgT.transform.rotation = Quaternion(*[0.0, 0.0, 0.0, 1.0])
