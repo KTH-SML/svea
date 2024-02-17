@@ -5,11 +5,24 @@
 #
 # Author: Kaj Munhoz Arfvidsson
 
-## Uncomment to build base image
-#ROSDISTRO="noetic"
-#BUILD_FILE="Dockerfile.base"
-#BUILD_TAG="ros:$ROSDISTRO"
-#IMAGE_TAG="ghcr.io/kth-sml/svea:$(uname -m)"
+mach_name() {
+    filename=/etc/nv_tegra_release
+    if [ -f "$filename" ]; then
+        cat "$filename" | \
+            grep -o -e 'R\([0-9]\+\)'  -e 'REVISION: \([.0-9]\+\)' | \
+            sed 's/.*: //' | \
+            xargs | \
+            sed 's/R/r/;s/ /./'
+    else
+        uname -m
+    fi
+}
+
+# Uncomment to build base image
+ROSDISTRO="noetic"
+BUILD_FILE="Dockerfile.base"
+BUILD_TAG="svea_jetson" #"ros:$ROSDISTRO"
+IMAGE_TAG="svea_jetson:$(mach_name)" #"ghcr.io/kth-sml/svea:$(uname -m)"
 
 main() {
 
