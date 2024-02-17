@@ -18,6 +18,21 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 ## Install dependencies from apt-get
 
+# Use pre-installed opencv build
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y equivs && \
+    equivs-control control-file && \
+    sed -i "s/^# Version:\(.*\)/Version: $(opencv_version)/" ./control-file && \
+    sed -i "s/^Package:\(.*\)/Package: libopencv/" ./control-file && \
+    equivs-build ./control-file && \
+    sed -i "s/^Package:\(.*\)/Package: libopencv-dev/" ./control-file && \
+    equivs-build ./control-file && \
+    dpkg -i *.deb && \
+    apt-mark hold libopencv libopencv-dev && \
+    apt-get autoremove -y equivs && \
+    rm ./control-file ./*.deb && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install --no-install-recommends -y \
