@@ -212,6 +212,7 @@ class WheelEncoder():
         # Linear velocity
         self.linear_velocity = (right_wheel_velocity + left_wheel_velocity)/2
         self.linear_velocity *= direction
+        print("linear",self.linear_velocity)
         # Angular velocity
         angular_velocity = (right_wheel_velocity - left_wheel_velocity)
         angular_velocity /= self.axle_track
@@ -225,16 +226,16 @@ class WheelEncoder():
         direction_epsilon = self.tick_to_distance_coefficient * 0.5 # m/s
         if velocity > direction_epsilon:
             self.direction = 1
-        elif velocity < direction_epsilon:
+        elif velocity < -(direction_epsilon):
             self.direction = -1
         else:
-            self.directions = 0
+            self.direction = 0
 
     def _calc_wheel_velocity(self, ticks, time_delta):
         if time_delta == 0:
             return 0
         distance = ticks * self.tick_to_distance_coefficient
-        velocity = (distance/time_delta) * 1e6
+        velocity = (distance/(time_delta/1e3))
         return velocity
 
     def add_callback(self, cb):
