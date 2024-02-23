@@ -154,15 +154,21 @@ class WheelEncoder():
         self.axle_track = axle_track * mm_to_meter
         self.wheel_radius = wheel_radius
         self.ticks_per_revolution = ticks_per_revolution
-        self.tick_to_distance_coefficient = (
-            wheel_radius * tau * mm_to_meter / ticks_per_revolution
-        )
+        self.tick_to_distance_coefficient = (wheel_radius * tau * mm_to_meter / ticks_per_revolution)
+        self.direction_epsilon = self.tick_to_distance_coefficient * 0.5 # m/s
         # Storage fields
         self.direction = 1
         self.linear_velocity = 0.0
         self.angular_velocity = 0.0
         self.r_wheel_velocity = 0.0
         self.l_wheel_velocity = 0.0
+        self.running_average_linear = 0.0
+        self.running_average_angular = 0.0
+        self.right_wheel_velocity = 0.0
+        self.left_wheel_velocity = 0.0
+        self.alpha = 2/(10+1) 
+        self.encoder_time_scale = 1e-6 # in micros
+        self.threshold = 1e-5
         # list of functions to call whenever a new reading comes in
         self.callbacks = []
 
@@ -210,23 +216,29 @@ class WheelEncoder():
             msg.left_time_delta)
         direction = self.direction
         # Linear velocity
-        self.linear_velocity = (right_wheel_velocity + left_wheel_velocity)/2
+        self.right_wheel_velocity = self.alpha*right_wheel_velocity + (1-self.alpha)*self.right_wheel_velocity
+        self.left_wheel_velocity = self.alpha*left_wheel_velocity + (1-self.alpha)*self.left_wheel_velocity
+        self.linear_velocity = (self.right_wheel_velocity + self.left_wheel_velocity)/2
+        self.running_average_linear = self.alpha*self.linear_velocity + (1-self.alpha)*self.running_average_linear
         self.linear_velocity *= direction
-        print("linear",self.linear_velocity)
+        if -self.threshold < self.running_average_linear < self.threshold:
+            self.linear_velocity = 0.0
         # Angular velocity
-        angular_velocity = (right_wheel_velocity - left_wheel_velocity)
-        angular_velocity /= self.axle_track
-        angular_velocity *= direction
-        self.angular_velocity = angular_velocity
+        self.angular_velocity = (self.right_wheel_velocity - self.left_wheel_velocity)/self.axle_track
+        # print(self.right_wheel_velocity, self.left_wheel_velocity)
+        self.running_average_angular = self.alpha*self.angular_velocity + (1-self.alpha)*self.running_average_angular
+        if -self.threshold < self.angular_velocity < self.threshold:
+            self.angular_velocity = 0.0
+        # print("linear",self.linear_velocity, "angular", self.angular_velocity, self.threshold)
+
         for cb in self.callbacks:
             cb(self)
 
     def _process_direction(self, msg):
         velocity = msg.twist.twist.linear.x
-        direction_epsilon = self.tick_to_distance_coefficient * 0.5 # m/s
-        if velocity > direction_epsilon:
+        if velocity > self.direction_epsilon:
             self.direction = 1
-        elif velocity < -(direction_epsilon):
+        elif velocity < -self.direction_epsilon:
             self.direction = -1
         else:
             self.direction = 0
@@ -235,7 +247,7 @@ class WheelEncoder():
         if time_delta == 0:
             return 0
         distance = ticks * self.tick_to_distance_coefficient
-        velocity = (distance/(time_delta/1e3))
+        velocity = (distance/(time_delta * self.encoder_time_scale))
         return velocity
 
     def add_callback(self, cb):
