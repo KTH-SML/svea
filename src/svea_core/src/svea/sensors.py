@@ -215,21 +215,22 @@ class WheelEncoder():
             msg.left_ticks,
             msg.left_time_delta)
         direction = self.direction
-        # Linear velocity
+
         self.right_wheel_velocity = self.alpha*right_wheel_velocity + (1-self.alpha)*self.right_wheel_velocity
         self.left_wheel_velocity = self.alpha*left_wheel_velocity + (1-self.alpha)*self.left_wheel_velocity
+        
+        # Linear velocity
         self.linear_velocity = (self.right_wheel_velocity + self.left_wheel_velocity)/2
         self.running_average_linear = self.alpha*self.linear_velocity + (1-self.alpha)*self.running_average_linear
         self.linear_velocity *= direction
         if -self.threshold < self.running_average_linear < self.threshold:
             self.linear_velocity = 0.0
+
         # Angular velocity
         self.angular_velocity = (self.right_wheel_velocity - self.left_wheel_velocity)/self.axle_track
-        # print(self.right_wheel_velocity, self.left_wheel_velocity)
         self.running_average_angular = self.alpha*self.angular_velocity + (1-self.alpha)*self.running_average_angular
         if -self.threshold < self.angular_velocity < self.threshold:
             self.angular_velocity = 0.0
-        # print("linear",self.linear_velocity, "angular", self.angular_velocity, self.threshold)
 
         for cb in self.callbacks:
             cb(self)
