@@ -94,9 +94,7 @@
         </group>
 
         <!-- Start IMU -->
-        <group if="$(arg start_imu)">
-            <include file="$(find svea_sensors)/launch/sensors_launch/imu.launch"></include>
-        </group>
+        <include if="$(arg start_imu)" file="$(find svea_sensors)/launch/sensors_launch/imu.launch"></include>
 
         <!-- Start controller -->
         <include file="$(find svea_sensors)/launch/sensors_launch/controller.launch"></include>
