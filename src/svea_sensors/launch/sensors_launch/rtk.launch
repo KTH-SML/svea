@@ -5,8 +5,10 @@
 
 <launch>
     <!-- RTK RECEIVER ARGUMENTS -->
-    <arg name="gps_device"          default="/dev/ttyACM0"/>
+    <arg name="gps_device"          default="/dev/ttyACM0"/> 
+    <!-- dev/ttyS0 if connected via UART -->
     <arg name="baud"            default="250000" />
+    <!-- 38400 if connected via UART -->
     <arg name="gps_frame"       default="gps"/>
     <arg name="dynamic_model"   default="portable"/> <!-- Allowed values are "portable", "stationary", "pedestrian","automotive","sea","airborne_1g","airborne_2g", "airborne_4g","wrist_watch", and "bike" -->
 

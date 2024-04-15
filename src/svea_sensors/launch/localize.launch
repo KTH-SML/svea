@@ -29,10 +29,15 @@
     <arg name="start_wheel_encoders"    default="false" />
 
     <!-- GPS -->
-    <arg name="start_rtk"                 default="false"/>
+    <arg name="start_rtk"               default="false"/>
     <arg name="gps_device"              default="/dev/ttyACM0" />
     <arg name="delay"                   default="2.0"/>
+    <arg name="gps_baud"                default="250000" />  <!-- 38400 for UART connection -->
     <!-- yaw offest = initial_pose_a -->
+
+    <!-- IMU -->
+    <!-- Set to true if the imu is connected to tx2. Set to false if the imu is connected to teensy. -->
+    <arg name="start_imu_on_tx2"        default="false"/>
 
     <!-- odom to map node -->
     <arg name="map_frame"               default="map"/>
@@ -80,6 +85,7 @@
             <group if="$(arg start_rtk)">
                 <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
                     <arg name="gps_device"      value="$(arg gps_device)" />
+                    <arg name="baud"            value="$(arg gps_baud)" />
                 </include>
             </group>
             <include file="$(find svea_sensors)/launch/sensors_launch/navsat.launch">
@@ -89,7 +95,7 @@
         </group>
 
         <!-- Start IMU -->
-        <include file="$(find svea_sensors)/launch/sensors_launch/imu.launch"></include>
+        <include if="$(arg start_imu_on_tx2)" file="$(find svea_sensors)/launch/sensors_launch/imu.launch"></include>
 
         <!-- Start controller -->
         <include file="$(find svea_sensors)/launch/sensors_launch/controller.launch"></include>
