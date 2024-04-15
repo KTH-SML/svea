@@ -62,14 +62,14 @@ class RTKManager:
 
     def __init__(self):
         # Read parameters
-        self.device = rospy.get_param("~device", "/dev/ttyACM0")
-        if "/dev/ttyACM" in self.device:
+        self.device = rospy.get_param("~device", "/dev/ttyACM0") #UART: /dev/ttyS0
+        if "/dev/ttyACM" in self.device or "/dev/gps" in self.device:
             self.rateUART1 = 0
             self.rateUSB = 1
         else:
             self.rateUART1 = 1
             self.rateUSB = 0
-        self.baud = rospy.get_param("~baud", 38400)
+        self.baud = rospy.get_param("~baud", 250000) #UART: 38400
         self.frame_id = rospy.get_param("~gps_frame", "gps")
         self.dynamic_model = rospy.get_param("~dynamic_model", "portable")
         # Setup ROS Rate
