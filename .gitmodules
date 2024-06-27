@@ -1,0 +1,3 @@
+[submodule "src/svea_vision"]
+	path = src/svea_vision
+	url = https://github.com/KTH-SML/svea_vision.git
