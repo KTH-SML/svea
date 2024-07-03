@@ -92,6 +92,10 @@
                 <arg name="delay"           value="$(arg delay)"/>
                 <arg name="yaw_offset"      value="$(arg initial_pose_a)"/>
             </include>
+            <!-- Start Lidar -->
+            <include file="$(find svea_sensors)/launch/sensors_launch/lidar.launch">
+                <arg name="lidar_ip"                    value="$(arg lidar_ip)" />
+            </include>
         </group>
 
         <!-- Start IMU -->
