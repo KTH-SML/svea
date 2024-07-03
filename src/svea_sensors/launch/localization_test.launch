@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!-- Args -->
+    <arg name="record"          default="false"/>
+    <arg name="record_visual"   default="false"/>
+    <arg name="rosbag_prefix"   default="/svea_ws/src/ismir_data" />
+    <arg name="gps_device"      default="/dev/ttyACM1"/>
+    <arg name="gps_auth_alt"    default="false"/>
+    <arg name="initial_pose_a"  default="0.0"/>
+
+    <!-- ZED Camera Args -->
+    <arg name="zed_base_frame"  default="base_link"/>
+    <arg name="zed_cam_pos_x"   default="0.4"/>
+    <arg name="zed_cam_pos_y"   default="0.0"/>
+    <arg name="zed_cam_pos_z"   default="0.6"/>
+    <arg name="zed_cam_roll"    default="0.0"/>
+    <arg name="zed_cam_pitch"   default="0.0"/>
+    <arg name="zed_cam_yaw"     default="0.0"/>
+
+    <!-- RTK -->
+    <group unless="$(arg gps_auth_alt)">
+        <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
+            <arg name="gps_device"    value="$(arg gps_device)"/>
+            <arg name="username"      value="708583036" />
+            <arg name="password"      value="151515" />
+        </include>
+    </group>
+    <group if="$(arg gps_auth_alt)">
+        <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
+            <arg name="gps_device"    value="$(arg gps_device)"/>
+            <arg name="username"      value="707886204" />
+            <arg name="password"      value="115544" />
+        </include>
+    </group>
+
+    <!-- Localization -->
+    <include file="$(find svea_sensors)/launch/localize.launch">
+        <arg name="is_indoors"              value="false"/>
+        <arg name="start_serial"            value="true"/>
+        <arg name="start_wheel_encoders"    value="false"/>
+        <arg name="initial_pose_a"          value="$(arg initial_pose_a)"/>
+        <arg name="publish_tf"              value="false"/>
+    </include>
+
+    <!-- Vision -->
+    <include file="$(find svea_vision)/launch/zed_main.launch">
+        <arg name="enable_sidewalk_segmentation"    value="false"/>
+        <arg name="enable_bbox_image"               value="false"/>
+        <arg name="enable_state_estimation"         value="false"/>
+        <arg name="zed_base_frame"                  value="$(arg zed_base_frame)"/>
+        <arg name="zed_cam_pos_x"                   value="$(arg zed_cam_pos_x)"/>
+        <arg name="zed_cam_pos_y"                   value="$(arg zed_cam_pos_y)"/>
+        <arg name="zed_cam_pos_z"                   value="$(arg zed_cam_pos_z)"/>
+        <arg name="zed_cam_roll"                    value="$(arg zed_cam_roll)"/>
+        <arg name="zed_cam_pitch"                   value="$(arg zed_cam_pitch)"/>
+        <arg name="zed_cam_yaw"                     value="$(arg zed_cam_yaw)"/>
+    </include>
+
+    <!-- Rosbag -->
+    <include if="$(arg record)" file="$(find svea_ismir)/launch/record_data.launch">
+        <arg name="rosbag_prefix"   value="$(arg rosbag_prefix)"/>
+        <arg name="record_visual"   value="$(arg record_visual)"/>
+    </include>
+
+</launch>

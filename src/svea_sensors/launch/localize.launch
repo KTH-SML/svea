@@ -45,6 +45,9 @@
     <arg name="publish_odometry"        default="true"/>
     <arg name="publish_pose"            default="true"/>
 
+    <!-- ekf tf -->
+    <arg name="publish_tf"              default="true"/>
+
     <!-- Nodes -->
 
     <!-- Start low-level interface -->
@@ -136,7 +139,7 @@
                         0.0,                    0.0,                    0.0, 
                         0.0,                    0.0,                    0.0]
         </rosparam>
-        <param name="publish_tf"            value="true"/>
+        <param name="publish_tf"            value="$(arg publish_tf)"/>
         <param name="odom0"                 value="rs/t265_camera/odom/sample"/>
         <param name="imu0"                  value="imu/data"/>
         <param name="twist0"                value="actuation_twist"/>
@@ -158,7 +161,7 @@
                         0.0,                    0.0,                    0.0, 
                         0.0,                    0.0,                    0.0]
         </rosparam>
-        <param name="publish_tf"            value="true"/>
+        <param name="publish_tf"            value="$(arg publish_tf)"/>
         <param name="odom0"                 value="odometry/gps"/>
         <param name="imu0"                  value="imu/data"/>
         <param name="twist0"                value="actuation_twist"/>
