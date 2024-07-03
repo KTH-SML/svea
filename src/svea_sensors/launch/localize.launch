@@ -56,7 +56,7 @@
     </group>
 
     <!-- Start map server -->
-    <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
+    <node if="$(eval map_file != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
 
     <!-- start all sensors if this is not a simulation -->
     <group unless="$(arg is_sim)">
