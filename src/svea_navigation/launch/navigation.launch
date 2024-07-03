@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <!-- Launch file arguments -->
+    <arg name="gps_device"      default="/dev/ttyACM1"/>
+    <arg name="map"             default="itrl"/>
+    <arg name="use_foxglove"    default="true"/>
+    <arg name="initial_pose_x"  default="0"/>
+    <arg name="initial_pose_y"  default="0"/>
+    <arg name="initial_pose_a"  default="0" /> <!-- wrt to map-->
+
+
+    <!-- RTK -->
+    <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
+        <arg name="gps_device"              value="$(arg gps_device)"/>
+        <arg name="username"                value="708583036" />
+        <arg name="password"                value="151515" />
+	    <!-- <arg name="username"			    value="707886204" />
+	    <arg name="password" 			    value="115544" /> -->
+    </include>
+
+    <!-- Start localization. it also starts low level interface and map server -->
+    <include file="$(find svea_sensors)/launch/localize.launch">
+        <arg name="map_file"                value="$(find svea_core)/maps/$(arg map).yaml"/>
+        <arg name="is_indoors"              value="false"/>
+        <arg name="start_serial"            value="true"/>
+        <arg name="start_wheel_encoders"    value="false"/>
+        <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
+        <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
+        <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
+    </include>
+
+    <!-- Start Foxglove -->
+    <include if="$(eval use_foxglove)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
+        <arg name="port" value="8765" />
+    </include>
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <rosparam file="$(find svea_navigation)/params/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+        <rosparam file="$(find svea_navigation)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find svea_navigation)/params/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find svea_navigation)/params/global_costmap_params.yaml" command="load" /> 
+        <rosparam file="$(find svea_navigation)/params/base_local_planner_params.yaml" command="load" />
+    </node>
+
+</launch>

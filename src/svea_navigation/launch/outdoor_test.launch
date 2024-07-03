@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Launch file arguments -->
+    <arg name="xavier"                  default="false"/>
+    <arg name="map_file"                default=""/>
+    <arg name="initial_pose_x"          default="0.0" />
+    <arg name="initial_pose_y"          default="0.0" />
+    <arg name="initial_pose_a"          default="0.0" />
+    <arg name="use_wheel_encoders"      default="false" />
+    <arg name="device"                  default="/dev/ttyACM0" />
+
+    <!-- Generate waypoints for driving to different gps location-->
+    <arg name="waypoints_topic"         default="/outdoor_localization_waypoint"/>
+    <arg name="resolution"              default="10"/>
+    <arg name="location_topic"          default="/gps/filtered"/>
+    <arg name="marker_topic"            default="/waypoints"/>
+    <arg name="gps_odometry_topic"      default="/odometry/filtered/global"/>
+
+    <!-- Start localization -->
+    <include file="$(find svea_sensors)/launch/localize.launch">
+        <arg name="xavier"              value="$(arg xavier)"/>
+        <arg name="map_file"            value="$(arg map_file)"/>
+        <arg name="map_frame"           value="map"/>
+        <arg name="initial_pose_x"      value="$(arg initial_pose_x)" />
+        <arg name="initial_pose_y"      value="$(arg initial_pose_y)" />
+        <arg name="initial_pose_a"      value="$(arg initial_pose_a)" />
+        <arg name="use_wheel_encoders"  value="$(arg use_wheel_encoders)" />
+        <arg name="is_indoors"          value="false" />
+        
+        <!-- Should be set to true, if only the localization is running (i.e. this is needed in order to have wheel encoders
+        and actuation_to_twist working) -->
+        <arg name="start_serial"        value="true" />
+        <arg name="device"              value="$(arg device)" />
+
+    </include>
+
+    <!-- For generating waypoints based on gps for svea to follow -->
+    <node pkg="svea_examples" type="relative_waypoints.py" name="relative_waypoints" output="screen">
+        <param name="waypoints_topic"       value="$(arg waypoints_topic)"/>
+        <rosparam subst_value="true">
+        corners: [[59.3508586, 18.0679122],
+                    [59.3508938, 18.0680175],
+                    [59.3508563, 18.0680577],
+                    [59.3508059, 18.0679789]] 
+        </rosparam>
+        <!-- The four points inside the carpark -->
+        <param name="resolution"            value="$(arg resolution)"/>
+        <param name="location_topic"        value="$(arg location_topic)"/>
+        <param name="marker_topic"          value="$(arg marker_topic)"/>
+        <param name="gps_odometry_topic"    value="$(arg gps_odometry_topic)"/>
+    </node>
+    
+    <!-- Start pure_pursuit -->
+    <group if="$(eval controller == 'pure_pursuit')">
+        <node name="outdoor_test" pkg="svea_examples" type="outdoor_test.py" output="screen">
+            <param name="is_sim"            value="false"/>
+            <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
+            <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
+            <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
+            <param name="waypoints_topic"   value="$(arg waypoints_topic)"/>
+        </node>
+    </group>
+
+</launch>
