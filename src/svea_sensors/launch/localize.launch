@@ -23,7 +23,7 @@
     <arg name="map_file"                default=""/>
 
     <!-- Lidar  -->
-    <arg name="lidar_ip"                default="192.168.3.11" />
+    <arg name="lidar_ip"                default="192.168.0.10" />
 
     <!-- Wheel encoder -->
     <arg name="start_wheel_encoders"    default="false" />
