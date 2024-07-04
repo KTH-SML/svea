@@ -45,7 +45,7 @@ class QuatToEulerRelay:
                 self.quat_topic = load_param('~quat_topic', 'quat')
                 
                 # Other Parameters
-                self.topic_timeout = load_param('~topic_timeout', 5.0)
+                self.topic_timeout = load_param('~topic_timeout', 30.0)
                 
                 # Get quat topic type
                 self.quat_topic_type, msg = get_topic_type(self.quat_topic, self.topic_timeout)

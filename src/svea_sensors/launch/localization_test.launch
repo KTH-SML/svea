@@ -60,25 +60,25 @@
 
     <!-- Paths -->
     <node pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_1" output="screen" >
-        <param name="odom_topic" value="/odom/gps"/>
+        <param name="odom_topic" value="/odometry/gps"/>
     </node>
     <node pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_2" output="screen" >
-        <param name="odom_topic" value="/odom/filtered"/>
+        <param name="odom_topic" value="/odometry/filtered"/>
     </node>
     <node pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_3" output="screen" >
-        <param name="odom_topic" value="/odom/filtered/global"/>
+        <param name="odom_topic" value="/odometry/filtered/global"/>
     </node>
     <!-- Zed camera already publishes the path in the (default) topic: /zed/zed_node/path_map -->
 
     <!-- Euler angles -->
     <node pkg="svea_sensors" type="quat_to_euler_relay.py" name="quat_to_euler_relay_1" output="screen" >
-        <param name="quat_topic" value="/odom/gps"/>
+        <param name="quat_topic" value="/odometry/gps"/>
     </node>
     <node pkg="svea_sensors" type="quat_to_euler_relay.py" name="quat_to_euler_relay_2" output="screen" >
-        <param name="quat_topic" value="/odom/filtered"/>
+        <param name="quat_topic" value="/odometry/filtered"/>
     </node>
     <node pkg="svea_sensors" type="quat_to_euler_relay.py" name="quat_to_euler_relay_3" output="screen" >
-        <param name="quat_topic" value="/odom/filtered/global"/>
+        <param name="quat_topic" value="/odometry/filtered/global"/>
     </node>
     <node pkg="svea_sensors" type="quat_to_euler_relay.py" name="quat_to_euler_relay_4" output="screen" >
         <param name="quat_topic" value="/zed/zed_node/odom"/>
