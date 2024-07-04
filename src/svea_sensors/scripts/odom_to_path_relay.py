@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 import rospy
-import tf2_ros
+import tf
 from nav_msgs.msg import Odometry, Path
 from geometry_msgs.msg import PoseStamped
 
@@ -37,8 +37,8 @@ class OdomToPathRelay:
                 self.frame_id = load_param('~base_frame_id', 'base_link')
                 
                 # TF2
-                self.tf_buf = tf2_ros.Buffer()
-                self.tf_listener = tf2_ros.TransformListener(self.tf_buf)
+                self.tf_buf = tf.Buffer()
+                self.tf_listener = tf.TransformListener(self.tf_buf)
                 
                 # Publishers
                 self.path_topic = self.odom_topic + '/path'
@@ -77,7 +77,7 @@ class OdomToPathRelay:
                 pose_stamped.header = msg.header
                 pose_stamped.pose = msg.pose.pose
                 try:
-                    pose_stamped = self.tf_buf.transform(pose_stamped, self.frame_id)
+                    pose_stamped = self.tf_listener.transformPose(self.frame_id, pose_stamped)
                 except Exception as e:
                     # Log error
                     rospy.logerr("{}: {}".format(rospy.get_name(), e))
