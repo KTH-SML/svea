@@ -3,6 +3,8 @@
 import rospy
 from tf.transformations import euler_from_quaternion
 from geometry_msgs.msg import Quaternion, Vector3
+from nav_msgs.msg import Odometry
+from sensor_msgs.msg import Imu
 
 import math
 
@@ -21,6 +23,14 @@ def replace_base(old, new) -> str:
     ns += new.split('/')
     return '/'.join(ns)
 
+def get_topic_type(topic: str, timeout: float = 1.0) -> str:
+    # Get topic type
+    try:
+        msg = rospy.wait_for_message(topic, rospy.AnyMsg, timeout=timeout)
+        return msg._type, ""
+    except rospy.ROSException as e:
+        return None, str(e)
+
 
 class QuatToEulerRelay:
         
@@ -34,11 +44,25 @@ class QuatToEulerRelay:
                 
                 self.euler_topic = load_param('~euler_topic', 'euler')
                 
+                # Other Parameters
+                self.topic_timeout = load_param('~topic_timeout', 5.0)
+                
+                # Get quat topic type
+                self.quat_topic_type, msg = get_topic_type(self.quat_topic, self.topic_timeout)
+                if self.quat_topic_type is None:
+                    raise rospy.ROSException(msg)
+                elif self.quat_topic_type == "nav_msgs/Odometry":
+                    self.quat_type = Odometry
+                elif self.quat_topic_type == "sensor_msgs/Imu":
+                    self.quat_type = Imu
+                else:
+                    raise TypeError("Invalid quaternion topic type, only Odometry and Imu msg types are supported for now.")
+                
                 # Publishers
                 self.euler_pub = rospy.Publisher(self.euler_topic, Vector3, queue_size=10)
                 
                 # Subscribers
-                self.quat_sub = rospy.Subscriber(self.quat_topic, Quaternion, self.quat_callback, queue_size=10)
+                self.quat_sub = rospy.Subscriber(self.quat_topic, self.quat_type, self.callback)
             
             except Exception as e:
                 # Log error
@@ -54,10 +78,16 @@ class QuatToEulerRelay:
             except rospy.ROSInterruptException:
                 rospy.loginfo('Shutting down {}'.format(rospy.get_name()))
         
-        def quat_callback(self, msg: Quaternion) -> None:
+        def callback(self, msg) -> None:
             try:
+                # Get quaternion from message
+                if self.quat_topic_type == "nav_msgs/Odometry":
+                    quat = msg.pose.pose.orientation
+                elif self.quat_topic_type == "sensor_msgs/Imu":
+                    quat = msg.orientation
+                
                 # Convert quaternion to roll, pitch, and yaw
-                roll, pitch, yaw = euler_from_quaternion([msg.x, msg.y, msg.z, msg.w])
+                roll, pitch, yaw = euler_from_quaternion([quat.x, quat.y, quat.z, quat.w])
                 
                 # Create Vector3 message
                 euler_msg = Vector3()

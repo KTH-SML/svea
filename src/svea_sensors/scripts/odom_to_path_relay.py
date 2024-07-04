@@ -1,7 +1,8 @@
 #! /usr/bin/env python3
 
 import rospy
-from nav_msgs.msg import Odometry, Path, PoseStamped
+from nav_msgs.msg import Odometry, Path
+from geometry_msgs.msg import PoseStamped
 
 import math
 
