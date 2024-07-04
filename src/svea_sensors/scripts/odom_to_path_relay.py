@@ -32,9 +32,8 @@ class OdomToPathRelay:
                 # Topic Parameters
                 self.odom_topic = load_param('~odom_topic', 'odom')
                 
-                self.path_topic = load_param('~path_topic', 'path')
-                
                 # Publishers
+                self.path_topic = self.odom_topic + '/path'
                 self.path_pub = rospy.Publisher(self.path_topic, Path, queue_size=10)
                 
                 # Subscribers
