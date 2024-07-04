@@ -76,12 +76,12 @@ class OdomToPathRelay:
                 pose_stamped = PoseStamped()
                 pose_stamped.header = msg.header
                 pose_stamped.pose = msg.pose.pose
-                try:
-                    pose_stamped = self.tf_listener.transformPose(self.frame_id, pose_stamped)
-                except Exception as e:
-                    # Log error
-                    rospy.logerr("{}: {}".format(rospy.get_name(), e))
-                    return                   
+                # try:
+                #     pose_stamped = self.tf_listener.transformPose(self.frame_id, pose_stamped)
+                # except Exception as e:
+                #     # Log error
+                #     rospy.logerr("{}: {}".format(rospy.get_name(), e))
+                #     return                   
                     
                 # Append pose to path
                 self.path.poses.append(pose_stamped)
