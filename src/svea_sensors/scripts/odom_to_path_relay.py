@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 import rospy
-import tf
+# import tf
 from nav_msgs.msg import Odometry, Path
 from geometry_msgs.msg import PoseStamped
 
@@ -37,8 +37,8 @@ class OdomToPathRelay:
                 self.frame_id = load_param('~base_frame_id', 'base_link')
                 
                 # TF2
-                self.tf_buf = tf.Buffer()
-                self.tf_listener = tf.TransformListener(self.tf_buf)
+                # self.tf_buf = tf.Buffer()
+                # self.tf_listener = tf.TransformListener(self.tf_buf)
                 
                 # Publishers
                 self.path_topic = self.odom_topic + '/path'
