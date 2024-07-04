@@ -68,7 +68,9 @@
     <node pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_3" output="screen" >
         <param name="odom_topic" value="/odometry/filtered/global"/>
     </node>
-    <!-- Zed camera already publishes the path in the (default) topic: /zed/zed_node/path_map -->
+    <node pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_4" output="screen" >
+        <param name="odom_topic" value="/zed/zed_node/odom"/>
+    </node>
 
     <!-- Euler angles -->
     <node pkg="svea_sensors" type="quat_to_euler_relay.py" name="quat_to_euler_relay_1" output="screen" >
