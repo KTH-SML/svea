@@ -58,6 +58,35 @@
         <arg name="zed_cam_yaw"                     value="$(arg zed_cam_yaw)"/>
     </include>
 
+    <!-- Paths -->
+    <node pkg="svea_sensors" type="odom_to_path_relay.py" output="screen" >
+        <param name="odom_topic" value="/odom/gps"/>
+    </node>
+    <node pkg="svea_sensors" type="odom_to_path_relay.py" output="screen" >
+        <param name="odom_topic" value="/odom/filtered"/>
+    </node>
+    <node pkg="svea_sensors" type="odom_to_path_relay.py" output="screen" >
+        <param name="odom_topic" value="/odom/filtered/global"/>
+    </node>
+    <!-- Zed camera already publishes the path in the (default) topic: /zed/zed_node/path_map -->
+
+    <!-- Euler angles -->
+    <node pkg="svea_sensors" type="quat_to_euler_relay.py" output="screen" >
+        <param name="quat_topic" value="/odom/gps"/>
+    </node>
+    <node pkg="svea_sensors" type="quat_to_euler_relay.py" output="screen" >
+        <param name="quat_topic" value="/odom/filtered"/>
+    </node>
+    <node pkg="svea_sensors" type="quat_to_euler_relay.py" output="screen" >
+        <param name="quat_topic" value="/odom/filtered/global"/>
+    </node>
+    <node pkg="svea_sensors" type="quat_to_euler_relay.py" output="screen" >
+        <param name="quat_topic" value="/zed/zed_node/odom"/>
+    </node>
+    <node pkg="svea_sensors" type="quat_to_euler_relay.py" output="screen" >
+        <param name="quat_topic" value="/imu/data"/>
+    </node>
+
     <!-- Rosbag -->
     <include if="$(arg record)" file="$(find svea_ismir)/launch/record_data.launch">
         <arg name="rosbag_prefix"   value="$(arg rosbag_prefix)"/>
