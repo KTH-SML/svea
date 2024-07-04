@@ -3,32 +3,37 @@
     
     <!-- Launch file arguments -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
-    <arg name="map"             default="itrl"/>
+    <arg name="map"             default="$(find svea_core)/maps/itrl.yaml"/>
     <arg name="use_foxglove"    default="true"/>
     <arg name="initial_pose_x"  default="0"/>
     <arg name="initial_pose_y"  default="0"/>
     <arg name="initial_pose_a"  default="0" /> <!-- wrt to map-->
+    <arg name="is_sim"          default="true"/>
 
+    <!-- Start map server -->
+    <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map)"/>
 
-    <!-- RTK -->
-    <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
-        <arg name="gps_device"              value="$(arg gps_device)"/>
-        <arg name="username"                value="708583036" />
-        <arg name="password"                value="151515" />
-	    <!-- <arg name="username"			    value="707886204" />
-	    <arg name="password" 			    value="115544" /> -->
-    </include>
+    <!-- If is_sim equal to false, then include all these tags-->
+    <group unless="$(arg is_sim)">
+        <!-- RTK -->
+        <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
+            <arg name="gps_device"              value="$(arg gps_device)"/>
+            <arg name="username"                value="708583036" />
+            <arg name="password"                value="151515" />
+            <!-- <arg name="username"			    value="707886204" />
+            <arg name="password" 			    value="115544" /> -->
+        </include>
 
-    <!-- Start localization. it also starts low level interface and map server -->
-    <include file="$(find svea_sensors)/launch/localize.launch">
-        <arg name="map_file"                value="$(find svea_core)/maps/$(arg map).yaml"/>
-        <arg name="is_indoors"              value="false"/>
-        <arg name="start_serial"            value="true"/>
-        <arg name="start_wheel_encoders"    value="false"/>
-        <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
-        <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
-        <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
-    </include>
+        <!-- Start localization. it also starts low level interface and map server -->
+        <include file="$(find svea_sensors)/launch/localize.launch">
+            <arg name="is_indoors"              value="false"/>
+            <arg name="start_serial"            value="true"/>
+            <arg name="start_wheel_encoders"    value="false"/>
+            <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
+            <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
+            <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
+        </include>
+    </group>
 
     <!-- Start Foxglove -->
     <include if="$(eval use_foxglove)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
@@ -41,6 +46,11 @@
         <rosparam file="$(find svea_navigation)/params/local_costmap_params.yaml" command="load" />
         <rosparam file="$(find svea_navigation)/params/global_costmap_params.yaml" command="load" /> 
         <rosparam file="$(find svea_navigation)/params/base_local_planner_params.yaml" command="load" />
+    </node>
+
+    <node name="main" pkg="svea_navigation" type="main.py" output="screen">
+        <param name="use_rviz" value="$(arg use_foxglove)"/>
+        <param name="is_sim" value="$(arg is_sim)"/>
     </node>
 
 </launch>
