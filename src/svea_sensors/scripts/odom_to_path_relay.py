@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import rospy
+import tf2_ros
 from nav_msgs.msg import Odometry, Path
 from geometry_msgs.msg import PoseStamped
 
@@ -32,6 +33,13 @@ class OdomToPathRelay:
                 # Topic Parameters
                 self.odom_topic = load_param('~odom_topic', 'odom')
                 
+                # Other parameters
+                self.frame_id = load_param('~base_frame_id', 'base_link')
+                
+                # TF2
+                self.tf_buf = tf2_ros.Buffer()
+                self.tf_listener = tf2_ros.TransformListener(self.tf_buf)
+                
                 # Publishers
                 self.path_topic = self.odom_topic + '/path'
                 self.path_pub = rospy.Publisher(self.path_topic, Path, queue_size=10)
@@ -47,6 +55,9 @@ class OdomToPathRelay:
                 rospy.logerr(e)
 
             else:
+                # Sleep for 1 second for tf2 buffer to fill
+                rospy.sleep(1)
+                
                 # Log status
                 rospy.loginfo('{} node initialized.'.format(rospy.get_name()))
                 
@@ -61,10 +72,18 @@ class OdomToPathRelay:
                 # Update path header
                 self.path.header = msg.header
                 
-                # Append pose to path
+                # Transform pose to base frame
                 pose_stamped = PoseStamped()
                 pose_stamped.header = msg.header
                 pose_stamped.pose = msg.pose.pose
+                try:
+                    pose_stamped = self.tf_buf.transform(pose_stamped, self.frame_id)
+                except Exception as e:
+                    # Log error
+                    rospy.logerr("{}: {}".format(rospy.get_name(), e))
+                    return                   
+                    
+                # Append pose to path
                 self.path.poses.append(pose_stamped)
                 
                 # Publish path
