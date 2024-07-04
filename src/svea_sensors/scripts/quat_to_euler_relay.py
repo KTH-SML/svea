@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import rospy
+import rostopic
 from tf.transformations import euler_from_quaternion
 from geometry_msgs.msg import Quaternion, Vector3
 from nav_msgs.msg import Odometry
@@ -25,11 +26,12 @@ def replace_base(old, new) -> str:
 
 def get_topic_type(topic: str, timeout: float = 1.0) -> str:
     # Get topic type
-    try:
-        msg = rospy.wait_for_message(topic, rospy.AnyMsg, timeout=timeout)
-        return msg._type, ""
-    except rospy.ROSException as e:
-        return None, str(e)
+    time = rospy.Time.now()
+    while (rospy.Time.now() - time).to_sec() < timeout:
+        topic_type, _, _ = rostopic.get_topic_type(topic)
+        if topic_type:
+            return topic_type, ""
+    return None, "Timeout while trying to get topic type for {}".format(topic)
 
 
 class QuatToEulerRelay:
@@ -41,8 +43,6 @@ class QuatToEulerRelay:
                 
                 # Topic Parameters
                 self.quat_topic = load_param('~quat_topic', 'quat')
-                
-                self.euler_topic = load_param('~euler_topic', 'euler')
                 
                 # Other Parameters
                 self.topic_timeout = load_param('~topic_timeout', 5.0)
@@ -59,6 +59,7 @@ class QuatToEulerRelay:
                     raise TypeError("Invalid quaternion topic type, only Odometry and Imu msg types are supported for now.")
                 
                 # Publishers
+                self.euler_topic = self.quat_topic + '/orientation/euler'
                 self.euler_pub = rospy.Publisher(self.euler_topic, Vector3, queue_size=10)
                 
                 # Subscribers
@@ -89,11 +90,11 @@ class QuatToEulerRelay:
                 # Convert quaternion to roll, pitch, and yaw
                 roll, pitch, yaw = euler_from_quaternion([quat.x, quat.y, quat.z, quat.w])
                 
-                # Create Vector3 message
+                # Create Vector3 message (in degrees)
                 euler_msg = Vector3()
-                euler_msg.x = roll
-                euler_msg.y = pitch
-                euler_msg.z = yaw
+                euler_msg.x = roll * 180 / math.pi
+                euler_msg.y = pitch * 180 / math.pi
+                euler_msg.z = yaw * 180 / math.pi
                 
                 # Publish euler message
                 self.euler_pub.publish(euler_msg)
