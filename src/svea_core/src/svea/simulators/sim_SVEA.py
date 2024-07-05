@@ -87,6 +87,7 @@ class SimSVEA(object):
             self.vehicle_name = namespace.split('/')[-2]
 
         self._map_frame_id = 'map'
+        self._laser_frame_id = 'laser'
         self._odom_frame_id = sub_namespace + 'odom'
         self._base_link_frame_id = sub_namespace + 'base_link'
 
@@ -246,6 +247,20 @@ class SimSVEA(object):
         odom2base.transform.translation.z = pose.position.z
         odom2base.transform.rotation = pose.orientation
         self.tf_br.sendTransform(odom2base)
+
+        base_to_laser = TransformStamped()
+        base_to_laser.header.stamp = self.current_state.pose_msg.header.stamp
+        base_to_laser.header.frame_id = self._base_link_frame_id
+        base_to_laser.child_frame_id = self._laser_frame_id
+        base_to_laser.transform.translation.x = 0.284  
+        base_to_laser.transform.translation.y = 0.0
+        base_to_laser.transform.translation.z = 0.2
+        base_to_laser.transform.rotation.x = 0.0
+        base_to_laser.transform.rotation.y = 0.0
+        base_to_laser.transform.rotation.z = 0.0
+        base_to_laser.transform.rotation.w = 1.0
+        self.tf_br.sendTransform(base_to_laser) 
+
 
 
     def _update_ctrl_request(self, ctrl_request_msg):

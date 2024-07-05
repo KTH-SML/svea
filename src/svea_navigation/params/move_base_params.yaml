@@ -1,0 +1,19 @@
+# Parameters for TrajectoryPlannerROS (local planner)
+TrajectoryPlannerROS:
+  max_vel_x: 0.45
+  min_vel_x: 0.1
+  max_vel_theta: 1.0
+  min_in_place_vel_theta: 0.4
+
+  acc_lim_theta: 3.2
+  acc_lim_x: 2.5
+  acc_lim_y: 2.5
+
+  holonomic_robot: false
+
+# Parameters for NavfnROS (global planner)
+NavfnROS:
+  tolerance: 0.1
+  planner_window_x: 0.5
+  planner_window_y: 0.5
+  default_tolerance: 0.0

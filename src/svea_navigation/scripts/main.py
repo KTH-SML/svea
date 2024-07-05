@@ -95,7 +95,6 @@ class main:
         state = self.svea.wait_for_state()                  # limit the rate of main loop by waiting for state
         steering, velocity = self.svea.compute_control()
         self.svea.send_control(steering, velocity)
-
         self.svea.visualize_data()
 
 
