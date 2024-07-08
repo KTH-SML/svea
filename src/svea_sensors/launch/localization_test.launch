@@ -89,6 +89,14 @@
         <param name="quat_topic" value="/imu/data"/>
     </node>
 
+    <!-- GPS to UTM -->
+    <node pkg="svea_sensors" type="gps_to_utm_relay.py" name="gps_to_utm_relay_1" output="screen" >
+        <param name="gps_topic" value="/gps/fix"/>
+    </node>
+    <node pkg="svea_sensors" type="gps_to_utm_relay.py" name="gps_to_utm_relay_2" output="screen" >
+        <param name="gps_topic" value="/gps/filtered"/>
+    </node>
+
     <!-- Rosbag -->
     <include if="$(arg record)" file="$(find svea_ismir)/launch/record_data.launch">
         <arg name="rosbag_prefix"   value="$(arg rosbag_prefix)"/>
