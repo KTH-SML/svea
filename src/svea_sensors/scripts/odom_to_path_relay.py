@@ -127,3 +127,8 @@ class OdomToPathRelay:
             pose_transformed.pose.orientation.w = quaternion[3]
             
             return pose_transformed
+        
+        
+if __name__ == '__main__':
+    node = OdomToPathRelay()
+    node.run()
