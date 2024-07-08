@@ -1,7 +1,8 @@
 #! /usr/bin/env python3
 
 import rospy
-# import tf
+import tf2_ros
+import tf.transformations as tr
 from nav_msgs.msg import Odometry, Path
 from geometry_msgs.msg import PoseStamped
 
@@ -34,11 +35,11 @@ class OdomToPathRelay:
                 self.odom_topic = load_param('~odom_topic', 'odom')
                 
                 # Other parameters
-                self.frame_id = load_param('~base_frame_id', 'base_link')
+                self.base_frame_id = load_param('~base_frame_id', 'base_link')
                 
                 # TF2
-                # self.tf_buf = tf.Buffer()
-                # self.tf_listener = tf.TransformListener(self.tf_buf)
+                self.tf_buf = tf2_ros.Buffer()
+                self.tf_listener = tf2_ros.TransformListener(self.tf_buf)
                 
                 # Publishers
                 self.path_topic = self.odom_topic + '/path'
@@ -72,16 +73,19 @@ class OdomToPathRelay:
                 # Update path header
                 self.path.header = msg.header
                 
-                # Transform pose to base frame
+                # Create pose stamped
                 pose_stamped = PoseStamped()
                 pose_stamped.header = msg.header
                 pose_stamped.pose = msg.pose.pose
-                # try:
-                #     pose_stamped = self.tf_listener.transformPose(self.frame_id, pose_stamped)
-                # except Exception as e:
-                #     # Log error
-                #     rospy.logerr("{}: {}".format(rospy.get_name(), e))
-                #     return                   
+                
+                # Transform pose to base frame
+                if pose_stamped.header.frame_id != self.base_frame_id:
+                    try:
+                        pose_stamped = self.transform_to_base(pose_stamped)            
+                    except Exception as e:
+                        # Log error
+                        rospy.logerr("{}: {}".format(rospy.get_name(), e))
+                        return
                     
                 # Append pose to path
                 self.path.poses.append(pose_stamped)
@@ -92,8 +96,34 @@ class OdomToPathRelay:
                 # Log error
                 rospy.logerr(e)
                 
+        def transform_to_base(self, pose: PoseStamped) -> PoseStamped:
+            # Convert pose to matrix form for transformation from map frame to pose frame
+            matrix_mp_trans = tr.translation_matrix((pose.pose.position.x, pose.pose.position.y, pose.pose.position.z))
+            matrix_mp_rot = tr.quaternion_matrix((pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w))
+            matrix_mp = tr.concatenate_matrices(matrix_mp_trans, matrix_mp_rot)            
             
-
-if __name__ == '__main__':
-    node = OdomToPathRelay()
-    node.run()
+            # Get matrix of transform from pose frame to base frame
+            transform_pb = self.tf_buf.lookup_transform(self.base_frame_id, pose.header.frame_id, pose.header.stamp, rospy.Duration(1.0))
+            matrix_pb_trans = tr.translation_matrix((transform_pb.transform.translation.x, transform_pb.transform.translation.y, transform_pb.transform.translation.z))
+            matrix_pb_rot = tr.quaternion_matrix((transform_pb.transform.rotation.x, transform_pb.transform.rotation.y, transform_pb.transform.rotation.z, transform_pb.transform.rotation.w))
+            matrix_pb = tr.concatenate_matrices(matrix_pb_trans, matrix_pb_rot)
+            
+            # Get matrix of transform from map frame to base frame
+            matrix_mb = tr.concatenate_matrices(matrix_mp, matrix_pb)
+            
+            # Extract translation and quaternion from matrix
+            translation = tr.translation_from_matrix(matrix_mb)
+            quaternion = tr.quaternion_from_matrix(matrix_mb)
+            
+            # Convert to pose stamped and return
+            pose_transformed = PoseStamped()
+            pose_transformed.header = pose.header
+            pose_transformed.pose.position.x = translation[0]
+            pose_transformed.pose.position.y = translation[1]
+            pose_transformed.pose.position.z = translation[2]
+            pose_transformed.pose.orientation.x = quaternion[0]
+            pose_transformed.pose.orientation.y = quaternion[1]
+            pose_transformed.pose.orientation.z = quaternion[2]
+            pose_transformed.pose.orientation.w = quaternion[3]
+            
+            return pose_transformed
