@@ -1,4 +1,4 @@
-image: sidewalk.pgm
+image: map.pgm
 resolution: 0.050000
 origin: [0.000000, -5.000000, -nan]
 negate: 0

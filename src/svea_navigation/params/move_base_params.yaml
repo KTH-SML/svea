@@ -134,19 +134,19 @@ TebLocalPlannerROS:
   #costmap_converter_plugin: "costmap_converter::CostmapToLinesDBSRANSAC"
   #costmap_converter_plugin: "costmap_converter::CostmapToLinesDBSMCCH"
   #costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSConcaveHull"
- costmap_converter_spin_thread: true
- costmap_converter_rate: 4
+#  costmap_converter_spin_thread: true
+#  costmap_converter_rate: 4
 
 
   ## Configure plugins (namespace move_base/costmap_to_lines or move_base/costmap_to_polygons)
   ## costmap_converter/CostmapToLinesDBSRANSAC, costmap_converter/CostmapToLinesDBSMCCH, costmap_converter/CostmapToPolygonsDBSMCCH
- costmap_converter/CostmapToPolygonsDBSMCCH:             # Designed to convert costmap data (both from static and dynamic obstacles) into a polygonal representation
-  cluster_max_distance: 0.1                              # Maximum distance between points in a cluster.
-  cluster_min_pts: 2                                     # Minimum number of points required to form a cluster.
-  ransac_inlier_distance: 0.15
-  ransac_min_inliers: 10
-  ransac_no_iterations: 1500
-  ransac_remainig_outliers: 3
-  ransac_convert_outlier_pts: true
-  ransac_filter_remaining_outlier_pts: false
-  convex_hull_min_pt_separation: 0.1
+#  costmap_converter/CostmapToPolygonsDBSMCCH:             # Designed to convert costmap data (both from static and dynamic obstacles) into a polygonal representation
+#   cluster_max_distance: 0.1                              # Maximum distance between points in a cluster.
+#   cluster_min_pts: 2                                     # Minimum number of points required to form a cluster.
+#   ransac_inlier_distance: 0.15
+#   ransac_min_inliers: 10
+#   ransac_no_iterations: 1500
+#   ransac_remainig_outliers: 3
+#   ransac_convert_outlier_pts: true
+#   ransac_filter_remaining_outlier_pts: false
+#   convex_hull_min_pt_separation: 0.1

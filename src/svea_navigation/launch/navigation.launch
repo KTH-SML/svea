@@ -3,7 +3,7 @@
     
     <!-- Launch file arguments -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
-    <arg name="map"             default="$(find svea_core)/maps/floor2.yaml"/>
+    <arg name="map"             default="$(find svea_core)/maps/map.yaml"/>
     <arg name="use_foxglove"    default="true"/>
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="initial_pose_x"  default="0"/>
@@ -48,10 +48,8 @@
     </node>
 
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-        <rosparam file="$(find svea_navigation)/params/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
-        <rosparam file="$(find svea_navigation)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
-        <rosparam file="$(find svea_navigation)/params/local_costmap_params.yaml" command="load" />
-        <rosparam file="$(find svea_navigation)/params/global_costmap_params.yaml" command="load" /> 
+        <rosparam file="$(find svea_navigation)/params/local_costmap_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find svea_navigation)/params/global_costmap_params.yaml" command="load" ns="global_costmap" />  
         <rosparam file="$(find svea_navigation)/params/move_base_params.yaml" command="load" />
         <!-- Specify the global planner (default) -->
         <param name="base_global_planner" value="navfn/NavfnROS"/> 
