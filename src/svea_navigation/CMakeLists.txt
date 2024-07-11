@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   svea_core
   move_base
+  teb_local_planner
 )
 
 
@@ -106,6 +107,7 @@ catkin_package(
   rospy
   svea_core
   move_base
+  teb_local_planner
 #  DEPENDS system_lib
 )
 

@@ -87,7 +87,7 @@ class SimSVEA(object):
             self.vehicle_name = namespace.split('/')[-2]
 
         self._map_frame_id = 'map'
-        self._laser_frame_id = 'laser'
+        self._laser_frame_id = sub_namespace + 'laser'
         self._odom_frame_id = sub_namespace + 'odom'
         self._base_link_frame_id = sub_namespace + 'base_link'
 

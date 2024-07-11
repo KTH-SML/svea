@@ -7,9 +7,7 @@ global_costmap:
 
   plugins:
   - {name: static_layer, type: "costmap_2d::StaticLayer"}
-  - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
   - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
 
-  static_layer:
-    map_topic: /map
-    subscribe_to_updates: true
+
+ 

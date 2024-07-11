@@ -11,7 +11,7 @@ from svea.models.bicycle import SimpleBicycleModel
 from svea.states import VehicleState
 from svea.simulators.sim_SVEA import SimSVEA
 from svea.interfaces import LocalizationInterface
-from base_local_planner_controller import base_local_planner_controller
+from base_local_planner_controller import BaseLocalPlannerController
 from svea.svea_managers.svea_archetypes import SVEAManager
 from svea.data import TrajDataHandler, RVIZPathHandler
 
@@ -71,11 +71,13 @@ class main:
             self.simulator = SimSVEA(self.sim_model,
                                      dt=self.DELTA_TIME,
                                      run_lidar=True,
-                                     start_paused=True).start()
+                                     start_paused=True,
+                                     publish_odometry=True,
+                                     publish_pose=True).start()
 
         # start the SVEA manager (needed for both sim and real world)
         self.svea = SVEAManager(LocalizationInterface,
-                                    base_local_planner_controller,
+                                    BaseLocalPlannerController,
                                     data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
         self.svea.start(wait=True)
 
