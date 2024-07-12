@@ -3,12 +3,12 @@
     "3D!1d6wsay": {
       "cameraState": {
         "perspective": false,
-        "distance": 25.847108697986975,
+        "distance": 23.327015599932967,
         "phi": 59.99999999999777,
         "thetaOffset": 0,
         "targetOffset": [
-          -0.3217265221664256,
-          1.073879422211175,
+          -0.21445653140973053,
+          0.7760187202571339,
           -4.3650121758646524e-17
         ],
         "target": [
@@ -395,18 +395,19 @@
     },
     "3D!3hq9qrg": {
       "cameraState": {
-        "distance": 10.266841665589684,
         "perspective": false,
+        "distance": 15.475618749998304,
         "phi": 59.99999999999997,
+        "thetaOffset": 0,
+        "targetOffset": [
+          -0.30310806436908144,
+          0.01797777929746719,
+          5.891177107531232e-18
+        ],
         "target": [
           0,
           0,
           0
-        ],
-        "targetOffset": [
-          -0.00035724672888310435,
-          0.021708940960915232,
-          6.277619542550864e-19
         ],
         "targetOrientation": [
           0,
@@ -414,7 +415,6 @@
           0,
           1
         ],
-        "thetaOffset": 0,
         "fovy": 45,
         "near": 0.5,
         "far": 5000
@@ -462,7 +462,7 @@
       },
       "topics": {
         "/zed/zed_node/path_map": {
-          "visible": true,
+          "visible": false,
           "gradient": [
             "#5cd6a9ff",
             "#ffffff80"
@@ -493,7 +493,11 @@
           "lineWidth": 0.1
         },
         "/zed/zed_node/odom/path": {
-          "visible": false
+          "visible": true,
+          "gradient": [
+            "#5cd6a9ff",
+            "#ffffff80"
+          ]
         }
       },
       "layers": {
@@ -533,15 +537,15 @@
     },
     "map!2s7rprz": {
       "center": {
-        "lat": 0,
-        "lon": -0.17578125
+        "lat": 59.35076427825812,
+        "lon": 18.068086802959446
       },
       "customTileUrl": "",
       "disabledTopics": [],
       "followTopic": "/gps/filtered",
       "layer": "map",
       "topicColors": {},
-      "zoomLevel": 2,
+      "zoomLevel": 19,
       "maxNativeZoom": 18
     },
     "Plot!414m9rl": {
@@ -565,11 +569,26 @@
       "followingViewWidth": 120
     },
     "Plot!1zr5kq9": {
-      "paths": [],
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/gps/fix/utm.point.x",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": "Raw"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/gps/filtered/utm.point.x",
+          "enabled": true,
+          "color": "#f5774d",
+          "label": "Filtered"
+        }
+      ],
       "showXAxisLabels": true,
       "showYAxisLabels": true,
       "showLegend": true,
-      "legendDisplay": "none",
+      "legendDisplay": "floating",
       "showPlotValuesInLegend": false,
       "isSynced": true,
       "xAxisVal": "timestamp",
@@ -578,7 +597,21 @@
       "followingViewWidth": 120
     },
     "Plot!1n7tdhk": {
-      "paths": [],
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/gps/fix/utm.point.y",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": ""
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/gps/filtered/utm.point.y",
+          "enabled": true,
+          "color": "#f5774d"
+        }
+      ],
       "showXAxisLabels": true,
       "showYAxisLabels": true,
       "showLegend": true,
@@ -597,6 +630,13 @@
           "value": "/imu/data/orientation/euler.z",
           "enabled": true,
           "label": "IMU Heading"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered/global/orientation/euler.z",
+          "enabled": true,
+          "color": "#f5774d",
+          "label": "Global EKF Heading"
         }
       ],
       "showXAxisLabels": true,
