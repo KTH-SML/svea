@@ -15,7 +15,7 @@ from threading import Thread
 from sensor_msgs.msg import NavSatFix, NavSatStatus
 from nmea_msgs.msg import Sentence
 from std_msgs.msg import Float64
-from rtcm_msgs.msg import Message
+from mavros_msgs.msg import RTCM
 __author__ = "Mustafa Al-Janabi"
 __email__ = "musaj@kth.se"
 __license__ = "MIT"
@@ -130,7 +130,7 @@ class RTKManager:
     def _init_sub(self):
         """Initialize subscribers"""
         # Subscribe to RTCM correction messages from NTRIP Client
-        rospy.Subscriber("/ntrip_client/rtcm", Message, self._handle_rtcm_cb)
+        rospy.Subscriber("/ntrip_client/rtcm", RTCM, self._handle_rtcm_cb)
 
     def set_config(self, msgClass, msgID, **kwargs):
         """Utility function which write a configuration message to receiver and awaits an acknowledgement."""
@@ -187,7 +187,7 @@ class RTKManager:
 
     def _handle_rtcm_cb(self, msg):
         """Callback which listens to RTCM messages from NTRIP clients and writes them to the receiver."""
-        raw_rtcm = msg.message
+        raw_rtcm = msg.data
         self.serial.write(raw_rtcm)
 
     def _read_serial_handler(self):
