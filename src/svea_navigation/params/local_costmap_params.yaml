@@ -1,4 +1,4 @@
-transform_tolerance: 3  # Increased tolerance TODO:fix simulation desynch.
+transform_tolerance: 0.3  # Increased tolerance TODO:fix simulation desynch.
 footprint: [[-0.15, 0.17], [0.5, 0.17], [0.5, -0.17], [-0.15, -0.17]]
 global_frame: odom
 robot_base_frame: base_link
