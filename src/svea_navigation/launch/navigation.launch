@@ -3,7 +3,7 @@
     
     <!-- Launch file arguments -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
-    <arg name="map"             default="$(find svea_core)/maps/floor2.yaml"/>
+    <arg name="map"             default="$(find svea_core)/maps/map.yaml"/>
     <arg name="use_foxglove"    default="true"/>
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="initial_pose_x"  default="0"/>
@@ -13,10 +13,16 @@
 
     <!-- Start map server -->
     <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map)"/>
-    <rosparam command="load" file="$(find svea_core)/params/$(arg obstacle_map).yaml" />
+    <!-- <rosparam command="load" file="$(find svea_core)/params/$(arg obstacle_map).yaml" /> -->
 
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(arg is_sim)">
+
+        <node pkg="svea_navigation" type="set_datum_node.py"  name="set_datum_node" output="screen">
+            <param name="datum_config"    value= "maps/itrl_sidewalk.yaml" />
+            <param name="package_name"    value= "svea_core" />
+        </node>
+        
         <!-- RTK -->
         <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
             <arg name="gps_device"              value="$(arg gps_device)"/>

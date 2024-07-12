@@ -1,0 +1,17 @@
+image: itrl_sidewalk.pgm
+resolution: 0.050000
+origin: [0.000000, -5.000000, 0.0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+
+datum:
+  position:
+    latitude: 37.7749
+    longitude: -122.4194
+    altitude: 10.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
