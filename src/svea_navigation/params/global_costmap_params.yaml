@@ -12,13 +12,13 @@ plugins:
 
 inflation_layer:
   cost_scaling_factor: 5.0          # Controls how fast costs drop off with distance from obstacles to obstacles + inflation radius.
-  inflation_radius: 0.8             # Sets the distance around obstacles within which costs are inflated. Its purpose is to let the planners compute trajectories as far away as possible from obstacles. Set it big for global planner to find a central trajectory.
-  inflate_unknown: true             # Decides if unknown space should also be inflated.
-  inscribed_radius: 0.5             # Defines the radius around the robot's footprint considered lethal.(robot cannot pass through it without collision)
+  inflation_radius: 0.4             # Sets the distance around obstacles within which costs are inflated. Its purpose is to let the planners compute trajectories as far away as possible from obstacles. Set it big for global planner to find a central trajectory.
+  inflate_unknown: false             # Decides if unknown space should also be inflated.
+  inscribed_radius: 0.2             # Defines the radius around the robot's footprint considered lethal.(robot cannot pass through it without collision)
 
 static_layer:                   # plugin for the costmap_2d package that integrates a static map into the global costmap to assist global planning. 
   map_topic: /map               # Topic to subscribe to for the static map
   subscribe_to_updates: false   # Whether to subscribe to map updates. (default false -> static map does not get updated)
-  lethal_cost_threshold: 100    # The threshold value at which to consider a cost lethal when reading in a map from the map server. By default it is 100.
+  #lethal_cost_threshold: 100    # The threshold value at which to consider a cost lethal when reading in a map from the map server. By default it is 100.
   unknown_cost_value: 100       # Value for unknown cells. If 100, we treat unknown space as occupied. By default it is -1.
-  track_unknown_space: false    # Whether to track unknown space. If true, robot will try to avoid unknown areas treating them as cells with cost unknown_cost_value.
+ # track_unknown_space: true    # Whether to track unknown space. If true, robot will try to avoid unknown areas treating them as cells with cost unknown_cost_value.

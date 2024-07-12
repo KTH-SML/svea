@@ -6,11 +6,11 @@ update_frequency: 5.0   # Update the costmap 5 times per second
 publish_frequency: 5.0  # Publish the costmap 5 times per second
 static_map: false        # It indicates that your local costmap will use a pre-built static map for navigation instead of relying solely on real-time sensor data. 
 rolling_window: true    
-width: 10.0
-height: 10.0
+width: 3.0
+height: 3.0
 resolution: 0.05
-obstacle_range: 10
-raytrace_range: 10
+obstacle_range: 3
+raytrace_range: 3
 
 plugins:
   - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
@@ -33,4 +33,4 @@ inflation_layer:
   cost_scaling_factor: 10.0         # Controls how fast costs drop off with distance from obstacles to obstacles + inflation radius.
   inflation_radius: 0.4             # Sets the distance around obstacles within which costs are inflated. Its purpose is to let the planners compute trajectories as far away as possible from obstacles
   inflate_unknown: false            # Decides if unknown space should also be inflated.
-  inscribed_radius: 0.3             # Defines the radius around the robot's footprint considered lethal.(robot cannot pass through it without collision)
+  inscribed_radius: 0.2             # Defines the radius around the robot's footprint considered lethal.(robot cannot pass through it without collision)

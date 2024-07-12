@@ -12,6 +12,7 @@
     <arg name="initial_pose_x"          default="0.0" />
     <arg name="initial_pose_y"          default="0.0" />
     <arg name="initial_pose_a"          default="0.0" />
+    <arg name="wait_for_datum"          default="false" />
 
     <!-- low-level interface (serial) -->
     <arg name="start_serial"            default="false" /> 
@@ -91,6 +92,7 @@
             <include file="$(find svea_sensors)/launch/sensors_launch/navsat.launch">
                 <arg name="delay"           value="$(arg delay)"/>
                 <arg name="yaw_offset"      value="$(arg initial_pose_a)"/>
+                <arg name="wait_for_datum"  value="$(arg wait_for_datum)" />
             </include>
             <!-- Start Lidar -->
             <include file="$(find svea_sensors)/launch/sensors_launch/lidar.launch">

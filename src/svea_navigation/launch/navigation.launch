@@ -10,6 +10,7 @@
     <arg name="initial_pose_x"  default="0"/>
     <arg name="initial_pose_y"  default="0"/>
     <arg name="initial_pose_a"  default="0" /> <!-- wrt to map-->
+    <arg name="wait_for_datum"  default="true" />
     <arg name="is_sim"          default="true"/>
 
     <!-- Start map server -->
@@ -48,6 +49,7 @@
             <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
             <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
             <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
+            <arg name="wait_for_datum"  value="$(arg wait_for_datum)" />
         </include>
     </group>
 

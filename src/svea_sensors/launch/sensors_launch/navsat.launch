@@ -2,7 +2,7 @@
 <launch>
     <arg name="delay"           default="2.0" />
     <arg name="yaw_offset"      default="0" />
-    <arg name="wait_for_datum"  default="true" />
+    <arg name="wait_for_datum"  default="false" />
 
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
         <param name="publish_filtered_gps"                              value="true"/>

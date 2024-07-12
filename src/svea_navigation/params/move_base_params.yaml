@@ -43,9 +43,9 @@ TebLocalPlannerROS:
     
  # Robot
          
- max_vel_x: 0.4
- max_vel_x_backwards: 0.2
- max_vel_theta: 0.3
+ max_vel_x: 0.45
+ max_vel_x_backwards: 0.15
+ max_vel_theta: 0.2
  acc_lim_x: 0.5
  acc_lim_theta: 0.5
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
@@ -60,15 +60,15 @@ TebLocalPlannerROS:
    vertices: [[-0.15, 0.17], [0.5, 0.17], [0.5, -0.17], [-0.15, -0.17]] # for type "polygon". the pose [0,0] is located at the rear-axle (axis of rotation)
 
  # ********************** Carlike robot parameters ********************
- min_turning_radius: 0.2          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m)
+ min_turning_radius: 0.15          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m)
  wheelbase: 0.324                 # Wheelbase of our robot
  cmd_angle_instead_rotvel: true # stage simulator takes the angle instead of the rotvel as input (twist message)
  # ********************************************************************
  
  # GoalTolerance. We do not care too much about the final
     
- xy_goal_tolerance: 0.3        # Acceptable linear distance away from the final goal, in meters. 
- yaw_goal_tolerance: 0.3
+ xy_goal_tolerance: 0.35        # Acceptable linear distance away from the final goal, in meters. 
+ yaw_goal_tolerance: 0.35
  free_goal_vel: true           # Unrestricted velocity when nearing the goal position
  complete_global_plan: false   # false: The robot may consider the global plan complete when it reaches a position that is sufficiently close to the final goal
 
