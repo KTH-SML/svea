@@ -15,9 +15,9 @@ def load_datum_from_yaml(file_path):
 def set_datum(datum_data):
     rospy.init_node('set_datum_node')
 
-    rospy.wait_for_service('/set_datum')
+    rospy.wait_for_service('/datum')
     try:
-        set_datum_service = rospy.ServiceProxy('/set_datum', SetDatum)
+        set_datum_service = rospy.ServiceProxy('/datum', SetDatum)
 
         geo_pose = GeoPose()
         geo_pose.position.latitude = datum_data['datum']['position']['latitude']
