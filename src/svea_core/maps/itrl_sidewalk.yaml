@@ -7,9 +7,9 @@ free_thresh: 0.196
 
 datum:
   position:
-    latitude: 37.7749
-    longitude: -122.4194
-    altitude: 10.0
+    latitude: 59.3508622
+    longitude: 18.0677067
+    altitude: 55.746
   orientation:
     x: 0.0
     y: 0.0
