@@ -4,8 +4,7 @@
 
     <!-- Args -->
     <arg name="record"          default="false"/>
-    <arg name="record_visual"   default="false"/>
-    <arg name="rosbag_prefix"   default="/svea_ws/src/ismir_data" />
+    <arg name="rosbag_prefix"   default="/svea_ws/src/localization_test" />
     <arg name="gps_device"      default="/dev/ttyACM1"/>
     <arg name="gps_auth_alt"    default="false"/>
     <arg name="initial_pose_a"  default="0.0"/>
@@ -64,12 +63,14 @@
     </node>
     <node pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_2" output="screen" >
         <param name="odom_topic" value="/odometry/filtered"/>
+        <param name="yaw_offset" value="$(arg initial_pose_a)"/>
     </node>
     <node pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_3" output="screen" >
         <param name="odom_topic" value="/odometry/filtered/global"/>
     </node>
     <node pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_4" output="screen" >
         <param name="odom_topic" value="/zed/zed_node/odom"/>
+        <param name="yaw_offset" value="$(arg initial_pose_a)"/>
     </node>
 
     <!-- Euler angles -->
@@ -98,9 +99,6 @@
     </node>
 
     <!-- Rosbag -->
-    <include if="$(arg record)" file="$(find svea_ismir)/launch/record_data.launch">
-        <arg name="rosbag_prefix"   value="$(arg rosbag_prefix)"/>
-        <arg name="record_visual"   value="$(arg record_visual)"/>
-    </include>
+    <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-a -o $(arg rosbag_prefix)"/>
 
 </launch>

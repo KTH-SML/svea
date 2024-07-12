@@ -36,6 +36,7 @@ class OdomToPathRelay:
             
             # Other parameters
             self.base_frame_id = load_param('~base_frame_id', 'base_link')
+            self.yaw_offset = load_param('~yaw_offset', 0.0)
             
             # TF2
             self.tf_buf = tf2_ros.Buffer()
@@ -87,9 +88,19 @@ class OdomToPathRelay:
                     rospy.logerr("{}: {}".format(rospy.get_name(), e))
                     return
                 
+            # Apply yaw offset
+            if self.yaw_offset != 0.0:
+                quaternion = (pose_stamped.pose.orientation.x, pose_stamped.pose.orientation.y, pose_stamped.pose.orientation.z, pose_stamped.pose.orientation.w)
+                euler = tr.euler_from_quaternion(quaternion)
+                quaternion_updated = tr.quaternion_from_euler(euler[0], euler[1], euler[2] + self.yaw_offset)
+                pose_stamped.pose.orientation.x = quaternion_updated[0]
+                pose_stamped.pose.orientation.y = quaternion_updated[1]
+                pose_stamped.pose.orientation.z = quaternion_updated[2]
+                pose_stamped.pose.orientation.w = quaternion_updated[3]
+
             # Append pose to path
             self.path.poses.append(pose_stamped)
-            
+
             # Publish path
             self.path_pub.publish(self.path)
         except Exception as e:
