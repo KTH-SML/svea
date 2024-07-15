@@ -36,7 +36,7 @@ class OdomToPathRelay:
             
             # Other parameters
             self.base_frame_id = load_param('~base_frame_id', 'base_link')
-            self.yaw_offset = load_param('~yaw_offset', 0.0)
+            self.initial_yaw_offset = load_param('~initial_yaw_offset', 0.0)
             
             # TF2
             self.tf_buf = tf2_ros.Buffer()
@@ -88,15 +88,9 @@ class OdomToPathRelay:
                     rospy.logerr("{}: {}".format(rospy.get_name(), e))
                     return
                 
-            # Apply yaw offset
-            if self.yaw_offset != 0.0:
-                quaternion = (pose_stamped.pose.orientation.x, pose_stamped.pose.orientation.y, pose_stamped.pose.orientation.z, pose_stamped.pose.orientation.w)
-                euler = tr.euler_from_quaternion(quaternion)
-                quaternion_updated = tr.quaternion_from_euler(euler[0], euler[1], euler[2] + self.yaw_offset)
-                pose_stamped.pose.orientation.x = quaternion_updated[0]
-                pose_stamped.pose.orientation.y = quaternion_updated[1]
-                pose_stamped.pose.orientation.z = quaternion_updated[2]
-                pose_stamped.pose.orientation.w = quaternion_updated[3]
+            # Apply initial yaw offset to pose by rotating about z-axis
+            if self.initial_yaw_offset != 0.0:
+                pose_stamped = self.apply_initial_yaw_offset(pose_stamped)
 
             # Append pose to path
             self.path.poses.append(pose_stamped)
@@ -138,6 +132,36 @@ class OdomToPathRelay:
         pose_transformed.pose.orientation.w = quaternion[3]
         
         return pose_transformed
+    
+    def apply_initial_yaw_offset(self, pose: PoseStamped) -> PoseStamped:
+        # Convert current pose to matrix form
+        position_matrix = tr.translation_matrix((pose.pose.position.x, pose.pose.position.y, pose.pose.position.z))
+        rotation_matrix = tr.quaternion_matrix((pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w))
+        pose_matrix = tr.concatenate_matrices(position_matrix, rotation_matrix)
+        
+        # Convert yaw offset to rotation matrix
+        yaw_offset_matrix = tr.rotation_matrix(self.initial_yaw_offset, (0, 0, 1))
+        
+        # Apply yaw offset to pose matrix
+        updated_pose_matrix = tr.concatenate_matrices(pose_matrix, yaw_offset_matrix)
+        
+        # Extract translation and quaternion from updated pose matrix
+        updated_position = tr.translation_from_matrix(updated_pose_matrix)
+        updated_quaternion = tr.quaternion_from_matrix(updated_pose_matrix)
+        
+        # Convert to pose stamped and return
+        updated_pose = PoseStamped()
+        updated_pose.header = pose.header
+        updated_pose.pose.position.x = updated_position[0]
+        updated_pose.pose.position.y = updated_position[1]
+        updated_pose.pose.position.z = updated_position[2]
+        updated_pose.pose.orientation.x = updated_quaternion[0]
+        updated_pose.pose.orientation.y = updated_quaternion[1]
+        updated_pose.pose.orientation.z = updated_quaternion[2]
+        updated_pose.pose.orientation.w = updated_quaternion[3]
+        
+        return updated_pose
+        
     
         
 if __name__ == '__main__':
