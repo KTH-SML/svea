@@ -143,7 +143,7 @@ class OdomToPathRelay:
         yaw_offset_matrix = tr.rotation_matrix(self.initial_yaw_offset, (0, 0, 1))
         
         # Apply yaw offset to pose matrix
-        updated_pose_matrix = tr.concatenate_matrices(pose_matrix, yaw_offset_matrix)
+        updated_pose_matrix = tr.concatenate_matrices(yaw_offset_matrix, pose_matrix)
         
         # Extract translation and quaternion from updated pose matrix
         updated_position = tr.translation_from_matrix(updated_pose_matrix)
