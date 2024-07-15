@@ -3,11 +3,12 @@
 <launch>
 
     <!-- Args -->
-    <arg name="record"          default="false"/>
-    <arg name="rosbag_prefix"   default="/svea_ws/src/localization_test" />
-    <arg name="gps_device"      default="/dev/ttyACM1"/>
-    <arg name="gps_auth_alt"    default="false"/>
-    <arg name="initial_pose_a"  default="0.0"/>
+    <arg name="record"                  default="false"/>
+    <arg name="rosbag_prefix"           default="/svea_ws/src/localization_test" />
+    <arg name="gps_device"              default="/dev/ttyACM1"/>
+    <arg name="gps_auth_alt"            default="false"/>
+    <arg name="initial_pose_a"          default="0.0"/>
+    <arg name="start_foxglove_bridge"   default="true"/>
 
     <!-- ZED Camera Args -->
     <arg name="zed_base_frame"  default="base_link"/>
@@ -96,6 +97,11 @@
     <node pkg="svea_sensors" type="gps_to_utm_relay.py" name="gps_to_utm_relay_2" output="screen" >
         <param name="gps_topic" value="/gps/filtered"/>
     </node>
+
+    <!-- Start Foxglove Bridge -->
+    <include if="$(eval start_foxglove_bridge)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
+        <arg name="port" value="8765" />
+    </include>
 
     <!-- Rosbag -->
     <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-a -o $(arg rosbag_prefix)"/>
