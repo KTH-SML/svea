@@ -209,6 +209,8 @@ class SimLidar(object):
         self._scan_msg.ranges = self.ranges
 
     def publish_scan(self):
+        # Replace NaNs with RANGE_MAX in the ranges list
+        self._scan_msg.ranges = [self.RANGE_MAX if np.isnan(r) else r for r in self.ranges]
         self._scan_pub.publish(self._scan_msg)
 
     def publish_viz_points(self):

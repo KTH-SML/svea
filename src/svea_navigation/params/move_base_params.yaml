@@ -19,17 +19,17 @@ TrajectoryPlannerROS:
 # Parameters for NavfnROS (global planner). It uses the Dijkstra's algorithm to compute the shortest path on a the global costmap.
 NavfnROS:
   tolerance: 0.2                 # The tolerance in meters to allow the goal point to be within. (defalut 0.1m)
-  planner_window_x: 3            # The width of the planner's search window in meters.
-  planner_window_y: 3            # The height of the planner's search window in meters.
+  planner_window_x: 5            # The width of the planner's search window in meters.
+  planner_window_y: 10            # The height of the planner's search window in meters.
   default_tolerance: 0.2         # Allow some tolerance in reaching the goal
   allow_unknown: false           # Whether or not the planner will allow paths through unknown space in the costmap.
   use_dijkstra: true             # Whether to use Dijkstra's algorithm for planning. If set to false, the planner will use A* algorithm instead.
-
+  #cost_factor: 3.0               # Scales the cost values from the costmap
 
 # Parameters for Teb local planner.
+# TEB focuses on real-time navigation using local data (local costmap).
 TebLocalPlannerROS:
 
- odom_topic: odometry/corrected
  map_frame:  odom
     
  # Trajectory
@@ -38,16 +38,16 @@ TebLocalPlannerROS:
  dt_ref: 0.3
  dt_hysteresis: 0.1                    # A big value ensures that minor dynamic speed changes or path length variations do not cause frequent resizing
  global_plan_overwrite_orientation: true
- max_global_plan_lookahead_dist: 3.0   # The planner will consider up to 3 meters ahead in the global plan for trajectory optimization. This helps in planning for upcoming obstacles and turns.
+ max_global_plan_lookahead_dist: 2.0   # The planner will consider up to N meters ahead in the global plan for trajectory optimization. This helps in planning for upcoming obstacles and turns.
  feasibility_check_no_poses: 3         # A feasibility check is performed after the optimizer returns a trajectory and before the velocity commands are sent to the robot. The purpose of this check is to identify an invalid/infeasible trajectory that might be produced by the optimizer (just remember: soft constraints, local minima, etc.).
     
  # Robot
          
- max_vel_x: 0.45
+ max_vel_x: 0.3
  max_vel_x_backwards: 0.15
- max_vel_theta: 0.2
- acc_lim_x: 0.5
- acc_lim_theta: 0.5
+ max_vel_theta: 0.15
+ acc_lim_x: 0.3
+ acc_lim_theta: 0.3
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
    type: "two_circles"
    radius: 0.2 # for type "circular"
@@ -60,7 +60,7 @@ TebLocalPlannerROS:
    vertices: [[-0.15, 0.17], [0.5, 0.17], [0.5, -0.17], [-0.15, -0.17]] # for type "polygon". the pose [0,0] is located at the rear-axle (axis of rotation)
 
  # ********************** Carlike robot parameters ********************
- min_turning_radius: 0.15          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m)
+ min_turning_radius: 0.2          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m)
  wheelbase: 0.324                 # Wheelbase of our robot
  cmd_angle_instead_rotvel: true # stage simulator takes the angle instead of the rotvel as input (twist message)
  # ********************************************************************
@@ -74,12 +74,20 @@ TebLocalPlannerROS:
 
  # Obstacles
     
- min_obstacle_dist: 0.6                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost.
+ min_obstacle_dist: 0.1                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost.
  inflation_dist: 0.0
  include_costmap_obstacles: true              # Determines whether the obstacles from the costmap should be included in the planning process.
- costmap_obstacles_behind_robot_dist: 0.5     # Specifies the maximum distance behind the robot where obstacles from the costmap are considered during planning.
+ costmap_obstacles_behind_robot_dist: 1       # Specifies the maximum distance behind the robot where obstacles from the costmap are considered during planning.
  dynamic_obstacle_inflation_dist: 0.0         # inflation already considered in the local costmap.
- obstacle_poses_affected: 30                  # Determines the number of past and future obstacle poses (positions) that influence the trajectory planning process.
+ obstacle_poses_affected: 10                  # Determines the number of past and future obstacle poses (positions) that influence the trajectory planning process.
+ allow_unknown: false   
+  # Costmap converter plugin   
+ costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSMCCH"
+  # costmap_converter_plugin: "costmap_converter::CostmapToLinesDBSRANSAC"
+  # costmap_converter_plugin: "costmap_converter::CostmapToLinesDBSMCCH"
+  # costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSConcaveHull"
+ costmap_converter_spin_thread: true
+ costmap_converter_rate: 4                                          
 
  # Optimization
     
@@ -125,28 +133,22 @@ TebLocalPlannerROS:
  shrink_horizon_min_duration: 10            # Ensures that the planner commits to the reduced horizon for a sufficient amount of time to potentially resolve issues, rather than constantly switching strategies.
  oscillation_recovery: true                 # Recovery behavior to handle oscillations (back-and-forth movements) in the robot's trajectory.
  oscillation_v_eps: 0.1                     # Threshold for detecting oscillations in linear velocity (m/s).
- oscillation_omega_eps: 0.1                 # Threshold for detecting oscillations in angular velocity (rad/s).
+ oscillation_omega_eps: 0.05                 # Threshold for detecting oscillations in angular velocity (rad/s).
  oscillation_recovery_min_duration: 10      # The minimum duration (in seconds) to apply oscillation recovery behavior. Ensures that the oscillation recovery behavior is applied for a sufficient amount of time.
  oscillation_filter_duration: 10            # Defines the time window for detecting oscillatory behavior. This helps in smoothing out transient movements and focusing on consistent oscillations that require recovery.
 
- # Costmap converter plugin   
- #costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSMCCH"
-  #costmap_converter_plugin: "costmap_converter::CostmapToLinesDBSRANSAC"
-  #costmap_converter_plugin: "costmap_converter::CostmapToLinesDBSMCCH"
-  #costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSConcaveHull"
-#  costmap_converter_spin_thread: true
-#  costmap_converter_rate: 4
 
 
-  ## Configure plugins (namespace move_base/costmap_to_lines or move_base/costmap_to_polygons)
-  ## costmap_converter/CostmapToLinesDBSRANSAC, costmap_converter/CostmapToLinesDBSMCCH, costmap_converter/CostmapToPolygonsDBSMCCH
-#  costmap_converter/CostmapToPolygonsDBSMCCH:             # Designed to convert costmap data (both from static and dynamic obstacles) into a polygonal representation
-#   cluster_max_distance: 0.1                              # Maximum distance between points in a cluster.
-#   cluster_min_pts: 2                                     # Minimum number of points required to form a cluster.
-#   ransac_inlier_distance: 0.15
-#   ransac_min_inliers: 10
-#   ransac_no_iterations: 1500
-#   ransac_remainig_outliers: 3
-#   ransac_convert_outlier_pts: true
-#   ransac_filter_remaining_outlier_pts: false
-#   convex_hull_min_pt_separation: 0.1
+
+  # Configure plugins (namespace move_base/costmap_to_lines or move_base/costmap_to_polygons)
+  # costmap_converter/CostmapToLinesDBSRANSAC, costmap_converter/CostmapToLinesDBSMCCH, costmap_converter/CostmapToPolygonsDBSMCCH
+ costmap_converter/CostmapToPolygonsDBSMCCH:             # Designed to convert costmap data (both from static and dynamic obstacles) into a polygonal representation
+    cluster_max_distance: 0.1                              # Maximum distance between points in a cluster.
+    cluster_min_pts: 2                                     # Minimum number of points required to form a cluster.
+    ransac_inlier_distance: 0.15
+    ransac_min_inliers: 10
+    ransac_no_iterations: 1500
+    ransac_remainig_outliers: 3
+    ransac_convert_outlier_pts: true
+    ransac_filter_remaining_outlier_pts: false
+    convex_hull_min_pt_separation: 0.1

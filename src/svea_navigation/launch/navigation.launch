@@ -3,8 +3,8 @@
     
     <!-- Launch file arguments -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
-    <arg name="gps_auth_alt"    default="false"/>
-    <arg name="map"             default="$(find svea_core)/maps/itrl_sidewalk.yaml"/>
+    <arg name="gps_auth_alt"    default="false"/>  <!-- set to true to try alternative gps account login data-->      
+    <arg name="map"             default="maps/itrl_sidewalk.yaml"/>
     <arg name="use_foxglove"    default="true"/>
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="initial_pose_x"  default="0"/>
@@ -14,15 +14,15 @@
     <arg name="is_sim"          default="true"/>
 
     <!-- Start map server -->
-    <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map)"/>
-    <!-- <rosparam command="load" file="$(find svea_core)/params/$(arg obstacle_map).yaml" /> -->
+    <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(find svea_navigation)/$(arg map)"/> 
+    <rosparam command="load" file="$(find svea_navigation)/maps/$(arg obstacle_map).yaml" /> 
 
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(arg is_sim)">
 
         <node pkg="svea_navigation" type="set_datum_node.py"  name="set_datum_node" output="screen">
-            <param name="datum_config"    value= "maps/itrl_sidewalk.yaml" />
-            <param name="package_name"    value= "svea_core" />
+            <param name="datum_config"    value= "$(arg map)" />
+            <param name="package_name"    value= "svea_navigation" />
         </node>
 
         <!-- RTK -->
@@ -72,8 +72,10 @@
         <!-- Specify the local planner (default) -->
         <!-- <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/> -->
         <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-        <param name="controller_frequency" value="10.0" />
-        <param name="controller_patience" value="15.0" />
+        <param if="$(arg is_sim)" name="TebLocalPlannerROS/odom_topic" value="odometry/corrected"/>
+        <param unless="$(arg is_sim)" name="TebLocalPlannerROS/odom_topic" value="odometry/filtered/global"/>
+        <param name="controller_frequency" value="4.0" />
+        <param name="controller_patience" value="10.0" />
         <param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
 
     </node>
