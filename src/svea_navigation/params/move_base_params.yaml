@@ -39,13 +39,13 @@ TebLocalPlannerROS:
  dt_hysteresis: 0.1                    # A big value ensures that minor dynamic speed changes or path length variations do not cause frequent resizing
  global_plan_overwrite_orientation: true
  max_global_plan_lookahead_dist: 2.0   # The planner will consider up to N meters ahead in the global plan for trajectory optimization. This helps in planning for upcoming obstacles and turns.
- feasibility_check_no_poses: 3         # A feasibility check is performed after the optimizer returns a trajectory and before the velocity commands are sent to the robot. The purpose of this check is to identify an invalid/infeasible trajectory that might be produced by the optimizer (just remember: soft constraints, local minima, etc.).
+ feasibility_check_no_poses: 2         # A feasibility check is performed after the optimizer returns a trajectory and before the velocity commands are sent to the robot. The purpose of this check is to identify an invalid/infeasible trajectory that might be produced by the optimizer (just remember: soft constraints, local minima, etc.).
     
  # Robot
          
- max_vel_x: 0.3
- max_vel_x_backwards: 0.15
- max_vel_theta: 0.15
+ max_vel_x: 0.4
+ max_vel_x_backwards: 0.3
+ max_vel_theta: 0.3
  acc_lim_x: 0.3
  acc_lim_theta: 0.3
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
@@ -60,15 +60,15 @@ TebLocalPlannerROS:
    vertices: [[-0.15, 0.17], [0.5, 0.17], [0.5, -0.17], [-0.15, -0.17]] # for type "polygon". the pose [0,0] is located at the rear-axle (axis of rotation)
 
  # ********************** Carlike robot parameters ********************
- min_turning_radius: 0.2          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m)
+ min_turning_radius: 0.3          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m)
  wheelbase: 0.324                 # Wheelbase of our robot
  cmd_angle_instead_rotvel: true # stage simulator takes the angle instead of the rotvel as input (twist message)
  # ********************************************************************
  
  # GoalTolerance. We do not care too much about the final
     
- xy_goal_tolerance: 0.35        # Acceptable linear distance away from the final goal, in meters. 
- yaw_goal_tolerance: 0.35
+ xy_goal_tolerance: 0.4        # Acceptable linear distance away from the final goal, in meters. 
+ yaw_goal_tolerance: 0.4
  free_goal_vel: true           # Unrestricted velocity when nearing the goal position
  complete_global_plan: false   # false: The robot may consider the global plan complete when it reaches a position that is sufficiently close to the final goal
 
@@ -76,6 +76,7 @@ TebLocalPlannerROS:
     
  min_obstacle_dist: 0.1                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost.
  inflation_dist: 0.0
+ include_dynamic_obstacles: true
  include_costmap_obstacles: true              # Determines whether the obstacles from the costmap should be included in the planning process.
  costmap_obstacles_behind_robot_dist: 1       # Specifies the maximum distance behind the robot where obstacles from the costmap are considered during planning.
  dynamic_obstacle_inflation_dist: 0.0         # inflation already considered in the local costmap.
@@ -102,11 +103,12 @@ TebLocalPlannerROS:
  weight_acc_lim_x: 1                   # Higher weight discourages rapid acceleration changes, promoting smoother acceleration profiles.
  weight_acc_lim_theta: 1
  weight_kinematics_nh: 1000            # Enforces the non-holonomic constraint strongly, ensuring the robot adheres to its kinematic constraints (e.g., a car-like robot that cannot move sideways).
- weight_kinematics_forward_drive: 1    # Encourages the robot to prefer forward motion over backward motion, which is generally more efficient and safer.
- weight_kinematics_turning_radius: 1   # Encourages the robot to make wider turns, reducing sharp turns that might be infeasible or unsafe.
+ weight_kinematics_forward_drive: 100    # Encourages the robot to prefer forward motion over backward motion, which is generally more efficient and safer.
+ weight_kinematics_turning_radius: 2   # Encourages the robot to make wider turns, reducing sharp turns that might be infeasible or unsafe.
  weight_optimaltime: 1                 # Balances the trajectory to minimize travel time while considering other constraints and weights. (must be >0)
  weight_shortest_path: 0
  weight_obstacle: 50                   # Significantly penalizes trajectories that get close to obstacles, promoting safer paths.
+ weight_dynamic_obstacle: 50
  weight_viapoint: 1                    # Via points from global plan are intermediate points that the trajectory should pass through. The weight_viapoint parameter influences how strongly the planner tries to follow these via points. A higher weight means that the planner will prioritize hitting the via points more strictly, while a lower weight means it will be less strict about following these points.
  weight_adapt_factor: 2                # The planner reduces or increases the priority of obstacle avoidance according whether an open environment or a tight and crowded environment is detected, allowing the robot to move more efficiently.
 
@@ -135,7 +137,7 @@ TebLocalPlannerROS:
  oscillation_v_eps: 0.1                     # Threshold for detecting oscillations in linear velocity (m/s).
  oscillation_omega_eps: 0.05                 # Threshold for detecting oscillations in angular velocity (rad/s).
  oscillation_recovery_min_duration: 10      # The minimum duration (in seconds) to apply oscillation recovery behavior. Ensures that the oscillation recovery behavior is applied for a sufficient amount of time.
- oscillation_filter_duration: 10            # Defines the time window for detecting oscillatory behavior. This helps in smoothing out transient movements and focusing on consistent oscillations that require recovery.
+ oscillation_filter_duration: 5            # Defines the time window for detecting oscillatory behavior. This helps in smoothing out transient movements and focusing on consistent oscillations that require recovery.
 
 
 
@@ -143,7 +145,7 @@ TebLocalPlannerROS:
   # Configure plugins (namespace move_base/costmap_to_lines or move_base/costmap_to_polygons)
   # costmap_converter/CostmapToLinesDBSRANSAC, costmap_converter/CostmapToLinesDBSMCCH, costmap_converter/CostmapToPolygonsDBSMCCH
  costmap_converter/CostmapToPolygonsDBSMCCH:             # Designed to convert costmap data (both from static and dynamic obstacles) into a polygonal representation
-    cluster_max_distance: 0.1                              # Maximum distance between points in a cluster.
+    cluster_max_distance: 0.4                              # Maximum distance between points in a cluster.
     cluster_min_pts: 2                                     # Minimum number of points required to form a cluster.
     ransac_inlier_distance: 0.15
     ransac_min_inliers: 10

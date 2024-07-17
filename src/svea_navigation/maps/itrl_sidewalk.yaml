@@ -13,5 +13,5 @@ datum:
   orientation:
     x: 0.0
     y: 0.0
-    z: 0.9127639  # 2,3 radianti da est.
-    w: 0.4084874  
+    z: 0.8912074  # 2,2 radianti da est.
+    w: 0.4535961  
