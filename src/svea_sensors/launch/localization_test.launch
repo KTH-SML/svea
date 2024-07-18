@@ -8,6 +8,7 @@
     <arg name="gps_device"              default="/dev/ttyACM1"/>
     <arg name="gps_auth_alt"            default="false"/>
     <arg name="initial_pose_a"          default="0.0"/>
+    <arg name="start_zed_camera"        default="false"/>
     <arg name="start_foxglove_bridge"   default="false"/>
 
     <!-- ZED Camera Args -->
@@ -45,7 +46,7 @@
     </include>
 
     <!-- Vision -->
-    <include file="$(find svea_vision)/launch/zed_main.launch">
+    <include if="$(arg start_zed_camera)" file="$(find svea_vision)/launch/zed_main.launch">
         <arg name="enable_sidewalk_segmentation"    value="false"/>
         <arg name="enable_bbox_image"               value="false"/>
         <arg name="enable_state_estimation"         value="false"/>
@@ -68,7 +69,7 @@
     <node pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_3" output="screen" >
         <param name="odom_topic" value="/odometry/filtered/global"/>
     </node>
-    <node pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_4" output="screen" >
+    <node if="$(arg start_zed_camera)" pkg="svea_sensors" type="odom_to_path_relay.py" name="odom_to_path_relay_4" output="screen" >
         <param name="odom_topic"            value="/zed/zed_node/odom"/>
         <param name="initial_yaw_offset"    value="$(arg initial_pose_a)"/>
     </node>
@@ -83,7 +84,7 @@
     <node pkg="svea_sensors" type="quat_to_euler_relay.py" name="quat_to_euler_relay_3" output="screen" >
         <param name="quat_topic" value="/odometry/filtered/global"/>
     </node>
-    <node pkg="svea_sensors" type="quat_to_euler_relay.py" name="quat_to_euler_relay_4" output="screen" >
+    <node if="$(arg start_zed_camera)" pkg="svea_sensors" type="quat_to_euler_relay.py" name="quat_to_euler_relay_4" output="screen" >
         <param name="quat_topic" value="/zed/zed_node/odom"/>
     </node>
     <node pkg="svea_sensors" type="quat_to_euler_relay.py" name="quat_to_euler_relay_5" output="screen" >
