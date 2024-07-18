@@ -16,11 +16,11 @@ def load_param(name, value=None):
     return rospy.get_param(name, value)
 
 
-class SetDatum:
+class SetDatumNode:
     def __init__(self) -> None:
         try:
             # Initialize node
-            rospy.init_node('set_datum')
+            rospy.init_node('set_datum_node')
             
             # Topic Parameters
             self.datum_service = load_param('~datum_service', 'datum')
@@ -75,18 +75,18 @@ class SetDatum:
     def set_datum(self):
         # Set datum service request
         orientation = quaternion_from_euler(0, 0, self.datum['yaw'])
-        datum_srv = GeoPose()
-        datum_srv.position.latitude = self.datum['latitude']
-        datum_srv.position.longitude = self.datum['longitude']
-        datum_srv.position.altitude = 0.0
-        datum_srv.orientation.x = orientation[0]
-        datum_srv.orientation.y = orientation[1]
-        datum_srv.orientation.z = orientation[2]
-        datum_srv.orientation.w = orientation[3]
+        geopose = GeoPose()
+        geopose.position.latitude = self.datum['latitude']
+        geopose.position.longitude = self.datum['longitude']
+        geopose.position.altitude = 0.0
+        geopose.orientation.x = orientation[0]
+        geopose.orientation.y = orientation[1]
+        geopose.orientation.z = orientation[2]
+        geopose.orientation.w = orientation[3]
         
         # Call set datum service
         try:
-            response = self.set_datum_service(datum_srv)
+            response = self.set_datum_service(geopose)
             if response:
                 rospy.loginfo(f"{rospy.get_name()}: Datum set successfully.")
             else:
@@ -96,4 +96,4 @@ class SetDatum:
             
             
 if __name__ == '__main__':
-    node = SetDatum()
+    node = SetDatumNode()

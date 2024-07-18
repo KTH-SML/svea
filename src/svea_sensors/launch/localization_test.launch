@@ -20,6 +20,12 @@
     <arg name="zed_cam_pitch"   default="0.0"/>
     <arg name="zed_cam_yaw"     default="0.0"/>
 
+    <!-- Datum args, if use_datum is true, the datum will be set -->
+    <arg name="use_datum"               default="false" />
+    <arg name="datum_service"           default="/datum" />
+    <arg name="datum_file"              default="" />
+    <arg name="datum_data"              default="" />
+
     <!-- RTK -->
     <group unless="$(arg gps_auth_alt)">
         <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
@@ -43,6 +49,10 @@
         <arg name="start_wheel_encoders"    value="false"/>
         <arg name="initial_pose_a"          value="$(arg initial_pose_a)"/>
         <arg name="publish_tf"              value="false"/>
+        <arg name="use_datum"               value="$(arg use_datum)"/>
+        <arg name="datum_service"           value="$(arg datum_service)"/>
+        <arg name="datum_file"              value="$(arg datum_file)"/>
+        <arg name="datum_data"              value="$(arg datum_data)"/>
     </include>
 
     <!-- Vision -->

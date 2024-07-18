@@ -24,7 +24,7 @@
     </node> 
 
     <!-- Atleast one of the datum_file or datum_data must be set, if both are set, datum_file will be used -->
-    <node if="$(arg use_datum)" pkg="svea_sensors" type="set_datum" name="set_datum" output="screen">
+    <node if="$(arg use_datum)" pkg="svea_sensors" type="set_datum_node.py" name="set_datum_node" output="screen">
         <param name="datum_service"     value="$(arg datum_service)" />
         <param name="service_timeout"   value="60.0" />
         <param name="datum_file"        value="$(arg datum_file)" />
