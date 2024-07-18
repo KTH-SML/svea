@@ -7,7 +7,7 @@
     <arg name="use_datum"               default="false" />
     <arg name="datum_service"           default="/datum" />
     <arg name="datum_file"              default="" />
-    <arg name="datum_data"              default="" />
+    <arg name="datum_data"              default="[]" />
 
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
         <param name="publish_filtered_gps"                              value="true"/>

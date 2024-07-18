@@ -27,9 +27,12 @@ class SetDatumNode:
             
             # Other Parameters
             self.datum_file = load_param('~datum_file', "")
-            self.datum_data = load_param('~datum_data', "")
-            self.datum_data = ast.literal_eval(self.datum_data)
+            self.datum_data = load_param('~datum_data', "[]")
             self.service_timeout = load_param('~service_timeout', 60)
+            try:
+                self.datum_data = ast.literal_eval(self.datum_data)
+            except Exception as e:
+                raise ValueError(f"{rospy.get_name()}: Invalid datum_data provided, it should be a list of 3 elements. Error: {e}")
             
             # Warning if both datum_file and datum_data are provided
             if self.datum_file != "" and len(self.datum_data) > 0:
@@ -56,6 +59,8 @@ class SetDatumNode:
         except Exception as e:
             # Log error
             rospy.logerr(e)
+            # Shutdown node
+            rospy.signal_shutdown(f"{rospy.get_name()}: Initialization failed.")
 
         else:
             # Log status

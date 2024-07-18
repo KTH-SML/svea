@@ -43,7 +43,7 @@
     <arg name="use_datum"               default="false" />
     <arg name="datum_service"           default="/datum" />
     <arg name="datum_file"              default="" />
-    <arg name="datum_data"              default="" />
+    <arg name="datum_data"              default="[]" />
 
     <!-- odom to map node -->
     <arg name="map_frame"               default="map"/>

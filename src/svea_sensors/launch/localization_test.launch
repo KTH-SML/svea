@@ -24,7 +24,7 @@
     <arg name="use_datum"               default="false" />
     <arg name="datum_service"           default="/datum" />
     <arg name="datum_file"              default="" />
-    <arg name="datum_data"              default="" />
+    <arg name="datum_data"              default="[]" />
 
     <!-- RTK -->
     <group unless="$(arg gps_auth_alt)">
