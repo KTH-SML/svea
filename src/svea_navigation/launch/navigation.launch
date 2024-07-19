@@ -16,12 +16,12 @@
     <!-- Datum args, if use_datum is true, the datum will be set -->
     <arg name="use_datum"               default="true" />
     <arg name="datum_service"           default="/datum" />
-    <arg name="datum_file"              default="$(find svea_navigation)/maps/$(arg map)" />
+    <arg name="datum_file"              default="$(find svea_navigation)/$(arg map)" />
     <arg name="datum_data"              default="[]" />   
  
     <!-- Start map server -->
     <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(find svea_navigation)/$(arg map)"/>
-    <rosparam command="load" file="$(find svea_navigation)/$(arg obstacle_map).yaml" />
+    <rosparam command="load" file="$(find svea_navigation)/maps/$(arg obstacle_map).yaml" />
 
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(arg is_sim)">
