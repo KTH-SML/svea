@@ -21,7 +21,7 @@
  
     <!-- Start map server -->
     <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(find svea_navigation)/$(arg map)"/>
-    <rosparam command="load" file="$(find svea_navigation)/maps/$(arg obstacle_map).yaml" />
+    <rosparam command="load" file="$(find svea_navigation)/$(arg obstacle_map).yaml" />
 
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(arg is_sim)">
