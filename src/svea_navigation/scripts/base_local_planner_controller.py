@@ -23,11 +23,6 @@ class BaseLocalPlannerController(object):
 
         self.velocity = linear_velocity
 
-        # Ensure minimum velocity thresholds for car-like behavior
-        # if 0 < self.velocity < 0.3:
-        #     self.velocity = 0.3
-        # elif -0.3 < self.velocity < 0:
-        #     self.velocity = -0.3
 
     def compute_control(self, state):
         return self.steering, self.velocity

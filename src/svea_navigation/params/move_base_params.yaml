@@ -49,9 +49,9 @@ TebLocalPlannerROS:
  acc_lim_x: 0.3
  acc_lim_theta: 0.3
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
-   type: "two_circles"
+   type: "line"
    radius: 0.2 # for type "circular"
-   line_start: [-0.1, 0.0] # for type "line"
+   line_start: [-0.15, 0.0] # for type "line"
    line_end: [0.4, 0.0] # for type "line"
    front_offset: 0.16 # for type "two_circles"
    front_radius: 0.3 # for type "two_circles"
@@ -74,7 +74,7 @@ TebLocalPlannerROS:
 
  # Obstacles
     
- min_obstacle_dist: 0.1                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost.
+ min_obstacle_dist: 0.3                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost.
  inflation_dist: 0.0
  include_dynamic_obstacles: true
  include_costmap_obstacles: true              # Determines whether the obstacles from the costmap should be included in the planning process.
@@ -103,7 +103,7 @@ TebLocalPlannerROS:
  weight_acc_lim_x: 1                   # Higher weight discourages rapid acceleration changes, promoting smoother acceleration profiles.
  weight_acc_lim_theta: 1
  weight_kinematics_nh: 1000            # Enforces the non-holonomic constraint strongly, ensuring the robot adheres to its kinematic constraints (e.g., a car-like robot that cannot move sideways).
- weight_kinematics_forward_drive: 100    # Encourages the robot to prefer forward motion over backward motion, which is generally more efficient and safer.
+ weight_kinematics_forward_drive: 10   # Encourages the robot to prefer forward motion over backward motion, which is generally more efficient and safer.
  weight_kinematics_turning_radius: 2   # Encourages the robot to make wider turns, reducing sharp turns that might be infeasible or unsafe.
  weight_optimaltime: 1                 # Balances the trajectory to minimize travel time while considering other constraints and weights. (must be >0)
  weight_shortest_path: 0
@@ -137,7 +137,7 @@ TebLocalPlannerROS:
  oscillation_v_eps: 0.1                     # Threshold for detecting oscillations in linear velocity (m/s).
  oscillation_omega_eps: 0.05                 # Threshold for detecting oscillations in angular velocity (rad/s).
  oscillation_recovery_min_duration: 10      # The minimum duration (in seconds) to apply oscillation recovery behavior. Ensures that the oscillation recovery behavior is applied for a sufficient amount of time.
- oscillation_filter_duration: 5            # Defines the time window for detecting oscillatory behavior. This helps in smoothing out transient movements and focusing on consistent oscillations that require recovery.
+ oscillation_filter_duration: 1            # Defines the time window for detecting oscillatory behavior. This helps in smoothing out transient movements and focusing on consistent oscillations that require recovery.
 
 
 
