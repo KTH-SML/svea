@@ -1,4 +1,4 @@
-image: sidewalk_DKv_30_east_to_west_mod1.pgm
+image: sidewalk_DKv_30_east_to_west.pgm
 resolution: 0.050000
 origin: [0.000000, -5.000000, 0.000000]
 negate: 0

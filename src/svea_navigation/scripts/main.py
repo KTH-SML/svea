@@ -12,8 +12,10 @@ from svea.states import VehicleState
 from svea.simulators.sim_SVEA import SimSVEA
 from svea.interfaces import LocalizationInterface
 from base_local_planner_controller import BaseLocalPlannerController
+from controller2 import Controller2
 from svea.svea_managers.svea_archetypes import SVEAManager
 from svea.data import TrajDataHandler, RVIZPathHandler
+from std_msgs.msg import Float32
 
 
 def load_param(name, value=None):
@@ -60,6 +62,9 @@ class main:
         state = VehicleState(*self.STATE)
         publish_initialpose(state)
 
+        self.steering_pub = rospy.Publisher('/nav_steering_angle', Float32, queue_size=1)
+        self.velocity_pub = rospy.Publisher('/nav_vehicle_velocity', Float32, queue_size=1)
+
         ## Create simulators, models, managers, etc.
         if self.IS_SIM:
 
@@ -76,7 +81,7 @@ class main:
 
         # start the SVEA manager (needed for both sim and real world)
         self.svea = SVEAManager(LocalizationInterface,
-                                    BaseLocalPlannerController,
+                                    Controller2,
                                     data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
         self.svea.start(wait=True)
 
@@ -95,8 +100,14 @@ class main:
 
         state = self.svea.wait_for_state()                  # limit the rate of main loop by waiting for state
         steering, velocity = self.svea.compute_control()
+        self.publish_control(steering,velocity)
         self.svea.send_control(steering, velocity)
         self.svea.visualize_data()
+        
+    def publish_control(self,steering,velocity):
+        self.steering_pub.publish(steering)
+        self.velocity_pub.publish(velocity)
+
 
 
 if __name__ == '__main__':

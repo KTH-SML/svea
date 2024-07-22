@@ -70,9 +70,10 @@
 
     <!-- Start debugging tools, if enabled. -->
     <group if="$(arg verbose)">
-        <node name="lidar_visualizer" pkg="svea_navigation" type="lidar_visualizer.py" output="screen">
+        <!-- <node name="lidar_visualizer" pkg="svea_navigation" type="lidar_visualizer.py" output="screen">
             <param name="is_sim" value="$(arg is_sim)"/>
-        </node>
+        </node> -->
+
     </group>
 
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
