@@ -40,14 +40,15 @@ TebLocalPlannerROS:
  global_plan_overwrite_orientation: true
  max_global_plan_lookahead_dist: 2.0   # The planner will consider up to N meters ahead in the global plan for trajectory optimization. This helps in planning for upcoming obstacles and turns.
  feasibility_check_no_poses: 2         # A feasibility check is performed after the optimizer returns a trajectory and before the velocity commands are sent to the robot. The purpose of this check is to identify an invalid/infeasible trajectory that might be produced by the optimizer (just remember: soft constraints, local minima, etc.).
-    
+ max_samples: 200
+ 
  # Robot
          
  max_vel_x: 0.6
- max_vel_x_backwards: 0.4
- max_vel_theta: 0.4
- acc_lim_x: 0.3
- acc_lim_theta: 0.3
+ max_vel_x_backwards: 0.3
+ max_vel_theta: 0.3       # = v_max/r_min
+ acc_lim_x: 0.5
+ acc_lim_theta: 0.5
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
    type: "line"
    radius: 0.2 # for type "circular"
@@ -60,9 +61,12 @@ TebLocalPlannerROS:
    vertices: [[-0.15, 0.17], [0.5, 0.17], [0.5, -0.17], [-0.15, -0.17]] # for type "polygon". the pose [0,0] is located at the rear-axle (axis of rotation)
 
  # ********************** Carlike robot parameters ********************
- min_turning_radius: 0.3          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m)
+ carlike_kinematics: true
+ enable_odom_backwards: true
+ min_turning_radius: 0.3          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m). It influences trajectory generation.
  wheelbase: 0.324                 # Wheelbase of our robot
- cmd_angle_instead_rotvel: true # stage simulator takes the angle instead of the rotvel as input (twist message)
+ cmd_angle_instead_rotvel: true   # Instead of providing a rotational velocity (angular velocity), the planner provides a steering angle.
+ enable_nh_heading: true          # Non-holonomic heading
  # ********************************************************************
  
  # GoalTolerance. We do not care too much about the final
@@ -104,7 +108,7 @@ TebLocalPlannerROS:
  weight_acc_lim_theta: 1
  weight_kinematics_nh: 1000            # Enforces the non-holonomic constraint strongly, ensuring the robot adheres to its kinematic constraints (e.g., a car-like robot that cannot move sideways).
  weight_kinematics_forward_drive: 10   # Encourages the robot to prefer forward motion over backward motion, which is generally more efficient and safer.
- weight_kinematics_turning_radius: 2   # Encourages the robot to make wider turns, reducing sharp turns that might be infeasible or unsafe.
+ weight_kinematics_turning_radius: 5  # Encourages the robot to make wider turns, reducing sharp turns that might be infeasible or unsafe.
  weight_optimaltime: 1                 # Balances the trajectory to minimize travel time while considering other constraints and weights. (must be >0)
  weight_shortest_path: 0
  weight_obstacle: 50                   # Significantly penalizes trajectories that get close to obstacles, promoting safer paths.

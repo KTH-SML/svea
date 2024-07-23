@@ -4,7 +4,7 @@
     <!-- Launch file arguments -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
     <arg name="gps_auth_alt"    default="false"/>  <!-- set to true to try alternative gps account login data-->
-    <arg name="map"             default="maps/sidewalk_DKv_30_east_to_west.yaml"/>
+    <arg name="map"             default="maps/itrl_sidewalk.yaml"/>
     <arg name="use_foxglove"    default="true"/>
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="initial_pose_x"  default="0"/>
@@ -12,6 +12,8 @@
     <arg name="initial_pose_a"  default="0" /> <!-- wrt to map-->
     <arg name="is_sim"          default="true"/>
     <arg name="verbose"         default="false"/>    <!-- boolean to enable visualization tools for easier debugging -->
+    <arg name="record"          default="false"/>
+    <arg name="rosbag_prefix"   default="/svea_ws/src/svea_navigation/bags/DKv_30"/>
 
     <!-- Datum args, if use_datum is true, the datum will be set -->
     <arg name="use_datum"               default="true" />
@@ -92,5 +94,14 @@
         <param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
 
     </node>
+
+    <!-- Conditional rosbag recording node -->
+    <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-o $(arg rosbag_prefix)
+        /cmd_vel
+        /nav_steering_angle
+        /nav_vehicle_velocity
+        /gps/fix
+        /odometry/filtered/global
+    " />
 
 </launch>
