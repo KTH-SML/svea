@@ -31,6 +31,9 @@ NavfnROS:
 TebLocalPlannerROS:
 
  map_frame:  odom
+
+ # Planning frequency
+ #replan_frequency: 0  # Update the plan. By default it is done as much as possible.   DOES NOT WORK
     
  # Trajectory
 
@@ -44,26 +47,26 @@ TebLocalPlannerROS:
  
  # Robot
          
- max_vel_x: 0.6
+ max_vel_x: 0.4
  max_vel_x_backwards: 0.3
  max_vel_theta: 0.3       # = v_max/r_min
- acc_lim_x: 0.5
- acc_lim_theta: 0.5
+ acc_lim_x: 0.3
+ acc_lim_theta: 0.3
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
    type: "line"
    radius: 0.2 # for type "circular"
-   line_start: [-0.15, 0.0] # for type "line"
+   line_start: [-0.1, 0.0] # for type "line"
    line_end: [0.4, 0.0] # for type "line"
    front_offset: 0.16 # for type "two_circles"
    front_radius: 0.3 # for type "two_circles"
    rear_offset: 0    # for type "two_circles"
    rear_radius: 0.25 # for type "two_circles"
-   vertices: [[-0.15, 0.17], [0.5, 0.17], [0.5, -0.17], [-0.15, -0.17]] # for type "polygon". the pose [0,0] is located at the rear-axle (axis of rotation)
+   vertices: [[-0.15, 0.14], [0.35, 0.14], [0.35, -0.14], [-0.15, -0.14]]    # ismir shell considered. for type "polygon". the pose [0,0] is located at the rear-axle (axis of rotation)
 
  # ********************** Carlike robot parameters ********************
  carlike_kinematics: true
  enable_odom_backwards: true
- min_turning_radius: 0.3          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m). It influences trajectory generation.
+ min_turning_radius: 0.5          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m). It influences trajectory generation.
  wheelbase: 0.324                 # Wheelbase of our robot
  cmd_angle_instead_rotvel: true   # Instead of providing a rotational velocity (angular velocity), the planner provides a steering angle.
  enable_nh_heading: true          # Non-holonomic heading
@@ -78,13 +81,13 @@ TebLocalPlannerROS:
 
  # Obstacles
     
- min_obstacle_dist: 0.3                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost.
+ min_obstacle_dist: 0.3                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost. Using line footprint it has to include half of car width as well (0.14m).
  inflation_dist: 0.0
  include_dynamic_obstacles: true
  include_costmap_obstacles: true              # Determines whether the obstacles from the costmap should be included in the planning process.
  costmap_obstacles_behind_robot_dist: 1       # Specifies the maximum distance behind the robot where obstacles from the costmap are considered during planning.
  dynamic_obstacle_inflation_dist: 0.0         # inflation already considered in the local costmap.
- obstacle_poses_affected: 10                  # Determines the number of past and future obstacle poses (positions) that influence the trajectory planning process.
+ obstacle_poses_affected: 10                  # How many of the closest obstacles (in terms of distance) are considered when computing the robot’s trajectory and planning its path
  allow_unknown: false   
   # Costmap converter plugin   
  costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSMCCH"
@@ -148,7 +151,7 @@ TebLocalPlannerROS:
 
   # Configure plugins (namespace move_base/costmap_to_lines or move_base/costmap_to_polygons)
   # costmap_converter/CostmapToLinesDBSRANSAC, costmap_converter/CostmapToLinesDBSMCCH, costmap_converter/CostmapToPolygonsDBSMCCH
- costmap_converter/CostmapToPolygonsDBSMCCH:             # Designed to convert costmap data (both from static and dynamic obstacles) into a polygonal representation
+ costmap_converter/CostmapToPolygonsDBSMCCH:             # Designed to convert costmap data (both from static and dynamic obstacles) into a polygonal representation. The plugin interprets areas of the costmap with high cost values (typically representing obstacles) and converts these areas into polygons
     cluster_max_distance: 0.4                              # Maximum distance between points in a cluster.
     cluster_min_pts: 2                                     # Minimum number of points required to form a cluster.
     ransac_inlier_distance: 0.15

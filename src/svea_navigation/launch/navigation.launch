@@ -4,7 +4,7 @@
     <!-- Launch file arguments -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
     <arg name="gps_auth_alt"    default="false"/>  <!-- set to true to try alternative gps account login data-->
-    <arg name="map"             default="maps/itrl_sidewalk.yaml"/>
+    <arg name="map"             default="maps/sidewalk_DKv_30_east_to_west.yaml"/>
     <arg name="use_foxglove"    default="true"/>
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="initial_pose_x"  default="0"/>
@@ -72,9 +72,9 @@
 
     <!-- Start debugging tools, if enabled. -->
     <group if="$(arg verbose)">
-        <!-- <node name="lidar_visualizer" pkg="svea_navigation" type="lidar_visualizer.py" output="screen">
+        <node name="lidar_visualizer" pkg="svea_navigation" type="lidar_visualizer.py" output="screen">
             <param name="is_sim" value="$(arg is_sim)"/>
-        </node> -->
+        </node>
 
     </group>
 

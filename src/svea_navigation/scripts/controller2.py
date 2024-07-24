@@ -20,11 +20,11 @@ class Controller2(object):
         raw_steering = data.angular.z 
         raw_velocity = data.linear.x
 
-        if abs(raw_velocity) < self.DEADZONE:
+        if abs(raw_velocity) <= self.DEADZONE:
             self.velocity = 0.0
-        elif raw_velocity >= self.DEADZONE and raw_velocity < self.MIN_SPEED:
+        elif raw_velocity > self.DEADZONE and raw_velocity < self.MIN_SPEED:
             self.velocity = self.MIN_SPEED
-        elif raw_velocity <= -self.DEADZONE and raw_velocity > -self.MIN_SPEED:
+        elif raw_velocity < -self.DEADZONE and raw_velocity > -self.MIN_SPEED:
             self.velocity = -self.MIN_SPEED
         else:
             self.velocity = raw_velocity

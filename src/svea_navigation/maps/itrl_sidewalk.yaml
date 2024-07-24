@@ -6,6 +6,6 @@ occupied_thresh: 0.65
 free_thresh: 0.196
 
 datum:
-  latitude: 59.3508622
-  longitude: 18.0677067 
-  yaw: 2.35
+  latitude: 59.3508331 
+  longitude: 18.0677238 
+  yaw: 2.2 

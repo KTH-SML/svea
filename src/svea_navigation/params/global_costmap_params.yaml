@@ -1,5 +1,5 @@
 # costmap used by global planner to find a path. 
-footprint: [[-0.15, 0.17], [0.5, 0.17], [0.5, -0.17], [-0.15, -0.17]]
+footprint: [[-0.15, 0.14], [0.35, 0.14], [0.35, -0.14], [-0.15, -0.14]]    # ismir shell considered.
 global_frame: map                      # Frame ID of the global costmap
 robot_base_frame: base_link            # Frame ID of the robot's base
 static_map: true                       #  initialised with map from map_server
