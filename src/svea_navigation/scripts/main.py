@@ -81,7 +81,7 @@ class main:
 
         # start the SVEA manager (needed for both sim and real world)
         self.svea = SVEAManager(LocalizationInterface,
-                                    Controller2,
+                                    BaseLocalPlannerController,
                                     data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
         self.svea.start(wait=True)
 

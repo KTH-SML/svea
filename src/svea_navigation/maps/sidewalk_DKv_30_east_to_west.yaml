@@ -6,6 +6,6 @@ occupied_thresh: 0.65
 free_thresh: 0.196
 
 datum:
-  latitude: 59.3498521
-  longitude: 18.068956 
-  yaw: 2.356
+  latitude: 59.3496168      # Recorded values while segmenting sidewalk: 59.3498521
+  longitude: 18.0692504     # 18.068956 
+  yaw: 2.2                  # original was:2.356

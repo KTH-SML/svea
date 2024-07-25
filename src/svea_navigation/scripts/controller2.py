@@ -7,7 +7,7 @@ from geometry_msgs.msg import Twist
 
 class Controller2(object):
 
-    MIN_SPEED = 0.2
+    MIN_SPEED = 0.25
     DEADZONE = 0 # 0.07
 
     def __init__(self, vehicle_name=''):
