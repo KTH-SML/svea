@@ -13,3 +13,6 @@ src/.vscode/
 
 venv/
 site/
+
+src/zed-ros-wrapper/
+requirements.txt
