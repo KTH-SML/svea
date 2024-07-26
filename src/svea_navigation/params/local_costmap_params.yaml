@@ -2,8 +2,8 @@
 footprint: [[-0.15, 0.14], [0.35, 0.14], [0.35, -0.14], [-0.15, -0.14]]    # ismir shell considered.
 global_frame: map
 robot_base_frame: base_link
-update_frequency: 10.0   # Update the costmap
-publish_frequency: 10.0  # Publish the costmap
+update_frequency: 10.0   # Update the costmap.    4
+publish_frequency: 10.0  # Publish the costmap.   4
 #static_map: true        # It indicates that your local costmap will use a pre-built static map for navigation instead of relying solely on real-time sensor data. 
 rolling_window: true    
 width: 3.5

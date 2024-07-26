@@ -52,8 +52,8 @@
   <depend>rospy</depend>
   <depend>svea_core</depend>
   <depend>move_base</depend>
-  <depend>robot_localization</depend>
   <depend>teb_local_planner</depend>
+
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

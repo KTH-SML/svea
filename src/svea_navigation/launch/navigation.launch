@@ -11,9 +11,27 @@
     <arg name="initial_pose_y"  default="0"/>
     <arg name="initial_pose_a"  default="0" /> <!-- wrt to map-->
     <arg name="is_sim"          default="true"/>
-    <arg name="verbose"         default="false"/>    <!-- boolean to enable visualization tools for easier debugging -->
+    <arg name="is_lidar"        default="false"/>    <!-- boolean to enable visualization of lidar rays -->
     <arg name="record"          default="false"/>
     <arg name="rosbag_prefix"   default="/svea_ws/src/svea_navigation/bags/DKv_30"/>
+
+    <!-- Svea vision / ZED Camera Args -->
+    <arg name="zed_base_frame"  default="base_link"/>
+    <arg name="zed_cam_pos_x"   default="0.4"/>
+    <arg name="zed_cam_pos_y"   default="0.0"/>
+    <arg name="zed_cam_pos_z"   default="0.6"/>
+    <arg name="zed_cam_roll"    default="0.0"/>
+    <arg name="zed_cam_pitch"   default="0.0"/>
+    <arg name="zed_cam_yaw"     default="0.0"/>
+    <arg name="prompt_type"     default="bbox"/>
+    <arg name="prompt_text"     default="a sidewalk or footpath or walkway or paved path"/>
+    <arg name="owl_roi"         default="[0.25, 0.50, 0.75, 0.95]"/>
+    <arg name="verbose"         default="true"/>
+
+    <!-- Enable/Disable Args for svea vision -->
+    <arg name="enable_sidewalk_segmentation" default="false"/>
+    <arg name="enable_bbox_image"            default="true"/>
+    <arg name="enable_state_estimation"      default="false"/>
 
     <!-- Datum args, if use_datum is true, the datum will be set -->
     <arg name="use_datum"               default="true" />
@@ -66,6 +84,24 @@
             <arg name="datum_file"              value="$(arg datum_file)"/>
             <arg name="datum_data"              value="$(arg datum_data)"/>
         </include>
+
+        <!-- Vision -->
+        <include file="$(find svea_vision)/launch/zed_main.launch">
+            <arg name="enable_sidewalk_segmentation"    value="$(arg enable_sidewalk_segmentation)"/>
+            <arg name="enable_bbox_image"               value="$(arg enable_bbox_image)"/>
+            <arg name="enable_state_estimation"         value="$(arg enable_state_estimation)"/>
+            <arg name="sidewalk_prompt_type"            value="$(arg prompt_type)"/>
+            <arg name="sidewalk_prompt_text"            value="$(arg prompt_text)"/>
+            <arg name="sidewalk_owl_roi"                value="$(arg owl_roi)"/>
+            <arg name="verbose"                         value="$(arg verbose)"/>
+            <arg name="zed_base_frame"                  value="$(arg zed_base_frame)"/>
+            <arg name="zed_cam_pos_x"                   value="$(arg zed_cam_pos_x)"/>
+            <arg name="zed_cam_pos_y"                   value="$(arg zed_cam_pos_y)"/>
+            <arg name="zed_cam_pos_z"                   value="$(arg zed_cam_pos_z)"/>
+            <arg name="zed_cam_roll"                    value="$(arg zed_cam_roll)"/>
+            <arg name="zed_cam_pitch"                   value="$(arg zed_cam_pitch)"/>
+            <arg name="zed_cam_yaw"                     value="$(arg zed_cam_yaw)"/>
+        </include>
     </group>
 
     <!-- Start Foxglove -->
@@ -80,7 +116,7 @@
     </node>
 
     <!-- Start debugging tools, if enabled. -->
-    <group if="$(arg verbose)">
+    <group if="$(arg is_lidar)">
         <node name="lidar_visualizer" pkg="svea_navigation" type="lidar_visualizer.py" output="screen">
             <param name="is_sim" value="$(arg is_sim)"/>
         </node>
