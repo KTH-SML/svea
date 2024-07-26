@@ -53,7 +53,7 @@
   <depend>svea_core</depend>
   <depend>move_base</depend>
   <depend>teb_local_planner</depend>
-
+  <depend>svea_vision</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
