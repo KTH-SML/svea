@@ -10,10 +10,13 @@ width: 3.5
 height: 3.5
 resolution: 0.05
 
+expected_update_rate: 1.0
+observation_persistence: 1.0
+
 
 plugins:
   - {name: global_layer, type: "costmap_2d::StaticLayer"}  # For global map data  
-  - {name: voxel_layer, type: "costmap_2d::VoxelLayer"}
+  - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
   - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
   
 
@@ -21,7 +24,7 @@ global_layer:
   map_topic: /map  
   subscribe_to_updates: false 
 
-voxel_layer:
+obstacle_layer:
   enabled: true
   observation_sources: point_cloud_sensor
   point_cloud_sensor:
