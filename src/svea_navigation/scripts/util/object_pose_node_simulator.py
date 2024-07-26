@@ -6,6 +6,9 @@ from svea_vision_msgs.msg import StampedObjectPoseArray, ObjectPose
 from std_msgs.msg import Header
 import numpy as np
 import os
+import tf2_ros
+import tf2_geometry_msgs
+from geometry_msgs.msg import PoseStamped
 
 class ObjectPoseSimulator:
     """
@@ -24,27 +27,30 @@ class ObjectPoseSimulator:
     - `speed` (float): Speed of the pedestrians in meters per second. 
     - `frequency` (float): Frequency of the node in Hz.
     """
-    
     def __init__(self, yaml_file, speed=1, frequency=1.0):
         rospy.init_node('object_pose_node_simulator')
         self.pub = rospy.Publisher('/objectposes', StampedObjectPoseArray, queue_size=1)
         self.yaml_file = yaml_file
         self.speed = speed
         self.frequency = frequency
-        
+
         # Load trajectories from YAML file
-        self.trajectories = self.load_trajectories()                # Trajectory is a list where each element is a dictionary representing a point.
+        self.trajectories = self.load_trajectories()
         self.current_indexes = self.initialize_indexes()
-        self.current_positions = []  
-        
+        self.current_positions = []
+
         # Initialize positions with starting points
         self.initialize_positions()
-        
+
         # Compute the step size based on speed and frequency
         self.step_size = self.speed / self.frequency
-        
+
         # Set up the rate for publishing
         self.rate = rospy.Rate(frequency)
+
+        # Initialize TF buffer and listener
+        self.tf_buffer = tf2_ros.Buffer()
+        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
         
         # Start the simulation
         self.simulate_pose_array()
@@ -95,7 +101,8 @@ class ObjectPoseSimulator:
         """
         while not rospy.is_shutdown():
             pose_array = StampedObjectPoseArray()
-            pose_array.header = Header(stamp=rospy.Time.now(), frame_id='map')
+            pose_array.header = Header(stamp=rospy.Time.now(), frame_id='base_link')
+            
             for i, trajectory in enumerate(self.trajectories):
                 if len(trajectory) < 2:
                     continue
@@ -105,13 +112,33 @@ class ObjectPoseSimulator:
                 # Interpolate the position
                 self.current_positions[i] = self.interpolate_position(self.current_positions[i], end_pos, self.step_size)
                 
-                # Create and append the ObjectPose message
-                pose = ObjectPose()
-                pose.pose.pose.position.x = self.current_positions[i][0]
-                pose.pose.pose.position.y = self.current_positions[i][1]
-                pose.pose.pose.position.z = self.current_positions[i][2]
-                pose_array.objects.append(pose)
+                # Create the PoseStamped message for transformation
+                pose_stamped = PoseStamped()
+                pose_stamped.header.stamp = rospy.Time.now()
+                pose_stamped.header.frame_id = 'map'
+                pose_stamped.pose.position.x = self.current_positions[i][0]
+                pose_stamped.pose.position.y = self.current_positions[i][1]
+                pose_stamped.pose.position.z = self.current_positions[i][2]
+                pose_stamped.pose.orientation.w = 1.0  # Assuming no rotation
                 
+                try:
+                    if self.tf_buffer.can_transform('base_link', 'map', rospy.Time.now(), rospy.Duration(1.0)):
+                        # Transform the pose to the base_link frame
+                        transformed_pose = self.tf_buffer.transform(pose_stamped, 'base_link')
+                        # Create and append the ObjectPose message
+                        pose = ObjectPose()
+                        pose.pose.pose.position.x = transformed_pose.pose.position.x
+                        pose.pose.pose.position.y = transformed_pose.pose.position.y
+                        pose.pose.pose.position.z = transformed_pose.pose.position.z
+                        pose.pose.pose.orientation = transformed_pose.pose.orientation
+                        pose_array.objects.append(pose)
+                    else:
+                         rospy.logwarn("Transform from map to base_link is not available.")
+                
+                except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
+                    rospy.logwarn(f"Transform exception: {e}")
+                    continue
+
                 # Update the current position index and trajectory
                 if np.linalg.norm(self.current_positions[i] - end_pos) < self.step_size:
                     self.current_indexes[i] += 1

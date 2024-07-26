@@ -56,7 +56,7 @@ class main:
         ## Parameters
         self.USE_RVIZ = load_param('~use_rviz', False)
         self.IS_SIM = load_param('~is_sim', False)
-        self.STATE = load_param('~state', [2, 0, 0, 0])   # floor2: [-1.5, -0.7, 1, 0]
+        self.STATE = load_param('~state', [3, 0, 0, 0])   # floor2: [-1.5, -0.7, 1, 0]
         ## Set initial values for node
         # initial state
         state = VehicleState(*self.STATE)
