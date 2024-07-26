@@ -23,11 +23,20 @@
  
     <!-- Start map server -->
     <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(find svea_navigation)/$(arg map)"/>
-    <rosparam command="load" file="$(find svea_navigation)/maps/$(arg obstacle_map).yaml" />
+    <!-- <rosparam command="load" file="$(find svea_navigation)/maps/$(arg obstacle_map).yaml" /> -->
+
+    <!-- Start simulated poses generator if simulation. -->
+    <group if="$(arg is_sim)">
+        <node name="object_pose_node_simulator" pkg="svea_navigation" type="object_pose_node_simulator.py" output="screen">
+        </node>
+    </group>
+
+    <!-- Start pointcloud converter node -->
+    <node name="pointcloud_from_poses_node" pkg="svea_navigation" type="pointcloud_from_poses_node.py" output="screen">
+    </node>
 
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(arg is_sim)">
-
         <!-- RTK -->
         <group unless="$(arg gps_auth_alt)">
             <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
@@ -75,7 +84,6 @@
         <node name="lidar_visualizer" pkg="svea_navigation" type="lidar_visualizer.py" output="screen">
             <param name="is_sim" value="$(arg is_sim)"/>
         </node>
-
     </group>
 
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">

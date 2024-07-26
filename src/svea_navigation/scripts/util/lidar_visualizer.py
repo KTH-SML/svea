@@ -6,7 +6,6 @@ from sensor_msgs.msg import LaserScan, PointCloud
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point, Point32
 from nav_msgs.msg import Odometry
-from std_msgs.msg import ColorRGBA
 from math import sin, cos
 from tf.transformations import euler_from_quaternion
 
