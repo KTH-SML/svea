@@ -9,7 +9,7 @@ class BaseLocalPlannerController(object):
 
     MIN_SPEED = 0.25
     DEADZONE = 0.0
-    MAX_STEERING_CHANGE = 0.2  # Maximum change in steering per time step. (0.2 = 12 deg. SVEA has 80 deg. steering window.)
+    MAX_STEERING_CHANGE = 0.2  # Maximum change in steering per time step. (0.2 = 12 deg. SVEA has 120 deg. steering window.)
 
 
     def __init__(self, vehicle_name=''):

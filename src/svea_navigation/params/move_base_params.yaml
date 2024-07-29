@@ -101,7 +101,7 @@ TebLocalPlannerROS:
     
  no_inner_iterations: 5                # Controls the number of optimization steps taken within each outer iteration.
  no_outer_iterations: 4                # Controls how many times the entire optimization process is repeated. 
- obstacle_cost_exponent: 2             # Controls the rate at which the cost increases as the robot gets closer to an obstacle
+ obstacle_cost_exponent: 2.5           # Controls the rate at which the cost increases as the robot gets closer to an obstacle
  optimization_activate: true
  optimization_verbose: false
  penalty_epsilon: 0.1
@@ -110,12 +110,12 @@ TebLocalPlannerROS:
  weight_acc_lim_x: 1                   # Higher weight discourages rapid acceleration changes, promoting smoother acceleration profiles.
  weight_acc_lim_theta: 1
  weight_kinematics_nh: 1000            # Enforces the non-holonomic constraint strongly, ensuring the robot adheres to its kinematic constraints (e.g., a car-like robot that cannot move sideways).
- weight_kinematics_forward_drive: 10   # Encourages the robot to prefer forward motion over backward motion, which is generally more efficient and safer.
- weight_kinematics_turning_radius: 5  # Encourages the robot to make wider turns, reducing sharp turns that might be infeasible or unsafe.
- weight_optimaltime: 1                 # Balances the trajectory to minimize travel time while considering other constraints and weights. (must be >0)
+ weight_kinematics_forward_drive: 1    # Encourages the robot to prefer forward motion over backward motion, which is generally more efficient and safer.
+ weight_kinematics_turning_radius: 5   # Encourages the robot to make wider turns, reducing sharp turns that might be infeasible or unsafe.
+ weight_optimaltime: 10                 # Balances the trajectory to minimize travel time while considering other constraints and weights. (must be >0)
  weight_shortest_path: 0
- weight_obstacle: 50                   # Significantly penalizes trajectories that get close to obstacles, promoting safer paths.
- weight_dynamic_obstacle: 50
+ weight_obstacle: 30                   # Significantly penalizes trajectories that get close to obstacles, promoting safer paths.
+ weight_dynamic_obstacle: 1000          # dynamic obstacles are the ones detected by the obstacle layer is the local costmap.
  weight_viapoint: 1                    # Via points from global plan are intermediate points that the trajectory should pass through. The weight_viapoint parameter influences how strongly the planner tries to follow these via points. A higher weight means that the planner will prioritize hitting the via points more strictly, while a lower weight means it will be less strict about following these points.
  weight_adapt_factor: 2                # The planner reduces or increases the priority of obstacle avoidance according whether an open environment or a tight and crowded environment is detected, allowing the robot to move more efficiently.
 
@@ -152,7 +152,7 @@ TebLocalPlannerROS:
   # Configure plugins (namespace move_base/costmap_to_lines or move_base/costmap_to_polygons)
   # costmap_converter/CostmapToLinesDBSRANSAC, costmap_converter/CostmapToLinesDBSMCCH, costmap_converter/CostmapToPolygonsDBSMCCH
  costmap_converter/CostmapToPolygonsDBSMCCH:             # Designed to convert costmap data (both from static and dynamic obstacles) into a polygonal representation. The plugin interprets areas of the costmap with high cost values (typically representing obstacles) and converts these areas into polygons
-    cluster_max_distance: 0.4                              # Maximum distance between points in a cluster.
+    cluster_max_distance: 0.3                              # Maximum distance between points in a cluster.
     cluster_min_pts: 2                                     # Minimum number of points required to form a cluster.
     ransac_inlier_distance: 0.15
     ransac_min_inliers: 10
