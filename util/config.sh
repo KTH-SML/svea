@@ -9,7 +9,7 @@
 #ROSDISTRO="noetic"
 #BUILD_FILE="Dockerfile.base"
 #BUILD_TAG="ros:$ROSDISTRO"
-#IMAGE_TAG="ghcr.io/kth-sml/svea:$(uname -m)"
+IMAGE_TAG="ghcr.io/kth-sml/svea:r35.4.1"
 
 main() {
 
