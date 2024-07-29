@@ -8,8 +8,8 @@
 ## Uncomment to build base image
 #ROSDISTRO="noetic"
 #BUILD_FILE="Dockerfile.base"
-#BUILD_TAG="ros:$ROSDISTRO"
-IMAGE_TAG="ghcr.io/kth-sml/svea:r35.4.1"
+BUILD_TAG="ghcr.io/kth-sml/svea:r35.4.1"
+IMAGE_TAG="svea:r35.4.1"
 
 main() {
 
