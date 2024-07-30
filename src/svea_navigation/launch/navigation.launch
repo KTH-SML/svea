@@ -16,6 +16,7 @@
     <arg name="rosbag_prefix"   default="/svea_ws/src/svea_navigation/bags/DKv_30"/>
 
     <!-- Svea vision / ZED Camera Args -->
+    <arg name="frame_id"        default="map"/>             <!-- desired frame of the detected object's poses. -->
     <arg name="zed_base_frame"  default="base_link"/>
     <arg name="zed_cam_pos_x"   default="0.4"/>
     <arg name="zed_cam_pos_y"   default="0.0"/>
@@ -101,6 +102,7 @@
             <arg name="zed_cam_roll"                    value="$(arg zed_cam_roll)"/>
             <arg name="zed_cam_pitch"                   value="$(arg zed_cam_pitch)"/>
             <arg name="zed_cam_yaw"                     value="$(arg zed_cam_yaw)"/>
+            <arg name="frame_id"                        value="$(arg frame_id)"/> 
         </include>
     </group>
 
