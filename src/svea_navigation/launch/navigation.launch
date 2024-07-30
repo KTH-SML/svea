@@ -54,6 +54,8 @@
     <node name="pointcloud_from_poses_node" pkg="svea_navigation" type="pointcloud_from_poses_node.py" output="screen">
     </node>
 
+    <!-- If is_sim equal to false, then include all these tags-->
+    <group unless="$(arg is_sim)">
         <!-- Start localization. it also starts low level interface and map server -->
         <include file="$(find svea_sensors)/launch/localize.launch">
             <arg name="is_indoors"              value="false"/>
