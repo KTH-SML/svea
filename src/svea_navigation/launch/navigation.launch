@@ -4,7 +4,7 @@
     <!-- Launch file arguments -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
     <arg name="gps_auth_alt"    default="false"/>  <!-- set to true to try alternative gps account login data-->
-    <arg name="map"             default="maps/sidewalk_DKv_30_east_to_west.yaml"/>
+    <arg name="map"             default="maps/itrl_sidewalk.yaml-"/>   <!-- eg: sidewalk_DKv_30_east_to_west.yaml or itrl_sidewalk.yaml-->
     <arg name="use_foxglove"    default="true"/>
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="initial_pose_x"  default="0"/>
@@ -53,24 +53,6 @@
     <!-- Start pointcloud converter node -->
     <node name="pointcloud_from_poses_node" pkg="svea_navigation" type="pointcloud_from_poses_node.py" output="screen">
     </node>
-
-    <!-- If is_sim equal to false, then include all these tags-->
-    <group unless="$(arg is_sim)">
-        <!-- RTK -->
-        <group unless="$(arg gps_auth_alt)">
-            <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
-                <arg name="gps_device"    value="$(arg gps_device)"/>
-                <arg name="username"      value="708583036" />
-                <arg name="password"      value="151515" />
-            </include>
-        </group>
-        <group if="$(arg gps_auth_alt)">
-            <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
-                <arg name="gps_device"    value="$(arg gps_device)"/>
-                <arg name="username"      value="707886204" />
-                <arg name="password"      value="115544" />
-            </include>
-        </group>
 
         <!-- Start localization. it also starts low level interface and map server -->
         <include file="$(find svea_sensors)/launch/localize.launch">
