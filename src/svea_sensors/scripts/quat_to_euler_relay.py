@@ -1,5 +1,9 @@
 #! /usr/bin/env python3
 
+__author__ = "Sulthan Suresh Fazeela"
+__email__ = "sultha@kth.se"
+__license__ = "MIT"
+
 import rospy
 import rostopic
 from tf.transformations import euler_from_quaternion
