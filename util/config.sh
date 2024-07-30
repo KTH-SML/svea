@@ -6,10 +6,10 @@
 # Author: Kaj Munhoz Arfvidsson
 
 ## Uncomment to build base image
-#ROSDISTRO="noetic"
-#BUILD_FILE="Dockerfile.base"
-BUILD_TAG="ghcr.io/kth-sml/svea:r35.4.1"
-IMAGE_TAG="svea:r35.4.1"
+ROSDISTRO="noetic"
+BUILD_FILE="Dockerfile.base"
+BUILD_TAG="svea_ismir:r35.3.1"
+IMAGE_TAG="svea_ismir_marco:r35.3.1"
 
 main() {
 

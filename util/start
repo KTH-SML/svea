@@ -1,0 +1,19 @@
+#! /bin/sh
+#
+# Start a container.
+#
+# This starts a stopped container.
+#
+# Author: Sulthan Suresh Fazeela
+
+. "$(dirname "$0")/config.sh"
+
+# Setting default arguments
+if [ -z "$*" ]; then
+    set -- "$CONTAINER_NAME"
+fi
+
+istrue DEBUG && fn="echo" || fn="exec"
+
+"$fn" docker start \
+    "$@"
