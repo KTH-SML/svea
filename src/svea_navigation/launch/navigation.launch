@@ -127,6 +127,9 @@
 
     <!-- Conditional rosbag recording node -->
     <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-o $(arg rosbag_prefix)
+        /map
+        /map_metadata
+        /move_base/NavfnROS/plan
         /3D_car
         /gps/filtered
         /gps/fix
