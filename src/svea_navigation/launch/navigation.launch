@@ -127,6 +127,23 @@
 
     <!-- Conditional rosbag recording node -->
     <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-o $(arg rosbag_prefix)
+        /3D_car
+        /gps/filtered
+        /gps/fix
+        /initialpose
+        /move_base/TebLocalPlannerROS/local_plan
+        /move_base/local_costmap/costmap
+        /objectposes
+        /objectmarkers
+        /objects
+        /obstacle_pointcloud
+        /odometry/corrected
+        /odometry/filtered
+        /odometry/filtered/global
+        /odometry/gps
+        /tf
+        /tf_static
+
         /cmd_vel
         /nav_steering_angle
         /nav_vehicle_velocity
