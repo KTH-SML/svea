@@ -2,10 +2,10 @@
 <launch>
 
     <!-- Launch file arguments -->
-    <arg name="start_gps"       default="false"/>       <!-- if set to false, rtk.launch has to be launched standalone, before this file. -->
+    <arg name="start_gps"       default="true"/>       <!-- if set to false, rtk.launch has to be launched standalone, before this file. -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
     <arg name="gps_auth_alt"    default="false"/>       <!-- set to true to try alternative gps account login data-->
-    <arg name="map"             default="maps/itrl_sidewalk.yaml"/>   <!-- eg: sidewalk_DKv_30_east_to_west.yaml or itrl_sidewalk.yaml-->
+    <arg name="map"             default="maps/sidewalk_DKv_30_east_to_west.yaml"/>   <!-- eg: sidewalk_DKv_30_east_to_west.yaml or itrl_sidewalk.yaml-->
     <arg name="use_foxglove"    default="true"/>
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="initial_pose_x"  default="0"/>
