@@ -162,7 +162,7 @@ class ObjectPoseSimulator:
 if __name__ == '__main__':
     try:
         yaml_file_path = '/svea_ws/src/svea_navigation/scripts/util/simulated_trajectories/traj_rand.yaml'
-        publish_frame_id = 'base_link'            # frame ID where the poses are published. choose between map and base_link
+        publish_frame_id = 'map'            # frame ID where the poses are published. choose between map and base_link
         simulator = ObjectPoseSimulator(yaml_file_path, publish_frame_id)
         rospy.spin() 
     except rospy.ROSInterruptException:

@@ -53,11 +53,12 @@ class PointCloudPublisher:
         Parameters:
         - msg (StampedObjectPoseArray): The message received from the /objectposes topic.
         """
-        # Check if it's time to clear the costmap
-        current_time = rospy.Time.now().to_sec()
-        if current_time - self.last_clear_time >= self.clear_interval:
-            self.clear_costmap()
-            self.last_clear_time = current_time
+        if self.clear_interval != -1:
+            # Check if it's time to clear the costmap
+            current_time = rospy.Time.now().to_sec()
+            if current_time - self.last_clear_time >= self.clear_interval:
+                self.clear_costmap()
+                self.last_clear_time = current_time
 
         # Convert StampedObjectPoseArray to PointCloud2
         points = []
@@ -79,7 +80,7 @@ if __name__ == '__main__':
         pointcloud_topic = '/obstacle_pointcloud'
         clear_costmap_service = '/move_base/clear_costmaps'
         obstacles_topis = '/objectposes'
-        clear_interval = 1     # time in seconds after which the local costmap gets cleaned.
+        clear_interval = 2     # time in seconds after which the local costmap gets cleaned. -1 = do not clear.
         
         publisher = PointCloudPublisher(obstacles_topis, pointcloud_topic, clear_costmap_service, clear_interval)
         rospy.spin() 

@@ -2,7 +2,7 @@
 <launch>
 
     <!-- Launch file arguments -->
-    <arg name="start_gps"       default="true"/>       <!-- if set to false, rtk.launch has to be launched standalone, before this file. -->
+    <arg name="start_gps"       default="true"/>       <!-- if set to false to let the gps signal stabilize first, launch gps_launch.launch before this file. -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
     <arg name="gps_auth_alt"    default="false"/>       <!-- set to true to try alternative gps account login data-->
     <arg name="map"             default="maps/sidewalk_DKv_30_east_to_west.yaml"/>   <!-- eg: sidewalk_DKv_30_east_to_west.yaml or itrl_sidewalk.yaml-->
@@ -52,8 +52,8 @@
         </node>
     </group>
 
-    <!-- Start pointcloud converter node -->
-    <node name="pointcloud_from_poses_node" pkg="svea_navigation" type="pointcloud_from_poses_node.py" output="screen">
+    <!--pointcloud_from_poses_node.py or dynamic_obstacles_inflator.py -->
+    <node name="dynamic_obstacles_inflator" pkg="svea_navigation" type="pointcloud_from_poses_node.py" output="screen">
     </node>
 
     <!-- If is_sim equal to false, then include all these tags-->
