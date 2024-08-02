@@ -170,6 +170,7 @@
         /cmd_vel
         /nav_steering_angle
         /nav_vehicle_velocity
+        /bbox_image
     " />
 
 </launch>

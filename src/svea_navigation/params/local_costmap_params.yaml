@@ -1,6 +1,6 @@
 # costmap used by local planner/controller to find a path.  
 footprint: [[-0.15, 0.14], [0.35, 0.14], [0.35, -0.14], [-0.15, -0.14]]    # ismir shell considered.
-global_frame: odom
+global_frame: map
 robot_base_frame: base_link
 update_frequency: 8.0   # Update the costmap.    4
 publish_frequency: 8.0  # Publish the costmap.   4

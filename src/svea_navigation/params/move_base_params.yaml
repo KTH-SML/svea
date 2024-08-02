@@ -30,7 +30,7 @@ NavfnROS:
 # TEB focuses on real-time navigation using local data (local costmap).
 TebLocalPlannerROS:
 
- map_frame:  odom
+ map_frame:  map
 
  # Trajectory
 
