@@ -78,13 +78,13 @@ TebLocalPlannerROS:
 
  # Obstacles
     
- min_obstacle_dist: 0.5                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost. Using line footprint it has to include half of car width as well (0.14m).
+ min_obstacle_dist: 0.3                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost. Using line footprint it has to include half of car width as well (0.14m).
  inflation_dist: 0.0
  include_dynamic_obstacles: true              # Specify whether the motion of dynamic obstacles should be included (constant-velocity-model) or not.
  include_costmap_obstacles: true              # Determines whether the obstacles from the costmap should be included in the planning process.
  costmap_obstacles_behind_robot_dist: 1.5       # Specifies the maximum distance behind the robot where obstacles from the costmap are considered during planning.
- dynamic_obstacle_inflation_dist: 0.8         # inflation already considered in the local costmap.
- obstacle_poses_affected: 10                  # How many of the closest obstacles (in terms of distance) are considered when computing the robot’s trajectory and planning its path
+ dynamic_obstacle_inflation_dist: 0.0         # inflation already considered in the local costmap.
+ obstacle_poses_affected: 20                  # How many of the closest obstacles (in terms of distance) are considered when computing the robot’s trajectory and planning its path
  allow_unknown: false   
   # Costmap converter plugin   
  costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSMCCH"
@@ -92,7 +92,7 @@ TebLocalPlannerROS:
   # costmap_converter_plugin: "costmap_converter::CostmapToLinesDBSMCCH"
   # costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSConcaveHull"
  costmap_converter_spin_thread: true
- costmap_converter_rate: 5                                          
+ costmap_converter_rate: 8                                          
 
  # Optimization
     
@@ -111,7 +111,7 @@ TebLocalPlannerROS:
  weight_kinematics_turning_radius: 5   # Encourages the robot to make wider turns, reducing sharp turns that might be infeasible or unsafe.
  weight_optimaltime: 10                 # Balances the trajectory to minimize travel time while considering other constraints and weights. (must be >0)
  weight_shortest_path: 0
- weight_obstacle: 30                   # Significantly penalizes trajectories that get close to static obstacles, promoting safer paths.
+ weight_obstacle: 50                   # Significantly penalizes trajectories that get close to obstacles, promoting safer paths.
  weight_dynamic_obstacle: 1000          # dynamic obstacles are the ones detected by the obstacle layer is the local costmap.
  weight_dynamic_obstacle_inflation: 30  # Optimization weight for inflation costs of dynamic obstacles.
  weight_viapoint: 1                    # Via points from global plan are intermediate points that the trajectory should pass through. The weight_viapoint parameter influences how strongly the planner tries to follow these via points. A higher weight means that the planner will prioritize hitting the via points more strictly, while a lower weight means it will be less strict about following these points.

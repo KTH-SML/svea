@@ -2,8 +2,8 @@
 footprint: [[-0.15, 0.14], [0.35, 0.14], [0.35, -0.14], [-0.15, -0.14]]    # ismir shell considered.
 global_frame: odom
 robot_base_frame: base_link
-update_frequency: 10.0   # Update the costmap.    4
-publish_frequency: 10.0  # Publish the costmap.   4
+update_frequency: 8.0   # Update the costmap.    4
+publish_frequency: 8.0  # Publish the costmap.   4
 #static_map: true        # It indicates that your local costmap will use a pre-built static map for navigation instead of relying solely on real-time sensor data. 
 rolling_window: true    
 width: 5
@@ -15,7 +15,7 @@ resolution: 0.05
 
 plugins:
   - {name: global_layer, type: "costmap_2d::StaticLayer"}  # For global map data  
-  - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
+ # - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}    # remove obstacle layer if using zonotope generator or dynamic obstacles inflator.
   - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
   
 
@@ -33,7 +33,7 @@ obstacle_layer:
     marking: true
     clearing: true
     obstacle_range: 5
-    raytrace_range: 5         # not needed if I force costmap clearing. TODO : test it on the car.
+    raytrace_range: 5         # not needed if I force costmap clearing. TODO : test it on the car. Result: it works sporadically.
 
 
 inflation_layer:
