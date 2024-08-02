@@ -155,6 +155,7 @@
         /gps/fix
         /initialpose
         /move_base/TebLocalPlannerROS/local_plan
+        /move_base/TebLocalPlannerROS/obstacles
         /move_base/local_costmap/costmap
         /objectposes
         /objectmarkers
