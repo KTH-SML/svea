@@ -7,7 +7,7 @@ __license__ = "MIT"
 import rospy
 import rostopic
 from tf.transformations import euler_from_quaternion
-from geometry_msgs.msg import Quaternion, Vector3
+from geometry_msgs.msg import Vector3Stamped
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
 
@@ -64,7 +64,7 @@ class QuatToEulerRelay:
                 
                 # Publishers
                 self.euler_topic = self.quat_topic + '/orientation/euler'
-                self.euler_pub = rospy.Publisher(self.euler_topic, Vector3, queue_size=10)
+                self.euler_pub = rospy.Publisher(self.euler_topic, Vector3Stamped, queue_size=10)
                 
                 # Subscribers
                 self.quat_sub = rospy.Subscriber(self.quat_topic, self.quat_type, self.callback)
@@ -94,11 +94,12 @@ class QuatToEulerRelay:
                 # Convert quaternion to roll, pitch, and yaw
                 roll, pitch, yaw = euler_from_quaternion([quat.x, quat.y, quat.z, quat.w])
                 
-                # Create Vector3 message (in degrees)
-                euler_msg = Vector3()
-                euler_msg.x = roll * 180 / math.pi
-                euler_msg.y = pitch * 180 / math.pi
-                euler_msg.z = yaw * 180 / math.pi
+                # Create Vector3Stamped message (in degrees)
+                euler_msg = Vector3Stamped()
+                euler_msg.header = msg.header
+                euler_msg.vector.x = roll * 180 / math.pi
+                euler_msg.vector.y = pitch * 180 / math.pi
+                euler_msg.vector.z = yaw * 180 / math.pi
                 
                 # Publish euler message
                 self.euler_pub.publish(euler_msg)

@@ -243,25 +243,25 @@
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/odometry/filtered/global/orientation/euler.z",
+          "value": "/odometry/filtered/global/orientation/euler.vector.z",
           "enabled": true,
           "label": "Global Odom"
         },
         {
           "timestampMethod": "receiveTime",
-          "value": "/odometry/filtered/orientation/euler.z",
+          "value": "/odometry/filtered/orientation/euler.vector.z",
           "enabled": true,
           "label": "Local Odom"
         },
         {
           "timestampMethod": "receiveTime",
-          "value": "/odometry/gps/orientation/euler.z",
+          "value": "/odometry/gps/orientation/euler.vector.z",
           "enabled": false,
           "label": "Navsat Odom"
         },
         {
           "timestampMethod": "receiveTime",
-          "value": "/zed/zed_node/odom/orientation/euler.z",
+          "value": "/zed/zed_node/odom/orientation/euler.vector.z",
           "enabled": false,
           "label": "ZED Odom"
         }
@@ -627,13 +627,13 @@
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/imu/data/orientation/euler.z",
+          "value": "/imu/data/orientation/euler.vector.z",
           "enabled": true,
           "label": "IMU Heading"
         },
         {
           "timestampMethod": "receiveTime",
-          "value": "/odometry/filtered/global/orientation/euler.z",
+          "value": "/odometry/filtered/global/orientation/euler.vector.z",
           "enabled": true,
           "color": "#f5774d",
           "label": "Global EKF Heading"
@@ -744,7 +744,7 @@
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/imu/data/orientation/euler.z",
+          "value": "/imu/data/orientation/euler.vector.z",
           "enabled": true,
           "color": "#d94fe3",
           "label": "IMU"
@@ -765,7 +765,7 @@
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/imu/data/orientation/euler.x",
+          "value": "/imu/data/orientation/euler.vector.x",
           "enabled": true,
           "color": "#d94fe3",
           "label": "IMU"
@@ -786,7 +786,7 @@
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/imu/data/orientation/euler.y",
+          "value": "/imu/data/orientation/euler.vector.y",
           "enabled": true,
           "label": "IMU",
           "color": "#d94fe3"
