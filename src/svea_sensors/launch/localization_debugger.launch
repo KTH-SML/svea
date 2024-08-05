@@ -4,7 +4,7 @@
 
     <!-- Args -->
     <arg name="record"                  default="false"/>
-    <arg name="rosbag_prefix"           default="/svea_ws/src/localization_test" />
+    <arg name="rosbag_prefix"           default="/svea_ws/src/localization_debugger" />
     <arg name="gps_device"              default="/dev/ttyACM1"/>
     <arg name="gps_auth_alt"            default="false"/>
     <arg name="initial_pose_a"          default="0.0"/>
