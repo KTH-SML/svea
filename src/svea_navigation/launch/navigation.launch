@@ -139,7 +139,7 @@
         <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
         <param if="$(arg is_sim)" name="TebLocalPlannerROS/odom_topic" value="odometry/corrected"/>
         <param unless="$(arg is_sim)" name="TebLocalPlannerROS/odom_topic" value="odometry/filtered/global"/>
-        <param name="controller_frequency" value="5.0" />
+        <param name="controller_frequency" value="10.0" />
         <param name="controller_patience" value="10.0" />
         <param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
 
@@ -156,6 +156,7 @@
         /initialpose
         /move_base/TebLocalPlannerROS/local_plan
         /move_base/TebLocalPlannerROS/obstacles
+        /move_base/TebLocalPlannerROS/teb_markers
         /move_base/local_costmap/costmap
         /objectposes
         /objectmarkers

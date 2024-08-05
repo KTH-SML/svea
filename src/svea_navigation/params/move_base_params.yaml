@@ -38,13 +38,13 @@ TebLocalPlannerROS:
  dt_ref: 0.3
  dt_hysteresis: 0.1                    # A big value ensures that minor dynamic speed changes or path length variations do not cause frequent resizing
  global_plan_overwrite_orientation: true
- max_global_plan_lookahead_dist: 3.0   # The planner will consider up to N meters ahead in the global plan for trajectory optimization. This helps in planning for upcoming obstacles and turns.
+ max_global_plan_lookahead_dist: 5.0   # The planner will consider up to N meters ahead in the global plan for trajectory optimization. This helps in planning for upcoming obstacles and turns.
  feasibility_check_no_poses: 2         # A feasibility check is performed after the optimizer returns a trajectory and before the velocity commands are sent to the robot. The purpose of this check is to identify an invalid/infeasible trajectory that might be produced by the optimizer (just remember: soft constraints, local minima, etc.).
  max_samples: 200
  
  # Robot
          
- max_vel_x: 0.4
+ max_vel_x: 0.35
  max_vel_x_backwards: 0.3
  max_vel_theta: 0.3       # = v_max/r_min
  acc_lim_x: 0.3
@@ -112,19 +112,19 @@ TebLocalPlannerROS:
  weight_optimaltime: 10                 # Balances the trajectory to minimize travel time while considering other constraints and weights. (must be >0)
  weight_shortest_path: 0
  weight_obstacle: 50                   # Significantly penalizes trajectories that get close to obstacles, promoting safer paths.
- weight_dynamic_obstacle: 1000          # dynamic obstacles are the ones detected by the obstacle layer is the local costmap.
- weight_dynamic_obstacle_inflation: 30  # Optimization weight for inflation costs of dynamic obstacles.
- weight_viapoint: 1                    # Via points from global plan are intermediate points that the trajectory should pass through. The weight_viapoint parameter influences how strongly the planner tries to follow these via points. A higher weight means that the planner will prioritize hitting the via points more strictly, while a lower weight means it will be less strict about following these points.
+ weight_dynamic_obstacle: 0            # dynamic obstacles are the ones detected by the obstacle layer is the local costmap.
+ weight_dynamic_obstacle_inflation: 0  # Optimization weight for inflation costs of dynamic obstacles.
+ weight_viapoint: 0.1                    # Via points from global plan are intermediate points that the trajectory should pass through. The weight_viapoint parameter influences how strongly the planner tries to follow these via points. A higher weight means that the planner will prioritize hitting the via points more strictly, while a lower weight means it will be less strict about following these points.
  weight_adapt_factor: 2                # The planner reduces or increases the priority of obstacle avoidance according whether an open environment or a tight and crowded environment is detected, allowing the robot to move more efficiently.
 
  # Homotopy Class Planner. It allows for the consideration of multiple topologically distinct paths (homotopy classes) around obstacles. 
 
- enable_homotopy_class_planning: true
+ enable_homotopy_class_planning: false  # for a sidewalk environment it proved to provide more troubles than benefits.
  enable_multithreading: true
  simple_exploration: false             # Uses a simpler and faster exploration method, potentially at the cost of finding fewer homotopy classes.
  max_number_classes: 3
- selection_cost_hysteresis: 1.0        # The parameter adds a small bias to the cost of the currently selected trajectory, making it less likely to switch to a new path unless the new path is significantly better.
- selection_prefer_initial_plan: 0.95   # It encourages the planner to follow the initial global plan by adding a cost preference for it. The planner multiplies the cost of deviating from the initial plan by this factor.
+ selection_cost_hysteresis: 100.0        # The parameter adds a small bias to the cost of the currently selected trajectory, making it less likely to switch to a new path unless the new path is significantly better.
+ selection_prefer_initial_plan: 100   # It encourages the planner to follow the initial global plan by adding a cost preference for it. The planner multiplies the cost of deviating from the initial plan by this factor.
  selection_obst_cost_scale: 1.0        # It adjusts the influence of obstacle costs when evaluating different candidate trajectories.
  roadmap_graph_no_samples: 15          # Specifies the number of points sampled in the environment to create the roadmap graph. More samples increase the graph's density and the potential for finding different paths but also increase computation.
  roadmap_graph_area_width: 3           # Width of the area to sample for the roadmap graph.
