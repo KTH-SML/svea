@@ -20,7 +20,6 @@ istrue DEBUG && fn="echo" || fn="exec"
     -e "TERM=xterm-256color" \
     -v "/dev:/dev" \
     -v "$SHARED_VOLUME" \
-    --rm \
     --network host \
     --privileged \
     "$@"

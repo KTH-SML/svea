@@ -161,7 +161,7 @@ class ObjectPoseSimulator:
 
 if __name__ == '__main__':
     try:
-        yaml_file_path = '/svea_ws/src/svea_navigation/scripts/util/simulated_trajectories/sidewalk_DKv_30_east_to_west_multiple_pedestrians_rand.yaml'
+        yaml_file_path = '/svea_ws/src/svea_navigation/scripts/util/simulated_trajectories/traj_trial.yaml'   # sidewalk_DKv_30_east_to_west_multiple_pedestrians_rand, sidewalk_DKv_30_east_to_west_one_pedestrian
         publish_frame_id = 'map'            # frame ID where the poses are published. choose between map and base_link
         simulator = ObjectPoseSimulator(yaml_file_path, publish_frame_id)
         rospy.spin() 

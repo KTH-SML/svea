@@ -10,8 +10,7 @@ class BaseLocalPlannerController(object):
     MIN_SPEED = 0.25
     MIN_STEER = 0.2
     MAX_STEERING_CHANGE = 0.15  # Maximum change in steering per time step. (0.2 = 12 deg. SVEA has 120 deg. steering window.)
-    MAX_VELOCITY_CHANGE = 0.2
-
+    RAW_STEERING_AMPLIFICATION = 2
 
     def __init__(self, vehicle_name=''):
         rospy.Subscriber("/cmd_vel", Twist, self.blp_control, queue_size=1)
@@ -44,7 +43,7 @@ class BaseLocalPlannerController(object):
                 self.velocity = self.velocity_lower_sat(raw_velocity)
 
         # Calculate the new steering value
-        target_steering = raw_steering * 2
+        target_steering = raw_steering * self.RAW_STEERING_AMPLIFICATION
         # Apply rate of change limit to steering
         steering_change = target_steering - self.last_steering
         if abs(steering_change) > self.MAX_STEERING_CHANGE:

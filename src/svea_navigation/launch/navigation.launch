@@ -56,6 +56,10 @@
     <node name="zonotope_generator" pkg="svea_navigation" type="zonotope_generator.py" output="screen">
     </node>
 
+    <!--Manages car's behaviour when sidewalk is crowded. Eventually, it can be incorporated with main.py -->
+    <node name="crowded_behaviour" pkg="svea_navigation" type="crowded_behaviour.py" output="screen">
+    </node>
+
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(arg is_sim)">
         <group if="$(arg start_gps)">   <!-- If gps hasn't been launched apart, do it here.-->
