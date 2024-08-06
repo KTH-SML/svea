@@ -6,7 +6,8 @@
     <arg name="record"                  default="false"/>
     <arg name="rosbag_prefix"           default="/svea_ws/src/localization_debugger" />
     <arg name="gps_device"              default="/dev/ttyACM1"/>
-    <arg name="gps_auth_alt"            default="false"/>
+    <arg name="rtk_username"            default=""/>
+    <arg name="rtk_password"            default=""/>
     <arg name="initial_pose_a"          default="0.0"/>
     <arg name="start_zed_camera"        default="false"/>
     <arg name="start_foxglove_bridge"   default="false"/>
@@ -27,20 +28,11 @@
     <arg name="datum_data"              default="[]" />
 
     <!-- RTK -->
-    <group unless="$(arg gps_auth_alt)">
-        <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
-            <arg name="gps_device"    value="$(arg gps_device)"/>
-            <arg name="username"      value="708583036" />
-            <arg name="password"      value="151515" />
-        </include>
-    </group>
-    <group if="$(arg gps_auth_alt)">
-        <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
-            <arg name="gps_device"    value="$(arg gps_device)"/>
-            <arg name="username"      value="707886204" />
-            <arg name="password"      value="115544" />
-        </include>
-    </group>
+    <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
+        <arg name="gps_device"    value="$(arg gps_device)"/>
+        <arg name="username"      value="$(arg rtk_username)"/>
+        <arg name="password"      value="$(arg rtk_password)"/>
+    </include>
 
     <!-- Localization -->
     <include file="$(find svea_sensors)/launch/localize.launch">

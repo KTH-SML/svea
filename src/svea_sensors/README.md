@@ -377,7 +377,9 @@ frame will be published on `odometry/corrected`.
 
     -   **`gps_device`** The device path of the gps. Default: `/dev/ttyACM1`.
 
-    -   **`gps_auth_alt`** Whether to use the alternative authentication credentials for the gps. Default: `false`.
+    -   **`rtk_username`** The username for the rtk service. A valid username is required to start the rtk service. Default: `""`
+
+    -   **`rtk_password`** The password for the rtk service. A valid password is required to start the rtk service. Default: `""`
 
     -   **`initial_pose_a`** The initial pose angle with respect to the east. Default: `0.0`.
 
