@@ -14,6 +14,7 @@ class CrowdedBehaviorMonitor:
     cluster_safe_distance_y = 0.8
     angle_max = np.arctan2(cluster_safe_distance_y , cluster_safe_distance_x)
     angle_min = -angle_max
+    min_distance = 0.3 # from baselink
 
     def __init__(self):
         # Initialize ROS node, publishers, subscribers, and services
@@ -51,13 +52,16 @@ class CrowdedBehaviorMonitor:
                 obstacle_point = np.array([obstacle_position.x, obstacle_position.y])
                 distance = np.linalg.norm(obstacle_point)
                 if distance <= self.cluster_safe_distance_x and self.is_within_angle_range(obstacle_point, self.angle_min, self.angle_max):
+                    if distance <= self.min_distance:
+                        rospy.loginfo(f'Person is too close')
+                        break
                     obstacle_count += 1
 
             except tf2_ros.TransformException as e:
                 rospy.logwarn(f"Transform failed: {e}")
         
         if obstacle_count >= 2 and self.right_region is True and self.left_region is True:  # checks if at least 2 people, 1 in the right side, the other on the left side, are in the cautious area.
-            rospy.loginfo(f'Is crowded')
+            rospy.loginfo(f'Environment is crowded')
 
     def is_within_angle_range(self, point, angle_min, angle_max):
         angle_to_point = np.arctan2(point[1], point[0])
