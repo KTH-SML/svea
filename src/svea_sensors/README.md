@@ -762,15 +762,15 @@ This node can be used to manually set a datum for `navsat_transform_node` by eit
 
 -   **`datum_service`** (string, Default: "datum")
 
-    The service name to set the datum. Default: `datum`
+    The service name to set the datum.
 
 -   **`datum_file`** (string, Default: "")
 
-    The path to the `yaml` file containing the datum values. Default: `""`
+    The path to the `yaml` file containing the datum values.
 
 -   **`datum_data`** (string, Default: "[]")
 
-    The datum values in the format `[latitude, longitude, yaw]` passed as a string to the node. Default: `[]`
+    The datum values in the format `"[latitude, longitude, yaw]"` passed as a string to the node.
 
 #### Service Calls
 
@@ -799,7 +799,7 @@ This node subscribes to a `sensor_msgs/NavSatFix` message topic and publishes a 
 
 -   **`gps_topic`** (string, Default: "gps/fix")
 
-    The topic name to subscribe to for the gps message. Default: `gps/fix`
+    The topic name to subscribe to for the gps message.
 
 #### Subscribed Topics
 
@@ -821,15 +821,15 @@ This node subscribes to a `nav_msgs/Odometry` message topic and publishes a `nav
 
 -   **`odom_topic`** (string, Default: "odom")
 
-    The topic name to subscribe to for the odometry message. Default: `odom`
+    The topic name to subscribe to for the odometry message.
 
 -   **`base_frame_id`** (string, Default: "base_link")
 
-    The frame id of the base frame. Default: `base_link`
+    The frame id of the base frame.
 
 -   **`initial_yaw_offset`** (float, Default: 0.0)
 
-    The initial yaw offset to be applied to the path. Default: `0.0`
+    The initial yaw offset to be applied to the path.
 
 #### Subscribed Topics
 
@@ -851,11 +851,11 @@ This node can subscribe to either a `nav_msgs/Odometry` message topic or a `sens
 
 -   **`quat_topic`** (string, Default: "quat")
 
-    The topic name to subscribe to for the quaternion message. Default: `quat`
+    The topic name to subscribe to for the quaternion message.
 
 -   **`topic_timeout`** (float, Default: 30.0)
 
-    The timeout (in seconds) for detecting the message type. Default: `30.0`
+    The timeout (in seconds) for detecting the message type.
 
 #### Subscribed Topics
 
@@ -866,6 +866,6 @@ This node can subscribe to either a `nav_msgs/Odometry` message topic or a `sens
 
 #### Published Topics
 
--   **`~quat_topic/euler`** ([geometry_msgs/Vector3Stamped])
+-   **`~quat_topic/orientation/euler`** ([geometry_msgs/Vector3Stamped])
 
     The output euler angles message topic, defined by the `quat_topic` parameter followed by `/orientation/euler`.
