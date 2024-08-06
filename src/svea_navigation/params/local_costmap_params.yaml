@@ -40,7 +40,7 @@ inflation_layer:
   inflate_unknown: false             # Decides if unknown space should also be inflated.
   inscribed_radius: 0.00             # Defines the radius around the robot's footprint considered lethal.(robot cannot pass through it without collision)
   cost_scaling_factor: 10.0          # Controls how fast costs drop off with distance from obstacles to obstacles + inflation radius.
-  inflation_radius: 0.25             # Sets the distance around obstacles within which costs are inflated. Its purpose is to let the planners compute trajectories as far away as possible from obstacles. Set it big for global planner to find a central trajectory.
+  inflation_radius: 0.2              # Sets the distance around obstacles within which costs are inflated. Its purpose is to let the planners compute trajectories as far away as possible from obstacles. Set it big for global planner to find a central trajectory.
  
 
 

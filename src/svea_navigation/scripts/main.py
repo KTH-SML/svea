@@ -60,7 +60,7 @@ class main:
         ## Set initial values for node
         # initial state
         state = VehicleState(*self.STATE)
-        publish_initialpose(state)
+       # publish_initialpose(state)
 
         self.steering_pub = rospy.Publisher('/nav_steering_angle', Float32, queue_size=1)
         self.velocity_pub = rospy.Publisher('/nav_vehicle_velocity', Float32, queue_size=1)

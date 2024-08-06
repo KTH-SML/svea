@@ -1,0 +1,11 @@
+image: sidewalk_DKv_30_west_to_east.pgm
+resolution: 0.050000
+origin: [0.000000, -5.000000, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+
+datum:
+  latitude: 59.3501577
+  longitude: 18.0685846
+  yaw: -1.0
