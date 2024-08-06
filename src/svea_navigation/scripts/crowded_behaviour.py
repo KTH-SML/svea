@@ -17,6 +17,7 @@ def load_param(name, value=None):
 class CrowdedBehaviorMonitor:
 
     def __init__(self):
+        
         # Initialize ROS node, publishers, subscribers, and services
         rospy.init_node('crowded_behavior_monitor')
 
