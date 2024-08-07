@@ -16,8 +16,8 @@ class ZonotopeGenerator:
         rospy.init_node('zonotope_generator_node')
 
         # Parameters
-        self.zonotope_width = load_param('~zonotope_width', 1)
-        self.zonotope_height = load_param('~zonotope_height', 0.25)
+        self.zonotope_width = load_param('~zonotope_width', 2)
+        self.zonotope_height = load_param('~zonotope_height', 0.3)
         
         # Initialize the publisher
         self.obstacle_publisher = rospy.Publisher(obstacle_pub_topic, ObstacleArrayMsg, queue_size=1)
