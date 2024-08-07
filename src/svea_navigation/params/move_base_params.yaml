@@ -119,12 +119,12 @@ TebLocalPlannerROS:
 
  # Homotopy Class Planner. It allows for the consideration of multiple topologically distinct paths (homotopy classes) around obstacles. 
 
- enable_homotopy_class_planning: false  # for a sidewalk environment it proved to provide more troubles than benefits.
+ enable_homotopy_class_planning: true  
  enable_multithreading: true
  simple_exploration: false             # Uses a simpler and faster exploration method, potentially at the cost of finding fewer homotopy classes.
- max_number_classes: 3
- selection_cost_hysteresis: 100.0        # The parameter adds a small bias to the cost of the currently selected trajectory, making it less likely to switch to a new path unless the new path is significantly better.
- selection_prefer_initial_plan: 100   # It encourages the planner to follow the initial global plan by adding a cost preference for it. The planner multiplies the cost of deviating from the initial plan by this factor.
+ max_number_classes: 2
+ selection_cost_hysteresis: 10.0        # The parameter adds a small bias to the cost of the currently selected trajectory, making it less likely to switch to a new path unless the new path is significantly better.
+ selection_prefer_initial_plan: 10   # It encourages the planner to follow the initial global plan by adding a cost preference for it. The planner multiplies the cost of deviating from the initial plan by this factor.
  selection_obst_cost_scale: 1.0        # It adjusts the influence of obstacle costs when evaluating different candidate trajectories.
  roadmap_graph_no_samples: 15          # Specifies the number of points sampled in the environment to create the roadmap graph. More samples increase the graph's density and the potential for finding different paths but also increase computation.
  roadmap_graph_area_width: 3           # Width of the area to sample for the roadmap graph.

@@ -24,7 +24,7 @@ class CrowdedBehaviorMonitor:
         # Parameters defining the cone where the crowdedness is measured 
         self.cluster_safe_distance_x = load_param('~cluster_safe_distance_x', 3.0)
         self.cluster_safe_distance_y = load_param('~cluster_safe_distance_y', 0.8)
-        self.min_distance = load_param('~min_distance', 0.3)
+        self.min_distance = load_param('~min_distance', 0.6)
 
         self.angle_max = np.arctan2(self.cluster_safe_distance_y , self.cluster_safe_distance_x)
         self.angle_min = -self.angle_max
