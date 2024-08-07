@@ -8,7 +8,6 @@ from geometry_msgs.msg import Twist
 class BaseLocalPlannerController(object):
 
     MIN_SPEED = 0.25
-    MIN_STEER = 0.2
     MAX_STEERING_CHANGE = 0.15  # Maximum change in steering per time step. (0.2 = 12 deg. SVEA has 120 deg. steering window.)
     RAW_STEERING_AMPLIFICATION = 2
 
@@ -54,10 +53,8 @@ class BaseLocalPlannerController(object):
         self.last_steering = self.steering
         self.last_velocity = self.velocity
 
-
     def compute_control(self, state):
         return self.steering, self.velocity
-
 
     def velocity_lower_sat(self, velocity):
         if velocity > 0:
@@ -67,5 +64,3 @@ class BaseLocalPlannerController(object):
         else:
             velocity = 0
         return velocity
-
-

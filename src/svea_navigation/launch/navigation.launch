@@ -5,7 +5,7 @@
     <arg name="start_gps"       default="true"/>       <!-- if set to false to let the gps signal stabilize first, launch gps_launch.launch before this file. -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
     <arg name="gps_auth_alt"    default="false"/>       <!-- set to true to try alternative gps account login data-->
-    <arg name="map"             default="maps/itrl_sidewalk.yaml"/>   <!-- eg: sidewalk_DKv_30_east_to_west.yaml or itrl_sidewalk.yaml-->
+    <arg name="map"             default="maps/sidewalk_DKv_30_west_to_east.yaml"/>   <!-- eg: sidewalk_DKv_30_east_to_west.yaml or itrl_sidewalk.yaml-->
     <arg name="use_foxglove"    default="true"/>
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="initial_pose_x"  default="0"/>
@@ -41,24 +41,14 @@
     <arg name="datum_service"           default="/datum" />
     <arg name="datum_file"              default="$(find svea_navigation)/$(arg map)" />
     <arg name="datum_data"              default="[]" />   
- 
+    
+       <!-- Start Foxglove -->
+    <include if="$(eval use_foxglove)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
+        <arg name="port" value="8765" />
+    </include>
+
     <!-- Start map server -->
     <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(find svea_navigation)/$(arg map)"/>
-    <!-- <rosparam command="load" file="$(find svea_navigation)/maps/$(arg obstacle_map).yaml" /> -->
-
-    <!-- Start simulated poses generator if simulation. -->
-    <group if="$(arg is_sim)">
-        <node name="object_pose_node_simulator" pkg="svea_navigation" type="object_pose_node_simulator.py" output="screen">
-        </node>
-    </group>
-
-    <!--pointcloud_from_poses_node.py or dynamic_obstacles_inflator.py or zonotope_simulator.py -->
-    <node name="zonotope_generator" pkg="svea_navigation" type="zonotope_generator.py" output="screen">
-    </node>
-
-    <!--Manages car's behaviour when sidewalk is crowded. Eventually, it can be incorporated with main.py -->
-    <node name="crowded_behaviour" pkg="svea_navigation" type="crowded_behaviour.py" output="screen">
-    </node>
 
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(arg is_sim)">
@@ -114,11 +104,6 @@
         </group>
     </group>
 
-    <!-- Start Foxglove -->
-    <include if="$(eval use_foxglove)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
-        <arg name="port" value="8765" />
-    </include>
-
     <!-- Start main node -->
     <node name="main" pkg="svea_navigation" type="main.py" output="screen">
         <param name="use_rviz" value="$(arg use_foxglove)"/>
@@ -148,6 +133,21 @@
         <param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
 
     </node>
+
+    <!-- Start simulated poses generator if simulation. -->
+    <group if="$(arg is_sim)">
+        <node name="object_pose_node_simulator" pkg="svea_navigation" type="object_pose_node_simulator.py" output="screen">
+        </node>
+    </group>
+
+    <!--pointcloud_from_poses_node.py or dynamic_obstacles_inflator.py or zonotope_simulator.py -->
+    <node name="zonotope_generator" pkg="svea_navigation" type="zonotope_generator.py" output="screen">
+    </node>
+
+    <!--Manages car's behaviour when sidewalk is crowded. Eventually, it can be incorporated with main.py -->
+    <node name="crowded_behaviour" pkg="svea_navigation" type="crowded_behaviour.py" output="screen">
+    </node>
+
 
     <!-- Conditional rosbag recording node -->
     <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-o $(arg rosbag_prefix)

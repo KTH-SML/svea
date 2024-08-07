@@ -46,9 +46,9 @@ TebLocalPlannerROS:
          
  max_vel_x: 0.35
  max_vel_x_backwards: 0.3
- max_vel_theta: 0.3       # = v_max/r_min
- acc_lim_x: 0.3
- acc_lim_theta: 0.3
+ max_vel_theta: 0.8       
+ acc_lim_x: 0.2
+ acc_lim_theta: 0.15
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
    type: "line"
    radius: 0.2 # for type "circular"
@@ -63,7 +63,7 @@ TebLocalPlannerROS:
  # ********************** Carlike robot parameters ********************
  carlike_kinematics: true
  enable_odom_backwards: true
- min_turning_radius: 0.5          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m). It influences trajectory generation.
+ min_turning_radius: 0.4          # Min turning radius of the carlike robot (using knowledge of wheelbase and max_steering_angle it has to be greater then 0.12m). It influences trajectory generation.
  wheelbase: 0.324                 # Wheelbase of our robot
  cmd_angle_instead_rotvel: true   # Instead of providing a rotational velocity (angular velocity), the planner provides a steering angle.
  enable_nh_heading: true          # Non-holonomic heading
