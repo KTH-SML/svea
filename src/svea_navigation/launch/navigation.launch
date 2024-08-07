@@ -145,8 +145,8 @@
     </node>
 
     <!--Manages car's behaviour when sidewalk is crowded. Eventually, it can be incorporated with main.py -->
-    <node name="crowded_behaviour" pkg="svea_navigation" type="crowded_behaviour.py" output="screen">
-    </node>
+    <!-- <node name="crowded_behaviour" pkg="svea_navigation" type="crowded_behaviour.py" output="screen">
+    </node> -->
 
 
     <!-- Conditional rosbag recording node -->

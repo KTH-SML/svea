@@ -17,29 +17,13 @@ class BaseLocalPlannerController(object):
         self.steering = 0.0
         self.velocity = 0.0
         self.last_steering = 0.0
-        self.last_velocity = 0.0
-        self.n = 3  # Number of consecutive callbacks to publish zero velocity when a change of direction is detected. this is preventing high oscillations.
-        self.direction_change_count = 0
 
     def blp_control(self, data):
         raw_steering = data.angular.z
         raw_velocity = data.linear.x
 
-        # Check if the sign of velocity has changed
-        direction_changed = (self.last_velocity > 0 and raw_velocity < 0) or (self.last_velocity < 0 and raw_velocity > 0)
-
-        if direction_changed:
-            # Reset the direction change counter
-            self.direction_change_count = self.n
-            self.velocity = 0
-        else:
-            # If direction change counter is greater than 0, decrement it and publish zero velocity.
-            if self.direction_change_count > 0:
-                self.direction_change_count -= 1
-                self.velocity = 0
-            else:
-                # Make sure velocity is above the minimum threshold 
-                self.velocity = self.velocity_lower_sat(raw_velocity)
+ 
+        self.velocity = self.velocity_lower_sat(raw_velocity)
 
         # Calculate the new steering value
         target_steering = raw_steering * self.RAW_STEERING_AMPLIFICATION
@@ -51,7 +35,6 @@ class BaseLocalPlannerController(object):
 
         # Update the last values
         self.last_steering = self.steering
-        self.last_velocity = self.velocity
 
     def compute_control(self, state):
         return self.steering, self.velocity
