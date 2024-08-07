@@ -24,7 +24,7 @@ class CrowdedBehaviorMonitor:
         # Parameters defining the cone where the crowdedness is measured 
         self.cluster_safe_distance_x = load_param('~cluster_safe_distance_x', 3.5)
         self.cluster_safe_distance_y = load_param('~cluster_safe_distance_y', 1)
-        self.min_distance = load_param('~min_distance', 0.8)
+        self.min_distance = load_param('~min_distance', 1)
 
         self.angle_max = np.arctan2(self.cluster_safe_distance_y , self.cluster_safe_distance_x)
         self.angle_min = -self.angle_max
@@ -49,7 +49,7 @@ class CrowdedBehaviorMonitor:
         obstacle_count = 0
         self.right_region = False
         self.left_region = False
-
+        message = 'clear'
         for obj in msg.objects:
             try:
                 # Create PoseStamped message for transformation
@@ -67,7 +67,7 @@ class CrowdedBehaviorMonitor:
                 distance = np.linalg.norm(obstacle_point)
                 if distance <= self.cluster_safe_distance_x and self.is_within_angle_range(obstacle_point, self.angle_min, self.angle_max):
                     if distance <= self.min_distance:
-                        self.publish_status('emergency_stop')
+                        message = 'emergency_stop'
                         rospy.loginfo(f'Person is too close. Stop the vehicle')
                         break
                     obstacle_count += 1
@@ -76,10 +76,9 @@ class CrowdedBehaviorMonitor:
                 rospy.logwarn(f"Transform failed: {e}")
         
         if obstacle_count >= 2 and self.right_region is True and self.left_region is True:  # checks if at least 2 people, 1 in the right side, the other on the left side, are in the cautious area.
-            self.publish_status('crowded')
+            message = 'crowded'
             rospy.loginfo(f'Front environment is crowded. Stop the vehicle')
-        else:
-            self.publish_status('clear')
+        self.publish_status(message)
 
     def is_within_angle_range(self, point, angle_min, angle_max):
         angle_to_point = np.arctan2(point[1], point[0])

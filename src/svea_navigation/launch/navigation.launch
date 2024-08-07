@@ -176,6 +176,7 @@
         /nav_steering_angle
         /nav_vehicle_velocity
         /bbox_image
+        /lli/ctrl_actuated
     " />
 
 </launch>

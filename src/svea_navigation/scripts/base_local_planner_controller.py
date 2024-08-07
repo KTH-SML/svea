@@ -3,11 +3,10 @@ import math
 import numpy as np
 import rospy
 from geometry_msgs.msg import Twist
-class BaseLocalPlannerController(object):
-    MIN_SPEED = 0.25
-    MIN_STEER = 0.2
-    MAX_STEERING_CHANGE = 0.15  # Maximum change in steering per time step. (0.2 = 12 deg. SVEA has 120 deg. steering window.)
 
+class BaseLocalPlannerController(object):
+    MIN_SPEED = 0.3
+    MAX_STEERING_CHANGE = 5 # 0.25  # Maximum change in steering per time step. (0.2 = 12 deg. SVEA has 120 deg. steering window.)
     RAW_STEERING_AMPLIFICATION = 2
 
     def __init__(self, vehicle_name=''):
@@ -19,6 +18,7 @@ class BaseLocalPlannerController(object):
         self.last_velocity = 0.0
         self.n = 3  # Number of consecutive callbacks to publish zero velocity when a change of direction is detected. this is preventing high oscillations.
         self.direction_change_count = 0
+
     def blp_control(self, data):
         raw_steering = data.angular.z
         raw_velocity = data.linear.x
@@ -48,8 +48,10 @@ class BaseLocalPlannerController(object):
         # Update the last values
         self.last_steering = self.steering
         self.last_velocity = self.velocity
+
     def compute_control(self, state):
         return self.steering, self.velocity
+    
     def velocity_lower_sat(self, velocity):
         if velocity > 0:
             velocity = max(velocity, self.MIN_SPEED)

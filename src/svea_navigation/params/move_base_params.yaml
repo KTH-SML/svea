@@ -44,11 +44,11 @@ TebLocalPlannerROS:
  
  # Robot
          
- max_vel_x: 0.35
- max_vel_x_backwards: 0.35
+ max_vel_x: 0.4
+ max_vel_x_backwards: 0.4
  max_vel_theta: 0.8       
- acc_lim_x: 0.2
- acc_lim_theta: 0.15
+ acc_lim_x: 0.15
+ acc_lim_theta: 0.11
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
    type: "line"
    radius: 0.2 # for type "circular"
@@ -78,13 +78,13 @@ TebLocalPlannerROS:
 
  # Obstacles
     
- min_obstacle_dist: 0.4                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost. Using line footprint it has to include half of car width as well (0.14m).
+ min_obstacle_dist: 0.5                       # Minimum distance you want to maintain away from obstacles. Distances greater than this one lead to 0 cost. Using line footprint it has to include half of car width as well (0.14m).
  inflation_dist: 0.0
  include_dynamic_obstacles: true              # Specify whether the motion of dynamic obstacles should be included (constant-velocity-model) or not.
  include_costmap_obstacles: true              # Determines whether the obstacles from the costmap should be included in the planning process.
- costmap_obstacles_behind_robot_dist: 1.5       # Specifies the maximum distance behind the robot where obstacles from the costmap are considered during planning.
+ costmap_obstacles_behind_robot_dist: 2       # Specifies the maximum distance behind the robot where obstacles from the costmap are considered during planning.
  dynamic_obstacle_inflation_dist: 0.0         # inflation already considered in the local costmap.
- obstacle_poses_affected: 20                  # How many of the closest obstacles (in terms of distance) are considered when computing the robot’s trajectory and planning its path
+ obstacle_poses_affected: 50                  # How many of the closest obstacles (in terms of distance) are considered when computing the robot’s trajectory and planning its path
  allow_unknown: false   
   # Costmap converter plugin   
  costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSMCCH"
@@ -98,7 +98,7 @@ TebLocalPlannerROS:
     
  no_inner_iterations: 5                # Controls the number of optimization steps taken within each outer iteration.
  no_outer_iterations: 4                # Controls how many times the entire optimization process is repeated. 
- obstacle_cost_exponent: 2.5           # Controls the rate at which the cost increases as the robot gets closer to an obstacle
+ obstacle_cost_exponent: 3           # Controls the rate at which the cost increases as the robot gets closer to an obstacle
  optimization_activate: true
  optimization_verbose: false
  penalty_epsilon: 0.1
@@ -111,7 +111,7 @@ TebLocalPlannerROS:
  weight_kinematics_turning_radius: 5   # Encourages the robot to make wider turns, reducing sharp turns that might be infeasible or unsafe.
  weight_optimaltime: 10                 # Balances the trajectory to minimize travel time while considering other constraints and weights. (must be >0)
  weight_shortest_path: 0
- weight_obstacle: 50                   # Significantly penalizes trajectories that get close to obstacles, promoting safer paths.
+ weight_obstacle: 100                   # Significantly penalizes trajectories that get close to obstacles, promoting safer paths.
  weight_dynamic_obstacle: 0            # dynamic obstacles are the ones detected by the obstacle layer is the local costmap.
  weight_dynamic_obstacle_inflation: 0  # Optimization weight for inflation costs of dynamic obstacles.
  weight_viapoint: 0.1                    # Via points from global plan are intermediate points that the trajectory should pass through. The weight_viapoint parameter influences how strongly the planner tries to follow these via points. A higher weight means that the planner will prioritize hitting the via points more strictly, while a lower weight means it will be less strict about following these points.
@@ -123,9 +123,8 @@ TebLocalPlannerROS:
  enable_multithreading: true
  simple_exploration: false             # Uses a simpler and faster exploration method, potentially at the cost of finding fewer homotopy classes.
  max_number_classes: 2
- selection_cost_hysteresis: 50.0        # The parameter adds a small bias to the cost of the currently selected trajectory, making it less likely to switch to a new path unless the new path is significantly better.
- selection_prefer_initial_plan: 1   # It encourages the planner to follow the initial global plan by adding a cost preference for it. The planner multiplies the cost of deviating from the initial plan by this factor.
- selection_obst_cost_scale: 1.0        # It adjusts the influence of obstacle costs when evaluating different candidate trajectories.
+ selection_cost_hysteresis: 0.8        # Specify how much trajectory cost must a new candidate have w.r.t. a previously selected trajectory in order to be selected (selection if new_cost < old_cost*factor).
+ selection_obst_cost_scale: 150        # It adjusts the influence of obstacle costs when evaluating different candidate trajectories.
  roadmap_graph_no_samples: 15          # Specifies the number of points sampled in the environment to create the roadmap graph. More samples increase the graph's density and the potential for finding different paths but also increase computation.
  roadmap_graph_area_width: 3           # Width of the area to sample for the roadmap graph.
  h_signature_prescaler: 0.5
