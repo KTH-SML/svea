@@ -17,7 +17,6 @@ def load_param(name, value=None):
 class CrowdedBehaviorMonitor:
 
     def __init__(self):
-        
         # Initialize ROS node, publishers, subscribers, and services
         rospy.init_node('crowded_behavior_monitor')
 
@@ -44,12 +43,12 @@ class CrowdedBehaviorMonitor:
         self.left_region = False
 
     def dynamic_obstacles_callback(self, msg):
-
         # Filter and count obstacles
         obstacle_count = 0
         self.right_region = False
         self.left_region = False
         message = 'clear'
+
         for obj in msg.objects:
             try:
                 # Create PoseStamped message for transformation
@@ -57,6 +56,13 @@ class CrowdedBehaviorMonitor:
                 pose_stamped.header.stamp = rospy.Time.now()
                 pose_stamped.header.frame_id = 'map'
                 pose_stamped.pose = obj.pose.pose
+
+                # Check if the transform is available
+                try:
+                    self.tf_buffer.can_transform('base_link', pose_stamped.header.frame_id, pose_stamped.header.stamp, rospy.Duration(1.0))
+                except (tf2_ros.ExtrapolationException, tf2_ros.TransformException) as e:
+                    rospy.logwarn(f"Transform is not available: {e}")
+                    continue
 
                 # Transform obstacle position to base_link frame
                 transformed_pose = self.tf_buffer.transform(pose_stamped, 'base_link', rospy.Duration(1.0))
@@ -75,10 +81,12 @@ class CrowdedBehaviorMonitor:
             except tf2_ros.TransformException as e:
                 rospy.logwarn(f"Transform failed: {e}")
         
-        if obstacle_count >= 2 and self.right_region is True and self.left_region is True:  # checks if at least 2 people, 1 in the right side, the other on the left side, are in the cautious area.
+        if obstacle_count >= 2 and self.right_region is True and self.left_region is True:
             message = 'crowded'
             rospy.loginfo(f'Front environment is crowded. Stop the vehicle')
         self.publish_status(message)
+
+
 
     def is_within_angle_range(self, point, angle_min, angle_max):
         angle_to_point = np.arctan2(point[1], point[0])

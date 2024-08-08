@@ -1,18 +1,12 @@
 #! /usr/bin/env python3
 
 import numpy as np
-
 import rospy
-from rospy import Publisher, Rate
-from geometry_msgs.msg import PoseWithCovarianceStamped
-from tf.transformations import quaternion_from_euler
-
 from svea.models.bicycle import SimpleBicycleModel
 from svea.states import VehicleState
 from svea.simulators.sim_SVEA import SimSVEA
 from svea.interfaces import LocalizationInterface
 from base_local_planner_controller import BaseLocalPlannerController
-from controller2 import Controller2
 from svea.svea_managers.svea_archetypes import SVEAManager
 from svea.data import TrajDataHandler, RVIZPathHandler
 from std_msgs.msg import Float32
@@ -22,26 +16,6 @@ def load_param(name, value=None):
     if value is None:
         assert rospy.has_param(name), f'Missing parameter "{name}"'
     return rospy.get_param(name, value)
-
-
-def publish_initialpose(state, n=10):
-
-    p = PoseWithCovarianceStamped()
-    p.header.frame_id = 'map'
-    p.pose.pose.position.x = state.x
-    p.pose.pose.position.y = state.y
-
-    q = quaternion_from_euler(0, 0, state.yaw)
-    p.pose.pose.orientation.z = q[2]
-    p.pose.pose.orientation.w = q[3]
-
-    pub = Publisher('/initialpose', PoseWithCovarianceStamped, queue_size=10)
-    rate = Rate(10)
-
-    for _ in range(n):
-        pub.publish(p)
-        rate.sleep()
-
 
 class main:
 
@@ -58,9 +32,8 @@ class main:
         self.IS_SIM = load_param('~is_sim', False)
         self.STATE = load_param('~state', [3, 0, 0, 0])   # floor2: [-1.5, -0.7, 1, 0]
         ## Set initial values for node
-        # initial state
+        # initial state for simulator.
         state = VehicleState(*self.STATE)
-       # publish_initialpose(state)
 
         self.steering_pub = rospy.Publisher('/nav_steering_angle', Float32, queue_size=1)
         self.velocity_pub = rospy.Publisher('/nav_vehicle_velocity', Float32, queue_size=1)
@@ -107,7 +80,6 @@ class main:
     def publish_control(self,steering,velocity):
         self.steering_pub.publish(steering)
         self.velocity_pub.publish(velocity)
-
 
 
 if __name__ == '__main__':

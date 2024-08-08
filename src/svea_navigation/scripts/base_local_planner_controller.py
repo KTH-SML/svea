@@ -6,7 +6,6 @@ from geometry_msgs.msg import Twist
 
 class BaseLocalPlannerController(object):
     MIN_SPEED = 0.3
-    MAX_STEERING_CHANGE = 5 # 0.25  # Maximum change in steering per time step. (0.2 = 12 deg. SVEA has 120 deg. steering window.)
     RAW_STEERING_AMPLIFICATION = 2
 
     def __init__(self, vehicle_name=''):
@@ -14,7 +13,6 @@ class BaseLocalPlannerController(object):
         self.vehicle_name = vehicle_name
         self.steering = 0.0
         self.velocity = 0.0
-        self.last_steering = 0.0
         self.last_velocity = 0.0
         self.n = 3  # Number of consecutive callbacks to publish zero velocity when a change of direction is detected. this is preventing high oscillations.
         self.direction_change_count = 0
@@ -38,15 +36,9 @@ class BaseLocalPlannerController(object):
                 self.velocity = self.velocity_lower_sat(raw_velocity)
 
         # Calculate the new steering value
-        target_steering = raw_steering * 2
-        target_steering = raw_steering * self.RAW_STEERING_AMPLIFICATION
-        # Apply rate of change limit to steering
-        steering_change = target_steering - self.last_steering
-        if abs(steering_change) > self.MAX_STEERING_CHANGE:
-            steering_change = self.MAX_STEERING_CHANGE * (steering_change / abs(steering_change))
-        self.steering = self.last_steering + steering_change
-        # Update the last values
-        self.last_steering = self.steering
+        self.steering = raw_steering * self.RAW_STEERING_AMPLIFICATION
+
+        # Update the last value
         self.last_velocity = self.velocity
 
     def compute_control(self, state):
