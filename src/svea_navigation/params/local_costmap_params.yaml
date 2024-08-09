@@ -6,7 +6,7 @@ update_frequency: 10.0   # Update the costmap.    4
 publish_frequency: 10.0  # Publish the costmap.   4
 #static_map: true        # It indicates that your local costmap will use a pre-built static map for navigation instead of relying solely on real-time sensor data. 
 rolling_window: true    
-width: 8
+width: 9
 height: 3
 resolution: 0.05
 

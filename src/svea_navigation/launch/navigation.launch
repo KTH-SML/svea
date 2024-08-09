@@ -11,8 +11,7 @@
     <arg name="initial_pose_x"  default="0"/>
     <arg name="initial_pose_y"  default="0"/>
     <arg name="initial_pose_a"  default="0" />          <!-- wrt to map-->
-    <arg name="is_sim"          default="true"/>
-    <arg name="is_lidar"        default="false"/>       <!-- boolean to enable visualization of lidar rays -->
+    <arg name="is_sim"          default="true"/>  
     <arg name="record"          default="false"/>
     <arg name="rosbag_prefix"   default="/svea_ws/src/svea_navigation/bags/DKv_30"/>
 
@@ -41,11 +40,6 @@
     <arg name="datum_service"           default="/datum" />
     <arg name="datum_file"              default="$(find svea_navigation)/$(arg map)" />
     <arg name="datum_data"              default="[]" />   
-    
-       <!-- Start Foxglove -->
-    <include if="$(eval use_foxglove)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
-        <arg name="port" value="8765" />
-    </include>
 
     <!-- Start map server -->
     <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(find svea_navigation)/$(arg map)"/>
@@ -110,13 +104,6 @@
         <param name="is_sim" value="$(arg is_sim)"/>
     </node>
 
-    <!-- Start debugging tools, if enabled. -->
-    <group if="$(arg is_lidar)">
-        <node name="lidar_visualizer" pkg="svea_navigation" type="lidar_visualizer.py" output="screen">
-            <param name="is_sim" value="$(arg is_sim)"/>
-        </node>
-    </group>
-
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
         <rosparam file="$(find svea_navigation)/params/local_costmap_params.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find svea_navigation)/params/global_costmap_params.yaml" command="load" ns="global_costmap" />
@@ -142,12 +129,11 @@
 
     <!--pointcloud_from_poses_node.py or dynamic_obstacles_inflator.py or zonotope_simulator.py -->
     <node name="zonotope_generator" pkg="svea_navigation" type="zonotope_generator.py" output="screen">
+        <param name="zonotope_width" value="1.0" />
+        <param name="zonotope_height" value="0.3" />
+        <param name="obstacles_topic" value="/objectposes" />
+        <param name="obstacle_pub_topic" value="/move_base/TebLocalPlannerROS/obstacles" />
     </node>
-
-    <!--Manages car's behaviour when sidewalk is crowded. Eventually, it can be incorporated with main.py -->
-    <!-- <node name="crowded_behaviour" pkg="svea_navigation" type="crowded_behaviour.py" output="screen">
-    </node> -->
-
 
     <!-- Conditional rosbag recording node -->
     <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-o $(arg rosbag_prefix)
@@ -178,5 +164,5 @@
         /bbox_image
         /lli/ctrl_actuated
     " />
-
+    
 </launch>

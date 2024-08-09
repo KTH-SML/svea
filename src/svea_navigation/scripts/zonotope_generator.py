@@ -12,24 +12,41 @@ def load_param(name, value=None):
     return rospy.get_param(name, value)
 
 class ZonotopeGenerator:
-    def __init__(self, obstacles_topic, obstacle_pub_topic):
+    """
+    Description: ROS node that converts StampedObjectPoseArray messages (obstacles detected by ZED camera) into
+    zonotopes (polygons) that will be then provided directly as obstacles to the TEB local planner through the
+    CostmapToPolygonsDBSMCCH costmap converter plugin.
+    
+    Purpose: The node aims at generating the zonotopes that eventually will come from pedestrian 
+    reachability analysis. It is supposed for the moment that each obstacle is enlarged with the same zonotope,
+    facing the same direction (x direction of map frame in particular) for the sake of simplicity and 
+    easier TEB tuning.
+    Eventually, when the reachability analysis will be incorporated, precise knowledge of the zonotope's dimensions
+    and heading for each obstacle will be required.
+
+    Status: Currently, this feature is primarily used to inflate detected objects rather than as a true
+    zonotope generator. While it has shown decent performance on the SVEA, its effectiveness is limited by
+    the reliability of the object pose estimates.
+    """
+    
+    def __init__(self):
         rospy.init_node('zonotope_generator_node')
 
-        # Parameters
+        # Load parameters from the ROS parameter server
+        self.obstacles_topic = load_param('~obstacles_topic', '/objectposes')
+        self.obstacle_pub_topic = load_param('~obstacle_pub_topic', '/move_base/TebLocalPlannerROS/obstacles')
         self.zonotope_width = load_param('~zonotope_width', 0.7)
         self.zonotope_height = load_param('~zonotope_height', 0.3)
         
         # Initialize the publisher
-        self.obstacle_publisher = rospy.Publisher(obstacle_pub_topic, ObstacleArrayMsg, queue_size=1)
+        self.obstacle_publisher = rospy.Publisher(self.obstacle_pub_topic, ObstacleArrayMsg, queue_size=1)
         
         # Create subscribers
-        rospy.Subscriber(obstacles_topic, StampedObjectPoseArray, self.poses_callback)
+        rospy.Subscriber(self.obstacles_topic, StampedObjectPoseArray, self.poses_callback)
 
     def generate_zonotopes(self, points_with_ids):
         """
         Inflate the obstacles around the given points with a rectangular inflation area and publish rectangles.
-        
-        :param points_with_ids: List of tuples containing (id, x, y) coordinates to be inflated.
         """
         # Create an ObstacleArrayMsg to publish rectangles
         obstacle_array_msg = ObstacleArrayMsg()
@@ -43,9 +60,6 @@ class ZonotopeGenerator:
             obstacle_msg.header = Header()
             obstacle_msg.header.stamp = rospy.Time.now()
             obstacle_msg.header.frame_id = 'map'
-
-            # Include the object ID if possible (depends on ObstacleMsg definition)
-            # Assuming ObstacleMsg has a field for IDs, you may need to adjust this based on the actual message definition
             obstacle_msg.id = obj_id
 
             # Define the corners of the rectangle
@@ -75,21 +89,16 @@ class ZonotopeGenerator:
         points_with_ids = []
         for obj in msg.objects:
             obj_id = obj.object.id
-            # Extract x, y from Pose (ignore z for 2D points)
             x = obj.pose.pose.position.x
             y = obj.pose.pose.position.y
-            z = 0.0  # Set Z to 0 for 2D points
+            z = 0.0  # 2D points
             points_with_ids.append((obj_id, x, y))
-        
-        # Inflate the points and publish obstacles
+  
         self.generate_zonotopes(points_with_ids)
 
 if __name__ == '__main__':
     try:
-        obstacles_topic = '/objectposes'
-        obstacle_pub_topic = '/move_base/TebLocalPlannerROS/obstacles'
-        
-        publisher = ZonotopeGenerator(obstacles_topic, obstacle_pub_topic)
+        ZonotopeGenerator()
         rospy.spin()
         
     except rospy.ROSInterruptException:

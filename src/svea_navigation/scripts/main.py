@@ -18,27 +18,37 @@ def load_param(name, value=None):
     return rospy.get_param(name, value)
 
 class main:
+    """
+    ROS Node for controlling and simulating the SVEA vehicle autonomously.
+
+    This ROS node is responsible for managing both simulation and real-world operations of the SVEA vehicle.
+    It initializes and configures the necessary components, it handles the control
+    commands using the custom defined controller, and interacts with the simulation or actual hardware.
+
+    The node performs the following tasks:
+    - Configures simulation or real-world operations based on the `is_sim` parameter.
+    - Sets up publishers for steering angle and vehicle velocity.
+    - Starts the SVEA manager for handling localization, planning, and data visualization.
+    - Runs a loop to continuously obtain vehicle state, compute control commands, and publish them.
+    """
 
     DELTA_TIME = 0.01
 
     def __init__(self):
-
-        ## Initialize node
-
         rospy.init_node('main')
 
-        ## Parameters
+        # Parameters
         self.USE_RVIZ = load_param('~use_rviz', False)
         self.IS_SIM = load_param('~is_sim', False)
-        self.STATE = load_param('~state', [3, 0, 0, 0])   # floor2: [-1.5, -0.7, 1, 0]
-        ## Set initial values for node
+        self.STATE = load_param('~state', [3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame.
+
         # initial state for simulator.
         state = VehicleState(*self.STATE)
 
         self.steering_pub = rospy.Publisher('/nav_steering_angle', Float32, queue_size=1)
         self.velocity_pub = rospy.Publisher('/nav_vehicle_velocity', Float32, queue_size=1)
 
-        ## Create simulators, models, managers, etc.
+        # Create simulators, models, managers, etc.
         if self.IS_SIM:
 
             # simulator need a model to simulate
@@ -70,7 +80,6 @@ class main:
         return not rospy.is_shutdown()
 
     def spin(self):
-
         state = self.svea.wait_for_state()                  # limit the rate of main loop by waiting for state
         steering, velocity = self.svea.compute_control()
         self.publish_control(steering,velocity)
@@ -83,5 +92,4 @@ class main:
 
 
 if __name__ == '__main__':
-    ## Start node ##
     main().run()

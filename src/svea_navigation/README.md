@@ -1,20 +1,19 @@
-# svea_examples
+# svea_navigation
+introduction:
+-what are the goals
+-what does it rely on? svea vison, ...
 
-Examples on how to use [SVEA](https://github.com/KTH-SML/svea).
 
-## Installation
+## ROS nodes
+describe 
 
-### With ROS installed
 
-```
-git clone https://github.com/KTH-SML/svea
-cd svea/src
-git submodule add https://github.com/KTH-SML/svea_examples
-cd ..
-catkin config --init --extend /opt/ros/noetic
-```
+## Util scripts
+- zed poses simulator.
+- other nodes for dynamics obstacles.
 
-### Without ROS installed
+
+## Installation with docker
 
 You must have docker installed.
 
@@ -25,9 +24,19 @@ util/start
 ```
 
 ## Usage
-
 ```
 roslaunch svea_examples floor2.launch
 ```
 
 
+## Current achievements
+- 
+
+
+
+## Problematics
+
+
+
+
+## Next steps

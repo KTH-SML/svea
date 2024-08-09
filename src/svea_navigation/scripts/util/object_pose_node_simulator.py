@@ -12,7 +12,7 @@ from geometry_msgs.msg import PoseStamped
 
 class ObjectPoseSimulator:
     """
-    A ROS node that simulates object poses node (svea_vision) based on trajectories loaded from a YAML file. 
+    A ROS node that simulates the object poses node (from svea_vision) based on trajectories loaded from a YAML file. 
     This simulator is designed to model complex pedestrian trajectories, enabling a quicker tuning on the simulator for navigation.
     It maintains consistency with the message formats and topics used by the real-world 'object_pose' node within the 'svea_vision' package.
     

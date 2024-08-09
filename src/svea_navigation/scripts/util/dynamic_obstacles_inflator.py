@@ -15,6 +15,16 @@ def load_param(name, value=None):
 
 
 class DynamicObstaclesInflator:
+    """
+    Purpose: ROS node for inflating dynamic obstacles in the local costmap. The inflation simulates zonotopes, 
+    similar to what has been done in zonotope_generator.py, but here it directly modifies the costmap: this node 
+    subscribes to the ZED detected obstacles topic and inflates these obstacles in the local costmap. 
+    It also provides functionality to clear the costmap periodically.
+
+    Status: Currently not working. While the costmap is correctly updated, the TEB planner does not consider 
+    the updated costmap while planning. The best way to integrate this functionality may be to code a custom obstacle layer 
+    plugin for the local costmap that accounts for this zonotope inflation.
+    """
     def __init__(self, obstacles_topic, local_costmap_topic, clear_costmap_service, clear_interval):
         rospy.init_node('dynamic_obstacles_inflator_node')
 
@@ -56,8 +66,6 @@ class DynamicObstaclesInflator:
     def inflate_points(self, points):
         """
         Inflate the costmap around the given points with a rectangular inflation area.
-
-        :param points: List of (x, y) coordinates to be inflated.
         """
         if self.costmap is None:
             rospy.logwarn("Costmap is not initialized.")
@@ -131,11 +139,7 @@ class DynamicObstaclesInflator:
 
 
     def costmap_callback(self, msg):
-        """
-        Callback for Costmap2D messages.
-        """
-        self.costmap = msg
-        
+        self.costmap = msg 
         # Inflate the points on the costmap
         self.inflate_points(self.points)
 
@@ -144,7 +148,7 @@ if __name__ == '__main__':
         local_costmap_topic = '/move_base/local_costmap/costmap'
         clear_costmap_service = '/move_base/clear_costmaps'
         obstacles_topic = '/objectposes'
-        clear_interval = 10000000  # Time in seconds after which the local costmap gets cleaned if any dynamic obstacle is detected
+        clear_interval = 2 # Time in seconds after which the local costmap gets cleaned if any dynamic obstacle is detected
         
         publisher = DynamicObstaclesInflator(obstacles_topic, local_costmap_topic, clear_costmap_service, clear_interval)
         rospy.spin()

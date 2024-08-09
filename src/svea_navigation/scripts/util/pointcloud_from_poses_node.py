@@ -11,11 +11,10 @@ import numpy as np
 class PointCloudPublisher:
     def __init__(self, obstacles_topic, pointcloud_topic, clear_costmap_service, clear_interval):
         """
-        A ROS node that publishes PointCloud2 messages.
-        
-        Parameters:
-        - pointcloud_topic: The ROS topic to publish the PointCloud2 data.
-        - clear_costmap_service: The ROS service to call for clearing the costmap.
+        A ROS node that converts StampedObjectPoseArray messages into PointCloud2 messages and publishes them.
+        This node is meant to be used when the obstacles want to be incorporated in the local costmap through
+        the obstacle layer plugin.
+        Furthermore, the node subscribes to the costmap clearing service to refresh it every clear_interval seconds.       
         """
         rospy.init_node('pointcloud_from_poses_node')
 
@@ -49,9 +48,6 @@ class PointCloudPublisher:
     def poses_callback(self, msg):
         """
         Callback function to convert StampedObjectPoseArray to PointCloud2 and publish it.
-        
-        Parameters:
-        - msg (StampedObjectPoseArray): The message received from the /objectposes topic.
         """
         if self.clear_interval != -1:
             # Check if it's time to clear the costmap

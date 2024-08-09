@@ -15,6 +15,16 @@ def load_param(name, value=None):
     return rospy.get_param(name, value)
 
 class CrowdedBehaviorMonitor:
+    """
+    Purpose: This class implements a node whose purpose is to monitor the SVEA's sorroundings to indentify
+    critical and especially edge case situations so as to define behaviours to properly handle them. This node
+    is meant to provide additional safety features to the TEB controller. Indeed, TEB works also to minimize the risk
+    of collisions by incorporating collision avoidance constraints, but it may not always guarantee complete collision-free
+    trajectories. 
+
+    Status: Not employed by the car due to inaccurate object's pose estimates.
+    Also, the published behaviours still need to be actuated in the main script.
+    """
 
     def __init__(self):
         # Initialize ROS node, publishers, subscribers, and services
