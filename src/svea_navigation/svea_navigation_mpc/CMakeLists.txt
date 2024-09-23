@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(svea_navigation)
+project(svea_navigation_mpc)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -10,8 +10,6 @@ project(svea_navigation)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   svea_core
-  move_base
-  teb_local_planner
 )
 
 
@@ -106,8 +104,6 @@ catkin_package(
   CATKIN_DEPENDS
   rospy
   svea_core
-  move_base
-  teb_local_planner
 #  DEPENDS system_lib
 )
 

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>svea_navigation</name>
+  <name>svea_navigation_mpc</name>
   <version>0.0.0</version>
   <description>The svea navigation package</description>
 
@@ -51,8 +51,6 @@
   <buildtool_depend>catkin</buildtool_depend>
   <depend>rospy</depend>
   <depend>svea_core</depend>
-  <depend>move_base</depend>
-  <depend>teb_local_planner</depend>
   <depend>svea_vision</depend>
 
   <!-- The export tag contains other, unspecified, tags -->

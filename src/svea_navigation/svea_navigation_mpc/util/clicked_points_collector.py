@@ -67,7 +67,7 @@ class PointCollector:
         yaml_data = {'pedestrians': [[{'x': p.x, 'y': p.y, 'z': p.z} for p in group] for group in grouped_points]}
 
         # Define the directory and filename
-        save_directory = '/svea_ws/src/svea_navigation/scripts/util/simulated_trajectories/'
+        save_directory = '/svea_ws/src/svea_navigation/maps/simulated_trajectories/'
         full_path = os.path.join(save_directory, self.filename)
 
         # Ensure the directory exists
