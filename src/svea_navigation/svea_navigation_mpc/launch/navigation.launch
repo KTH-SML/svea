@@ -99,7 +99,7 @@
     </group>
 
     <!-- Start main node -->
-    <node name="main" pkg="svea_navigation_teb" type="main.py" output="screen">
+    <node name="main" pkg="svea_navigation_mpc" type="main.py" output="screen">
         <param name="use_rviz" value="$(arg use_foxglove)"/>
         <param name="is_sim" value="$(arg is_sim)"/>
     </node>

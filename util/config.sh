@@ -5,11 +5,15 @@
 #
 # Author: Kaj Munhoz Arfvidsson
 
-## Uncomment to build base image
-ROSDISTRO="noetic"
-BUILD_FILE="Dockerfile.base"
-BUILD_TAG="svea_ismir:r35.3.1"
-IMAGE_TAG="svea_ismir_marco:r35.3.1"
+
+# # Uncomment to build/run ismir image (used on the car). Comment to build/run base image (used for simulator). 
+# # [To be fixed] If you want to build and run the container on the car: 
+# # Reintroduce svea_vision nested requirements in the homonymous file. (they can't be installed with base image)
+
+# ROSDISTRO="noetic"
+# BUILD_FILE="Dockerfile.base"
+# BUILD_TAG="svea_ismir:r35.3.1"
+# IMAGE_TAG="svea_ismir_marco:r35.3.1"
 
 main() {
 

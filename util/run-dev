@@ -11,7 +11,7 @@
 
 # Setting default arguments
 if [ -z "$*" ]
-then set -- --name "$CONTAINER_NAME" "marco_svea"
+then set -- --name "$CONTAINER_NAME" "$IMAGE_TAG"
 fi
 
 istrue DEBUG && fn="echo" || fn="exec"
