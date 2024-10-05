@@ -81,7 +81,9 @@ class main:
 
     def spin(self):
         state = self.svea.wait_for_state()                  # limit the rate of main loop by waiting for state
+        print("localization",state.v)
         steering, velocity = self.svea.compute_control()
+        print("teb",velocity)
         self.publish_control(steering,velocity)
         self.svea.send_control(steering, velocity)
         self.svea.visualize_data()

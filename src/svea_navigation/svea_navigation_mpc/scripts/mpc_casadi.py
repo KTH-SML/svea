@@ -14,8 +14,11 @@ class MPC_casadi:
         :param max_steering: Maximum steering angle [rad]
         :param min_acceleration: Minimum acceleration [m/s^2]
         :param max_acceleration: Maximum acceleration [m/s^2]
+        :param min_velocity: Minimum velovity [m/s]
+        :param max_velocity: Maximum velocity [m/s]
         :param Q1: State weight matrix (4x4)
-        :param Q2: Control weight matrix (2x2)
+        :param Q2: Control rate weight matrix (2x2)
+        :param Q3: Control weight matrix (2x2)
         :param Qf: Final state weight matrix (4x4)
         """
         config_path = '/svea_ws/src/svea_navigation/svea_navigation_mpc/params/mpc_params.yaml'
@@ -24,7 +27,8 @@ class MPC_casadi:
             config = yaml.safe_load(file)
 
         # Initialize parameters from YAML file
-        self.N = config['prediction_horizon']  # Prediction horizon
+        self.N = config['prediction_horizon']  # maximum prediction horizon
+        self.current_horizon = self.N          # Initially set to max horizon
         self.dt = ca.DM(config['time_step'])  # Sampling time
         self.L = ca.DM(config['base_length'])  # Wheelbase of the vehicle
         
@@ -32,17 +36,22 @@ class MPC_casadi:
         Q1_list = config['state_weight_matrix']
         self.Q1 = ca.DM(np.array(Q1_list).reshape((4, 4)))    # conversion to dense matrix to allow symbolic operations.
 
-        Q2_list = config['control_weight_matrix']
+        Q2_list = config['control_rate_weight_matrix']
         self.Q2 = ca.DM(np.array(Q2_list).reshape((2, 2)))
+
+        Q3_list = config['control_weight_matrix']
+        self.Q3 = ca.DM(np.array(Q3_list).reshape((2, 2)))
 
         Qf_list = config['final_state_weight_matrix']
         self.Qf = ca.DM(np.array(Qf_list).reshape((4, 4)))
         
         # Load input constraints from the YAML file
-        self.min_steering = np.radians(config['steering_min'])  # Steering angle [rad]
-        self.max_steering = np.radians(config['steering_max'])  # Steering angle [rad]
-        self.min_acceleration = config['acceleration_min']  # Acceleration [m/s^2]
-        self.max_acceleration = config['acceleration_max']  # Acceleration [m/s^2]
+        self.min_steering = np.radians(config['steering_min'])  
+        self.max_steering = np.radians(config['steering_max']) 
+        self.min_acceleration = config['acceleration_min']  
+        self.max_acceleration = config['acceleration_max']  
+        self.min_velocity = config['velocity_min']  
+        self.max_velocity = config['velocity_max']  
         
         self.opti = ca.Opti()  # CasADi optimization problem
 
@@ -52,7 +61,6 @@ class MPC_casadi:
         self.set_control_input_constraints()
         self.set_solver_options()
 
-
     def compute_control(self, state, reference_trajectory):
         """
         Compute the control actions (steering, acceleration) using MPC.
@@ -61,9 +69,10 @@ class MPC_casadi:
         :param reference_trajectory: Reference trajectory [4, N+1]
         :return: steering, acceleration
         """
-        # Set current state and reference trajectory
-        self.opti.set_value(self.x_init, state)
-        self.opti.set_value(self.x_ref, reference_trajectory)
+        bounded_state = self.bound_initial_state(state)
+        # Set current state and reference trajectory for the active part of the horizon
+        self.opti.set_value(self.x_init, bounded_state)
+        self.opti.set_value(self.x_ref[:, :self.current_horizon+1], reference_trajectory[:, :self.current_horizon+1])
 
         # # Set initial guess for controls with the correct dimensions
         # initial_control_guess = np.array([[0.0] * self.N, [0.1] * self.N])  
@@ -75,12 +84,22 @@ class MPC_casadi:
         # Extract control actions
         steering = self.sol.value(self.u[0, 0])
         acceleration = self.sol.value(self.u[1, 0])
-        self.velocity = self.velocity + acceleration * self.dt
-        predicted_state = self.sol.value(self.x)
+        velocity = bounded_state[3] + acceleration * float(self.dt)
         #print(self.sol.value(self.x))
         #print(self.sol.value(self.u))
-        return steering, self.velocity, predicted_state
+        return steering, velocity
     
+    def set_new_prediction_horizon(self, new_horizon):
+        """
+        Dynamically adjust the active horizon for the optimization problem.
+        When the horizon is reduced, you simply freeze unused variables and update the reference trajectory 
+        and state for the active part of the horizon. The solver will then only optimize over the active steps.
+        """
+        self.current_horizon = new_horizon
+        
+        # Redefine objective function with new horizon.
+        self.set_objective_function()
+
     def get_optimal_control(self, all=True):
         """
         This method returns the optimal control computed by the mpc.
@@ -107,33 +126,41 @@ class MPC_casadi:
         :rtype: NumPy array
         """
         if self.sol is not None:
-            return np.array(self.sol.value(self.x))
+            return np.array(self.sol.value(self.x))   # to get only optimized one: self.sol.value(self.x[:, :self.current_horizon])
         else: 
             return None
 
     def define_state_and_control_variables(self):
         # Define state and control variables
         self.x = self.opti.variable(4, self.N + 1)  # state = [x, y, theta, v]
-        self.u = self.opti.variable(2, self.N)  # input = [steering, acceleration]
-        self.velocity = 0 # actual control action
+        self.u = self.opti.variable(2, self.N)      # input = [steering, acceleration]
 
-        self.x_init = self.opti.parameter(4)  # Initial state
+        self.x_init = self.opti.parameter(4)             # Initial state
         self.x_ref = self.opti.parameter(4, self.N + 1)  # Reference trajectory
 
     def set_objective_function(self):
-        # Define the objective function: J = (x[k]-x_ref[k])^T Q1 (x[k]-x_ref[k]) + (u[k+1] - u[k])^T Q2 (u[k+1] - u[k])
+        # Define the objective function: 
+        # J = (x[k]-x_ref[k])^T Q1 (x[k]-x_ref[k]) + (u[k+1] - u[k])^T Q2 (u[k+1] - u[k]) + u[k]^T Q3 u[k]
         self.objective = 0
-        for k in range(self.N):
+        for k in range(self.current_horizon):
+            # State error term
             state_error = self.x[:, k] - self.x_ref[:, k]
-            if k < self.N-1: 
-                input_cost = self.u[:,k+1] - self.u[:,k]
+            
+            # Control input rate of change term (u[k+1] - u[k])
+            if k < self.current_horizon - 1:
+                input_cost = self.u[:, k+1] - self.u[:, k]
             else:
                 input_cost = ca.DM.zeros(self.u.shape[0], 1)
+            
+            # Accumulate the terms into the objective
             self.objective += ca.mtimes([state_error.T, self.Q1, state_error]) + \
-                              ca.mtimes([input_cost.T, self.Q2, input_cost])
-        # Final state cost
-        final_state_error = self.x[:, self.N] - self.x_ref[:, self.N]
+                            ca.mtimes([input_cost.T, self.Q2, input_cost]) + \
+                            ca.mtimes([self.u[:, k].T, self.Q3, self.u[:, k]])
+                            
+        # Final state cost - be careful, it is always active, regardless of the reduction of the prediction horizon
+        final_state_error = self.x[:, self.current_horizon] - self.x_ref[:, self.current_horizon]
         self.objective += ca.mtimes([final_state_error.T, self.Qf, final_state_error])
+
         # Specify type of optimization problem
         self.opti.minimize(self.objective)
 
@@ -152,8 +179,8 @@ class MPC_casadi:
             self.opti.subject_to(self.x[2, k + 1] == theta_next)
             self.opti.subject_to(self.x[3, k + 1] == v_next)
 
-            self.opti.subject_to(self.x[3, k] <= 1.5)
-            self.opti.subject_to(self.x[3, k] >= -1.5)
+            self.opti.subject_to(self.x[3, k] <= self.max_velocity)
+            self.opti.subject_to(self.x[3, k] >= self.min_velocity)
     
     def set_control_input_constraints(self):
         # Input constraints (steering, acceleration)
@@ -167,3 +194,17 @@ class MPC_casadi:
         # Set solver options
         opts = {"ipopt.print_level": 0, "print_time": 0}
         self.opti.solver("ipopt", opts)
+
+    def bound_initial_state(self,state):
+        """
+        This method checks if the initial state provided to the mpc, which comes from the localization stack,
+        is within the allowed bounds. If not, it clamps it.
+        """
+        # Ensure the velocity is within the specified bounds
+        clamped_velocity = max(self.min_velocity, min(state[3], self.max_velocity))
+        
+        # Create a new state with the clamped velocity
+        bounded_state = state.copy()
+        bounded_state[3] = clamped_velocity
+        
+        return bounded_state

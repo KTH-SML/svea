@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import numpy as np
+import math
 import rospy
 from svea.models.bicycle import SimpleBicycleModel
 from svea.states import VehicleState
@@ -33,6 +34,9 @@ class main:
         self.IS_SIM = load_param('~is_sim', False)
         self.STATE = load_param('~state', [3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
         self.MPC_FREQ = load_param('~mpc_freq', 10)
+        self.GOAL_REACHED_DIST = 0.1   # meters
+        self.GOAL_REACHED_YAW = 0.1   #  radians
+        self.REDUCE_PREDICTION_HORIZON_THR = 1  # meters
         # Initialize control variables
         self.steering = 0
         self.velocity = 0
@@ -55,13 +59,22 @@ class main:
         # Retrieve current state from SVEA localization
         state = self.svea.wait_for_state()
         state = [state.x, state.y, state.yaw, state.v]
+        #print("v localization",state[3])
         # If enough time has passed, run the MPC computation
         current_time = rospy.get_time()
         if current_time - self.mpc_last_time >= self.mpc_dt:
             reference_trajectory = self.get_reference_trajectory()
-            if not self.is_goal_reached(state, reference_trajectory[0:2, -1]):
+            distance_to_goal = self.compute_distance(state, reference_trajectory[0:2, -1])
+            yaw_to_goal = state[2] - reference_trajectory[2, -1]
+            if distance_to_goal < self.REDUCE_PREDICTION_HORIZON_THR:
+                new_horizon = math.ceil(3 + (distance_to_goal / 0.5))
+                #print(new_horizon)
+                self.svea.controller.set_new_prediction_horizon(new_horizon)
+            if  not self.is_goal_reached(distance_to_goal,yaw_to_goal):
                 # Run the MPC to compute control
-                self.steering, self.velocity, self.predicted_state = self.svea.controller.compute_control(state, reference_trajectory)       
+                self.steering, self.velocity = self.svea.controller.compute_control([state[0],state[1],state[2],self.velocity], reference_trajectory)  
+                self.predicted_state = self.svea.controller.get_optimal_states()
+                #print("velocity command", self.velocity)
                 # Publish the predicted path
                 self.publish_predicted_path(self.predicted_state[0:3, :])
             else:
@@ -70,10 +83,11 @@ class main:
                 print("GOAL ACHIEVED",state)
             # Update the last time the MPC was computed
             self.mpc_last_time = current_time
+            
         # Publish the latest control, whether newly computed or the last one
         self.publish_control(self.steering, self.velocity)
         # Visualization data and send control
-        self.svea.send_control(self.steering, self.velocity)
+        self.svea.send_control(self.steering, self.velocity) 
         self.svea.visualize_data()
         
         
@@ -114,12 +128,18 @@ class main:
         self.velocity_pub.publish(velocity)
 
     def get_reference_trajectory(self):
-        reference_state = [self.STATE[0] + 2,self.STATE[1],self.STATE[2]+np.pi,self.STATE[3]]
-        x_ref = np.tile(reference_state, (26, 1)).T 
+        reference_state = [self.STATE[0] + 2,self.STATE[1],self.STATE[2]+3.14,self.STATE[3]]
+        x_ref = np.tile(reference_state, (11, 1)).T 
         return x_ref
+    
+    def is_goal_reached(self,distance,yaw_error):
+        if distance < self.GOAL_REACHED_DIST and abs(yaw_error) < self.GOAL_REACHED_YAW:
+            return True
+        else:
+            return False
  
-    def is_goal_reached(self,state,goal):
-        return False #(state[0]-goal[0])**2 + (state[1]-goal[1])**2 <= 0.01    
+    def compute_distance(self,point1,point2):
+        return np.sqrt((point1[0]-point2[0])**2 + (point1[1]-point2[1])**2)   
 
     def publish_predicted_path(self, points):
         pointx, pointy, pointyaw = [], [], []

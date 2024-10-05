@@ -98,6 +98,11 @@
         </group>
     </group>
 
+    <!-- Start Foxglove -->
+    <include if="$(eval use_foxglove)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
+        <arg name="port" value="8765" />
+    </include>
+    
     <!-- Start main node -->
     <node name="main" pkg="svea_navigation_mpc" type="main.py" output="screen">
         <param name="use_rviz" value="$(arg use_foxglove)"/>
@@ -105,10 +110,6 @@
         <param name="mpc_freq" value="10"/> 
     </node>
 
-    <!-- Start Foxglove -->
-    <include if="$(eval use_foxglove)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
-        <arg name="port" value="8765" />
-    </include>
 
     <!-- Start simulated poses generator if simulation. -->
     <!-- <group if="$(arg is_sim)">

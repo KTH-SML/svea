@@ -7,32 +7,42 @@ base_length: 0.32
 state_weight_matrix: [5, 0, 0, 0,
                       0, 5, 0, 0,
                       0, 0, 0, 0,
-                      0, 0, 0, 10]
+                      0, 0, 0, 0]
 
 # Q2 in objective function J
+control_rate_weight_matrix: [5, 0,
+                            0, 20]
+
+# Q3 in objective function J
 control_weight_matrix: [3, 0,
-                        0, 2]
+                        0, 3]
 
 # Qf in objective function J
-final_state_weight_matrix: [5, 0, 0, 0,
-                            0, 5, 0, 0,
+final_state_weight_matrix: [10, 0, 0, 0,
+                            0, 10, 0, 0,
                             0, 0, 10, 0,
-                            0, 0, 0, 10]
+                            0, 0, 0, 0]
 
 # The time step [s] in which the optimization problem is divided (unit [s])
-time_step: 0.1
+time_step: 0.3
 
 # The prediction horizon steps for the mpc optimization problem
-prediction_horizon: 25
+prediction_horizon: 10
 
 # The minimum steering angle allowed for SVEA (unit [degrees])
-steering_min: -45
+steering_min: -40
 
 # The maximum steering angle allowed for SVEA (unit [degrees])
-steering_max: 45
+steering_max: 4
 
 # The minimum acceleration allowed for SVEA (unit [m/s^2])
-acceleration_min: -0.5
+acceleration_min: -0.3
 
 # The maximum acceleration allowed for SVEA (unit [m/s^2])
 acceleration_max: 0.5
+
+# The minimum velocity allowed for SVEA (unit [m/s^2])
+velocity_min: -1.2
+
+# The maximum velocity allowed for SVEA (unit [m/s^2])
+velocity_max: 1.2
