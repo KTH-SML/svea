@@ -77,7 +77,7 @@ class main:
             yaw_to_goal = state[2] - reference_trajectory[2, -1]
             if distance_to_goal < self.REDUCE_PREDICTION_HORIZON_THR:
                 self.new_horizon = math.ceil(3+ (distance_to_goal / 0.5))
-                #print(self.new_horizon)
+                print(self.new_horizon)
                 self.svea.controller.set_new_prediction_horizon(self.new_horizon)
             if  not self.is_goal_reached(distance_to_goal,yaw_to_goal):
                 # Run the MPC to compute control

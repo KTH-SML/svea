@@ -52,6 +52,8 @@ class MPC_casadi:
         self.max_acceleration = config['acceleration_max']  
         self.min_velocity = config['velocity_min']  
         self.max_velocity = config['velocity_max']  
+        self.velocity_deadzone = 0.1
+        self.Qv = ca.DM(10)
         
         self.opti = ca.Opti()  # CasADi optimization problem
 
@@ -152,10 +154,14 @@ class MPC_casadi:
             else:
                 input_cost = ca.DM.zeros(self.u.shape[0], 1)
             
+            # Penalize for violating the velocity deadzone (soft constraint)
+            velocity_error = ca.fmax(0, self.velocity_deadzone - ca.fabs(self.x[3, k]))  # Penalize if |v| < velocity_deadzone
+            
             # Accumulate the terms into the objective
             self.objective += ca.mtimes([state_error.T, self.Q1, state_error]) + \
                             ca.mtimes([input_cost.T, self.Q2, input_cost]) + \
-                            ca.mtimes([self.u[:, k].T, self.Q3, self.u[:, k]])
+                            ca.mtimes([self.u[:, k].T, self.Q3, self.u[:, k]]) + \
+                            ca.mtimes([velocity_error.T, self.Qv, velocity_error])
                             
         # Final state cost - be careful, it is always active, regardless of the reduction of the prediction horizon
         final_state_error = self.x[:, self.current_horizon] - self.x_ref[:, self.current_horizon]
