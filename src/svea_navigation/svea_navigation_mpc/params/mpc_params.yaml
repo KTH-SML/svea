@@ -10,17 +10,17 @@ state_weight_matrix: [5, 0, 0, 0,
                       0, 0, 0, 0]
 
 # Q2 in objective function J
-control_rate_weight_matrix: [5, 0,
-                            0, 20]
+control_rate_weight_matrix: [0, 0,
+                            0, 0]
 
 # Q3 in objective function J
 control_weight_matrix: [3, 0,
                         0, 3]
 
 # Qf in objective function J
-final_state_weight_matrix: [10, 0, 0, 0,
-                            0, 10, 0, 0,
-                            0, 0, 10, 0,
+final_state_weight_matrix: [20, 0, 0, 0,
+                            0, 20, 0, 0,
+                            0, 0, 20, 0,
                             0, 0, 0, 0]
 
 # The time step [s] in which the optimization problem is divided (unit [s])
@@ -33,16 +33,16 @@ prediction_horizon: 10
 steering_min: -40
 
 # The maximum steering angle allowed for SVEA (unit [degrees])
-steering_max: 4
+steering_max: 40
 
 # The minimum acceleration allowed for SVEA (unit [m/s^2])
-acceleration_min: -0.3
+acceleration_min: -0.2
 
 # The maximum acceleration allowed for SVEA (unit [m/s^2])
-acceleration_max: 0.5
+acceleration_max: 0.2
 
 # The minimum velocity allowed for SVEA (unit [m/s^2])
-velocity_min: -1.2
+velocity_min: -0.5
 
 # The maximum velocity allowed for SVEA (unit [m/s^2])
-velocity_max: 1.2
+velocity_max: 0.8
