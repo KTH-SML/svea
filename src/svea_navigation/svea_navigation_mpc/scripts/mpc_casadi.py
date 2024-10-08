@@ -44,51 +44,58 @@ class MPC_casadi:
 
         Qf_list = config['final_state_weight_matrix']
         self.Qf = ca.DM(np.array(Qf_list).reshape((4, 4)))
+
+        self.Qv = ca.DM(config['velocity_deadzone_weight_matrix'])
         
-        # Load input constraints from the YAML file
+        # Load constraints from the YAML file
         self.min_steering = np.radians(config['steering_min'])  
         self.max_steering = np.radians(config['steering_max']) 
         self.min_acceleration = config['acceleration_min']  
         self.max_acceleration = config['acceleration_max']  
         self.min_velocity = config['velocity_min']  
         self.max_velocity = config['velocity_max']  
-        self.velocity_deadzone = 0.1
-        self.Qv = ca.DM(10)
+        self.min_steering_rate = np.radians(config['steering_rate_min'])  
+        self.max_steering_rate = np.radians(config['steering_rate_max'])
+        self.velocity_deadzone = config['velocity_deadzone'] 
         
         self.opti = ca.Opti()  # CasADi optimization problem
 
         self.define_state_and_control_variables()
         self.set_objective_function()
-        self.set_vehicle_dynamics_constraints()
+        self.set_state_constraints()
         self.set_control_input_constraints()
         self.set_solver_options()
 
     def compute_control(self, state, reference_trajectory):
         """
         Compute the control actions (steering, acceleration) using MPC.
-
-        :param state: Current state of the vehicle [x, y, theta, v]
+        
+        :param state: Current state of the vehicle [x, y, theta, v, delta]
         :param reference_trajectory: Reference trajectory [4, N+1]
-        :return: steering, acceleration
+        :return: steering, velocity
         """
+        # Bound the initial state to respect constraints
         bounded_state = self.bound_initial_state(state)
+
+        # Enlarge the reference trajectory with a fictitious steering value for feasibility.
+        # Add a row of zeros as the last row to the reference_trajectory matrix.
+        reference_trajectory = ca.vertcat(reference_trajectory, ca.DM.zeros(1, reference_trajectory.shape[1]))
+
         # Set current state and reference trajectory for the active part of the horizon
         self.opti.set_value(self.x_init, bounded_state)
         self.opti.set_value(self.x_ref[:, :self.current_horizon+1], reference_trajectory[:, :self.current_horizon+1])
 
-        # # Set initial guess for controls with the correct dimensions
-        # initial_control_guess = np.array([[0.0] * self.N, [0.1] * self.N])  
-        # self.opti.set_initial(self.u, initial_control_guess)
-
         # Solve the optimization problem
         self.sol = self.opti.solve()
 
-        # Extract control actions
-        steering = self.sol.value(self.u[0, 0])
-        acceleration = self.sol.value(self.u[1, 0])
-        velocity = bounded_state[3] + acceleration * float(self.dt)
-        #print(self.sol.value(self.x))
-        #print(self.sol.value(self.u))
+        # Extract control actions (acceleration and steering rate)
+        acceleration = self.sol.value(self.u[0, 0])
+        steering_rate = self.sol.value(self.u[1, 0])
+
+        # Compute the next steering angle and velocity
+        velocity = bounded_state[3] + acceleration * float(0.1)
+        steering = bounded_state[4] + steering_rate * float(0.1)
+
         return steering, velocity
     
     def set_new_prediction_horizon(self, new_horizon):
@@ -134,67 +141,77 @@ class MPC_casadi:
 
     def define_state_and_control_variables(self):
         # Define state and control variables
-        self.x = self.opti.variable(4, self.N + 1)  # state = [x, y, theta, v]
+        self.x = self.opti.variable(5, self.N + 1)  # state = [x, y, theta, v]
         self.u = self.opti.variable(2, self.N)      # input = [steering, acceleration]
 
-        self.x_init = self.opti.parameter(4)             # Initial state
-        self.x_ref = self.opti.parameter(4, self.N + 1)  # Reference trajectory
+        self.x_init = self.opti.parameter(5)             # Initial state
+        self.x_ref = self.opti.parameter(5, self.N + 1)  # Reference trajectory
 
     def set_objective_function(self):
         # Define the objective function: 
         # J = (x[k]-x_ref[k])^T Q1 (x[k]-x_ref[k]) + (u[k+1] - u[k])^T Q2 (u[k+1] - u[k]) + u[k]^T Q3 u[k]
         self.objective = 0
         for k in range(self.current_horizon):
-            # State error term
-            state_error = self.x[:, k] - self.x_ref[:, k]
-            
+            # State error term (ignore delta in reference trajectory)
+            state_error = self.x[0:4, k] - self.x_ref[0:4, k]
+
             # Control input rate of change term (u[k+1] - u[k])
             if k < self.current_horizon - 1:
                 input_cost = self.u[:, k+1] - self.u[:, k]
             else:
                 input_cost = ca.DM.zeros(self.u.shape[0], 1)
-            
+
             # Penalize for violating the velocity deadzone (soft constraint)
             velocity_error = ca.fmax(0, self.velocity_deadzone - ca.fabs(self.x[3, k]))  # Penalize if |v| < velocity_deadzone
-            
+
             # Accumulate the terms into the objective
             self.objective += ca.mtimes([state_error.T, self.Q1, state_error]) + \
                             ca.mtimes([input_cost.T, self.Q2, input_cost]) + \
                             ca.mtimes([self.u[:, k].T, self.Q3, self.u[:, k]]) + \
                             ca.mtimes([velocity_error.T, self.Qv, velocity_error])
-                            
-        # Final state cost - be careful, it is always active, regardless of the reduction of the prediction horizon
-        final_state_error = self.x[:, self.current_horizon] - self.x_ref[:, self.current_horizon]
+
+        # Final state cost
+        final_state_error = self.x[0:4, self.current_horizon] - self.x_ref[0:4, self.current_horizon]
         self.objective += ca.mtimes([final_state_error.T, self.Qf, final_state_error])
 
         # Specify type of optimization problem
         self.opti.minimize(self.objective)
 
-    def set_vehicle_dynamics_constraints(self):
+    def set_state_constraints(self):
         # Initial state constraint
         self.opti.subject_to(self.x[:, 0] == self.x_init)
+
         # Vehicle dynamics constraints
         for k in range(self.N):
-            x_next = self.x[0, k] + self.dt * self.x[3, k] * ca.cos(self.x[2, k])
-            y_next = self.x[1, k] + self.dt * self.x[3, k] * ca.sin(self.x[2, k])
-            theta_next = self.x[2, k] + self.dt * (self.x[3, k] / self.L) * ca.tan(self.u[0, k])
-            v_next = self.x[3, k] + self.dt * self.u[1, k]
+            x_next = self.x[0, k] + self.dt * self.x[3, k] * ca.cos(self.x[2, k])  # x_k+1 = x_k + dt * v_k * cos(theta_k)
+            y_next = self.x[1, k] + self.dt * self.x[3, k] * ca.sin(self.x[2, k])  # y_k+1 = y_k + dt * v_k * sin(theta_k)
+            theta_next = self.x[2, k] + self.dt * (self.x[3, k] / self.L) * ca.tan(self.x[4, k])  # theta_k+1 = theta_k + dt * v_k * tan(delta_k) / L
+            v_next = self.x[3, k] + self.dt * self.u[0, k]  # v_k+1 = v_k + dt * a_k
+            delta_next = self.x[4, k] + self.dt * self.u[1, k]  # delta_k+1 = delta_k + dt * steering_rate_k
 
             self.opti.subject_to(self.x[0, k + 1] == x_next)
             self.opti.subject_to(self.x[1, k + 1] == y_next)
             self.opti.subject_to(self.x[2, k + 1] == theta_next)
             self.opti.subject_to(self.x[3, k + 1] == v_next)
+            self.opti.subject_to(self.x[4, k + 1] == delta_next)
 
+            # Velocity constraints
             self.opti.subject_to(self.x[3, k] <= self.max_velocity)
             self.opti.subject_to(self.x[3, k] >= self.min_velocity)
+
+            # Steering angle constraints
+            self.opti.subject_to(self.x[4, k] <= self.max_steering)
+            self.opti.subject_to(self.x[4, k] >= self.min_steering)
     
     def set_control_input_constraints(self):
-        # Input constraints (steering, acceleration)
+        # Input constraints (acceleration, steering rate)
         for k in range(self.N):
-            self.opti.subject_to(self.min_steering <= self.u[0, k])
-            self.opti.subject_to(self.u[0, k] <= self.max_steering)
-            self.opti.subject_to(self.min_acceleration <= self.u[1, k])
-            self.opti.subject_to(self.u[1, k] <= self.max_acceleration)
+            self.opti.subject_to(self.min_acceleration <= self.u[0, k])
+            self.opti.subject_to(self.u[0, k] <= self.max_acceleration)
+
+            # Steering rate constraint
+            self.opti.subject_to(self.min_steering_rate <= self.u[1, k])
+            self.opti.subject_to(self.u[1, k] <= self.max_steering_rate)
 
     def set_solver_options(self):
         # Set solver options

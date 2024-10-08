@@ -37,7 +37,7 @@ class main:
         self.MPC_FREQ = load_param('~mpc_freq', 10)
         self.GOAL_REACHED_DIST = 0.2   # meters
         self.GOAL_REACHED_YAW = 0.2   #  radians
-        self.REDUCE_PREDICTION_HORIZON_THR = 1  # meters
+        self.REDUCE_PREDICTION_HORIZON_THR = 0.3  # meters
         # Initialize control variables
         self.steering = 0
         self.velocity = 0
@@ -76,12 +76,12 @@ class main:
             distance_to_goal = self.compute_distance(state, reference_trajectory[0:2, -1])
             yaw_to_goal = state[2] - reference_trajectory[2, -1]
             if distance_to_goal < self.REDUCE_PREDICTION_HORIZON_THR:
-                self.new_horizon = math.ceil(3+ (distance_to_goal / 0.5))
-                print(self.new_horizon)
+                self.new_horizon = math.ceil(10)
+                #print(self.new_horizon)
                 self.svea.controller.set_new_prediction_horizon(self.new_horizon)
             if  not self.is_goal_reached(distance_to_goal,yaw_to_goal):
                 # Run the MPC to compute control
-                self.steering, self.velocity = self.svea.controller.compute_control([state[0],state[1],state[2],self.velocity], reference_trajectory)  
+                self.steering, self.velocity = self.svea.controller.compute_control([state[0],state[1],state[2],self.velocity,self.steering], reference_trajectory)  
                 self.predicted_state = self.svea.controller.get_optimal_states()
                 #print("velocity command", self.velocity)
                 #control = self.svea.controller.get_optimal_control()
@@ -100,8 +100,7 @@ class main:
         # Visualization data and send control
         self.svea.send_control(self.steering, self.velocity) 
         self.svea.visualize_data()
-        
-        
+                
     def init_publishers(self):
         self.steering_pub = rospy.Publisher('/nav_steering_angle', Float32, queue_size=1)
         self.velocity_pub = rospy.Publisher('/nav_vehicle_velocity', Float32, queue_size=1)
@@ -139,7 +138,7 @@ class main:
         self.velocity_pub.publish(velocity)
 
     def get_reference_trajectory(self):
-        reference_state = [self.STATE[0] + 3,self.STATE[1],self.STATE[2]+3.14,self.STATE[3]]
+        reference_state = [self.STATE[0] + 1,self.STATE[1],self.STATE[2]+3.14,self.STATE[3]]
         x_ref = np.tile(reference_state, (11, 1)).T 
         return x_ref
     
@@ -160,7 +159,6 @@ class main:
             pointyaw.append(points[2, i])  # yaw values        
         # Publish the trajectory as a PoseArray
         publish_pose_array(self.predicted_trajectory_pub, pointx, pointy, pointyaw)
-
 
 if __name__ == '__main__':
     rospy.init_node('main')

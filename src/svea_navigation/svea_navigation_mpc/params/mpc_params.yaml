@@ -4,18 +4,21 @@
 base_length: 0.32
 
 # Q1 in objective function J
-state_weight_matrix: [3, 0, 0, 0,
-                      0, 3, 0, 0,
+state_weight_matrix: [10, 0, 0, 0,
+                      0, 10, 0, 0,
                       0, 0, 0, 0,
                       0, 0, 0, 0]
 
 # Q2 in objective function J
-control_rate_weight_matrix: [1, 0,
-                            0, 1]
+control_rate_weight_matrix: [0, 0,
+                            0, 0]
 
 # Q3 in objective function J
-control_weight_matrix: [3, 0,
-                        0, 3]
+control_weight_matrix: [2, 0,
+                        0, 2]
+
+# Qv matrix in objective function
+velocity_deadzone_weight_matrix: 10
 
 # Qf in objective function J
 final_state_weight_matrix: [25, 0, 0, 0,
@@ -30,19 +33,28 @@ time_step: 0.2
 prediction_horizon: 10
 
 # The minimum steering angle allowed for SVEA (unit [degrees])
-steering_min: -30
+steering_min: -40
+
+# The minimum steering rate allowed for SVEA (unit [degrees/s])
+steering_rate_min: -25 
 
 # The maximum steering angle allowed for SVEA (unit [degrees])
-steering_max: 30
+steering_max: 40
+
+# The maximum steering rate allowed for SVEA (unit [degrees/s])
+steering_rate_max: 25 
 
 # The minimum acceleration allowed for SVEA (unit [m/s^2])
 acceleration_min: -0.2
 
 # The maximum acceleration allowed for SVEA (unit [m/s^2])
-acceleration_max: 0.2
+acceleration_max: 0.5
 
 # The minimum velocity allowed for SVEA (unit [m/s^2])
 velocity_min: -0.8
 
 # The maximum velocity allowed for SVEA (unit [m/s^2])
 velocity_max: 0.8
+
+# The velocity deadzone(unit [m/s])
+velocity_deadzone: 0.1
