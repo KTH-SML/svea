@@ -3,6 +3,7 @@
 import numpy as np
 import math
 import rospy
+import tf
 import yaml
 from svea.models.bicycle import SimpleBicycleModel
 from svea.states import VehicleState
@@ -12,6 +13,7 @@ from mpc_casadi import MPC_casadi
 from svea.svea_managers.svea_archetypes import SVEAManager
 from svea.data import TrajDataHandler, RVIZPathHandler
 from std_msgs.msg import Float32
+from svea_navigation_mpc.srv import SetGoalPosition, SetGoalPositionResponse
 from geometry_msgs.msg import PoseArray
 from svea.simulators.viz_utils import publish_pose_array
 
@@ -38,13 +40,16 @@ class main:
         self.GOAL_REACHED_DIST = 0.2   # meters
         self.GOAL_REACHED_YAW = 0.2   #  radians
         self.REDUCE_PREDICTION_HORIZON_THR = 0.3  # meters
-        # Initialize control variables
+        self.delta_s = 1
+        # Initialize optimal variables
         self.steering = 0
         self.velocity = 0
         self.predicted_state = None
         # Initialize other variables
         self.mpc_last_time = rospy.get_time()
-        self.mpc_dt = 1.0 / self.MPC_FREQ  
+        self.mpc_dt = 1.0 / self.MPC_FREQ 
+        self.goal_pose = None
+        self.state = []
 
         # TODO: import yaml here and set mpc params from here. set path in launch file.
         config_path = '/svea_ws/src/svea_navigation/svea_navigation_mpc/params/mpc_params.yaml'
@@ -56,6 +61,7 @@ class main:
 
         self.create_simulator_and_SVEAmanager()
         self.init_publishers()
+        self.init_services()
 
     def run(self):
         while self.keep_alive():
@@ -67,21 +73,23 @@ class main:
     def spin(self):
         # Retrieve current state from SVEA localization
         state = self.svea.wait_for_state()
-        state = [state.x, state.y, state.yaw, state.v]
+        self.state = [state.x, state.y, state.yaw, state.v]
         #print("v localization",state[3])
         # If enough time has passed, run the MPC computation
         current_time = rospy.get_time()
         if current_time - self.mpc_last_time >= self.mpc_dt:
             reference_trajectory = self.get_reference_trajectory()
-            distance_to_goal = self.compute_distance(state, reference_trajectory[0:2, -1])
-            yaw_to_goal = state[2] - reference_trajectory[2, -1]
+            distance_to_goal = self.compute_distance(self.state, reference_trajectory[0:2, -1])
+            yaw_to_goal = self.state[2] - reference_trajectory[2, -1]
             if distance_to_goal < self.REDUCE_PREDICTION_HORIZON_THR:
-                self.new_horizon = math.ceil(10)
+                self.new_horizon = math.ceil(5)
                 #print(self.new_horizon)
                 self.svea.controller.set_new_prediction_horizon(self.new_horizon)
             if  not self.is_goal_reached(distance_to_goal,yaw_to_goal):
                 # Run the MPC to compute control
-                self.steering, self.velocity = self.svea.controller.compute_control([state[0],state[1],state[2],self.velocity,self.steering], reference_trajectory)  
+                steering_rate, acceleration = self.svea.controller.compute_control([self.state[0],self.state[1],self.state[2],self.velocity,self.steering], reference_trajectory)
+                self.steering += steering_rate * self.mpc_dt
+                self.velocity += acceleration * self.mpc_dt  
                 self.predicted_state = self.svea.controller.get_optimal_states()
                 #print("velocity command", self.velocity)
                 #control = self.svea.controller.get_optimal_control()
@@ -91,7 +99,7 @@ class main:
             else:
                 # Stop the vehicle if the goal is reached
                 self.steering, self.velocity = 0, 0
-                print("GOAL ACHIEVED",state)
+                #print("GOAL ACHIEVED",self.state)
             # Update the last time the MPC was computed
             self.mpc_last_time = current_time
             
@@ -105,6 +113,9 @@ class main:
         self.steering_pub = rospy.Publisher('/nav_steering_angle', Float32, queue_size=1)
         self.velocity_pub = rospy.Publisher('/nav_vehicle_velocity', Float32, queue_size=1)
         self.predicted_trajectory_pub = rospy.Publisher('/predicted_path', PoseArray, queue_size=1)
+
+    def init_services(self):
+        self.goal_service = rospy.Service('/set_goal_position', SetGoalPosition, self.handle_set_goal_position)
 
     def create_simulator_and_SVEAmanager(self):
         # initial state for simulator.
@@ -138,10 +149,93 @@ class main:
         self.velocity_pub.publish(velocity)
 
     def get_reference_trajectory(self):
-        reference_state = [self.STATE[0] + 1,self.STATE[1],self.STATE[2]+3.14,self.STATE[3]]
+        reference_state = [self.STATE[0] + 1,self.STATE[1],self.STATE[2]+0,self.STATE[3]]
         x_ref = np.tile(reference_state, (11, 1)).T 
         return x_ref
     
+    def handle_set_goal_position(self, req):
+        """
+        Service handler that sets a new goal position and calculates a trajectory.
+        :param req: SetGoalPositionRequest containing the goal PoseStamped.
+        :return: SetGoalPositionResponse
+        """
+        self.goal_pose = req.goal_pose
+        rospy.loginfo(f"New goal position received: ({self.goal_pose.pose.position.x}, {self.goal_pose.pose.position.y})")
+
+        # Compute trajectory (straight line from current position to goal)
+        self.compute_trajectory()
+
+        # Respond with success
+        res = SetGoalPositionResponse()
+        res.success = True
+        res.message = "Goal position set successfully and trajectory computed."
+        return res
+
+    def get_yaw_from_pose(self,pose_stamped):
+        """
+        Extracts the yaw from a PoseStamped message.
+        """
+        # Convert the quaternion to Euler angles
+        orientation = pose_stamped.pose.orientation
+        quaternion = (orientation.x, orientation.y, orientation.z, orientation.w)
+        
+        # Use tf to convert quaternion to Euler angles
+        euler = tf.transformations.euler_from_quaternion(quaternion)
+        
+        # Return the yaw
+        return euler[2]  
+    
+    def compute_trajectory(self):
+        """
+        Compute a straight-line trajectory from the current position to the goal using delta_s,
+        including the heading for each point, and publish the path.
+        """
+        if not self.goal_pose or not self.state:
+            rospy.logwarn("Missing goal or current state for trajectory computation.")
+            return
+
+        # Calculate the straight-line trajectory between current state and goal position
+        start_x, start_y = self.state[0], self.state[1]
+        goal_x, goal_y = self.goal_pose.pose.position.x, self.goal_pose.pose.position.y
+        distance = self.compute_distance([start_x, start_y], [goal_x, goal_y])
+        goal_yaw = self.get_yaw_from_pose(self.goal_pose)
+
+        # Compute intermediate points at intervals of delta_s
+        num_points = int(distance // self.delta_s)
+        trajectory = np.zeros((3, num_points + 1))  # shape [3, N]
+
+        for i in range(num_points):
+            ratio = (i * self.delta_s) / distance
+            x = start_x + ratio * (goal_x - start_x)
+            y = start_y + ratio * (goal_y - start_y)
+            
+            # Calculate the heading for this point
+            heading = math.atan2(goal_y - start_y, goal_x - start_x)
+            
+            trajectory[0, i] = x  # x values
+            trajectory[1, i] = y  # y values
+            trajectory[2, i] = heading  # yaw values
+
+        # Handle any leftover distance
+        if distance % self.delta_s > 0:
+            # Calculate last point with the goal heading
+            last_x = goal_x
+            last_y = goal_y
+            heading = math.atan2(goal_y - start_y, goal_x - start_x)
+            
+            trajectory[0, num_points] = last_x
+            trajectory[1, num_points] = last_y
+            trajectory[2, num_points] = goal_yaw
+
+        # Publish the predicted path
+        self.publish_predicted_path(trajectory)
+
+    def _visualize_trajectory(self, trajectory):
+        """Use svea manager handler to visualize the computed trajectory."""
+        traj_x = [point[0] for point in trajectory]
+        traj_y = [point[1] for point in trajectory]
+        self.svea.data_handler.update_traj(traj_x, traj_y)
+        
     def is_goal_reached(self,distance,yaw_error):
         if distance < self.GOAL_REACHED_DIST and abs(yaw_error) < self.GOAL_REACHED_YAW:
             return True

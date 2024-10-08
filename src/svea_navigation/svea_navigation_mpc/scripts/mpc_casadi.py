@@ -92,11 +92,7 @@ class MPC_casadi:
         acceleration = self.sol.value(self.u[0, 0])
         steering_rate = self.sol.value(self.u[1, 0])
 
-        # Compute the next steering angle and velocity
-        velocity = bounded_state[3] + acceleration * float(0.1)
-        steering = bounded_state[4] + steering_rate * float(0.1)
-
-        return steering, velocity
+        return steering_rate, acceleration
     
     def set_new_prediction_horizon(self, new_horizon):
         """

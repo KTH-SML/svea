@@ -110,6 +110,10 @@
         <param name="mpc_freq" value="10"/> 
     </node>
 
+    <!-- Start goal setter node for the mpc -->
+    <node name="goal_setter_node" pkg="svea_navigation_mpc" type="mpc_goal_setter_node.py" output="screen"/>
+
+
 
     <!-- Start simulated poses generator if simulation. -->
     <!-- <group if="$(arg is_sim)">
