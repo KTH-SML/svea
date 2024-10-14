@@ -10,8 +10,8 @@ state_weight_matrix: [10, 0, 0, 0,
                       0, 0, 0, 0]
 
 # Q2 in objective function J
-control_rate_weight_matrix: [0, 0,
-                            0, 0]
+control_rate_weight_matrix: [1, 0,
+                            0, 1]
 
 # Q3 in objective function J
 control_weight_matrix: [2, 0,
