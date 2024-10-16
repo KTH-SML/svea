@@ -5,28 +5,53 @@
 #
 # Author: Kaj Munhoz Arfvidsson
 
-## Uncomment to build base image
-#ROSDISTRO="noetic"
-#BUILD_FILE="Dockerfile.base"
-#BUILD_TAG="ros:$ROSDISTRO"
-#IMAGE_TAG="ghcr.io/kth-sml/svea:$(uname -m)"
+## Uncomment to build base image for amd64 (x86)/arm64.
+# CONFIG="base-amd64"
+# CONFIG="base-arm64"
 
 main() {
 
-    ROSDISTRO="${ROSDISTRO:-"noetic"}"
-    WORKSPACE="${WORKSPACE:-"/svea_ws"}"
+    CONFIG="${CONFIG:-"deafult"}"
+    DEFAULT_ROSDISTRO="noetic"
+    DEFAULT_WORKSPACE="/svea_ws"
+    DEFAULT_BUILD_PLATFORM="linux/amd64"
+    DEFAULT_BUILD_FILE="docker/Dockerfile"
+    DEFAULT_BUILD_TAG="latest"
+    DEFAULT_IMAGE_PUSH="0"
+
+    if [ "$CONFIG" = "base" ]; then
+        DEFAULT_BUILD_PLATFORM="linux/amd64,linux/arm64/v8"
+        DEFAULT_BUILD_FILE="docker/Dockerfile.base"
+        DEFAULT_BUILD_TAG="$DEFAULT_ROSDISTRO"
+	IMAGE_PUSH="1"
+        IMAGE_TAG="ghcr.io/kth-sml/svea"
+    elif [ "$CONFIG" = "base-amd64" ]; then
+        DEFAULT_BUILD_PLATFORM="linux/amd64"
+        DEFAULT_BUILD_FILE="docker/Dockerfile.base"
+        DEFAULT_BUILD_TAG="$DEFAULT_ROSDISTRO"
+        IMAGE_TAG="ghcr.io/kth-sml/svea"
+    elif [ "$CONFIG" = "base-arm64" ]; then
+        DEFAULT_BUILD_PLATFORM="linux/arm64/v8"
+        DEFAULT_BUILD_FILE="docker/Dockerfile.base"
+        DEFAULT_BUILD_TAG="$DEFAULT_ROSDISTRO"
+        IMAGE_TAG="ghcr.io/kth-sml/svea"
+    fi
+
+    ROSDISTRO="${ROSDISTRO:-"$DEFAULT_ROSDISTRO"}"
+    WORKSPACE="${WORKSPACE:-"$DEFAULT_WORKSPACE"}"
 
     REPOSITORY_PATH="$(climb entrypoint)"
     REPOSITORY_NAME="$(basename "$REPOSITORY_PATH")"
 
-    BUILD_CONTEXT="$REPOSITORY_PATH"
-    BUILD_FILE="$BUILD_CONTEXT/docker/${BUILD_FILE:-"Dockerfile"}"
-    BUILD_TAG="${BUILD_TAG:-"ghcr.io/kth-sml/svea:$(uname -m)"}"
+    BUILD_PLATFORM="${BUILD_PLATFORM:-"$DEFAULT_BUILD_PLATFORM"}"
+    BUILD_CONTEXT="${BUILD_CONTEXT:-"$REPOSITORY_PATH"}"
+    BUILD_FILE="$BUILD_CONTEXT/${BUILD_FILE:-"$DEFAULT_BUILD_FILE"}"
+    BUILD_TAG="${BUILD_TAG:-"$DEFAULT_BUILD_TAG"}"
 
+    IMAGE_PUSH="${IMAGE_PUSH:-"$DEFAULT_IMAGE_PUSH"}"
     IMAGE_TAG="${IMAGE_TAG:-"$REPOSITORY_NAME"}"
 
     CONTAINER_NAME="$REPOSITORY_NAME"
-
     SHARED_VOLUME="$BUILD_CONTEXT/src:$WORKSPACE/src"
 
     if [ -n "$DEBUG" ]; then
@@ -35,9 +60,11 @@ main() {
         echo "WORKSPACE=$WORKSPACE"
         echo "REPOSITORY_PATH=$REPOSITORY_PATH"
         echo "REPOSITORY_NAME=$REPOSITORY_NAME"
+        echo "BUILD_PLATFORM=$BUILD_PLATFORM"
         echo "BUILD_CONTEXT=$BUILD_CONTEXT"
         echo "BUILD_FILE=$BUILD_FILE"
         echo "BUILD_TAG=$BUILD_TAG"
+        echo "IMAGE_PUSH=$IMAGE_PUSH"
         echo "IMAGE_TAG=$IMAGE_TAG"
         echo "CONTAINER_NAME=$CONTAINER_NAME"
         echo "SHARED_VOLUME=$SHARED_VOLUME"
@@ -95,6 +122,23 @@ climb() {
     [ "$PARENT" = "/" ] && return 1
     climb "$CHILD" "$PARENT/.."
     return $?
+}
+
+# Echo TRUTHY if `istrue NAME` else FALSY
+# > ifelse NAME TRUTHY FALSY
+ifelse() {
+    if istrue "$1"
+    then echo "$2"
+    else echo "$3"
+    fi
+}
+
+# Append ARGS to shell variable with name NAME
+# > append LIST_NAME [ARGS...]
+append() {
+    LIST_NAME="$1"
+    shift
+    eval "$LIST_NAME=\"\${$LIST_NAME} $*\""
 }
 
 # Assert shell variable with name NAME is the number one
