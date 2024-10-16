@@ -35,8 +35,5 @@ jobs:
         CONFIG: base
       run: util/build
 
-    - name: Push Docker Image to GHCR
-      run: docker push ghcr.io/kth-sml/svea:x86_64
-
     - name: Log out from GitHub Container Registry
       run: docker logout ghcr.io
