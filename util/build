@@ -13,20 +13,28 @@
 
 . "$(dirname "$0")/config.sh"
 
-# Set default arguments, create and set list content
-append DEFAULT_ARGS "$(ifelse IMAGE_PUSH --push --load)"
-append DEFAULT_ARGS --tag "$IMAGE_TAG" --file "$BUILD_FILE" "$BUILD_CONTEXT"
+CMD="docker buildx build"
+ARGS=""
 
-if [ -z "$*" ]; then
-    set -- $DEFAULT_ARGS
-fi
-
-istrue DEBUG && fn="echo" || fn="exec"
-
-"$fn" docker buildx build \
-    --network host \
+append ARGS \
+    --network "host" \
     --platform "$BUILD_PLATFORM" \
     --build-arg "BUILD_TAG=$BUILD_TAG" \
     --build-arg "ROSDISTRO=$ROSDISTRO" \
-    --build-arg "WORKSPACE=$WORKSPACE" \
-    "$@"
+    --build-arg "WORKSPACE=$WORKSPACE"
+        
+
+# Special case for TX2s that have old version of docker
+if [ "$(jetson_release)" = "R32" ]; then
+    CMD="docker build"
+else
+    append ARGS "$(ifelse IMAGE_PUSH --push --load)"
+fi
+
+# These args are replaced if util/build is called with arguments
+if [ -z "$*" ]
+then append ARGS --tag "$IMAGE_TAG" --file "$BUILD_FILE" "$BUILD_CONTEXT"
+else append ARGS "$@"
+fi
+
+call $CMD $ARGS

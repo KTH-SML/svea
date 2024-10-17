@@ -11,64 +11,91 @@
 
 main() {
 
-    CONFIG="${CONFIG:-"deafult"}"
-    DEFAULT_ROSDISTRO="noetic"
-    DEFAULT_WORKSPACE="/svea_ws"
-    DEFAULT_BUILD_PLATFORM="linux/amd64"
-    DEFAULT_BUILD_FILE="docker/Dockerfile"
-    DEFAULT_BUILD_TAG="latest"
-    DEFAULT_IMAGE_PUSH="0"
+    withdefault DEBUG "0"
 
-    if [ "$CONFIG" = "base" ]; then
-        DEFAULT_BUILD_PLATFORM="linux/amd64,linux/arm64/v8"
-        DEFAULT_BUILD_FILE="docker/Dockerfile.base"
-        DEFAULT_BUILD_TAG="$DEFAULT_ROSDISTRO"
-	IMAGE_PUSH="1"
-        IMAGE_TAG="ghcr.io/kth-sml/svea"
-    elif [ "$CONFIG" = "base-amd64" ]; then
-        DEFAULT_BUILD_PLATFORM="linux/amd64"
-        DEFAULT_BUILD_FILE="docker/Dockerfile.base"
-        DEFAULT_BUILD_TAG="$DEFAULT_ROSDISTRO"
-        IMAGE_TAG="ghcr.io/kth-sml/svea"
-    elif [ "$CONFIG" = "base-arm64" ]; then
-        DEFAULT_BUILD_PLATFORM="linux/arm64/v8"
-        DEFAULT_BUILD_FILE="docker/Dockerfile.base"
-        DEFAULT_BUILD_TAG="$DEFAULT_ROSDISTRO"
-        IMAGE_TAG="ghcr.io/kth-sml/svea"
+    withdefault ROSDISTRO       "noetic"
+    withdefault WORKSPACE       "/svea_ws"
+    withdefault REPOSITORY_PATH "$(climb entrypoint)"
+    withdefault REPOSITORY_NAME "$(basename "$REPOSITORY_PATH")"
+
+    withdefault BUILD_CONFIG    "default"
+    if [ "$BUILD_CONFIG" = "default" ]; then
+        # building for host platform
+        withdefault BUILD_PLATFORM  "$(uname -m)"
+        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+        withdefault BUILD_FILE      "docker/Dockerfile"
+        withdefault BUILD_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_TAG       "$REPOSITORY_NAME"
+        withdefault IMAGE_PUSH      "0"
+    elif [ "$BUILD_CONFIG" = "base" ]; then
+        # building for host platform
+        withdefault BUILD_PLATFORM  "$(uname -m)"
+        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_TAG       "ros:$ROSDISTRO"
+        withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH      "0"
+    elif [ "$BUILD_CONFIG" = "base-amd64" ]; then
+        # building for x86_64
+        withdefault BUILD_PLATFORM  "linux/amd64"
+        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_TAG       "ros:$ROSDISTRO"
+        withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH      "0"
+    elif [ "$BUILD_CONFIG" = "base-arm64" ]; then
+        # building for arm64/aarch64/jetson
+        withdefault BUILD_PLATFORM  "linux/arm64"
+        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_TAG       "ros:$ROSDISTRO"
+        withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH      "0"
+    elif [ "$BUILD_CONFIG" = "ghcr" ]; then
+        # building for both amd64 and arm64
+        withdefault BUILD_PLATFORM  "linux/arm64,linux/amd64"
+        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_TAG       "ros:$ROSDISTRO"
+        withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH      "1"
     fi
 
-    ROSDISTRO="${ROSDISTRO:-"$DEFAULT_ROSDISTRO"}"
-    WORKSPACE="${WORKSPACE:-"$DEFAULT_WORKSPACE"}"
-
-    REPOSITORY_PATH="$(climb entrypoint)"
-    REPOSITORY_NAME="$(basename "$REPOSITORY_PATH")"
-
-    BUILD_PLATFORM="${BUILD_PLATFORM:-"$DEFAULT_BUILD_PLATFORM"}"
-    BUILD_CONTEXT="${BUILD_CONTEXT:-"$REPOSITORY_PATH"}"
-    BUILD_FILE="$BUILD_CONTEXT/${BUILD_FILE:-"$DEFAULT_BUILD_FILE"}"
-    BUILD_TAG="${BUILD_TAG:-"$DEFAULT_BUILD_TAG"}"
-
-    IMAGE_PUSH="${IMAGE_PUSH:-"$DEFAULT_IMAGE_PUSH"}"
-    IMAGE_TAG="${IMAGE_TAG:-"$REPOSITORY_NAME"}"
-
-    CONTAINER_NAME="$REPOSITORY_NAME"
-    SHARED_VOLUME="$BUILD_CONTEXT/src:$WORKSPACE/src"
-
-    if [ -n "$DEBUG" ]; then
+    withdefault CONTAINER_NAME "$REPOSITORY_NAME"
+    withdefault SHARED_VOLUME  "$BUILD_CONTEXT/src:$WORKSPACE/src"
+    
+    if istrue DEBUG; then
         echo ""
-        echo "ROSDISTRO=$ROSDISTRO"
-        echo "WORKSPACE=$WORKSPACE"
-        echo "REPOSITORY_PATH=$REPOSITORY_PATH"
-        echo "REPOSITORY_NAME=$REPOSITORY_NAME"
-        echo "BUILD_PLATFORM=$BUILD_PLATFORM"
-        echo "BUILD_CONTEXT=$BUILD_CONTEXT"
-        echo "BUILD_FILE=$BUILD_FILE"
-        echo "BUILD_TAG=$BUILD_TAG"
-        echo "IMAGE_PUSH=$IMAGE_PUSH"
-        echo "IMAGE_TAG=$IMAGE_TAG"
-        echo "CONTAINER_NAME=$CONTAINER_NAME"
-        echo "SHARED_VOLUME=$SHARED_VOLUME"
+        echovar BUILD_CONFIG
         echo
+        echovar ROSDISTRO
+        echovar WORKSPACE
+        echovar REPOSITORY_PATH
+        echovar REPOSITORY_NAME
+        echovar BUILD_PLATFORM
+        echovar BUILD_CONTEXT
+        echovar BUILD_FILE
+        echovar BUILD_TAG
+        echovar IMAGE_TAG
+        echovar IMAGE_PUSH
+        echovar CONTAINER_NAME
+        echovar SHARED_VOLUME
+        echo
+    fi
+}
+
+call() {
+    if istrue DEBUG; then 
+        echo "$@"
+    else 
+        exec "$@"
+    fi
+}
+
+jetson_release() {
+    file="/etc/nv_tegra_release"
+    if [ -f "$file" ]; then
+        echo "$(index 2 $(cat "$file"))"
     fi
 }
 
@@ -124,12 +151,40 @@ climb() {
     return $?
 }
 
+# Echo shell variable
+# > echovar NAME
+echovar() {
+    eval "echo \"$1=\$$1\""
+}
+
+# Set shell variable with default
+# > withdefault NAME DEFAULT
+withdefault() {
+    eval "$1=\"\${$1:-\"$2\"}\""
+}
+
 # Echo TRUTHY if `istrue NAME` else FALSY
 # > ifelse NAME TRUTHY FALSY
 ifelse() {
     if istrue "$1"
     then echo "$2"
     else echo "$3"
+    fi
+}
+
+# If VALUE equals COND then echo RET, otherwise shift
+# and continue with following arguments
+# > switch VALUE [[COND RET]...]
+switch() {
+    VALUE="$1"
+    shift
+    if [ "$VALUE" = "$1" ]; then 
+        echo "$2"
+    elif [ "$#" -ge 2 ]; then
+        shift 2
+        switch "$VALUE" "$@"
+    else
+        echo "$@" # echo nothing or remaining arg
     fi
 }
 

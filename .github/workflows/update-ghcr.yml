@@ -32,7 +32,7 @@ jobs:
       
     - name: Build the Docker image
       env:
-        CONFIG: base
+        BUILD_CONFIG: ghcr
       run: util/build
 
     - name: Log out from GitHub Container Registry

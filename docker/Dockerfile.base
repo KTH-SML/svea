@@ -10,7 +10,7 @@ ARG WORKSPACE
 ## SVEA BASE IMAGE ##
 #####################
 
-FROM ros:${BUILD_TAG:-latest}
+FROM ${BUILD_TAG:-ros:latest}
 
 ARG ROSDISTRO
 ARG WORKSPACE
