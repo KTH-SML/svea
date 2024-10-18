@@ -27,7 +27,7 @@ RUN rosdep install \
         --ignore-src \
         -qry \
         && \
-    pip install -r requirements.txt
+    pip install -r requirements.txt 
 
 # Run catkin build on workspace (improves build speeds later on).
 RUN catkin build

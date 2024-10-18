@@ -14,7 +14,6 @@ geopy
 utm
 
 # Requirements to run the mpc
-scipy
 casadi==3.5.5
 
 # Nesting requirements

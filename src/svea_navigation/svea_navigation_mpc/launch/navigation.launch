@@ -5,9 +5,9 @@
     <arg name="start_gps"       default="true"/>       <!-- if set to false to let the gps signal stabilize first, launch gps_launch.launch before this file. -->
     <arg name="gps_device"      default="/dev/ttyACM1"/>
     <arg name="gps_auth_alt"    default="false"/>       <!-- set to true to try alternative gps account login data-->
-    <arg name="map"             default="/svea_ws/src/svea_navigation/maps/sidewalk_DKv_30_west_to_east.yaml"/>   <!-- eg: sidewalk_DKv_30_east_to_west.yaml or itrl_sidewalk.yaml-->
+    <arg name="map"             default="/svea_ws/src/svea_navigation/maps/sml.yaml"/>   <!-- eg: sidewalk_DKv_30_east_to_west.yaml or itrl_sidewalk.yaml-->
     <arg name="use_foxglove"    default="true"/>
-    <arg name="obstacle_map"    default="obstacles"/>
+    <arg name="use_mocap"       default="true"/>
     <arg name="initial_pose_x"  default="0"/>
     <arg name="initial_pose_y"  default="0"/>
     <arg name="initial_pose_a"  default="0" />          <!-- wrt to map-->
@@ -30,7 +30,7 @@
     <arg name="verbose"         default="true"/>
 
     <!-- Enable/Disable Args for svea vision -->
-    <arg name="enable_svea_vision"           default="true"/>
+    <arg name="enable_svea_vision"           default="false"/>
     <arg name="enable_sidewalk_segmentation" default="false"/>
     <arg name="enable_bbox_image"            default="true"/>
     <arg name="enable_state_estimation"      default="false"/>
@@ -44,38 +44,49 @@
     <!-- Start map server -->
     <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map)"/>
 
-    <!-- If is_sim equal to false, then include all these tags-->
+    <!-- If is_sim equal to false, then start localization-->
     <group unless="$(arg is_sim)">
-        <group if="$(arg start_gps)">   <!-- If gps hasn't been launched apart, do it here.-->
-            <!-- RTK -->
-            <group unless="$(arg gps_auth_alt)">
-                <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
-                    <arg name="gps_device"    value="$(arg gps_device)"/>
-                    <arg name="username"      value="708583036" />
-                    <arg name="password"      value="151515" />
-                </include>
-            </group>
-            <group if="$(arg gps_auth_alt)">
-                <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
-                    <arg name="gps_device"    value="$(arg gps_device)"/>
-                    <arg name="username"      value="707886204" />
-                    <arg name="password"      value="115544" />
-                </include>
-            </group>
+
+        <group if="$(arg use_mocap)">   <!-- If the localization is provided by Mocap, only start low level interface.-->
+            <!-- Start low-level interface -->
+            <node name="serial_node" pkg="rosserial_python" type="serial_node.py">
+                <param name="port" value="/dev/ttyACM0"/>
+                <param name="baud" value="250000"/>
+            </node>
         </group>
-        <!-- Start localization. it also starts low level interface and map server -->
-        <include file="$(find svea_sensors)/launch/localize.launch">
-            <arg name="is_indoors"              value="false"/>
-            <arg name="start_serial"            value="true"/>
-            <arg name="start_wheel_encoders"    value="false"/>
-            <arg name="initial_pose_x"          value="$(arg initial_pose_x)" />
-            <arg name="initial_pose_y"          value="$(arg initial_pose_y)" />
-            <arg name="initial_pose_a"          value="$(arg initial_pose_a)" />
-            <arg name="use_datum"               value="$(arg use_datum)"/>
-            <arg name="datum_service"           value="$(arg datum_service)"/>
-            <arg name="datum_file"              value="$(arg datum_file)"/>
-            <arg name="datum_data"              value="$(arg datum_data)"/>
-        </include>
+
+        <group unless="$(arg use_mocap)">  <!-- If the localization is NOT provided by Mocap, use outdoor localization-->
+            <group if="$(arg start_gps)">   <!-- If gps hasn't been launched apart, do it here.-->
+                <!-- RTK -->
+                <group unless="$(arg gps_auth_alt)">  <!-- Second gps login account.-->  
+                    <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
+                        <arg name="gps_device"    value="$(arg gps_device)"/>
+                        <arg name="username"      value="708583036" />
+                        <arg name="password"      value="151515" />
+                    </include>
+                </group>
+                <group if="$(arg gps_auth_alt)">    <!-- Fist gps login account.--> 
+                    <include file="$(find svea_sensors)/launch/sensors_launch/rtk.launch">
+                        <arg name="gps_device"    value="$(arg gps_device)"/>
+                        <arg name="username"      value="707886204" />
+                        <arg name="password"      value="115544" />
+                    </include>
+                </group>
+            </group>
+            <!-- Start localization. it also starts low level interface and map server -->
+            <include file="$(find svea_sensors)/launch/localize.launch">
+                <arg name="is_indoors"              value="false"/>
+                <arg name="start_serial"            value="true"/>
+                <arg name="start_wheel_encoders"    value="false"/>
+                <arg name="initial_pose_x"          value="$(arg initial_pose_x)" />
+                <arg name="initial_pose_y"          value="$(arg initial_pose_y)" />
+                <arg name="initial_pose_a"          value="$(arg initial_pose_a)" />
+                <arg name="use_datum"               value="$(arg use_datum)"/>
+                <arg name="datum_service"           value="$(arg datum_service)"/>
+                <arg name="datum_file"              value="$(arg datum_file)"/>
+                <arg name="datum_data"              value="$(arg datum_data)"/>
+            </include>
+        </group>
         <group if="$(arg enable_svea_vision)">
             <!-- Vision -->
             <include file="$(find svea_vision)/launch/zed_main.launch">

@@ -9,6 +9,7 @@ from svea.models.bicycle import SimpleBicycleModel
 from svea.states import VehicleState
 from svea.simulators.sim_SVEA import SimSVEA
 from svea.interfaces import LocalizationInterface
+from svea_mocap.mocap import MotionCaptureInterface
 from mpc_casadi import MPC_casadi
 from svea.svea_managers.svea_archetypes import SVEAManager
 from svea.data import TrajDataHandler, RVIZPathHandler
@@ -35,6 +36,8 @@ class main:
         # ROS Parameters
         self.USE_RVIZ = load_param('~use_rviz', False)
         self.IS_SIM = load_param('~is_sim', False)
+        self.IS_SIM = load_param('~is_sim', False)
+        self.USE_MOCAP = load_param('~use_mocap', False)
         self.STATE = load_param('~state', [3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
         self.MPC_FREQ = load_param('~mpc_freq', 10)
         self.GOAL_REACHED_DIST = 0.2   # meters
@@ -141,9 +144,9 @@ class main:
                                      publish_pose=True).start()
 
         # start the SVEA manager (needed for both sim and real world)
-        self.svea = SVEAManager(LocalizationInterface,
-                                    self.mpc,
-                                    data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
+        self.svea = SVEAManager(localizer=MotionCaptureInterface if self.USE_MOCAP else LocalizationInterface,
+                                controller = self.mpc,
+                                data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
         self.svea.start(wait=True)
 
         # everything ready to go -> unpause simulator
