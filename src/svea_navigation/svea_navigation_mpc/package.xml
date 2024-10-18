@@ -53,7 +53,6 @@
   <depend>rospy</depend>
   <depend>svea_core</depend>
   <depend>svea_vision</depend>
-  <depend>svea_mocap</depend>
   <exec_depend>message_runtime</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
