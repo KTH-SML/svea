@@ -10,6 +10,7 @@ project(svea_navigation_mpc)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   svea_core
+  svea_mocap
   geometry_msgs  
   message_generation
 )
