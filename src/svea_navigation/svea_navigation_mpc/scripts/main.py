@@ -40,7 +40,7 @@ class main:
         self.USE_MOCAP = load_param('~use_mocap', False)
         self.STATE = load_param('~state', [3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
         self.MPC_FREQ = load_param('~mpc_freq', 10)
-        self.MOCAP_NAME = load_param('~mocap_name', "svea3")
+        self.MOCAP_NAME = load_param('~mocap_name')
         self.GOAL_REACHED_DIST = 0.2   # meters
         self.GOAL_REACHED_YAW = 0.2   #  radians
         self.REDUCE_PREDICTION_HORIZON_THR = 0.0  # meters
@@ -150,7 +150,7 @@ class main:
                                 data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
         if self.USE_MOCAP:
             self.svea.localizer.update_name(self.MOCAP_NAME)
-            
+
         self.svea.start(wait=True)
 
         # everything ready to go -> unpause simulator
