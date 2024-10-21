@@ -145,7 +145,9 @@ class main:
                                      publish_pose=True).start()
 
         # start the SVEA manager (needed for both sim and real world)
-        self.svea = SVEAManager(localizer=MotionCaptureInterface if self.USE_MOCAP else LocalizationInterface,
+        localizer = MotionCaptureInterface if self.USE_MOCAP else LocalizationInterface
+        print(localizer)
+        self.svea = SVEAManager(localizer=localizer,
                                 controller = self.mpc,
                                 data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
         if self.USE_MOCAP:
