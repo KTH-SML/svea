@@ -12,7 +12,7 @@
 
     <include file="$(find mocap_qualisys)/launch/qualisys.launch"/>
 
-    <!-- <include file="$(find svea_mocap)/launch/map_correction.launch">
+    <include file="$(find svea_mocap)/launch/map_correction.launch">
         <arg name="x" value="$(arg x)"/>
         <arg name="y" value="$(arg y)"/>
         <arg name="z" value="$(arg z)"/>
@@ -21,6 +21,6 @@
         <arg name="pitch" value="$(arg pitch)"/>
         <arg name="frame_id" value="$(arg frame_id)"/>
         <arg name="child_frame" value="$(arg child_frame)"/>
-    </include> -->
+    </include>
 
 </launch>
