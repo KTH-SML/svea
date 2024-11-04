@@ -15,7 +15,7 @@ from svea.svea_managers.svea_archetypes import SVEAManager
 from svea.data import TrajDataHandler, RVIZPathHandler
 from std_msgs.msg import Float32
 from svea_navigation_mpc.srv import SetGoalPosition, SetGoalPositionResponse
-from geometry_msgs.msg import PoseArray
+from geometry_msgs.msg import PoseArray, PoseStamped
 from svea.simulators.viz_utils import publish_pose_array
 
 
@@ -57,6 +57,8 @@ class main:
         self.static_path_plan = np.empty((3, 0))
         self.current_index_static_plan = 0
         self.is_last_point = False
+        # Initialize tf listener for frame transformations
+        self.tf_listener = tf.TransformListener()
 
         # TODO: import yaml here and set mpc params from here. set path in launch file.
         config_path = '/svea_ws/src/svea_navigation/svea_navigation_mpc/params/mpc_params.yaml'
@@ -81,6 +83,8 @@ class main:
     def spin(self):
         # Retrieve current state from SVEA localization
         state = self.svea.wait_for_state()
+        if self.USE_MOCAP:
+            state = self.transform_state_to_map_frame(state)
         self.state = [state.x, state.y, state.yaw, state.v]
         #print("v localization",state[3])
         # If a static path plan has been computed, run the mpc.
@@ -298,7 +302,45 @@ class main:
             pointyaw.append(points[2, i])  # yaw values        
         # Publish the trajectory as a PoseArray
         publish_pose_array(publisher, pointx, pointy, pointyaw)
+   
+    def transform_state_to_map_frame(self, state):
+        """
+        Transforms the state from the mocap frame to the map frame if needed.
+        :param state: VehicleState in the mocap frame
+        :return: VehicleState in the map frame
+        """
+        # Only transform if the frame is `mocap`
+        if state.frame_id != "mocap":
+            return state
 
+        # Prepare a PoseStamped for transformation
+        pose = PoseStamped()
+        pose.header.frame_id = state.frame_id
+        pose.pose.position.x = state.x
+        pose.pose.position.y = state.y
+        pose.pose.orientation.z = math.sin(state.yaw / 2)
+        pose.pose.orientation.w = math.cos(state.yaw / 2)
+
+        try:
+            # Transform the pose to the map frame
+            self.tf_listener.waitForTransform("map", "mocap", rospy.Time(0), rospy.Duration(1.0))
+            transformed_pose = self.tf_listener.transformPose("map", pose)
+
+            # Update the state object with transformed values
+            state.x = transformed_pose.pose.position.x
+            state.y = transformed_pose.pose.position.y
+            _, _, state.yaw = tf.transformations.euler_from_quaternion([
+                transformed_pose.pose.orientation.x,
+                transformed_pose.pose.orientation.y,
+                transformed_pose.pose.orientation.z,
+                transformed_pose.pose.orientation.w,
+            ])
+            state.frame_id = "map"  # Update frame_id to indicate transformation
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
+            rospy.logwarn("Could not transform state to map frame: %s", e)
+
+        return state
+    
 if __name__ == '__main__':
     rospy.init_node('main')
     node = main(sim_dt = 0.01, mpc = MPC_casadi)
