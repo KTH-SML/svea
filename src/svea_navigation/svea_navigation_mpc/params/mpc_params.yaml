@@ -18,13 +18,13 @@ control_weight_matrix: [2, 0,
                         0, 2]
 
 # Qv matrix in objective function
-velocity_deadzone_weight_matrix: 10
+velocity_deadzone_weight_matrix: 0
 
 # Qf in objective function J
 final_state_weight_matrix: [25, 0, 0, 0,
                             0, 25, 0, 0,
                             0, 0, 20, 0,
-                            0, 0, 0, 0]
+                            0, 0, 0, 1]
 
 # The time step [s] in which the optimization problem is divided (unit [s])
 time_step: 0.2

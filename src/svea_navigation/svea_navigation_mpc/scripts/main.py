@@ -36,16 +36,15 @@ class main:
         # ROS Parameters
         self.USE_RVIZ = load_param('~use_rviz', False)
         self.IS_SIM = load_param('~is_sim', False)
-        self.IS_SIM = load_param('~is_sim', False)
         self.USE_MOCAP = load_param('~use_mocap', False)
-        self.STATE = load_param('~state', [3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
+        self.STATE = load_param('~state', [-3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
         self.MPC_FREQ = load_param('~mpc_freq', 10)
         self.MOCAP_NAME = load_param('~mocap_name')
         self.GOAL_REACHED_DIST = 0.2   # meters
         self.GOAL_REACHED_YAW = 0.2   #  radians
         self.REDUCE_PREDICTION_HORIZON_THR = 0.0  # meters
         self.NEW_REFERENCE_THR = 0.5 # meters 
-        self.DELTA_S = 2   # TODO: get it from launch file
+        self.DELTA_S = 1.5   # TODO: get it from launch file
         # Initialize optimal variables
         self.steering = 0
         self.velocity = 0
@@ -241,7 +240,7 @@ class main:
 
         # Compute intermediate points at intervals of DELTA_S
         num_points = int(distance // self.DELTA_S)
-        print(num_points)
+
         for i in range(num_points):
             ratio = ((i+1) * self.DELTA_S) / distance
             x = start_x + ratio * (goal_x - start_x)
@@ -254,11 +253,24 @@ class main:
             new_point = np.array([[x], [y], [heading]])
             self.static_path_plan = np.hstack((self.static_path_plan, new_point))
 
-        last_x = goal_x
-        last_y = goal_y         
-        # Append the last point
-        new_point = np.array([[last_x], [last_y], [goal_yaw]])
-        self.static_path_plan = np.hstack((self.static_path_plan, new_point))
+        # Calculate distance between the last appended point and the goal point.
+        if self.static_path_plan is not None:
+            last_appended_x = self.static_path_plan[0, -1]
+            last_appended_y = self.static_path_plan[1, -1]    
+            distance = self.compute_distance([last_appended_x, last_appended_y], [goal_x, goal_y])
+
+            # If the distance to the goal is less than 1 meter, replace the last point
+            if distance < self.DELTA_S / 2:
+                # Replace the last appended point with the goal point
+                self.static_path_plan[:, -1] = np.array([goal_x, goal_y, goal_yaw])
+            else:
+                # Otherwise, append the last point as usual
+                new_point = np.array([[goal_x], [goal_y], [goal_yaw]])
+                self.static_path_plan = np.hstack((self.static_path_plan, new_point))
+        else:
+            # Otherwise, append the last point as usual
+            new_point = np.array([[goal_x], [goal_y], [goal_yaw]])
+            self.static_path_plan = np.hstack((self.static_path_plan, new_point))
 
         # Publish the static path
         self.publish_trajectory(self.static_path_plan,self.static_trajectory_pub)
