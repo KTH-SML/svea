@@ -51,10 +51,10 @@ acceleration_min: -0.2
 acceleration_max: 0.5
 
 # The minimum velocity allowed for SVEA (unit [m/s^2])
-velocity_min: -0.8
+velocity_min: -0.6
 
 # The maximum velocity allowed for SVEA (unit [m/s^2])
-velocity_max: 0.8
+velocity_max: 0.6
 
 # The velocity deadzone(unit [m/s])
 velocity_deadzone: 0.1

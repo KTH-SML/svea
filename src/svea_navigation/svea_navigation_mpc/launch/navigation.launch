@@ -14,7 +14,7 @@
     <arg name="initial_pose_a"  default="0" />          <!-- wrt to map-->
     <arg name="is_sim"          default="true"/>  
     <arg name="record"          default="false"/>
-    <arg name="rosbag_prefix"   default="/svea_ws/src/svea_navigation_mpc/bags/DKv_30"/>
+    <arg name="rosbag_prefix"   default="/svea_ws/src/svea_navigation/svea_navigation_mpc/bag"/>
 
     <!-- Svea vision / ZED Camera Args -->
     <arg name="frame_id"        default="map"/>             <!-- desired frame of the detected object's poses. -->
@@ -143,8 +143,9 @@
         <param name="obstacle_pub_topic" value="/move_base/TebLocalPlannerROS/obstacles" />
     </node> -->
 
-    <!-- Conditional rosbag recording node -->
-    <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-o $(arg rosbag_prefix)
+    <!-- Conditional rosbag recording node. first for teb with gps, second for mpc with mocap -->
+
+    <!-- <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-o $(arg rosbag_prefix)
         /map
         /map_metadata
         /move_base/NavfnROS/plan
@@ -171,6 +172,22 @@
         /nav_vehicle_velocity
         /bbox_image
         /lli/ctrl_actuated
+    " /> -->
+
+    <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-o $(arg rosbag_prefix)
+        /map
+        /map_metadata
+        /3D_car
+        /tf
+        /tf_static
+        /target_steering_angle
+        /target_speed
+        /measured_speed
+        /lli/ctrl_actuated
+        /predicted_path
+        /static_path
+        /past_path
+        /mpc_target
     " />
     
 </launch>

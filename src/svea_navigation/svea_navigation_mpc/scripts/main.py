@@ -81,8 +81,9 @@ class main:
     def spin(self):
         # Retrieve current state from SVEA localization
         state = self.svea.wait_for_state()
+        #print(state)
         self.state = [state.x, state.y, state.yaw, state.v]
-        #print("v localization",state[3])
+        #print("v localization",self.state[3])
         # If a static path plan has been computed, run the mpc.
         if self.static_path_plan.size > 0 :
             # If enough time has passed, run the MPC computation
@@ -111,15 +112,16 @@ class main:
                 # Update the last time the MPC was computed
                 self.mpc_last_time = current_time
             
-        # Publish the latest control, whether newly computed or the last one
-        self.publish_control(self.steering, self.velocity)
+        # Publish the latest control target and the estimated speed.
+        self.publish_control(self.steering, self.velocity, self.state[3])
         # Visualization data and send control
         self.svea.send_control(self.steering, self.velocity) 
         self.svea.visualize_data()
                 
     def init_publishers(self):
-        self.steering_pub = rospy.Publisher('/nav_steering_angle', Float32, queue_size=1)
-        self.velocity_pub = rospy.Publisher('/nav_vehicle_velocity', Float32, queue_size=1)
+        self.steering_pub = rospy.Publisher('/target_steering_angle', Float32, queue_size=1)
+        self.velocity_pub = rospy.Publisher('/target_speed', Float32, queue_size=1)
+        self.velocity_measured_pub = rospy.Publisher('/measured_speed', Float32, queue_size=1)   # estimated/measured speed
         self.predicted_trajectory_pub = rospy.Publisher('/predicted_path', PoseArray, queue_size=1)
         self.static_trajectory_pub = rospy.Publisher('/static_path', PoseArray, queue_size=1)
 
@@ -156,9 +158,10 @@ class main:
         if self.IS_SIM:
             self.simulator.toggle_pause_simulation()
 
-    def publish_control(self,steering,velocity):
-        self.steering_pub.publish(steering)
-        self.velocity_pub.publish(velocity)
+    def publish_control(self,target_steering,target_speed,measured_speed):
+        self.steering_pub.publish(target_steering)
+        self.velocity_pub.publish(target_speed)
+        self.velocity_measured_pub.publish(measured_speed)
 
     def get_mpc_current_reference(self):
         """
