@@ -43,8 +43,8 @@ class main:
         self.GOAL_REACHED_DIST = 0.2   # meters
         self.GOAL_REACHED_YAW = 0.2   #  radians
         self.REDUCE_PREDICTION_HORIZON_THR = 0.0  # meters
-        self.NEW_REFERENCE_THR = 0.5 # meters 
-        self.DELTA_S = 1.5   # TODO: get it from launch file
+        self.NEW_REFERENCE_THR = 2 # meters 
+        self.DELTA_S = 5   # TODO: get it from launch file
         # Initialize optimal variables
         self.steering = 0
         self.velocity = 0
@@ -94,9 +94,16 @@ class main:
                     self.new_horizon = math.ceil(5)
                     #print(self.new_horizon)
                     self.svea.controller.set_new_prediction_horizon(self.new_horizon)
+                if self.is_last_point and distance_to_next_point <= self.NEW_REFERENCE_THR:
+                    # if we are approaching the target position, and we are getting close enough to it, then update the 
+                    # final state weight matrix to consider the desired final yaw and speed.
+                    self.svea.controller.update_weight_matrices('Qf',np.array([25, 0, 0, 0,
+                                                                                0, 25, 0, 0,
+                                                                                0, 0, 20, 0,
+                                                                                0, 0, 0, 0]).reshape((4, 4)))
                 if  not self.is_goal_reached(distance_to_next_point):
                     # Run the MPC to compute control
-                    steering_rate, acceleration = self.svea.controller.compute_control([self.state[0],self.state[1],self.state[2],self.velocity,self.steering], reference_trajectory)
+                    steering_rate, acceleration = self.svea.controller.compute_control([self.state[0],self.state[1],self.state[2],self.state[3],self.steering], reference_trajectory)
                     self.steering += steering_rate * self.mpc_dt
                     self.velocity += acceleration * self.mpc_dt  
                     self.predicted_state = self.svea.controller.get_optimal_states()
@@ -112,8 +119,8 @@ class main:
                 # Update the last time the MPC was computed
                 self.mpc_last_time = current_time
             
-        # Publish the latest control target and the estimated speed.
-        self.publish_control(self.steering, self.velocity, self.state[3])
+        # Publish the latest control target and the estimated(mocap) / measured(in/out loc.) speed.
+        self.publish_to_foxglove(self.steering, self.velocity, self.state[3])
         # Visualization data and send control
         self.svea.send_control(self.steering, self.velocity) 
         self.svea.visualize_data()
@@ -158,7 +165,7 @@ class main:
         if self.IS_SIM:
             self.simulator.toggle_pause_simulation()
 
-    def publish_control(self,target_steering,target_speed,measured_speed):
+    def publish_to_foxglove(self,target_steering,target_speed,measured_speed):
         self.steering_pub.publish(target_steering)
         self.velocity_pub.publish(target_speed)
         self.velocity_measured_pub.publish(measured_speed)
@@ -257,12 +264,12 @@ class main:
             self.static_path_plan = np.hstack((self.static_path_plan, new_point))
 
         # Calculate distance between the last appended point and the goal point.
-        if self.static_path_plan is not None:
+        if self.static_path_plan.size != 0:
             last_appended_x = self.static_path_plan[0, -1]
             last_appended_y = self.static_path_plan[1, -1]    
             distance = self.compute_distance([last_appended_x, last_appended_y], [goal_x, goal_y])
 
-            # If the distance to the goal is less than 1 meter, replace the last point
+            # If the distance to the goal is too small, replace the last point with the goal directly.
             if distance < self.DELTA_S / 2:
                 # Replace the last appended point with the goal point
                 self.static_path_plan[:, -1] = np.array([goal_x, goal_y, goal_yaw])

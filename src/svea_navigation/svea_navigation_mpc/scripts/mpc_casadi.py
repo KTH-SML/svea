@@ -29,7 +29,7 @@ class MPC_casadi:
         # Initialize parameters from YAML file
         self.N = config['prediction_horizon']  # maximum prediction horizon
         self.current_horizon = self.N          # Initially set to max horizon
-        self.dt = ca.DM(config['time_step'])  # Sampling time
+        self.dt = ca.DM(config['time_step'])   # Sampling time
         self.L = ca.DM(config['base_length'])  # Wheelbase of the vehicle
         
         # Load state weight matrix Q1, control weight matrix Q2, and final state weight matrix Qf
@@ -78,7 +78,7 @@ class MPC_casadi:
         bounded_state = self.bound_initial_state(state)
 
         # Enlarge the reference trajectory with a fictitious velocity and steering value for feasibility.
-        # Add a row of zeros as the last row to the reference_trajectory matrix.
+        # Add two rows of zeros to the reference_trajectory matrix.
         reference_trajectory = ca.vertcat(reference_trajectory, ca.DM.zeros(2, reference_trajectory.shape[1]))
 
         # Set current state and reference trajectory for the active part of the horizon
@@ -87,6 +87,8 @@ class MPC_casadi:
 
         # Solve the optimization problem
         self.sol = self.opti.solve()
+
+        #print('obj fun',self.sol.value(self.objective))
 
         # Extract control actions (acceleration and steering rate)
         acceleration = self.sol.value(self.u[0, 0])
@@ -137,15 +139,15 @@ class MPC_casadi:
 
     def define_state_and_control_variables(self):
         # Define state and control variables
-        self.x = self.opti.variable(5, self.N + 1)  # state = [x, y, theta, v]
-        self.u = self.opti.variable(2, self.N)      # input = [steering, acceleration]
+        self.x = self.opti.variable(5, self.N + 1)  # state = [x, y, theta, v, steering]
+        self.u = self.opti.variable(2, self.N)      # input = [steering_rate, acceleration]
 
         self.x_init = self.opti.parameter(5)             # Initial state
         self.x_ref = self.opti.parameter(5, self.N + 1)  # Reference trajectory
 
     def set_objective_function(self):
         # Define the objective function: 
-        # J = (x[k]-x_ref[k])^T Q1 (x[k]-x_ref[k]) + (u[k+1] - u[k])^T Q2 (u[k+1] - u[k]) + u[k]^T Q3 u[k]
+        # J = (x[k]-x_ref[k])^T Q1 (x[k]-x_ref[k]) + (u[k+1] - u[k])^T Q2 (u[k+1] - u[k]) + u[k]^T Q3 u[k] + velocity_penalty
         self.objective = 0
         for k in range(self.current_horizon):
             # State error term (ignore delta in reference trajectory)
@@ -213,6 +215,19 @@ class MPC_casadi:
         # Set solver options
         opts = {"ipopt.print_level": 0, "print_time": 0}
         self.opti.solver("ipopt", opts)
+    
+    def update_weight_matrices(self, matrix_name, new_value):
+        # Check if the matrix exists as an attribute and if so, update it.
+        if hasattr(self, matrix_name):
+            try:
+                # Overwrite with the new dense matrix
+                setattr(self, matrix_name, ca.DM(new_value))
+                # Redefine objective function with updated matrix.
+                self.set_objective_function()
+            except Exception as e:
+                print(f"Failed to update {matrix_name}: {e}")
+        else:
+            print(f"Matrix {matrix_name} does not exist in MPC class.")
 
     def bound_initial_state(self,state):
         """

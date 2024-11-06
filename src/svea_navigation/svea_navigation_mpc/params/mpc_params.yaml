@@ -18,16 +18,16 @@ control_weight_matrix: [2, 0,
                         0, 2]
 
 # Qv matrix in objective function
-velocity_deadzone_weight_matrix: 0
+velocity_deadzone_weight_matrix: 0   # did not prove to be too useful for now.
 
-# Qf in objective function J
-final_state_weight_matrix: [25, 0, 0, 0,
-                            0, 25, 0, 0,
-                            0, 0, 20, 0,
-                            0, 0, 0, 1]
+# Qf in objective function J. The final weight gets updated when close to target to include speed and yaw constraints.
+final_state_weight_matrix: [10, 0, 0, 0,
+                            0, 10, 0, 0,
+                            0, 0, 0, 0,
+                            0, 0, 0, 0]
 
 # The time step [s] in which the optimization problem is divided (unit [s])
-time_step: 0.2
+time_step: 0.3
 
 # The prediction horizon steps for the mpc optimization problem
 prediction_horizon: 10
@@ -54,7 +54,7 @@ acceleration_max: 0.5
 velocity_min: -0.6
 
 # The maximum velocity allowed for SVEA (unit [m/s^2])
-velocity_max: 0.6
+velocity_max: 0.8
 
 # The velocity deadzone(unit [m/s])
 velocity_deadzone: 0.1
