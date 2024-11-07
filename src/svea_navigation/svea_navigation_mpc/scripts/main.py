@@ -42,7 +42,7 @@ class main:
         self.MOCAP_NAME = load_param('~mocap_name')
         self.GOAL_REACHED_DIST = 0.2   # meters
         self.GOAL_REACHED_YAW = 0.2   #  radians
-        self.REDUCE_PREDICTION_HORIZON_THR = 0.0  # meters
+        self.REDUCE_PREDICTION_HORIZON_THR = 2  # meters
         self.NEW_REFERENCE_THR = 2 # meters 
         self.DELTA_S = 5   # TODO: get it from launch file
         # Initialize optimal variables
@@ -66,6 +66,7 @@ class main:
         # Initialize parameters from YAML file
         self.N = config['prediction_horizon']  
         self.new_horizon = self.N
+        self.Qf = config['final_state_weight_matrix']  
 
         self.create_simulator_and_SVEAmanager()
         self.init_publishers()
@@ -90,15 +91,15 @@ class main:
             current_time = rospy.get_time()
             if current_time - self.mpc_last_time >= self.mpc_dt:
                 reference_trajectory, distance_to_next_point = self.get_mpc_current_reference()
-                if distance_to_next_point < self.REDUCE_PREDICTION_HORIZON_THR:
-                    self.new_horizon = math.ceil(5)
+                if self.is_last_point and distance_to_next_point <= self.REDUCE_PREDICTION_HORIZON_THR:
+                    self.new_horizon = 5
                     #print(self.new_horizon)
                     self.svea.controller.set_new_prediction_horizon(self.new_horizon)
                 if self.is_last_point and distance_to_next_point <= self.NEW_REFERENCE_THR:
                     # if we are approaching the target position, and we are getting close enough to it, then update the 
                     # final state weight matrix to consider the desired final yaw and speed.
-                    self.svea.controller.update_weight_matrices('Qf',np.array([25, 0, 0, 0,
-                                                                                0, 25, 0, 0,
+                    self.svea.controller.update_weight_matrices('Qf',np.array([70, 0, 0, 0,
+                                                                                0, 70, 0, 0,
                                                                                 0, 0, 20, 0,
                                                                                 0, 0, 0, 0]).reshape((4, 4)))
                 if  not self.is_goal_reached(distance_to_next_point):
@@ -241,6 +242,11 @@ class main:
         self.current_index_static_plan = 0
         self.is_last_point = False
         self.static_path_plan = np.empty((3, 0))
+
+        # TODO: implemet reset function within mpc class for effeciency and readability.
+        self.new_horizon = self.N
+        self.svea.controller.set_new_prediction_horizon(self.new_horizon)
+        self.svea.controller.update_weight_matrices('Qf',np.array(self.Qf).reshape((4, 4)))
 
         # Calculate the straight-line trajectory between current state and goal position
         start_x, start_y = self.state[0], self.state[1]
