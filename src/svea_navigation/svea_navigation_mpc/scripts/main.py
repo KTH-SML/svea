@@ -58,6 +58,16 @@ class main:
         self.current_index_static_plan = 0
         self.is_last_point = False
 
+        if self.IS_SIM is False:
+            # add steering bias of svea0
+            unitless_steering = 28
+            PERC_TO_LLI_COEFF = 1.27
+            MAX_STEERING_ANGLE = 40 * math.pi / 180
+            steer_percent = unitless_steering / PERC_TO_LLI_COEFF
+            self.steering_bias = (steer_percent / 100.0) * MAX_STEERING_ANGLE
+        else:
+            self.steering_bias = 0
+
         # TODO: import yaml here and set mpc params from here. set path in launch file.
         config_path = '/svea_ws/src/svea_navigation/svea_navigation_mpc/params/mpc_params.yaml'
         # Load parameters from the YAML file 
@@ -85,11 +95,13 @@ class main:
         #print(state)
         self.state = [state.x, state.y, state.yaw, state.v]
         #print("v localization",self.state[3])
+        #actuated_steering = self.svea.actuation.ctrl_actuated_log[-1].steering
         # If a static path plan has been computed, run the mpc.
         if self.static_path_plan.size > 0 :
             # If enough time has passed, run the MPC computation
             current_time = rospy.get_time()
-            if current_time - self.mpc_last_time >= self.mpc_dt:
+            measured_dt = current_time - self.mpc_last_time
+            if measured_dt >= self.mpc_dt:
                 reference_trajectory, distance_to_next_point = self.get_mpc_current_reference()
                 if self.is_last_point and distance_to_next_point <= self.REDUCE_PREDICTION_HORIZON_THR:
                     self.new_horizon = 5
@@ -104,9 +116,9 @@ class main:
                                                                                 0, 0, 0, 0]).reshape((4, 4)))
                 if  not self.is_goal_reached(distance_to_next_point):
                     # Run the MPC to compute control
-                    steering_rate, acceleration = self.svea.controller.compute_control([self.state[0],self.state[1],self.state[2],self.state[3],self.steering], reference_trajectory)
-                    self.steering += steering_rate * self.mpc_dt
-                    self.velocity += acceleration * self.mpc_dt  
+                    steering_rate, acceleration = self.svea.controller.compute_control([self.state[0],self.state[1],self.state[2],self.velocity,self.steering], reference_trajectory)
+                    self.steering += steering_rate * measured_dt
+                    self.velocity += acceleration * measured_dt  
                     self.predicted_state = self.svea.controller.get_optimal_states()
                     #print("velocity command", self.velocity)
                     #control = self.svea.controller.get_optimal_control()
@@ -123,7 +135,7 @@ class main:
         # Publish the latest control target and the estimated(mocap) / measured(in/out loc.) speed.
         self.publish_to_foxglove(self.steering, self.velocity, self.state[3])
         # Visualization data and send control
-        self.svea.send_control(self.steering, self.velocity) 
+        self.svea.send_control(self.steering + self.steering_bias, self.velocity) 
         self.svea.visualize_data()
                 
     def init_publishers(self):
@@ -242,6 +254,11 @@ class main:
         self.current_index_static_plan = 0
         self.is_last_point = False
         self.static_path_plan = np.empty((3, 0))
+        # reset control actions
+        self.velocity = 0
+        self.steering = 0
+        # reset mpc last run time
+        self.mpc_last_time = rospy.get_time()
 
         # TODO: implemet reset function within mpc class for effeciency and readability.
         self.new_horizon = self.N
