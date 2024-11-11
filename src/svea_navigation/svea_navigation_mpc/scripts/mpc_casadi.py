@@ -4,7 +4,7 @@ import numpy as np
 import yaml
 
 class MPC_casadi:
-    def __init__(self,vehicle_name=''):
+    def __init__(self,vehicle_name='',mpc_config_file_path=None):
         """
         Initialize the MPC controller with the given parameters.
 
@@ -21,9 +21,8 @@ class MPC_casadi:
         :param Q3: Control weight matrix (2x2)
         :param Qf: Final state weight matrix (4x4)
         """
-        config_path = '/svea_ws/src/svea_navigation/svea_navigation_mpc/params/mpc_params.yaml'
         # Load parameters from the YAML file 
-        with open(config_path, 'r') as file:
+        with open(mpc_config_file_path, 'r') as file:
             config = yaml.safe_load(file)
 
         # Initialize parameters from YAML file

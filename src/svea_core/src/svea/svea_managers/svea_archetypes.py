@@ -51,14 +51,15 @@ class SVEAManager(object):
     def __init__(self, localizer, controller,
                        actuation=ActuationInterface,
                        data_handler=BasicDataHandler,
-                       vehicle_name=''):
+                       vehicle_name='',
+                       controller_config_path=''):
 
         self.vehicle_name = vehicle_name
         sub_namespace = vehicle_name + '/' if vehicle_name else ''
         self._emergency_topic = '{}lli/emergency'.format(sub_namespace)
 
         self.localizer = localizer(vehicle_name)
-        self.controller = controller(vehicle_name)
+        self.controller = controller(vehicle_name,controller_config_path)
         self.actuation = actuation(vehicle_name)
         self.data_handler = data_handler(vehicle_name)
 

@@ -39,16 +39,20 @@ class main:
         self.USE_MOCAP = load_param('~use_mocap', False)
         self.STATE = load_param('~state', [-3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
         self.MPC_FREQ = load_param('~mpc_freq', 10)
-        self.MOCAP_NAME = load_param('~mocap_name')
+        self.SVEA_MOCAP_NAME = load_param('~svea_mocap_name')
+        self.DELTA_S = load_param('~delta_s', 5)            # static path discretization lenght
+        self.mpc_config_file_path = load_param('~mpc_config_file_path')    
         self.GOAL_REACHED_DIST = 0.2   # meters
         self.GOAL_REACHED_YAW = 0.2   #  radians
-        self.REDUCE_PREDICTION_HORIZON_THR = 2  # meters
+        self.APPROACH_TARGET_THR = 2  # meters
         self.NEW_REFERENCE_THR = 2 # meters 
-        self.DELTA_S = 5   # TODO: get it from launch file
+        self.UPDATE_MPC_PARAM = True   # Tracks if update can happen when approaching
+        self.RESET_MPC_PARAM = False   # Tracks if reset can happen when moving away
         # Initialize optimal variables
         self.steering = 0
         self.velocity = 0
         self.predicted_state = None
+
         # Initialize other variables
         self.mpc_last_time = rospy.get_time()
         self.mpc_dt = 1.0 / self.MPC_FREQ 
@@ -58,6 +62,14 @@ class main:
         self.current_index_static_plan = 0
         self.is_last_point = False
 
+        # Load parameters from the YAML file 
+        with open(self.mpc_config_file_path, 'r') as file:
+            config = yaml.safe_load(file)
+        # Initialize parameters from YAML file
+        self.initial_horizon = config['prediction_horizon']  
+        self.initial_Qf = config['final_state_weight_matrix']  
+        self.current_horizon = self.initial_horizon
+        
         if self.IS_SIM is False:
             # add steering bias of svea0
             unitless_steering = 28
@@ -67,16 +79,6 @@ class main:
             self.steering_bias = (steer_percent / 100.0) * MAX_STEERING_ANGLE
         else:
             self.steering_bias = 0
-
-        # TODO: import yaml here and set mpc params from here. set path in launch file.
-        config_path = '/svea_ws/src/svea_navigation/svea_navigation_mpc/params/mpc_params.yaml'
-        # Load parameters from the YAML file 
-        with open(config_path, 'r') as file:
-            config = yaml.safe_load(file)
-        # Initialize parameters from YAML file
-        self.N = config['prediction_horizon']  
-        self.new_horizon = self.N
-        self.Qf = config['final_state_weight_matrix']  
 
         self.create_simulator_and_SVEAmanager()
         self.init_publishers()
@@ -101,19 +103,29 @@ class main:
             # If enough time has passed, run the MPC computation
             current_time = rospy.get_time()
             measured_dt = current_time - self.mpc_last_time
-            if measured_dt >= self.mpc_dt:
+            if measured_dt >= self.mpc_dt :
                 reference_trajectory, distance_to_next_point = self.get_mpc_current_reference()
-                if self.is_last_point and distance_to_next_point <= self.REDUCE_PREDICTION_HORIZON_THR:
-                    self.new_horizon = 5
-                    #print(self.new_horizon)
-                    self.svea.controller.set_new_prediction_horizon(self.new_horizon)
-                if self.is_last_point and distance_to_next_point <= self.NEW_REFERENCE_THR:
-                    # if we are approaching the target position, and we are getting close enough to it, then update the 
-                    # final state weight matrix to consider the desired final yaw and speed.
-                    self.svea.controller.update_weight_matrices('Qf',np.array([70, 0, 0, 0,
-                                                                                0, 70, 0, 0,
-                                                                                0, 0, 20, 0,
-                                                                                0, 0, 0, 0]).reshape((4, 4)))
+                if self.is_last_point and distance_to_next_point <= self.APPROACH_TARGET_THR and self.UPDATE_MPC_PARAM:
+                    # Update the prediction horizon and final state weight matrix only once when approaching target
+                    new_horizon = 5
+                    self.current_horizon = new_horizon
+                    new_Qf = np.array([70, 0, 0, 0,
+                                        0, 70, 0, 0,
+                                        0, 0, 20, 0,
+                                        0, 0, 0, 0]).reshape((4, 4))
+                    self.svea.controller.set_new_prediction_horizon(new_horizon)
+                    self.svea.controller.update_weight_matrices('Qf', new_Qf)
+                    self.UPDATE_MPC_PARAM = False
+                    self.RESET_MPC_PARAM = True  # Allow resetting when moving away
+
+                elif self.is_last_point and distance_to_next_point > self.APPROACH_TARGET_THR and self.RESET_MPC_PARAM:
+                    # Reset to initial values only once when moving away from target
+                    self.current_horizon = self.initial_horizon
+                    self.svea.controller.set_new_prediction_horizon(self.initial_horizon)
+                    self.svea.controller.update_weight_matrices('Qf', self.initial_Qf)
+                    self.UPDATE_MPC_PARAM = True  # Allow updating again when re-approaching
+                    self.RESET_MPC_PARAM = False  # Prevent repeated resetting
+
                 if  not self.is_goal_reached(distance_to_next_point):
                     # Run the MPC to compute control
                     steering_rate, acceleration = self.svea.controller.compute_control([self.state[0],self.state[1],self.state[2],self.velocity,self.steering], reference_trajectory)
@@ -124,7 +136,7 @@ class main:
                     #control = self.svea.controller.get_optimal_control()
                     #print("control command", control)
                     # Publish the predicted path
-                    self.publish_trajectory(self.predicted_state[0:3, :self.new_horizon+1],self.predicted_trajectory_pub)
+                    self.publish_trajectory(self.predicted_state[0:3, :self.current_horizon+1],self.predicted_trajectory_pub)
                 else:
                     # Stop the vehicle if the goal is reached
                     self.steering, self.velocity = 0, 0
@@ -168,9 +180,10 @@ class main:
         # start the SVEA manager (needed for both sim and real world)
         self.svea = SVEAManager(localizer = MotionCaptureInterface if self.USE_MOCAP else LocalizationInterface,
                                 controller = self.mpc,
-                                data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
+                                data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler,
+                                controller_config_path = self.mpc_config_file_path)
         if self.USE_MOCAP:
-            self.svea.localizer.update_name(self.MOCAP_NAME)
+            self.svea.localizer.update_name(self.SVEA_MOCAP_NAME)
 
         self.svea.start(wait=True)
 
@@ -201,13 +214,13 @@ class main:
             if distance_to_next_point < self.NEW_REFERENCE_THR and not self.is_last_point:
                 self.current_index_static_plan += 1  
             reference_state = self.static_path_plan[:,self.current_index_static_plan]
-            x_ref = np.tile(reference_state, (self.N+1, 1)).T     
+            x_ref = np.tile(reference_state, (self.initial_horizon+1, 1)).T     
             return x_ref, distance_to_next_point
 
         else:
             distance_to_last_point = self.compute_distance(self.state,self.static_path_plan[:,-1])
             reference_state = self.static_path_plan[:,-1]
-            x_ref = np.tile(reference_state, (self.N+1, 1)).T
+            x_ref = np.tile(reference_state, (self.initial_horizon+1, 1)).T
             return x_ref, distance_to_last_point
     
     def handle_set_goal_position(self, req):
@@ -250,20 +263,21 @@ class main:
         if not self.goal_pose or not self.state:
             rospy.logwarn("Missing goal or current state for trajectory computation.")
             return
-        # Reset previous trjectory related variables
+        # Reset previous trajectory related variables
         self.current_index_static_plan = 0
         self.is_last_point = False
         self.static_path_plan = np.empty((3, 0))
         # reset control actions
         self.velocity = 0
         self.steering = 0
-        # reset mpc last run time
+        # reset mpc parameters
+        self.UPDATE_MPC_PARAM = True  
+        self.RESET_MPC_PARAM = False
         self.mpc_last_time = rospy.get_time()
-
         # TODO: implemet reset function within mpc class for effeciency and readability.
-        self.new_horizon = self.N
-        self.svea.controller.set_new_prediction_horizon(self.new_horizon)
-        self.svea.controller.update_weight_matrices('Qf',np.array(self.Qf).reshape((4, 4)))
+        self.current_horizon = self.initial_horizon
+        self.svea.controller.set_new_prediction_horizon(self.initial_horizon)
+        self.svea.controller.update_weight_matrices('Qf',np.array(self.initial_Qf).reshape((4, 4)))
 
         # Calculate the straight-line trajectory between current state and goal position
         start_x, start_y = self.state[0], self.state[1]
