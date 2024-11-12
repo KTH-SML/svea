@@ -6,7 +6,7 @@ base_length: 0.32
 # Q1 in objective function J
 state_weight_matrix: [10, 0, 0, 0,
                       0, 10, 0, 0,
-                      0, 0, 0, 0,
+                      0, 0, 1, 0,
                       0, 0, 0, 0]
 
 # Q2 in objective function J
@@ -18,12 +18,12 @@ control_weight_matrix: [2, 0,
                         0, 2]
 
 # Qv matrix in objective function
-velocity_deadzone_weight_matrix: 0   # did not prove to be too useful for now.
+forward_speed_weight: 0  # a big value encourage forward movements rather than backwards.  FEATURE DOES NOT WORK SO FAR
 
 # Qf in objective function J. The final weight gets updated when close to target to include speed and yaw constraints.
 final_state_weight_matrix: [10, 0, 0, 0,
                             0, 10, 0, 0,
-                            0, 0, 0, 0,
+                            0, 0, 1, 0,
                             0, 0, 0, 0]
 
 # The time step [s] in which the optimization problem is divided (unit [s])
@@ -55,6 +55,3 @@ velocity_min: -0.4
 
 # The maximum velocity allowed for SVEA (unit [m/s^2])
 velocity_max: 0.4
-
-# The velocity deadzone(unit [m/s])
-velocity_deadzone: 0.1

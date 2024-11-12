@@ -44,7 +44,7 @@ class MPC_casadi:
         Qf_list = config['final_state_weight_matrix']
         self.Qf = ca.DM(np.array(Qf_list).reshape((4, 4)))
 
-        self.Qv = ca.DM(config['velocity_deadzone_weight_matrix'])
+        self.Qv = ca.DM(config['forward_speed_weight'])
         
         # Load constraints from the YAML file
         self.min_steering = np.radians(config['steering_min'])  
@@ -55,7 +55,6 @@ class MPC_casadi:
         self.max_velocity = config['velocity_max']  
         self.min_steering_rate = np.radians(config['steering_rate_min'])  
         self.max_steering_rate = np.radians(config['steering_rate_max'])
-        self.velocity_deadzone = config['velocity_deadzone'] 
         
         self.opti = ca.Opti()  # CasADi optimization problem
 
@@ -146,7 +145,7 @@ class MPC_casadi:
 
     def set_objective_function(self):
         # Define the objective function: 
-        # J = (x[k]-x_ref[k])^T Q1 (x[k]-x_ref[k]) + (u[k+1] - u[k])^T Q2 (u[k+1] - u[k]) + u[k]^T Q3 u[k] + velocity_penalty
+        # J = (x[k]-x_ref[k])^T Q1 (x[k]-x_ref[k]) + (u[k+1] - u[k])^T Q2 (u[k+1] - u[k]) + u[k]^T Q3 u[k] + Qv max(0,-x[3])^2
         self.objective = 0
         for k in range(self.current_horizon):
             # State error term (ignore delta in reference trajectory)
@@ -158,18 +157,19 @@ class MPC_casadi:
             else:
                 input_cost = ca.DM.zeros(self.u.shape[0], 1)
 
-            # Penalize for violating the velocity deadzone (soft constraint)
-            velocity_error = ca.fmax(0, self.velocity_deadzone - ca.fabs(self.x[3, k]))  # Penalize if |v| < velocity_deadzone
+            # Penalize for negative velocity (soft constraint)
+            velocity_penalty = ca.fmax(0, -self.x[3, k])  # Penalize if v < 0
 
             # Accumulate the terms into the objective
             self.objective += ca.mtimes([state_error.T, self.Q1, state_error]) + \
                             ca.mtimes([input_cost.T, self.Q2, input_cost]) + \
                             ca.mtimes([self.u[:, k].T, self.Q3, self.u[:, k]]) + \
-                            ca.mtimes([velocity_error.T, self.Qv, velocity_error])
+                            ca.mtimes([velocity_penalty.T, self.Qv, velocity_penalty])
 
         # Final state cost
         final_state_error = self.x[0:4, self.current_horizon] - self.x_ref[0:4, self.current_horizon]
         self.objective += ca.mtimes([final_state_error.T, self.Qf, final_state_error])
+
 
         # Specify type of optimization problem
         self.opti.minimize(self.objective)

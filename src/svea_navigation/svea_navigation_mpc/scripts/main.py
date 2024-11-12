@@ -108,12 +108,12 @@ class main:
                 if self.is_last_point and distance_to_next_point <= self.APPROACH_TARGET_THR and self.UPDATE_MPC_PARAM:
                     # Update the prediction horizon and final state weight matrix only once when approaching target
                     new_horizon = 5
-                    self.current_horizon = new_horizon
+                  #  self.current_horizon = new_horizon
                     new_Qf = np.array([70, 0, 0, 0,
                                         0, 70, 0, 0,
                                         0, 0, 20, 0,
                                         0, 0, 0, 0]).reshape((4, 4))
-                    self.svea.controller.set_new_prediction_horizon(new_horizon)
+                   # self.svea.controller.set_new_prediction_horizon(new_horizon)
                     self.svea.controller.update_weight_matrices('Qf', new_Qf)
                     self.UPDATE_MPC_PARAM = False
                     self.RESET_MPC_PARAM = True  # Allow resetting when moving away
@@ -345,8 +345,7 @@ class main:
             pointyaw.append(points[2, i])  # yaw values        
         # Publish the trajectory as a PoseArray
         publish_pose_array(publisher, pointx, pointy, pointyaw)
-   
-    
+       
 if __name__ == '__main__':
     rospy.init_node('main')
     node = main(sim_dt = 0.01, mpc = MPC_casadi)
