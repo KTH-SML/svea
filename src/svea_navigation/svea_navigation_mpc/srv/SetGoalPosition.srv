@@ -1,5 +1,0 @@
-# Custom service to set the goal position
-geometry_msgs/PoseStamped goal_pose
----
-bool success
-string message
