@@ -1,10 +1,13 @@
 #! /usr/bin/env python3
+
 import casadi as ca
 import numpy as np
-import yaml
+
+from svea.helpers import load_param
 
 class MPC_casadi:
-    def __init__(self,vehicle_name='',mpc_config_file_path=None):
+
+    def __init__(self, vehicle_name='', config_ns='~mpc'):
         """
         Initialize the MPC controller with the given parameters.
 
@@ -21,42 +24,56 @@ class MPC_casadi:
         :param Q3: Control weight matrix (2x2)
         :param Qf: Final state weight matrix (4x4)
         """
-        # Load parameters from the YAML file 
-        with open(mpc_config_file_path, 'r') as file:
-            config = yaml.safe_load(file)
 
-        # Initialize parameters from YAML file
-        self.N = config['prediction_horizon']  # maximum prediction horizon
-        self.current_horizon = self.N          # Initially set to max horizon
-        self.dt = ca.DM(config['time_step'])   # Sampling time
-        self.L = ca.DM(config['base_length'])  # Wheelbase of the vehicle
+        ## Core Parameters
         
-        # Load state weight matrix Q1, control weight matrix Q2, and final state weight matrix Qf
-        Q1_list = config['state_weight_matrix']
-        self.Q1 = ca.DM(np.array(Q1_list).reshape((4, 4)))    # conversion to dense matrix to allow symbolic operations.
+        # Wheelbase of the vehicle (unit [m]).
+        self.L = ca.DM(0.32)
 
-        Q2_list = config['control_rate_weight_matrix']
+        # The prediction horizon steps for the mpc optimization problem.
+        self.N = load_param(f'{config_ns}/prediction_horizon')
+        self.current_horizon = self.N # Initially set to max horizon
+
+        # The time step in which the optimization problem is divided (unit [s]).
+        self.dt = ca.DM(load_param(f'{config_ns}/time_step'))
+        
+        ## Load state weight matrix Q1, control weight matrix Q2, and final state weight matrix Qf
+        ## Objective Function J
+
+        # Note: we convert to dense matrix to allow symbolic operations.
+
+        Q1_list = load_param(f'{config_ns}/state_weight_matrix')
+        self.Q1 = ca.DM(np.array(Q1_list).reshape((4, 4)))
+
+        Q2_list = load_param(f'{config_ns}/control_rate_weight_matrix')
         self.Q2 = ca.DM(np.array(Q2_list).reshape((2, 2)))
 
-        Q3_list = config['control_weight_matrix']
+        Q3_list = load_param(f'{config_ns}/control_weight_matrix')
         self.Q3 = ca.DM(np.array(Q3_list).reshape((2, 2)))
 
-        Qf_list = config['final_state_weight_matrix']
+        Qf_list = load_param(f'{config_ns}/final_state_weight_matrix')
         self.Qf = ca.DM(np.array(Qf_list).reshape((4, 4)))
 
-        self.Qv = ca.DM(config['forward_speed_weight'])
+        Qv_num  = load_param(f'{config_ns}/forward_speed_weight')
+        self.Qv = ca.DM(Qv_num)
         
-        # Load constraints from the YAML file
-        self.min_steering = np.radians(config['steering_min'])  
-        self.max_steering = np.radians(config['steering_max']) 
-        self.min_acceleration = config['acceleration_min']  
-        self.max_acceleration = config['acceleration_max']  
-        self.min_velocity = config['velocity_min']  
-        self.max_velocity = config['velocity_max']  
-        self.min_steering_rate = np.radians(config['steering_rate_min'])  
-        self.max_steering_rate = np.radians(config['steering_rate_max'])
+        ## Model Parameters
+
+        self.min_steering = np.radians(load_param(f'{config_ns}/steering_min'))
+        self.max_steering = np.radians(load_param(f'{config_ns}/steering_max'))
+
+        self.min_steering_rate = np.radians(load_param(f'{config_ns}/steering_rate_min'))
+        self.max_steering_rate = np.radians(load_param(f'{config_ns}/steering_rate_max'))
+
+        self.min_velocity = load_param(f'{config_ns}/velocity_min')
+        self.max_velocity = load_param(f'{config_ns}/velocity_max')
+
+        self.min_acceleration = load_param(f'{config_ns}/acceleration_min')
+        self.max_acceleration = load_param(f'{config_ns}/acceleration_max')
         
-        self.opti = ca.Opti()  # CasADi optimization problem
+        ## Setup CasADi
+
+        self.opti = ca.Opti()
 
         self.define_state_and_control_variables()
         self.set_objective_function()
@@ -161,10 +178,10 @@ class MPC_casadi:
             velocity_penalty = ca.fmax(0, -self.x[3, k])  # Penalize if v < 0
 
             # Accumulate the terms into the objective
-            self.objective += ca.mtimes([state_error.T, self.Q1, state_error]) + \
-                            ca.mtimes([input_cost.T, self.Q2, input_cost]) + \
-                            ca.mtimes([self.u[:, k].T, self.Q3, self.u[:, k]]) + \
-                            ca.mtimes([velocity_penalty.T, self.Qv, velocity_penalty])
+            self.objective += (ca.mtimes([state_error.T, self.Q1, state_error]) 
+                               + ca.mtimes([input_cost.T, self.Q2, input_cost])
+                               + ca.mtimes([self.u[:, k].T, self.Q3, self.u[:, k]])
+                               + ca.mtimes([velocity_penalty.T, self.Qv, velocity_penalty]))
 
         # Final state cost
         final_state_error = self.x[0:4, self.current_horizon] - self.x_ref[0:4, self.current_horizon]

@@ -1,57 +1,58 @@
-# Configuration file for MPC Controller
+##
+## Configuration file for MPC Controller
+##
 
-# The length between front and rear wheel for SVEA (unit [m])
-base_length: 0.32
+## Core Parameters
 
-# Q1 in objective function J
-state_weight_matrix: [10, 0, 0, 0,
-                      0, 10, 0, 0,
-                      0, 0, 1, 0,
-                      0, 0, 0, 0]
-
-# Q2 in objective function J
-control_rate_weight_matrix: [0, 0,
-                            0, 0]
-
-# Q3 in objective function J
-control_weight_matrix: [2, 0,
-                        0, 2]
-
-# Qv matrix in objective function
-forward_speed_weight: 0  # a big value encourage forward movements rather than backwards.  FEATURE DOES NOT WORK SO FAR
-
-# Qf in objective function J. The final weight gets updated when close to target to include speed and yaw constraints.
-final_state_weight_matrix: [10, 0, 0, 0,
-                            0, 10, 0, 0,
-                            0, 0, 1, 0,
-                            0, 0, 0, 0]
-
-# The time step [s] in which the optimization problem is divided (unit [s])
+# The time step in which the optimization problem is divided (unit [s])
 time_step: 0.4
 
 # The prediction horizon steps for the mpc optimization problem
 prediction_horizon: 10
 
-# The minimum steering angle allowed for SVEA (unit [degrees])
+## Objective Function J
+
+# Q1
+state_weight_matrix: [10,  0, 0, 0,
+                       0, 10, 0, 0,
+                       0,  0, 1, 0,
+                       0,  0, 0, 0]
+
+# Q2
+control_rate_weight_matrix: [0, 0,
+                             0, 0]
+
+# Q3
+control_weight_matrix: [2, 0,
+                        0, 2]
+
+# Qf
+# Note: The final weight gets updated when close to target to include
+#       speed and yaw constraints.
+final_state_weight_matrix: [10,  0, 0, 0,
+                             0, 10, 0, 0,
+                             0,  0, 1, 0,
+                             0,  0, 0, 0]
+
+# Qv
+# Note: A big value encourage forward movements rather than backwards.
+#       FEATURE DOES NOT WORK SO FAR.
+forward_speed_weight: 0
+
+## Model Parameters
+
+# The min/max steering angle allowed for SVEA (unit [degrees])
 steering_min: -40
-
-# The minimum steering rate allowed for SVEA (unit [degrees/s])
-steering_rate_min: -35 
-
-# The maximum steering angle allowed for SVEA (unit [degrees])
 steering_max: 40
 
-# The maximum steering rate allowed for SVEA (unit [degrees/s])
+# The min/max steering rate allowed for SVEA (unit [degrees/s])
+steering_rate_min: -35 
 steering_rate_max: 35 
 
-# The minimum acceleration allowed for SVEA (unit [m/s^2])
-acceleration_min: -0.2
-
-# The maximum acceleration allowed for SVEA (unit [m/s^2])
-acceleration_max: 0.4
-
-# The minimum velocity allowed for SVEA (unit [m/s^2])
+# The min/max velocity allowed for SVEA (unit [m/s^2])
 velocity_min: -0.4
-
-# The maximum velocity allowed for SVEA (unit [m/s^2])
 velocity_max: 0.4
+
+# The min/max acceleration allowed for SVEA (unit [m/s^2])
+acceleration_min: -0.2
+acceleration_max: 0.4
