@@ -1,5 +1,5 @@
 #! /usr/bin/env python3
-from mpc_casadi import MPC_casadi
+from svea.controllers.mpc import MPC_casadi
 import numpy as np
 
 if __name__ == '__main__':

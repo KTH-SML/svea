@@ -122,7 +122,7 @@
         <param name="mpc_freq" value="10"/> 
         <param name="delta_s"  value="5"/>
         <param name="svea_mocap_name" value="$(arg svea_mocap_name)"/>
-        <param name="mpc_config_file_path" value="/svea_ws/src/svea_navigation/svea_navigation_mpc/params/mpc_params.yaml"/>
+        <param name="mpc_config_file_path" value="/svea_ws/src/svea_core/params/mpc_params.yaml"/>
         <param name="use_mocap" value="$(arg use_mocap)"/>
     </node>
 

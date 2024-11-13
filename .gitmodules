@@ -1,9 +1,0 @@
-[submodule "src/svea_vision"]
-	path = src/svea_vision
-	url = https://github.com/KTH-SML/svea_vision.git
-[submodule "src/svea_mocap"]
-	path = src/svea_mocap
-	url = https://github.com/KTH-SML/svea_mocap.git
-[submodule "src/motion_capture_system"]
-	path = src/motion_capture_system
-	url = https://github.com/KTH-SML/motion_capture_system.git

@@ -23,7 +23,7 @@
     <arg name="map_file"                default=""/>
 
     <!-- Lidar  -->
-    <arg name="lidar_ip"                default="192.168.0.10" />
+    <arg name="lidar_ip"                default="192.168.3.11" />
 
     <!-- Wheel encoder -->
     <arg name="start_wheel_encoders"    default="false" />
@@ -34,12 +34,6 @@
     <arg name="delay"                   default="2.0"/>
     <arg name="gps_baud"                default="250000" />  <!-- 38400 for UART connection -->
     <!-- yaw offest = initial_pose_a -->
-
-    <!-- Datum args, if use_datum is true, the datum will be set -->
-    <arg name="use_datum"               default="false" />
-    <arg name="datum_service"           default="/datum" />
-    <arg name="datum_file"              default="" />
-    <arg name="datum_data"              default="[]" />
 
     <!-- IMU -->
     <!-- Set to true if the imu is connected to tx2. Set to false if the imu is connected to teensy. -->
@@ -62,7 +56,7 @@
     </group>
 
     <!-- Start map server -->
-    <node if="$(eval map_file != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
+    <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
 
     <!-- start all sensors if this is not a simulation -->
     <group unless="$(arg is_sim)">
@@ -97,14 +91,6 @@
             <include file="$(find svea_sensors)/launch/sensors_launch/navsat.launch">
                 <arg name="delay"           value="$(arg delay)"/>
                 <arg name="yaw_offset"      value="$(arg initial_pose_a)"/>
-                <arg name="use_datum"       value="$(arg use_datum)" />
-                <arg name="datum_service"   value="$(arg datum_service)" />
-                <arg name="datum_file"      value="$(arg datum_file)" />
-                <arg name="datum_data"      value="$(arg datum_data)" />
-            </include>
-            <!-- Start Lidar -->
-            <include file="$(find svea_sensors)/launch/sensors_launch/lidar.launch">
-                <arg name="lidar_ip"                    value="$(arg lidar_ip)" />
             </include>
         </group>
 

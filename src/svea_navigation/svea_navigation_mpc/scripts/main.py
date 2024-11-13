@@ -10,8 +10,8 @@ from svea.states import VehicleState
 from svea.simulators.sim_SVEA import SimSVEA
 from svea.interfaces import LocalizationInterface
 from svea_mocap.mocap import MotionCaptureInterface
-from mpc_casadi import MPC_casadi
-from svea.svea_managers.svea_archetypes import SVEAManager
+from svea.controllers.mpc import MPC_casadi
+from svea.svea_managers.path_following_sveas import SVEAManagerMPC
 from svea.data import TrajDataHandler, RVIZPathHandler
 from std_msgs.msg import Float32
 from svea_navigation_mpc.srv import SetGoalPosition, SetGoalPositionResponse
@@ -69,7 +69,6 @@ class main:
         self.initial_horizon = config['prediction_horizon']  
         self.initial_Qf = config['final_state_weight_matrix']  
         self.current_horizon = self.initial_horizon
-        
         if self.IS_SIM is False:
             # add steering bias of svea0
             unitless_steering = 28
@@ -178,9 +177,10 @@ class main:
                                      publish_pose=True).start()
 
         # start the SVEA manager (needed for both sim and real world)
-        self.svea = SVEAManager(localizer = MotionCaptureInterface if self.USE_MOCAP else LocalizationInterface,
+        self.svea = SVEAManagerMPC(localizer = MotionCaptureInterface if self.USE_MOCAP else LocalizationInterface,
                                 controller = self.mpc,
                                 data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler,
+                                vehicle_name='',
                                 controller_config_path = self.mpc_config_file_path)
         if self.USE_MOCAP:
             self.svea.localizer.update_name(self.SVEA_MOCAP_NAME)
