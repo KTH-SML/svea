@@ -1,2 +1,0 @@
-svea_core:svea_examples:svea_msgs:svea_navigation:svea_sensors:svea_vision/svea_vision:svea_vision/svea_vision_msgs
--DCATKIN_DEVEL_PREFIX=/home/marco/marco/marco_svea/devel -DCMAKE_INSTALL_PREFIX=/home/marco/marco/marco_svea/install -G Unix Makefiles
