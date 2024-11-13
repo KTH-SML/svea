@@ -5,7 +5,7 @@
 ARG BUILD_TAG
 ARG ROSDISTRO
 
-FROM ${BUILD_TAG:-ghcr.io/kth-sml/svea:latest}
+FROM $BUILD_TAG
 
 ARG ROSDISTRO
 ARG DEBIAN_FRONTEND=noninteractive

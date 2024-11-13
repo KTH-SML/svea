@@ -8,22 +8,19 @@
 
 . "$(dirname "$0")/config.sh"
 
-CMD="docker run"
-ARGS=""
+# Setting default arguments
+if [ -z "$*" ]; then
+    set -- --name "$CONTAINER_NAME" "$IMAGE_TAG"
+fi
 
-append ARGS \
+istrue DEBUG && fn="echo" || fn="exec"
+
+"$fn" docker run \
     -it \
     -e "TERM=xterm-256color" \
     -v "/dev:/dev" \
     -v "$SHARED_VOLUME" \
     --rm \
     --network host \
-    --privileged
-
-# These args are replaced if util/build is called with arguments
-if [ -z "$*" ]
-then append ARGS --name "$CONTAINER_NAME" "$IMAGE_TAG"
-else append ARGS "$@"
-fi
-
-call $CMD $ARGS
+    --privileged \
+    "$@"
