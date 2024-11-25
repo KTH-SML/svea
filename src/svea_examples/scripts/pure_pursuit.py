@@ -10,9 +10,7 @@ from tf.transformations import quaternion_from_euler
 from svea.models.bicycle import SimpleBicycleModel
 from svea.states import VehicleState
 from svea.simulators.sim_SVEA import SimSVEA
-from svea.interfaces import LocalizationInterface, ActuationInterface
-from svea_mocap.mocap import MotionCaptureInterface
-
+from svea.interfaces import LocalizationInterface
 from svea.controllers.pure_pursuit import PurePursuitController
 from svea.svea_managers.path_following_sveas import SVEAPurePursuit
 from svea.data import TrajDataHandler, RVIZPathHandler
@@ -57,7 +55,7 @@ class pure_pursuit:
 
     DELTA_TIME = 0.01
     TRAJ_LEN = 10
-    TARGET_VELOCITY = 0.35
+    TARGET_VELOCITY = 1.0
     RATE = 1e9
 
     def __init__(self):
@@ -65,11 +63,8 @@ class pure_pursuit:
         ## Initialize node
 
         rospy.init_node('pure_pursuit')
-        self.MOCAP_NAME = 'svea_with_camera'
 
         ## Parameters
-
-        self.rate = rospy.Rate(20)
 
         self.POINTS = load_param('~points')
         self.IS_SIM = load_param('~is_sim', False)
@@ -103,15 +98,10 @@ class pure_pursuit:
                                      start_paused=True).start()
 
         # start the SVEA manager
-        # self.localization = MotionCaptureInterface(self.MOCAP_NAME).start()
-
-        self.svea = SVEAPurePursuit(MotionCaptureInterface,
+        self.svea = SVEAPurePursuit(LocalizationInterface,
                                     PurePursuitController,
-                                    xs, ys, vehicle_name="svea_with_camera",
+                                    xs, ys,
                                     data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
-
-        self.svea.controller.dt = 1/20
-        self.actuation = ActuationInterface().start()
 
         self.svea.controller.target_velocity = self.TARGET_VELOCITY
         self.svea.start(wait=True)
@@ -119,7 +109,6 @@ class pure_pursuit:
         # everything ready to go -> unpause simulator
         if self.IS_SIM:
             self.simulator.toggle_pause_simulation()
-        
 
     def run(self):
         while self.keep_alive():
@@ -131,19 +120,17 @@ class pure_pursuit:
     def spin(self):
 
         # limit the rate of main loop by waiting for state
+        state = self.svea.wait_for_state()
 
-        self.rate.sleep()
-        state = self.svea.state
-
-        print("self.svea.is_finished", self.svea.is_finished)
         if self.svea.is_finished:
             self.update_goal()
             xs, ys = self.compute_traj(state)
             self.svea.update_traj(xs, ys)
 
         steering, velocity = self.svea.compute_control()
-        print(steering, velocity)
-        self.actuation.send_control(steering, self.TARGET_VELOCITY)
+        self.svea.send_control(steering, velocity)
+
+        self.svea.visualize_data()
 
     def update_goal(self):
         self.curr += 1
