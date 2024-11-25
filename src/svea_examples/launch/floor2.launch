@@ -18,7 +18,7 @@
     <group unless="$(arg is_sim)">
         <!-- Start low-level interface -->
         <node name="serial_node" pkg="rosserial_python" type="serial_node.py">
-            <param name="port" value="/dev/ttyACM0"/>
+            <param name="port" value="/dev/ttyACM2"/>
             <param name="baud" value="250000"/>
         </node>
 
