@@ -6,7 +6,7 @@ import math
 
 class PurePursuitController(object):
 
-    k = 0.6  # look forward gain
+    k = 0.9  # look forward gain
     Lfc = 0.2  # look-ahead distance
     K_p = 1.0  # speed control propotional gain
     K_i = 0.2  # speed control integral gain
@@ -38,7 +38,6 @@ class PurePursuitController(object):
         else:
             # allow manual setting of target
             self.target = target
-
         tx, ty = self.target
         alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
         if state.v < 0:  # back
@@ -72,7 +71,6 @@ class PurePursuitController(object):
         ind = d.index(min(d))
         dist = 0.0
         Lf = self.k * state.v + self.Lfc
-
         # search look ahead target point index
         while Lf > dist and (ind + 1) < len(self.traj_x):
             dx = self.traj_x[ind + 1] - self.traj_x[ind]
@@ -83,6 +81,8 @@ class PurePursuitController(object):
         # terminating condition
         if dist < 0.1:
             self.is_finished = True
+
             pass
+        
 
         return ind

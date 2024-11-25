@@ -2,7 +2,7 @@
 <launch>
     <!-- Launch file arguments -->
     <arg name="map"             default="floor2"/>
-    <arg name="is_sim"          default="true"/>
+    <arg name="is_sim"          default="false"/>
     <arg name="use_foxglove"    default="true"/>
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="initial_pose_x"  default="-2.65488696"/>
@@ -23,11 +23,6 @@
         </node>
 
         <!-- Start localization -->
-        <include file="$(find svea_sensors)/launch/localize.launch">
-            <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
-            <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
-            <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
-        </include>
     </group>
 
     <!-- Start Foxglove -->
@@ -41,12 +36,48 @@
         <param name="is_sim" value="$(arg is_sim)"/>
         <!-- Waypoints for floo2 map -->
         <rosparam>
-            state: [-7.4, -15.3, 0.9] # initial state (x, y, yaw)
+            state: [0, 0, 0] # initial state (x, y, yaw)
             points:
-            - [-2.3, -7.1]  # Bottom right (project room)
-            - [10.5, 11.7]  # Top right
-            - [5.7, 15.0]   # Top left
-            - [-7.0, -4.0]  # Bottom left
+            - [1.50, 0.00]
+            - [1.482, 0.235]
+            - [1.427, 0.464]
+            - [1.337, 0.681]
+            - [1.214, 0.882]
+            - [1.061, 1.061]
+            - [0.882, 1.214]
+            - [0.681, 1.337]
+            - [0.464, 1.427]
+            - [0.235, 1.482]
+            - [0.00, 1.50]
+            - [-0.235, 1.482]
+            - [-0.464, 1.427]
+            - [-0.681, 1.337]
+            - [-0.882, 1.214]
+            - [-1.061, 1.061]
+            - [-1.214, 0.882]
+            - [-1.337, 0.681]
+            - [-1.427, 0.464]
+            - [-1.482, 0.235]
+            - [-1.50, 0.00]
+            - [-1.482, -0.235]
+            - [-1.427, -0.464]
+            - [-1.337, -0.681]
+            - [-1.214, -0.882]
+            - [-1.061, -1.061]
+            - [-0.882, -1.214]
+            - [-0.681, -1.337]
+            - [-0.464, -1.427]
+            - [-0.235, -1.482]
+            - [-0.00, -1.50]
+            - [0.235, -1.482]
+            - [0.464, -1.427]
+            - [0.681, -1.337]
+            - [0.882, -1.214]
+            - [1.061, -1.061]
+            - [1.214, -0.882]
+            - [1.337, -0.681]
+            - [1.427, -0.464]
+            - [1.482, -0.235]
         </rosparam>
     </node>
 </launch>
