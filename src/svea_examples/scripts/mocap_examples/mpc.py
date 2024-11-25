@@ -40,7 +40,9 @@ class mpc_navigation:
         self.MPC_FREQ = load_param('~mpc_freq', 10)
         self.SVEA_MOCAP_NAME = load_param('~svea_mocap_name')
         self.DELTA_S = load_param('~delta_s', 5)            # static path discretization lenght
-        self.mpc_config_file_path = load_param('~mpc_config_file_path')    
+        self.mpc_config_ns = load_param('~mpc_config_ns')  
+        self.initial_horizon = load_param(f'{self.mpc_config_ns}/prediction_horizon') 
+        self.initial_Qf = load_param(f'{self.mpc_config_ns}/final_state_weight_matrix')  
         self.GOAL_REACHED_DIST = 0.2   # meters
         self.GOAL_REACHED_YAW = 0.2   #  radians
         self.APPROACH_TARGET_THR = 2  # meters
@@ -60,13 +62,7 @@ class mpc_navigation:
         self.static_path_plan = np.empty((3, 0))
         self.current_index_static_plan = 0
         self.is_last_point = False
-
-        # Load parameters from the YAML file 
-        with open(self.mpc_config_file_path, 'r') as file:
-            config = yaml.safe_load(file)
-        # Initialize parameters from YAML file
-        self.initial_horizon = config['prediction_horizon']  
-        self.initial_Qf = config['final_state_weight_matrix']  
+ 
         self.current_horizon = self.initial_horizon
         if self.IS_SIM is False:
             # add steering bias of svea0.
@@ -180,7 +176,7 @@ class mpc_navigation:
                                 controller = self.mpc,
                                 data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler,
                                 vehicle_name='',
-                                controller_config_path = self.mpc_config_file_path)
+                                controller_config_path = self.mpc_config_ns)
         if not self.IS_SIM:
             self.svea.localizer.update_name(self.SVEA_MOCAP_NAME)
 

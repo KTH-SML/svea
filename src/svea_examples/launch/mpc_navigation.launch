@@ -32,13 +32,14 @@
     </include>
     
     <!-- Start main node -->
-    <node name="main" pkg="svea_examples" type="mpc.py" output="screen">
+    <node name="mpc" pkg="svea_examples" type="mpc.py" output="screen">
         <param name="use_rviz" value="$(arg use_foxglove)"/>
         <param name="is_sim" value="$(arg is_sim)"/>
         <param name="mpc_freq" value="10"/> 
         <param name="delta_s"  value="5"/>
         <param name="svea_mocap_name" value="$(arg svea_mocap_name)"/>
-        <param name="mpc_config_file_path" value="/svea_ws/src/svea_core/params/mpc_default.yaml"/>
+        <rosparam file="$(find svea_core)/params/mpc_default.yaml" />
+        <param name="mpc_config_ns" value='/mpc'/>
     </node>
     
 </launch>

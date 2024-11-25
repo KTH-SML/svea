@@ -7,7 +7,7 @@ from svea.helpers import load_param
 
 class MPC_casadi:
 
-    def __init__(self, vehicle_name='', config_ns='~mpc'):
+    def __init__(self, vehicle_name='', config_ns='/mpc'):
         """
         Initialize the MPC controller with the given parameters.
 
@@ -28,7 +28,7 @@ class MPC_casadi:
         ## Core Parameters
         
         # Wheelbase of the vehicle (unit [m]).
-        self.L = ca.DM(0.32)
+        self.L = ca.DM(load_param(f'{config_ns}/wheelbase'))
 
         # The prediction horizon steps for the mpc optimization problem.
         self.N = load_param(f'{config_ns}/prediction_horizon')

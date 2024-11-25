@@ -27,8 +27,6 @@ control_weight_matrix: [2, 0,
                         0, 2]
 
 # Qf
-# Note: The final weight gets updated when close to target to include
-#       speed and yaw constraints.
 final_state_weight_matrix: [10,  0, 0, 0,
                              0, 10, 0, 0,
                              0,  0, 1, 0,
@@ -56,3 +54,6 @@ velocity_max: 0.4
 # The min/max acceleration allowed for SVEA (unit [m/s^2])
 acceleration_min: -0.2
 acceleration_max: 0.4
+
+# The wheelbase of the vehicle (unit [m]). 
+wheelbase: 0.32
