@@ -5,7 +5,7 @@
     <arg name="serial_port" default="/dev/ttyACM1"/>
     <arg name="baud_rate" default="115200"/>
     <arg name="log_format" default="{:.3f}"/>
-    <arg name="rate" default="1"/>
+    <arg name="rate" default="50"/>
 
     <!-- Launch the rosserial_python node -->
     <node name="rosserial_python" pkg="rosserial_python" type="serial_node.py" output="screen">
