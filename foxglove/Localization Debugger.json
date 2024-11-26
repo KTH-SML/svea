@@ -1,0 +1,978 @@
+{
+  "configById": {
+    "3D!1d6wsay": {
+      "cameraState": {
+        "perspective": false,
+        "distance": 23.327015599932967,
+        "phi": 59.99999999999777,
+        "thetaOffset": 0,
+        "targetOffset": [
+          -0.21445653140973053,
+          0.7760187202571339,
+          -4.3650121758646524e-17
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-none",
+      "followTf": "map",
+      "scene": {},
+      "transforms": {
+        "frame:utm": {
+          "visible": false
+        },
+        "frame:map": {
+          "visible": false
+        },
+        "frame:odom": {
+          "visible": false
+        },
+        "frame:base_link": {
+          "visible": false
+        },
+        "frame:gps": {
+          "visible": false
+        },
+        "frame:imu": {
+          "visible": false
+        },
+        "frame:zed_base_link": {
+          "visible": false
+        },
+        "frame:zed_camera_center": {
+          "visible": false
+        },
+        "frame:zed_left_camera_frame": {
+          "visible": false
+        },
+        "frame:zed_left_camera_optical_frame": {
+          "visible": false
+        },
+        "frame:zed_right_camera_frame": {
+          "visible": false
+        },
+        "frame:zed_right_camera_optical_frame": {
+          "visible": false
+        }
+      },
+      "topics": {
+        "/zed/zed_node/path_odom": {
+          "visible": false
+        },
+        "/zed/zed_node/path_map": {
+          "visible": false,
+          "type": "line",
+          "lineWidth": 0.1,
+          "gradient": [
+            "#5cd6a9ff",
+            "#ffffff80"
+          ]
+        },
+        "/odom/filtered/global/path": {
+          "visible": true
+        },
+        "/zed/zed_node/left/image_rect_color/compressed": {
+          "visible": false
+        },
+        "/zed/zed_node/left_raw/camera_info": {
+          "visible": false
+        },
+        "/odom/filtered/path": {
+          "visible": true
+        },
+        "/odom/gps/path": {
+          "visible": true
+        },
+        "/odometry/filtered/global/path": {
+          "visible": true,
+          "gradient": [
+            "#4e98e2ff",
+            "#ffffff80"
+          ],
+          "lineWidth": 0.1
+        },
+        "/odometry/filtered/path": {
+          "visible": true,
+          "gradient": [
+            "#f5774dff",
+            "#ffffff80"
+          ],
+          "lineWidth": 0.1
+        },
+        "/odometry/gps/path": {
+          "visible": true,
+          "lineWidth": 0.1,
+          "gradient": [
+            "#f7df71ff",
+            "#ffffff80"
+          ]
+        },
+        "/zed/zed_node/odom/path": {
+          "visible": true,
+          "gradient": [
+            "#5cd6a9ff",
+            "#ffffff80"
+          ]
+        }
+      },
+      "layers": {
+        "da38ab7e-c5ef-4d27-b87e-7e47f7add656": {
+          "visible": true,
+          "frameLocked": true,
+          "label": "Grid",
+          "instanceId": "da38ab7e-c5ef-4d27-b87e-7e47f7add656",
+          "layerId": "foxglove.Grid",
+          "frameId": "map",
+          "size": 10,
+          "divisions": 10,
+          "lineWidth": 0.5,
+          "color": "#ffffffff",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "order": 1
+        }
+      },
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {}
+    },
+    "Plot!11rlra3": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered/global.pose.pose.position.x",
+          "enabled": true,
+          "label": "Global Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered.pose.pose.position.x",
+          "enabled": true,
+          "label": "Local Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/gps.pose.pose.position.x",
+          "enabled": true,
+          "label": "Navsat Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/zed/zed_node/odom.pose.pose.orientation.x",
+          "enabled": true,
+          "label": "ZED Odom"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 131.140625,
+      "foxglovePanelTitle": "X [Meters]",
+      "followingViewWidth": 120
+    },
+    "Plot!3szdv5a": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered/global.pose.pose.position.x",
+          "enabled": true,
+          "label": "Global Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered.pose.pose.position.y",
+          "enabled": true,
+          "label": "Local Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/gps.pose.pose.position.y",
+          "enabled": true,
+          "label": "Navsat Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/zed/zed_node/odom.pose.pose.position.y",
+          "enabled": true,
+          "label": "ZED Odom"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": false,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 76.6171875,
+      "foxglovePanelTitle": "Y [Meters]",
+      "followingViewWidth": 120
+    },
+    "Plot!2i3jacv": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered/global/orientation/euler.vector.z",
+          "enabled": true,
+          "label": "Global Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered/orientation/euler.vector.z",
+          "enabled": true,
+          "label": "Local Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/gps/orientation/euler.vector.z",
+          "enabled": false,
+          "label": "Navsat Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/zed/zed_node/odom/orientation/euler.vector.z",
+          "enabled": false,
+          "label": "ZED Odom"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": false,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 76.6171875,
+      "foxglovePanelTitle": "Yaw [Degrees]",
+      "followingViewWidth": 120,
+      "minYValue": -180,
+      "maxYValue": 180
+    },
+    "Plot!3py65p9": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered/global.twist.twist.linear.x",
+          "enabled": true,
+          "label": "Global Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered.twist.twist.linear.x",
+          "enabled": true,
+          "label": "Local Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/gps.twist.twist.linear.x",
+          "enabled": true,
+          "label": "Navsat Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/zed/zed_node/odom.twist.twist.linear.x",
+          "enabled": true,
+          "label": "ZED Odom"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": false,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 76.6171875,
+      "foxglovePanelTitle": "Vel X [Meters/Second]",
+      "followingViewWidth": 120
+    },
+    "Plot!2e8cied": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered/global.twist.twist.linear.y",
+          "enabled": true,
+          "label": "Global Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered.twist.twist.linear.y",
+          "enabled": true,
+          "label": "Local Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/gps.twist.twist.linear.y",
+          "enabled": true,
+          "label": "Navsat Odom"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/zed/zed_node/odom.twist.twist.linear.y",
+          "enabled": true,
+          "label": "ZED Odom"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": false,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 76.6171875,
+      "foxglovePanelTitle": "Vel Y [Meters/Second]",
+      "followingViewWidth": 120
+    },
+    "Plot!31fwgco": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered.twist.twist.angular.z",
+          "enabled": true,
+          "label": "Global Odom X"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered.twist.twist.angular.z",
+          "enabled": true,
+          "label": "Local Odom X"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/gps.twist.twist.angular.z",
+          "enabled": true,
+          "label": "Navsat Odom X"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/zed/zed_node/odom.twist.twist.angular.z",
+          "enabled": true,
+          "label": "ZED Odom X"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "none",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 76.6171875,
+      "foxglovePanelTitle": "Angular Vel Yaw [Radians/Second]",
+      "followingViewWidth": 120
+    },
+    "3D!3hq9qrg": {
+      "cameraState": {
+        "perspective": false,
+        "distance": 15.475618749998304,
+        "phi": 59.99999999999997,
+        "thetaOffset": 0,
+        "targetOffset": [
+          -0.30310806436908144,
+          0.01797777929746719,
+          5.891177107531232e-18
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-none",
+      "followTf": "map",
+      "scene": {},
+      "transforms": {
+        "frame:utm": {
+          "visible": false
+        },
+        "frame:map": {
+          "visible": false
+        },
+        "frame:odom": {
+          "visible": false
+        },
+        "frame:base_link": {
+          "visible": false
+        },
+        "frame:gps": {
+          "visible": false
+        },
+        "frame:imu": {
+          "visible": false
+        },
+        "frame:zed_base_link": {
+          "visible": false
+        },
+        "frame:zed_camera_center": {
+          "visible": false
+        },
+        "frame:zed_left_camera_frame": {
+          "visible": false
+        },
+        "frame:zed_left_camera_optical_frame": {
+          "visible": false
+        },
+        "frame:zed_right_camera_frame": {
+          "visible": false
+        },
+        "frame:zed_right_camera_optical_frame": {
+          "visible": false
+        }
+      },
+      "topics": {
+        "/zed/zed_node/path_map": {
+          "visible": false,
+          "gradient": [
+            "#5cd6a9ff",
+            "#ffffff80"
+          ],
+          "lineWidth": 0.1
+        },
+        "/odometry/gps/path": {
+          "visible": true,
+          "gradient": [
+            "#f7df71ff",
+            "#ffffff80"
+          ]
+        },
+        "/odometry/filtered/path": {
+          "visible": true,
+          "gradient": [
+            "#f5774dff",
+            "#ffffff80"
+          ],
+          "lineWidth": 0.1
+        },
+        "/odometry/filtered/global/path": {
+          "visible": true,
+          "gradient": [
+            "#4e98e2ff",
+            "#ffffff80"
+          ],
+          "lineWidth": 0.1
+        },
+        "/zed/zed_node/odom/path": {
+          "visible": true,
+          "gradient": [
+            "#5cd6a9ff",
+            "#ffffff80"
+          ]
+        }
+      },
+      "layers": {
+        "9c77b1d9-0b9f-4023-84f2-a2bffe88b052": {
+          "visible": true,
+          "frameLocked": true,
+          "label": "Grid",
+          "instanceId": "9c77b1d9-0b9f-4023-84f2-a2bffe88b052",
+          "layerId": "foxglove.Grid",
+          "size": 10,
+          "divisions": 10,
+          "color": "#ffffffff",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "order": 1,
+          "lineWidth": 0.5
+        }
+      },
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {}
+    },
+    "map!2s7rprz": {
+      "center": {
+        "lat": 59.35076427825812,
+        "lon": 18.068086802959446
+      },
+      "customTileUrl": "",
+      "disabledTopics": [],
+      "followTopic": "/gps/filtered",
+      "layer": "map",
+      "topicColors": {},
+      "zoomLevel": 19,
+      "maxNativeZoom": 18
+    },
+    "Plot!414m9rl": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/gps/fix.position_covariance[0].@log10",
+          "enabled": true,
+          "label": "Easting Covariance"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Covariance",
+      "followingViewWidth": 120
+    },
+    "Plot!1zr5kq9": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/gps/fix/utm.point.x",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": "Raw"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/gps/filtered/utm.point.x",
+          "enabled": true,
+          "color": "#f5774d",
+          "label": "Filtered"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "UTM Easting",
+      "followingViewWidth": 120
+    },
+    "Plot!1n7tdhk": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/gps/fix/utm.point.y",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": ""
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/gps/filtered/utm.point.y",
+          "enabled": true,
+          "color": "#f5774d"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "none",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "UTM Northing",
+      "followingViewWidth": 120
+    },
+    "Plot!267hdv1": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/imu/data/orientation/euler.vector.z",
+          "enabled": true,
+          "label": "IMU Heading"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/odometry/filtered/global/orientation/euler.vector.z",
+          "enabled": true,
+          "color": "#f5774d",
+          "label": "Global EKF Heading"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Heading [Degrees]",
+      "followingViewWidth": 120
+    },
+    "Plot!450w6vu": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/actuation_twist.twist.twist.linear.x",
+          "enabled": true,
+          "label": "Actuation Twist"
+        }
+      ],
+      "minYValue": -2,
+      "maxYValue": 2,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 33.171875,
+      "foxglovePanelTitle": "Vel X [Meters/Second]",
+      "followingViewWidth": 120
+    },
+    "Plot!xip4qr": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/actuation_twist.twist.twist.linear.y",
+          "enabled": true,
+          "label": "Actuation Twist"
+        }
+      ],
+      "minYValue": -2,
+      "maxYValue": 2,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 35.70703125,
+      "foxglovePanelTitle": "Vel Y [Meters/Second]",
+      "followingViewWidth": 120
+    },
+    "Plot!9kuizh": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/imu/data.linear_acceleration.x",
+          "enabled": true,
+          "label": "IMU",
+          "color": "#dd4fe3"
+        }
+      ],
+      "minYValue": -2,
+      "maxYValue": 2,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 32.8671875,
+      "foxglovePanelTitle": "Accel X [Meters/Second^2]",
+      "followingViewWidth": 120
+    },
+    "Plot!3axr889": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/imu/data.linear_acceleration.x",
+          "enabled": true,
+          "label": "IMU",
+          "color": "#d94fe3"
+        }
+      ],
+      "minYValue": -2,
+      "maxYValue": 2,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 35.96875,
+      "foxglovePanelTitle": "Accel Y [Meters/Second^2]",
+      "followingViewWidth": 120
+    },
+    "Plot!2wa9e2m": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/imu/data/orientation/euler.vector.z",
+          "enabled": true,
+          "color": "#d94fe3",
+          "label": "IMU"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 33.6484375,
+      "foxglovePanelTitle": "Yaw [Degrees]",
+      "followingViewWidth": 120
+    },
+    "Plot!7oyerg": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/imu/data/orientation/euler.vector.x",
+          "enabled": true,
+          "color": "#d94fe3",
+          "label": "IMU"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 36.6328125,
+      "foxglovePanelTitle": "Roll [Degrees]",
+      "followingViewWidth": 120
+    },
+    "Plot!3vzyuar": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/imu/data/orientation/euler.vector.y",
+          "enabled": true,
+          "label": "IMU",
+          "color": "#d94fe3"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 36.9296875,
+      "foxglovePanelTitle": "Pitch [Degrees]",
+      "followingViewWidth": 120
+    },
+    "Plot!rm5gei": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/actuation_twist.twist.twist.angular.z",
+          "enabled": true,
+          "label": "Actuation Twist"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 31.765625,
+      "foxglovePanelTitle": "Angular Vel Yaw [Radians/Second]",
+      "followingViewWidth": 120
+    },
+    "Plot!2eym2ft": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/actuation_twist.twist.twist.angular.x",
+          "enabled": true,
+          "label": "Actuation Twist"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 36.93359375,
+      "foxglovePanelTitle": "Angular Vel Roll [Radians/Second]",
+      "followingViewWidth": 120
+    },
+    "Plot!1mgz7r": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/actuation_twist.twist.twist.angular.y",
+          "enabled": true,
+          "label": "Actuation Twist"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 37.3359375,
+      "foxglovePanelTitle": "Angular Vel Pitch [Radians/Second]",
+      "followingViewWidth": 120
+    },
+    "Tab!2qygm3b": {
+      "activeTabIdx": 0,
+      "tabs": [
+        {
+          "title": "Overview",
+          "layout": {
+            "first": "3D!1d6wsay",
+            "second": {
+              "first": {
+                "first": "Plot!11rlra3",
+                "second": {
+                  "first": "Plot!3szdv5a",
+                  "second": "Plot!2i3jacv",
+                  "direction": "column",
+                  "splitPercentage": 50.442001402384065
+                },
+                "direction": "column",
+                "splitPercentage": 37.68656716417911
+              },
+              "second": {
+                "first": {
+                  "first": "Plot!3py65p9",
+                  "second": "Plot!2e8cied",
+                  "direction": "row"
+                },
+                "second": "Plot!31fwgco",
+                "direction": "column",
+                "splitPercentage": 48.32214765100673
+              },
+              "direction": "column",
+              "splitPercentage": 66.74968866749688
+            },
+            "direction": "row",
+            "splitPercentage": 37.361111111111114
+          }
+        },
+        {
+          "title": "Global",
+          "layout": {
+            "first": {
+              "first": "3D!3hq9qrg",
+              "second": "map!2s7rprz",
+              "direction": "column"
+            },
+            "second": {
+              "first": {
+                "first": "Plot!414m9rl",
+                "second": "Plot!1zr5kq9",
+                "direction": "column"
+              },
+              "second": {
+                "first": "Plot!1n7tdhk",
+                "second": "Plot!267hdv1",
+                "direction": "column"
+              },
+              "direction": "column"
+            },
+            "direction": "row",
+            "splitPercentage": 36.041666666666664
+          }
+        },
+        {
+          "title": "Local",
+          "layout": {
+            "first": {
+              "first": {
+                "first": "Plot!450w6vu",
+                "second": "Plot!xip4qr",
+                "direction": "column"
+              },
+              "second": {
+                "first": "Plot!9kuizh",
+                "second": "Plot!3axr889",
+                "direction": "column"
+              },
+              "direction": "column"
+            },
+            "second": {
+              "first": {
+                "first": "Plot!2wa9e2m",
+                "second": {
+                  "first": "Plot!7oyerg",
+                  "second": "Plot!3vzyuar",
+                  "direction": "row"
+                },
+                "direction": "column"
+              },
+              "second": {
+                "first": "Plot!rm5gei",
+                "second": {
+                  "first": "Plot!2eym2ft",
+                  "second": "Plot!1mgz7r",
+                  "direction": "row"
+                },
+                "direction": "column"
+              },
+              "direction": "column"
+            },
+            "direction": "row"
+          }
+        }
+      ]
+    }
+  },
+  "globalVariables": {
+    "globalVariable": 0
+  },
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": "Tab!2qygm3b"
+}

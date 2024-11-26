@@ -14,5 +14,6 @@ src/.vscode/
 venv/
 site/
 
-src/zed-ros-wrapper/
-requirements.txt
+src/motion_capture_system/
+src/svea_mocap/
+src/svea_vision/

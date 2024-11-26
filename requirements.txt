@@ -12,9 +12,5 @@ pyserial
 pyubx2
 geopy
 utm
-
-# Requirements to run the mpc
+# This is for NMPC
 casadi==3.5.5
-
-# Nesting requirements
-# -r src/svea_vision/svea_vision/requirements.txt
