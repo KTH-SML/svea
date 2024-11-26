@@ -9,8 +9,27 @@ class MPC_casadi:
 
     def __init__(self, vehicle_name='', config_ns='/mpc'):
         """
-        Initialize the MPC controller with the given parameters.
+        This is the release 0 of a general-purpose Nonlinear Model Predictive Controller (NMPC) 
+        designed for the SVEA platform. It offers the following features:
 
+        - Nonlinear dynamics with state representation [x, y, theta, v, steering] 
+        and control inputs [steering_rate, acceleration].
+        - Accepts a reference trajectory as input (see `compute_control` method) 
+        and optimizes the predicted trajectory to minimize the deviation of 
+        the predicted points from the next reference point.
+        - Functions as both an optimal path planner and path tracker:
+            - For path planning and tracking: Reference points should be spaced apart to give 
+                the MPC the freedom to determine the optimal path.
+            - For tracking only: Adjust parameters such as prediction horizon to 
+                follow the reference trajectory closely.
+
+        Limitations:
+        - Neither static nor dynamic obstacles are considered 
+        in this implementation.
+
+        Initialize the MPC controller with the given parameters:
+
+        :param L: Wheelbase of the vehicle (unit [m])
         :param N: Prediction horizon steps
         :param dt: Sampling time
         :param min_steering: Minimum steering angle [rad]
@@ -23,12 +42,10 @@ class MPC_casadi:
         :param Q2: Control rate weight matrix (2x2)
         :param Q3: Control weight matrix (2x2)
         :param Qf: Final state weight matrix (4x4)
+        :param Qv: Forward_speed_weight scalar
         """
 
         ## Core Parameters
-        
-        # Wheelbase of the vehicle (unit [m]).
-        self.L = ca.DM(load_param(f'{config_ns}/wheelbase'))
 
         # The prediction horizon steps for the mpc optimization problem.
         self.N = load_param(f'{config_ns}/prediction_horizon')
@@ -37,25 +54,23 @@ class MPC_casadi:
         # The time step in which the optimization problem is divided (unit [s]).
         self.dt = ca.DM(load_param(f'{config_ns}/time_step'))
         
-        ## Load state weight matrix Q1, control weight matrix Q2, and final state weight matrix Qf
-        ## Objective Function J
-
+        ## Load weight matrices 
         # Note: we convert to dense matrix to allow symbolic operations.
 
-        Q1_list = load_param(f'{config_ns}/state_weight_matrix')
-        self.Q1 = ca.DM(np.array(Q1_list).reshape((4, 4)))
+        self.Q1_list = load_param(f'{config_ns}/state_weight_matrix')
+        self.Q1 = ca.DM(np.array(self.Q1_list).reshape((4, 4)))
 
-        Q2_list = load_param(f'{config_ns}/control_rate_weight_matrix')
-        self.Q2 = ca.DM(np.array(Q2_list).reshape((2, 2)))
+        self.Q2_list = load_param(f'{config_ns}/control_rate_weight_matrix')
+        self.Q2 = ca.DM(np.array(self.Q2_list).reshape((2, 2)))
 
-        Q3_list = load_param(f'{config_ns}/control_weight_matrix')
-        self.Q3 = ca.DM(np.array(Q3_list).reshape((2, 2)))
+        self.Q3_list = load_param(f'{config_ns}/control_weight_matrix')
+        self.Q3 = ca.DM(np.array(self.Q3_list).reshape((2, 2)))
 
-        Qf_list = load_param(f'{config_ns}/final_state_weight_matrix')
-        self.Qf = ca.DM(np.array(Qf_list).reshape((4, 4)))
+        self.Qf_list = load_param(f'{config_ns}/final_state_weight_matrix')
+        self.Qf = ca.DM(np.array(self.Qf_list).reshape((4, 4)))
 
-        Qv_num  = load_param(f'{config_ns}/forward_speed_weight')
-        self.Qv = ca.DM(Qv_num)
+        self.Qv_num  = load_param(f'{config_ns}/forward_speed_weight')
+        self.Qv = ca.DM(self.Qv_num)
         
         ## Model Parameters
 
@@ -70,6 +85,9 @@ class MPC_casadi:
 
         self.min_acceleration = load_param(f'{config_ns}/acceleration_min')
         self.max_acceleration = load_param(f'{config_ns}/acceleration_max')
+
+        # Wheelbase of the vehicle (unit [m]).
+        self.L = ca.DM(load_param(f'{config_ns}/wheelbase'))
         
         ## Setup CasADi
 
@@ -103,24 +121,12 @@ class MPC_casadi:
         # Solve the optimization problem
         self.sol = self.opti.solve()
 
-        #print('obj fun',self.sol.value(self.objective))
-
         # Extract control actions (acceleration and steering rate)
         acceleration = self.sol.value(self.u[0, 0])
         steering_rate = self.sol.value(self.u[1, 0])
 
         return steering_rate, acceleration
     
-    def set_new_prediction_horizon(self, new_horizon):
-        """
-        Dynamically adjust the active horizon for the optimization problem.
-        When the horizon is reduced, you simply freeze unused variables and update the reference trajectory 
-        and state for the active part of the horizon. The solver will then only optimize over the active steps.
-        """
-        self.current_horizon = new_horizon
-        
-        # Redefine objective function with new horizon.
-        self.set_objective_function()
 
     def get_optimal_control(self, all=True):
         """
@@ -148,7 +154,7 @@ class MPC_casadi:
         :rtype: NumPy array
         """
         if self.sol is not None:
-            return np.array(self.sol.value(self.x))   # to get only optimized one: self.sol.value(self.x[:, :self.current_horizon])
+            return np.array(self.sol.value(self.x))   # Note: to get only optimized one: self.sol.value(self.x[:, :self.current_horizon])
         else: 
             return None
 
@@ -187,7 +193,6 @@ class MPC_casadi:
         final_state_error = self.x[0:4, self.current_horizon] - self.x_ref[0:4, self.current_horizon]
         self.objective += ca.mtimes([final_state_error.T, self.Qf, final_state_error])
 
-
         # Specify type of optimization problem
         self.opti.minimize(self.objective)
 
@@ -195,13 +200,13 @@ class MPC_casadi:
         # Initial state constraint
         self.opti.subject_to(self.x[:, 0] == self.x_init)
 
-        # Vehicle dynamics constraints
+        # Vehicle dynamics constraints - Simple kinematic bycicle model
         for k in range(self.N):
-            x_next = self.x[0, k] + self.dt * self.x[3, k] * ca.cos(self.x[2, k])  # x_k+1 = x_k + dt * v_k * cos(theta_k)
-            y_next = self.x[1, k] + self.dt * self.x[3, k] * ca.sin(self.x[2, k])  # y_k+1 = y_k + dt * v_k * sin(theta_k)
-            theta_next = self.x[2, k] + self.dt * (self.x[3, k] / self.L) * ca.tan(self.x[4, k])  # theta_k+1 = theta_k + dt * v_k * tan(delta_k) / L
-            v_next = self.x[3, k] + self.dt * self.u[0, k]  # v_k+1 = v_k + dt * a_k
-            delta_next = self.x[4, k] + self.dt * self.u[1, k]  # delta_k+1 = delta_k + dt * steering_rate_k
+            x_next = self.x[0, k] + self.dt * self.x[3, k] * ca.cos(self.x[2, k])                   # x_k+1 = x_k + dt * v_k * cos(theta_k)
+            y_next = self.x[1, k] + self.dt * self.x[3, k] * ca.sin(self.x[2, k])                   # y_k+1 = y_k + dt * v_k * sin(theta_k)
+            theta_next = self.x[2, k] + self.dt * (self.x[3, k] / self.L) * ca.tan(self.x[4, k])    # theta_k+1 = theta_k + dt * v_k * tan(delta_k) / L
+            v_next = self.x[3, k] + self.dt * self.u[0, k]                                          # v_k+1 = v_k + dt * a_k
+            delta_next = self.x[4, k] + self.dt * self.u[1, k]                                      # delta_k+1 = delta_k + dt * steering_rate_k
 
             self.opti.subject_to(self.x[0, k + 1] == x_next)
             self.opti.subject_to(self.x[1, k + 1] == y_next)
@@ -232,8 +237,25 @@ class MPC_casadi:
         opts = {"ipopt.print_level": 0, "print_time": 0}
         self.opti.solver("ipopt", opts)
     
-    def update_weight_matrices(self, matrix_name, new_value):
-        # Check if the matrix exists as an attribute and if so, update it.
+    def bound_initial_state(self,state):
+        """
+        This method checks if the initial state provided to the mpc, which could come from the localization stack,
+        is within the allowed bounds. If not, it clamps it to make the optimization problem feasible.
+        """
+        # Ensure the velocity is within the specified bounds
+        clamped_velocity = max(self.min_velocity, min(state[3], self.max_velocity))
+        
+        # Create a new state with the clamped velocity
+        bounded_state = state.copy()
+        bounded_state[3] = clamped_velocity
+        
+        return bounded_state
+
+    def set_new_weight_matrix(self, matrix_name, new_value):
+        """
+        Dynamically adjust one of the weight matrices.
+        Check if the matrix exists as an attribute and if so, update it.
+        """
         if hasattr(self, matrix_name):
             try:
                 # Overwrite with the new dense matrix
@@ -245,16 +267,31 @@ class MPC_casadi:
         else:
             print(f"Matrix {matrix_name} does not exist in MPC class.")
 
-    def bound_initial_state(self,state):
+
+    def set_new_prediction_horizon(self, new_horizon):
         """
-        This method checks if the initial state provided to the mpc, which comes from the localization stack,
-        is within the allowed bounds. If not, it clamps it.
+        Dynamically adjust the active horizon for the optimization problem.
+        When the horizon is reduced, you simply freeze unused variables and update the reference trajectory 
+        and state for the active part of the horizon. The solver will then only optimize over the active steps.
         """
-        # Ensure the velocity is within the specified bounds
-        clamped_velocity = max(self.min_velocity, min(state[3], self.max_velocity))
+        self.current_horizon = new_horizon
         
-        # Create a new state with the clamped velocity
-        bounded_state = state.copy()
-        bounded_state[3] = clamped_velocity
-        
-        return bounded_state
+        # Redefine objective function with new horizon.
+        self.set_objective_function()
+
+
+    def reset_parameters(self):
+        """
+        Reset the core parameters and weight matrices of the MPC instance to their initial values.
+        Useful for restoring values to their original state after runtime modifications.
+        """
+        self.current_horizon = self.N  # Reset to max horizon
+
+        # Reset weight matrices
+        self.Q1 = ca.DM(np.array(self.Q1_list).reshape((4, 4)))
+        self.Q2 = ca.DM(np.array(self.Q2_list).reshape((2, 2)))
+        self.Q3 = ca.DM(np.array(self.Q3_list).reshape((2, 2)))
+        self.Qf = ca.DM(np.array(self.Qf_list).reshape((4, 4)))
+        self.Qv = ca.DM(self.Qv_num)
+        # Reset objective function with initial values.
+        self.set_objective_function()

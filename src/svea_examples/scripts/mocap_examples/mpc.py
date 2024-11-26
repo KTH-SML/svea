@@ -4,17 +4,18 @@ import numpy as np
 import math
 import rospy
 import tf
-import yaml
 from svea.models.bicycle import SimpleBicycleModel
 from svea.states import VehicleState
 from svea.simulators.sim_SVEA import SimSVEA
 from svea.interfaces import LocalizationInterface
-#from svea_mocap.mocap import MotionCaptureInterface
+try:
+    from svea_mocap.mocap import MotionCaptureInterface
+except ImportError:
+    pass
 from svea.controllers.mpc import MPC_casadi
 from svea.svea_managers.path_following_sveas import SVEAManagerMPC
 from svea.data import TrajDataHandler, RVIZPathHandler
 from std_msgs.msg import Float32
-from svea_navigation_mpc.srv import SetGoalPosition, SetGoalPositionResponse
 from geometry_msgs.msg import PoseArray, PoseStamped
 from svea.simulators.viz_utils import publish_pose_array
 
@@ -33,7 +34,7 @@ class mpc_navigation:
         self.dt = sim_dt
         self.mpc = mpc
 
-        # ROS Parameters
+        ## ROS Parameters
         self.USE_RVIZ = load_param('~use_rviz', False)
         self.IS_SIM = load_param('~is_sim', False)
         self.STATE = load_param('~state', [-3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
@@ -43,29 +44,32 @@ class mpc_navigation:
         self.mpc_config_ns = load_param('~mpc_config_ns')  
         self.initial_horizon = load_param(f'{self.mpc_config_ns}/prediction_horizon') 
         self.initial_Qf = load_param(f'{self.mpc_config_ns}/final_state_weight_matrix')  
-        self.GOAL_REACHED_DIST = 0.2   # meters
-        self.GOAL_REACHED_YAW = 0.2   #  radians
-        self.APPROACH_TARGET_THR = 2  # meters
-        self.NEW_REFERENCE_THR = 2 # meters 
-        self.UPDATE_MPC_PARAM = True   # Tracks if update can happen when approaching
-        self.RESET_MPC_PARAM = False   # Tracks if reset can happen when moving away
-        # Initialize optimal variables
-        self.steering = 0
-        self.velocity = 0
-        self.predicted_state = None
 
-        # Initialize other variables
+        ## MPC parameters 
+        self.GOAL_REACHED_DIST = 0.2   # The distance threshold (in meters) within which the goal is considered reached.
+        self.GOAL_REACHED_YAW = 0.2    # The yaw angle threshold (in radians) within which the goal orientation is considered reached.
+        self.UPDATE_MPC_PARAM = True   # A flag indicating if the MPC parameters can be updated when the system is approaching the target.
+        self.RESET_MPC_PARAM = False   # A flag indicating if the MPC parameters should be reset when the system is moving away from the target.
+        self.predicted_state = None
         self.mpc_last_time = rospy.get_time()
         self.mpc_dt = 1.0 / self.MPC_FREQ 
+        self.current_horizon = self.initial_horizon
+
+        ## Static Planner parameters
+        self.APPROACH_TARGET_THR = 2   # The distance threshold (in meters) to define when the system is "approaching" the target.
+        self.NEW_REFERENCE_THR = 2     # The distance threshold (in meters) to update the next intermediate reference point. 
         self.goal_pose = None
-        self.state = []   
         self.static_path_plan = np.empty((3, 0))
         self.current_index_static_plan = 0
         self.is_last_point = False
- 
-        self.current_horizon = self.initial_horizon
+
+        ## Other parameters
+        self.steering = 0
+        self.velocity = 0
+        self.state = []   
+
         if self.IS_SIM is False:
-            # add steering bias of svea0.
+            # add steering bias of svea0. Other sveas might have different biases.
             unitless_steering = 28
             PERC_TO_LLI_COEFF = 1.27
             MAX_STEERING_ANGLE = 40 * math.pi / 180
@@ -88,10 +92,7 @@ class mpc_navigation:
     def spin(self):
         # Retrieve current state from SVEA localization
         state = self.svea.wait_for_state()
-        #print(state)
         self.state = [state.x, state.y, state.yaw, state.v]
-        #print("v localization",self.state[3])
-        #actuated_steering = self.svea.actuation.ctrl_actuated_log[-1].steering
         # If a static path plan has been computed, run the mpc.
         if self.static_path_plan.size > 0 :
             # If enough time has passed, run the MPC computation
@@ -102,13 +103,13 @@ class mpc_navigation:
                 if self.is_last_point and distance_to_next_point <= self.APPROACH_TARGET_THR and self.UPDATE_MPC_PARAM:
                     # Update the prediction horizon and final state weight matrix only once when approaching target
                     new_horizon = 5
-                  #  self.current_horizon = new_horizon
+                  # self.current_horizon = new_horizon
                     new_Qf = np.array([70, 0, 0, 0,
                                         0, 70, 0, 0,
                                         0, 0, 20, 0,
                                         0, 0, 0, 0]).reshape((4, 4))
                    # self.svea.controller.set_new_prediction_horizon(new_horizon)
-                    self.svea.controller.update_weight_matrices('Qf', new_Qf)
+                    self.svea.controller.set_new_weight_matrix('Qf', new_Qf)
                     self.UPDATE_MPC_PARAM = False
                     self.RESET_MPC_PARAM = True  # Allow resetting when moving away
 
@@ -116,7 +117,7 @@ class mpc_navigation:
                     # Reset to initial values only once when moving away from target
                     self.current_horizon = self.initial_horizon
                     self.svea.controller.set_new_prediction_horizon(self.initial_horizon)
-                    self.svea.controller.update_weight_matrices('Qf', self.initial_Qf)
+                    self.svea.controller.set_new_weight_matrix('Qf', self.initial_Qf)
                     self.UPDATE_MPC_PARAM = True  # Allow updating again when re-approaching
                     self.RESET_MPC_PARAM = False  # Prevent repeated resetting
 
@@ -126,15 +127,11 @@ class mpc_navigation:
                     self.steering += steering_rate * measured_dt
                     self.velocity += acceleration * measured_dt  
                     self.predicted_state = self.svea.controller.get_optimal_states()
-                    #print("velocity command", self.velocity)
-                    #control = self.svea.controller.get_optimal_control()
-                    #print("control command", control)
                     # Publish the predicted path
                     self.publish_trajectory(self.predicted_state[0:3, :self.current_horizon+1],self.predicted_trajectory_pub)
                 else:
                     # Stop the vehicle if the goal is reached
                     self.steering, self.velocity = 0, 0
-                    #print("GOAL ACHIEVED",self.state)
                 # Update the last time the MPC was computed
                 self.mpc_last_time = current_time
             
@@ -226,7 +223,6 @@ class mpc_navigation:
         # Set the goal position and log the new goal
         self.goal_pose = msg
         rospy.loginfo(f"New goal position received: ({self.goal_pose.pose.position.x}, {self.goal_pose.pose.position.y})")
-
         # Compute trajectory (straight line from current position to goal)
         self.compute_trajectory()
 
@@ -263,10 +259,7 @@ class mpc_navigation:
         self.UPDATE_MPC_PARAM = True  
         self.RESET_MPC_PARAM = False
         self.mpc_last_time = rospy.get_time()
-        # TODO: implemet reset function within mpc class for effeciency and readability.
-        self.current_horizon = self.initial_horizon
-        self.svea.controller.set_new_prediction_horizon(self.initial_horizon)
-        self.svea.controller.update_weight_matrices('Qf',np.array(self.initial_Qf).reshape((4, 4)))
+        self.svea.controller.reset_parameters()
 
         # Calculate the straight-line trajectory between current state and goal position
         start_x, start_y = self.state[0], self.state[1]
