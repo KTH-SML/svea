@@ -10,7 +10,7 @@ ARG WORKSPACE
 ## SVEA BASE IMAGE ##
 #####################
 
-FROM $BUILD_TAG
+FROM ${BUILD_TAG:-ros:latest}
 
 ARG ROSDISTRO
 ARG WORKSPACE
@@ -21,7 +21,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install --no-install-recommends -y \
-        apt-utils \
+        apt-utils lsb-release \
+        build-essential cmake \
         git vim nano curl iputils-ping \
         python3-tk \
         python3-pip \

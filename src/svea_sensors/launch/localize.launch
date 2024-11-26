@@ -23,7 +23,7 @@
     <arg name="map_file"                default=""/>
 
     <!-- Lidar  -->
-    <arg name="lidar_ip"                default="192.168.0.10" />
+    <arg name="lidar_ip"                default="192.168.3.11" />
 
     <!-- Wheel encoder -->
     <arg name="start_wheel_encoders"    default="false" />
@@ -35,21 +35,24 @@
     <arg name="gps_baud"                default="250000" />  <!-- 38400 for UART connection -->
     <!-- yaw offest = initial_pose_a -->
 
+    <!-- IMU -->
+    <!-- Set to true if the imu is connected to tx2. Set to false if the imu is connected to teensy. -->
+    <arg name="start_imu_on_tx2"        default="false"/>
+
     <!-- Datum args, if use_datum is true, the datum will be set -->
     <arg name="use_datum"               default="false" />
     <arg name="datum_service"           default="/datum" />
     <arg name="datum_file"              default="" />
     <arg name="datum_data"              default="[]" />
 
-    <!-- IMU -->
-    <!-- Set to true if the imu is connected to tx2. Set to false if the imu is connected to teensy. -->
-    <arg name="start_imu_on_tx2"        default="false"/>
-
     <!-- odom to map node -->
     <arg name="map_frame"               default="map"/>
     <arg name="wait_for_transform"      default="false"/>
     <arg name="publish_odometry"        default="true"/>
     <arg name="publish_pose"            default="true"/>
+
+    <!-- ekf tf -->
+    <arg name="publish_tf"              default="true"/>
 
     <!-- Nodes -->
 
@@ -102,10 +105,6 @@
                 <arg name="datum_file"      value="$(arg datum_file)" />
                 <arg name="datum_data"      value="$(arg datum_data)" />
             </include>
-            <!-- Start Lidar -->
-            <include file="$(find svea_sensors)/launch/sensors_launch/lidar.launch">
-                <arg name="lidar_ip"                    value="$(arg lidar_ip)" />
-            </include>
         </group>
 
         <!-- Start IMU -->
@@ -150,7 +149,7 @@
                         0.0,                    0.0,                    0.0, 
                         0.0,                    0.0,                    0.0]
         </rosparam>
-        <param name="publish_tf"            value="true"/>
+        <param name="publish_tf"            value="$(arg publish_tf)"/>
         <param name="odom0"                 value="rs/t265_camera/odom/sample"/>
         <param name="imu0"                  value="imu/data"/>
         <param name="twist0"                value="actuation_twist"/>
@@ -172,7 +171,7 @@
                         0.0,                    0.0,                    0.0, 
                         0.0,                    0.0,                    0.0]
         </rosparam>
-        <param name="publish_tf"            value="true"/>
+        <param name="publish_tf"            value="$(arg publish_tf)"/>
         <param name="odom0"                 value="odometry/gps"/>
         <param name="imu0"                  value="imu/data"/>
         <param name="twist0"                value="actuation_twist"/>

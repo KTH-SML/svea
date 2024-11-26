@@ -5,7 +5,7 @@
 ARG BUILD_TAG
 ARG ROSDISTRO
 
-FROM $BUILD_TAG
+FROM ${BUILD_TAG:-ghcr.io/kth-sml/svea:latest}
 
 ARG ROSDISTRO
 ARG DEBIAN_FRONTEND=noninteractive
@@ -27,7 +27,7 @@ RUN rosdep install \
         --ignore-src \
         -qry \
         && \
-    pip install -r requirements.txt 
+    pip install -r requirements.txt
 
 # Run catkin build on workspace (improves build speeds later on).
 RUN catkin build

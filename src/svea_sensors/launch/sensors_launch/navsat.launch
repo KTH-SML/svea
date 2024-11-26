@@ -30,5 +30,4 @@
         <param name="datum_file"        value="$(arg datum_file)" />
         <param name="datum_data"        value="$(arg datum_data)" />
     </node>
-
 </launch>
