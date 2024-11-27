@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 
+        This launch file enables navigation through Model Predictive Control (MPC) and sets the goal position using 
+        clicked points in Foxglove. It is compatible with both simulation and real SVEA vehicles when the Motion Capture 
+        system is enabled, and the necessary ROS packages (motion_capture_system, svea_mocap) are included in the repository.
+    -->
+
+    <!-- Launch file arguments -->
+    <arg name="map"             default="/svea_ws/src/svea_core/maps/sml.yaml"/>   <!-- eg: sidewalk_DKv_30_east_to_west.yaml or itrl_sidewalk.yaml-->
+    <arg name="use_foxglove"    default="true"/>
+    <arg name="svea_mocap_name" default="svea1"/>      <!-- name of svea-->    
+    <arg name="is_sim"          default="true"/>  
+
+
+    <!-- Start map server -->
+    <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map)"/>
+
+    <!-- If is_sim equal to false, then start localization-->
+    <group unless="$(arg is_sim)">
+        <!-- Start low-level interface -->
+        <node name="serial_node" pkg="rosserial_python" type="serial_node.py">
+            <param name="port" value="/dev/ttyACM0"/>
+            <param name="baud" value="250000"/>
+        </node>
+
+    </group>
+
+    <!-- Start Foxglove -->
+    <include if="$(eval use_foxglove)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
+        <arg name="port" value="8765" />
+    </include>
+    
+    <!-- Start main node -->
+    <node name="mpc" pkg="svea_examples" type="mpc.py" output="screen">
+        <param name="use_rviz" value="$(arg use_foxglove)"/>
+        <param name="is_sim" value="$(arg is_sim)"/>
+        <param name="mpc_freq" value="10"/> 
+        <param name="delta_s"  value="5"/>
+        <param name="svea_mocap_name" value="$(arg svea_mocap_name)"/>
+        <param name="mpc_config_ns" value='/mpc'/>
+        <rosparam file="$(find svea_core)/params/mpc_default.yaml" />
+    </node>
+    
+</launch>
