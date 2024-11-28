@@ -56,8 +56,8 @@ class mpc_navigation:
         self.current_horizon = self.initial_horizon
 
         ## Static Planner parameters
-        self.APPROACH_TARGET_THR = 2   # The distance threshold (in meters) to define when the system is "approaching" the target.
-        self.NEW_REFERENCE_THR = 2     # The distance threshold (in meters) to update the next intermediate reference point. 
+        self.APPROACH_TARGET_THR = 5   # The distance threshold (in meters) to define when the system is "approaching" the target.
+        self.NEW_REFERENCE_THR = 1     # The distance threshold (in meters) to update the next intermediate reference point. 
         self.goal_pose = None
         self.static_path_plan = np.empty((3, 0))
         self.current_index_static_plan = 0
@@ -69,8 +69,8 @@ class mpc_navigation:
         self.state = []   
 
         if self.IS_SIM is False:
-            # add steering bias of svea0. Other sveas might have different biases.
-            unitless_steering = 28
+            # add steering bias of sveas. {(svea0:28),(svea7:7)}
+            unitless_steering = 7     
             PERC_TO_LLI_COEFF = 1.27
             MAX_STEERING_ANGLE = 40 * math.pi / 180
             steer_percent = unitless_steering / PERC_TO_LLI_COEFF
@@ -102,13 +102,10 @@ class mpc_navigation:
                 reference_trajectory, distance_to_next_point = self.get_mpc_current_reference()
                 if self.is_last_point and distance_to_next_point <= self.APPROACH_TARGET_THR and self.UPDATE_MPC_PARAM:
                     # Update the prediction horizon and final state weight matrix only once when approaching target
-                    new_horizon = 5
-                  # self.current_horizon = new_horizon
                     new_Qf = np.array([70, 0, 0, 0,
                                         0, 70, 0, 0,
                                         0, 0, 20, 0,
                                         0, 0, 0, 0]).reshape((4, 4))
-                   # self.svea.controller.set_new_prediction_horizon(new_horizon)
                     self.svea.controller.set_new_weight_matrix('Qf', new_Qf)
                     self.UPDATE_MPC_PARAM = False
                     self.RESET_MPC_PARAM = True  # Allow resetting when moving away
