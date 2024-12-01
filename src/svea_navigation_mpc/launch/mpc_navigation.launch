@@ -38,7 +38,7 @@
         <param name="mpc_freq" value="10"/> 
         <param name="delta_s"  value="5"/>
         <param name="svea_mocap_name" value="$(arg svea_mocap_name)"/>
-        <param name="mpc_config_ns" value='/mpc'/>
+        <param name="mpc_config_ns" value='~mpc'/>
         <rosparam file="$(find svea_core)/params/mpc_default.yaml" />
     </node>
     

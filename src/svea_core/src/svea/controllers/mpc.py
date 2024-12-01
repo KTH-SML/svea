@@ -7,7 +7,7 @@ from svea.helpers import load_param
 
 class MPC_casadi:
 
-    def __init__(self, vehicle_name='', config_ns='/mpc'):
+    def __init__(self, vehicle_name='', config_ns='~mpc'):
         """
         This is the release 0 of a general-purpose Nonlinear Model Predictive Controller (NMPC) 
         designed for the SVEA platform. It offers the following features:
