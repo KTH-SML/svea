@@ -11,6 +11,9 @@ from .svea_archetypes import SVEAManager
 from svea.data import TrajDataHandler
 from svea.controllers import pure_pursuit
 from svea.controllers.pure_pursuit import PurePursuitController
+from svea.interfaces import ActuationInterface
+from svea.sensors import Lidar
+from svea.data import BasicDataHandler
 
 __license__ = "MIT"
 __maintainer__ = "Frank Jiang, Tobias Bolin"
@@ -163,3 +166,62 @@ class SVEAPlatoonMember(SVEAPurePursuit):
         self.controller.target_velocity += accel * dt
         steering, velocity = self.compute_control()
         self.send_control(steering, velocity)
+
+
+
+class SVEAManagerMPC(SVEAManager):
+    """Extended SVEAManager class with an additional controller_config_path parameter used to ease MPC setup.
+    
+    This class inherits from SVEAManager and adds the capability to pass a
+    configuration path specifically to the controller.
+
+    The __init__ method is redefined to delay the creation of the controller,
+    allowing the controller to be initialized with both vehicle_name and
+    controller_config_path, which is not supported in the base SVEAManager.
+
+    :param localizer: A chosen localization interface class constructor
+    :type localizer: class
+    :param controller: A chosen controller class constructor
+    :type controller: class
+    :param actuation: A chosen actuation interface class constructor,
+                      defaults to ActuationInterface
+    :type actuation: class
+    :param data_handler: A chosen data handler class constructor,
+                         defaults to BasicDataHandler
+    :type data_handler: class
+    :param vehicle_name: Name of vehicle; used to initialize each
+                         software module, defaults to ''
+    :type vehicle_name: str
+    :param controller_config_path: Path to the configuration file for the controller,
+                                   defaults to ''
+    :type controller_config_path: str
+    """
+    
+    def __init__(self, localizer, controller, 
+                 actuation=ActuationInterface, 
+                 data_handler=BasicDataHandler, 
+                 vehicle_name='', 
+                 controller_config_path=''):
+        
+        # Manually initialize components from SVEAManager except for the controller
+        self.vehicle_name = vehicle_name
+        sub_namespace = vehicle_name + '/' if vehicle_name else ''
+        self._emergency_topic = '{}lli/emergency'.format(sub_namespace)
+
+        # Initialize localizer, actuation, and data handler
+        self.localizer = localizer(vehicle_name)
+        self.actuation = actuation(vehicle_name)
+        self.data_handler = data_handler(vehicle_name)
+
+        # Initialize the controller with the additional controller_config_path parameter
+        self.controller = controller(vehicle_name, controller_config_path)
+
+        # Initialize additional components from SVEAManager
+        self.lidar = Lidar()
+
+        # Bring localizer state out into manager
+        self.state = self.localizer.state
+        self.last_state_time = None
+
+        # Set up automatic state logging
+        self.localizer.add_callback(self.data_handler.log_state)
