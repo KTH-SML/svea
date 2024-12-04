@@ -36,7 +36,7 @@
         <param name="use_rviz" value="$(arg use_foxglove)"/>
         <param name="is_sim" value="$(arg is_sim)"/>
         <param name="mpc_freq" value="10"/> 
-        <param name="delta_theta" value="0.2"/>
+        <param name="num_points" value="100"/>
         <param name="circle_radius" value="2"/>
         <param name="circle_center_x" value="0"/>
         <param name="circle_center_y" value="0"/>

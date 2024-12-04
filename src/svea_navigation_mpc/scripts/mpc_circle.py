@@ -37,10 +37,10 @@ class mpc_navigation:
         ## ROS Parameters
         self.USE_RVIZ = load_param('~use_rviz', False)
         self.IS_SIM = load_param('~is_sim', False)
-        self.STATE = load_param('~state', [2, 0, 2, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
+        self.STATE = load_param('~state', [-3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
         self.MPC_FREQ = load_param('~mpc_freq', 10)
         self.SVEA_MOCAP_NAME = load_param('~svea_mocap_name')
-        self.DELTA_THETA = load_param('~delta_theta', 0.1)  # Circle discretization step in radians
+        self.N = load_param('~num_points', 16)  # Number of points in the circle
         self.CIRCLE_RADIUS = load_param('~circle_radius', 5) # Radius of the static circle path
         self.CIRCLE_CENTER_X = load_param('~circle_center_x', 0) # X coordinate of the circle center
         self.CIRCLE_CENTER_Y = load_param('~circle_center_y', 0) # Y coordinate of the circle center
@@ -54,7 +54,7 @@ class mpc_navigation:
         self.current_horizon = self.initial_horizon
 
         ## Static Planner parameters
-        self.NEW_REFERENCE_THR = 0.2     # The distance threshold (in meters) to update the next intermediate reference point. 
+        self.NEW_REFERENCE_THR = 0.1     # The distance threshold (in meters) to update the next intermediate reference point. 
         self.goal_pose = None
         self.static_path_plan = np.empty((3, 0))
         self.current_index_static_plan = 0
@@ -86,11 +86,11 @@ class mpc_navigation:
         return not rospy.is_shutdown()
 
     def spin(self):
-        #print(self.static_path_plan)
-        # Generate static circle path once.
         if self.static_path_plan.size == 0:
             self.generate_static_circle_path()
-
+           # print(self.static_path_plan)
+        else:
+            self.publish_trajectory(self.static_path_plan, self.static_trajectory_pub)
         # Retrieve current state from SVEA localization
         state = self.svea.wait_for_state()
         self.state = [state.x, state.y, state.yaw, state.v]
@@ -126,10 +126,10 @@ class mpc_navigation:
 
     def generate_static_circle_path(self):
         """
-        Generates a circular path based on the specified radius, center, and discretization step (DELTA_THETA).
+        Generates a circular path with a specified number of equally spaced points,
+        with the first point starting at theta = -pi/2 and proceeding counterclockwise.
         """
-        rospy.sleep(2.0)
-        theta_values = np.arange(0, 2 * math.pi, self.DELTA_THETA)
+        theta_values = np.linspace(-math.pi ,  math.pi , self.N, endpoint=False)
         x_values = self.CIRCLE_CENTER_X + self.CIRCLE_RADIUS * np.cos(theta_values)
         y_values = self.CIRCLE_CENTER_Y + self.CIRCLE_RADIUS * np.sin(theta_values)
         yaw_values = np.arctan2(np.diff(y_values, append=y_values[0]), np.diff(x_values, append=x_values[0]))
@@ -173,17 +173,29 @@ class mpc_navigation:
     def get_mpc_current_reference(self):
         """
         Retrieves the current reference state for the MPC based on the SVEA's current position.
-        Updates the current index in the static path plan if the robot is close to the next point.
         """
-        distance_to_next_point = self.compute_distance(self.state, self.static_path_plan[:, self.current_index_static_plan])
-        if distance_to_next_point < self.NEW_REFERENCE_THR:
-            self.current_index_static_plan = (self.current_index_static_plan + 1) % self.static_path_plan.shape[1]
-        reference_state = self.static_path_plan[:, self.current_index_static_plan]
-        x_ref = np.tile(reference_state, (self.initial_horizon + 1, 1)).T     
+        self.current_index_static_plan = self.find_closest_point_index()
+        start_index = self.current_index_static_plan + 1 
+        end_index = start_index + self.initial_horizon + 1
+        if end_index > self.N:
+            # Wrap around by splitting the reference points into two segments
+            remaining_points = self.static_path_plan[:, start_index:self.N]
+            wrapped_points = self.static_path_plan[:, :end_index - self.N]
+            x_ref = np.concatenate((remaining_points, wrapped_points), axis=1)
+        else:
+            x_ref = self.static_path_plan[:, start_index:end_index]
+
         return x_ref
 
     def compute_distance(self, point1, point2):
         return np.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)   
+
+    def find_closest_point_index(self):
+        """
+        Finds the index of the closest point in the static path to the current state.
+        """
+        distances = np.linalg.norm(self.static_path_plan[:2, :] - np.array(self.state[:2])[:, None], axis=0)
+        return np.argmin(distances)
 
     def publish_trajectory(self, points, publisher):
         pointx, pointy, pointyaw = [], [], []
