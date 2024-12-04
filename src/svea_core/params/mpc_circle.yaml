@@ -13,9 +13,9 @@ mpc:
   ## Objective Function J
 
   # Q1
-  state_weight_matrix: [1,  0, 0, 0,
-                        0, 1, 0, 0,
-                        0,  0, 1, 0,
+  state_weight_matrix: [10,  0, 0, 0,
+                        0, 10, 0, 0,
+                        0,  0, 0, 0,
                         0,  0, 0, 0]
 
   # Q2
@@ -27,9 +27,9 @@ mpc:
                           0, 0.1]
 
   # Qf
-  final_state_weight_matrix: [1,  0, 0, 0,
-                              0,  1, 0, 0,
-                              0,  0, 1, 0,
+  final_state_weight_matrix: [10,  0, 0, 0,
+                              0,  10, 0, 0,
+                              0,  0, 0, 0,
                               0,  0, 0, 0]
 
   # Qv

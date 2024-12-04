@@ -54,7 +54,7 @@ class mpc_navigation:
         self.current_horizon = self.initial_horizon
 
         ## Static Planner parameters
-        self.NEW_REFERENCE_THR = 0.1     # The distance threshold (in meters) to update the next intermediate reference point. 
+        self.WRAP_AROUND_ENABLED = True
         self.goal_pose = None
         self.static_path_plan = np.empty((3, 0))
         self.current_index_static_plan = 0
@@ -88,12 +88,13 @@ class mpc_navigation:
     def spin(self):
         if self.static_path_plan.size == 0:
             self.generate_static_circle_path()
-           # print(self.static_path_plan)
+            #self.generate_static_line_path()
+            self.mpc_last_time = rospy.get_time()
         else:
             self.publish_trajectory(self.static_path_plan, self.static_trajectory_pub)
         # Retrieve current state from SVEA localization
         state = self.svea.wait_for_state()
-        self.state = [state.x, state.y, state.yaw, state.v]
+        self.state = [state.x, state.y, state.yaw, state.v]   
         # Run the MPC if the static path plan is available
         if self.static_path_plan.size > 0:
             current_time = rospy.get_time()
@@ -127,14 +128,13 @@ class mpc_navigation:
     def generate_static_circle_path(self):
         """
         Generates a circular path with a specified number of equally spaced points,
-        with the first point starting at theta = -pi/2 and proceeding counterclockwise.
+        with the first point starting at theta = -pi and proceeding counterclockwise.
         """
         theta_values = np.linspace(-math.pi ,  math.pi , self.N, endpoint=False)
         x_values = self.CIRCLE_CENTER_X + self.CIRCLE_RADIUS * np.cos(theta_values)
         y_values = self.CIRCLE_CENTER_Y + self.CIRCLE_RADIUS * np.sin(theta_values)
         yaw_values = np.arctan2(np.diff(y_values, append=y_values[0]), np.diff(x_values, append=x_values[0]))
         self.static_path_plan = np.vstack((x_values, y_values, yaw_values))
-        self.mpc_last_time = rospy.get_time()
         # Publish the static path
         self.publish_trajectory(self.static_path_plan, self.static_trajectory_pub)
 
@@ -173,22 +173,37 @@ class mpc_navigation:
     def get_mpc_current_reference(self):
         """
         Retrieves the current reference state for the MPC based on the SVEA's current position.
+
+        This function finds the closest point on the static path to the current vehicle state.
+        It then generates the reference trajectory (`x_ref`) consisting of points from the static path,
+        starting from the point after the closest one up to `initial_horizon + 1` steps ahead.
+        
+        If the vehicle is close to the end of the static path, the function ensures that `x_ref`
+        has enough points by either wrapping around the static path (if `WRAP_AROUND_ENABLED` is True, useful for infinite paths)
+        or repeating the last point until `x_ref` contains `initial_horizon + 1` points.
+        
+        Returns:
+            x_ref (numpy.ndarray): The reference trajectory for the MPC.
         """
         self.current_index_static_plan = self.find_closest_point_index()
         start_index = self.current_index_static_plan + 1 
         end_index = start_index + self.initial_horizon + 1
         if end_index > self.N:
-            # Wrap around by splitting the reference points into two segments
-            remaining_points = self.static_path_plan[:, start_index:self.N]
-            wrapped_points = self.static_path_plan[:, :end_index - self.N]
-            x_ref = np.concatenate((remaining_points, wrapped_points), axis=1)
+            if self.WRAP_AROUND_ENABLED:
+                # Wrap around by splitting the reference points into two segments
+                remaining_points = self.static_path_plan[:, start_index:self.N]
+                wrapped_points = self.static_path_plan[:, :end_index - self.N]
+                x_ref = np.concatenate((remaining_points, wrapped_points), axis=1)
+            else:
+                x_ref = self.static_path_plan[:, start_index:self.N]
+                # Ensure x_ref has the same number of columns as initial_horizon + 1
+                while x_ref.shape[1] < self.initial_horizon + 1:
+                    x_ref = np.concatenate((x_ref, self.static_path_plan[:, -1:]), axis=1)
         else:
             x_ref = self.static_path_plan[:, start_index:end_index]
 
         return x_ref
 
-    def compute_distance(self, point1, point2):
-        return np.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)   
 
     def find_closest_point_index(self):
         """
@@ -210,6 +225,76 @@ class mpc_navigation:
         self.steering_pub.publish(target_steering)
         self.velocity_pub.publish(target_speed)
         self.velocity_measured_pub.publish(measured_speed)
+
+    def generate_static_rectangle_path(self):
+        """
+        Generates a rectangular path with specified dimensions and number of equally spaced points,
+        starting from the bottom-left corner and proceeding counterclockwise.
+        """
+        # Define the rectangle dimensions
+        RECT_WIDTH = 2 * self.CIRCLE_RADIUS  # Width of the rectangle
+        RECT_HEIGHT = self.CIRCLE_RADIUS  # Height of the rectangle
+        
+        # Number of points per edge (self.N must be divisible by 4 for equal distribution)
+        points_per_edge = 30
+
+        # Calculate corner points of the rectangle
+        bottom_left = (self.CIRCLE_CENTER_X - RECT_WIDTH / 2, self.CIRCLE_CENTER_Y - RECT_HEIGHT / 2)
+        bottom_right = (self.CIRCLE_CENTER_X + RECT_WIDTH / 2, self.CIRCLE_CENTER_Y - RECT_HEIGHT / 2)
+        top_right = (self.CIRCLE_CENTER_X + RECT_WIDTH / 2, self.CIRCLE_CENTER_Y + RECT_HEIGHT / 2)
+        top_left = (self.CIRCLE_CENTER_X - RECT_WIDTH / 2, self.CIRCLE_CENTER_Y + RECT_HEIGHT / 2)
+
+        # Generate points for each edge
+        x_values = np.concatenate([
+            np.linspace(bottom_left[0], bottom_right[0], points_per_edge, endpoint=False),
+            np.linspace(bottom_right[0], top_right[0], points_per_edge, endpoint=False),
+            np.linspace(top_right[0], top_left[0], points_per_edge, endpoint=False),
+            np.linspace(top_left[0], bottom_left[0], points_per_edge, endpoint=False)
+        ])
+        
+        y_values = np.concatenate([
+            np.linspace(bottom_left[1], bottom_right[1], points_per_edge, endpoint=False),
+            np.linspace(bottom_right[1], top_right[1], points_per_edge, endpoint=False),
+            np.linspace(top_right[1], top_left[1], points_per_edge, endpoint=False),
+            np.linspace(top_left[1], bottom_left[1], points_per_edge, endpoint=False)
+        ])
+        
+        # Calculate yaw angles for the rectangle path
+        yaw_values = np.arctan2(np.diff(y_values, append=y_values[0]), np.diff(x_values, append=x_values[0]))
+        
+        # Combine into a single path array
+        self.static_path_plan = np.vstack((x_values, y_values, yaw_values))
+        
+        # Publish the static path
+        self.publish_trajectory(self.static_path_plan, self.static_trajectory_pub)
+
+
+    def generate_static_line_path(self):
+        """
+        Generates a straight-line path with equally spaced points.
+        The line is horizontal (y = const) with x values ranging between specified limits.
+        """
+        # Define the range for x values and constant y value
+        x_start = self.CIRCLE_CENTER_X + self.CIRCLE_RADIUS
+        x_end = self.CIRCLE_CENTER_X - self.CIRCLE_RADIUS
+        y_const = self.CIRCLE_CENTER_Y
+
+        # Generate equally spaced x values
+        x_values = np.linspace(x_start, x_end, self.N)
+
+        # y values are constant
+        y_values = np.full_like(x_values, y_const)
+
+        # Yaw values are constant (0 radians for a horizontal line pointing right)
+        # Yaw values are constant (π radians for a horizontal line pointing left)
+        yaw_values = np.full_like(x_values, math.pi)
+
+        # Combine into a single path array
+        self.static_path_plan = np.vstack((x_values, y_values, yaw_values))
+
+        # Publish the static path
+        self.publish_trajectory(self.static_path_plan, self.static_trajectory_pub)
+
        
 if __name__ == '__main__':
     rospy.init_node('mpc_navigation')
