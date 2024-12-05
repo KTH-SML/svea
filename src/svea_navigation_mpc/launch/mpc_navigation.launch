@@ -7,7 +7,7 @@
     -->
 
     <!-- Launch file arguments -->
-    <arg name="map"             default="/svea_ws/src/svea_core/maps/sml.yaml"/>   <!-- eg: sidewalk_DKv_30_east_to_west.yaml or itrl_sidewalk.yaml-->
+    <arg name="map"             default="/svea_ws/src/svea_core/maps/sml.yaml"/>  
     <arg name="use_foxglove"    default="true"/>
     <arg name="svea_mocap_name" default="svea7"/>      <!-- name of svea-->    
     <arg name="is_sim"          default="true"/>  

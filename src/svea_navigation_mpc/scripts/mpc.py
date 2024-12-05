@@ -27,9 +27,22 @@ def load_param(name, value=None):
 
 class mpc_navigation:
     """
-    ROS Node for controlling and simulating the SVEA vehicle autonomously.
-    """
+    This script implements a ROS node for controlling and simulating the SVEA vehicle autonomously.
 
+    The node uses the default MPC algorithm to compute an optimal trajectory
+    and control the vehicle to reach a specified target pose. The target pose is set interactively 
+    using Foxglove as a geometry_msgs/PoseStamped message. 
+
+    Key Features:
+    - Generates a straight-line trajectory with intermediate points from the vehicle's current position 
+    to the target pose, ensuring proper discretization for MPC.
+    - Supports both simulation and real-world operation, with integration with Motion Capture (Mocap).
+    - Dynamically updates MPC parameters as the vehicle approaches the target for precise parking.
+    - Publishes data like predicted paths, control targets, and velocities for visualization and debugging.
+
+    The script is designed for optimal path planning and precise parking but does not handle obstacle avoidance. 
+    It is ideal for scenarios where the vehicle must navigate to a predefined goal position with high accuracy.
+    """
     def __init__(self,sim_dt,mpc):
         self.dt = sim_dt
         self.mpc = mpc

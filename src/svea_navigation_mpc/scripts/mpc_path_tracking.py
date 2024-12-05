@@ -27,9 +27,19 @@ def load_param(name, value=None):
 
 class mpc_navigation:
     """
-    ROS Node for controlling and simulating the SVEA vehicle autonomously.
-    """
+    This class implements a ROS node for controlling and simulating the SVEA vehicle autonomously. 
 
+    The node uses the default MPC algorithm to follow a predefined path. 
+    The path is static and can be defined in this script. 
+    The MPC ensures the vehicle tracks the path by solving an optimization problem at each control step.
+
+    Key Features:
+    - Supports both simulation and real-world operation with Mocap.
+    - Allows for generating and tracking cyclic paths (e.g., circles) infinitely.
+    - Includes publishers for steering, velocity, and trajectory information.
+
+    This node is intended for path tracking using MPC as the control method. The static path should have points spaced closely enough to ensure the MPC can find a feasible solution.
+    """
     def __init__(self,sim_dt,mpc):
         self.dt = sim_dt
         self.mpc = mpc
@@ -37,7 +47,7 @@ class mpc_navigation:
         ## ROS Parameters
         self.USE_RVIZ = load_param('~use_rviz', False)
         self.IS_SIM = load_param('~is_sim', False)
-        self.STATE = load_param('~state', [-3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
+        self.STATE = load_param('~state', [0.3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
         self.MPC_FREQ = load_param('~mpc_freq', 10)
         self.SVEA_MOCAP_NAME = load_param('~svea_mocap_name')
         self.N = load_param('~num_points', 16)  # Number of points in the circle
@@ -54,11 +64,9 @@ class mpc_navigation:
         self.current_horizon = self.initial_horizon
 
         ## Static Planner parameters
-        self.WRAP_AROUND_ENABLED = True
-        self.goal_pose = None
+        self.WRAP_AROUND_ENABLED = True   # Enables tracking of cyclic paths infinitely
         self.static_path_plan = np.empty((3, 0))
         self.current_index_static_plan = 0
-        self.is_last_point = False
 
         ## Other parameters
         self.steering = 0
@@ -88,7 +96,6 @@ class mpc_navigation:
     def spin(self):
         if self.static_path_plan.size == 0:
             self.generate_static_circle_path()
-            #self.generate_static_line_path()
             self.mpc_last_time = rospy.get_time()
         else:
             self.publish_trajectory(self.static_path_plan, self.static_trajectory_pub)
@@ -226,49 +233,6 @@ class mpc_navigation:
         self.velocity_pub.publish(target_speed)
         self.velocity_measured_pub.publish(measured_speed)
 
-    def generate_static_rectangle_path(self):
-        """
-        Generates a rectangular path with specified dimensions and number of equally spaced points,
-        starting from the bottom-left corner and proceeding counterclockwise.
-        """
-        # Define the rectangle dimensions
-        RECT_WIDTH = 2 * self.CIRCLE_RADIUS  # Width of the rectangle
-        RECT_HEIGHT = self.CIRCLE_RADIUS  # Height of the rectangle
-        
-        # Number of points per edge (self.N must be divisible by 4 for equal distribution)
-        points_per_edge = 30
-
-        # Calculate corner points of the rectangle
-        bottom_left = (self.CIRCLE_CENTER_X - RECT_WIDTH / 2, self.CIRCLE_CENTER_Y - RECT_HEIGHT / 2)
-        bottom_right = (self.CIRCLE_CENTER_X + RECT_WIDTH / 2, self.CIRCLE_CENTER_Y - RECT_HEIGHT / 2)
-        top_right = (self.CIRCLE_CENTER_X + RECT_WIDTH / 2, self.CIRCLE_CENTER_Y + RECT_HEIGHT / 2)
-        top_left = (self.CIRCLE_CENTER_X - RECT_WIDTH / 2, self.CIRCLE_CENTER_Y + RECT_HEIGHT / 2)
-
-        # Generate points for each edge
-        x_values = np.concatenate([
-            np.linspace(bottom_left[0], bottom_right[0], points_per_edge, endpoint=False),
-            np.linspace(bottom_right[0], top_right[0], points_per_edge, endpoint=False),
-            np.linspace(top_right[0], top_left[0], points_per_edge, endpoint=False),
-            np.linspace(top_left[0], bottom_left[0], points_per_edge, endpoint=False)
-        ])
-        
-        y_values = np.concatenate([
-            np.linspace(bottom_left[1], bottom_right[1], points_per_edge, endpoint=False),
-            np.linspace(bottom_right[1], top_right[1], points_per_edge, endpoint=False),
-            np.linspace(top_right[1], top_left[1], points_per_edge, endpoint=False),
-            np.linspace(top_left[1], bottom_left[1], points_per_edge, endpoint=False)
-        ])
-        
-        # Calculate yaw angles for the rectangle path
-        yaw_values = np.arctan2(np.diff(y_values, append=y_values[0]), np.diff(x_values, append=x_values[0]))
-        
-        # Combine into a single path array
-        self.static_path_plan = np.vstack((x_values, y_values, yaw_values))
-        
-        # Publish the static path
-        self.publish_trajectory(self.static_path_plan, self.static_trajectory_pub)
-
-
     def generate_static_line_path(self):
         """
         Generates a straight-line path with equally spaced points.
@@ -279,20 +243,10 @@ class mpc_navigation:
         x_end = self.CIRCLE_CENTER_X - self.CIRCLE_RADIUS
         y_const = self.CIRCLE_CENTER_Y
 
-        # Generate equally spaced x values
         x_values = np.linspace(x_start, x_end, self.N)
-
-        # y values are constant
         y_values = np.full_like(x_values, y_const)
-
-        # Yaw values are constant (0 radians for a horizontal line pointing right)
-        # Yaw values are constant (π radians for a horizontal line pointing left)
         yaw_values = np.full_like(x_values, math.pi)
-
-        # Combine into a single path array
         self.static_path_plan = np.vstack((x_values, y_values, yaw_values))
-
-        # Publish the static path
         self.publish_trajectory(self.static_path_plan, self.static_trajectory_pub)
 
        
