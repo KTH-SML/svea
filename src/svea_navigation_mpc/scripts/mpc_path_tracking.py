@@ -73,9 +73,15 @@ class mpc_navigation:
         self.velocity = 0
         self.state = []   
 
+        ## Define the unitless steering biases for each SVEA.
+        ## These values represent the measured steering actuations when the SVEA is not actually steering.
+        self.unitless_steering_map = {
+            "svea0": 28,
+            "svea7": 7
+        }
         if self.IS_SIM is False:
-            # add steering bias of sveas. {(svea0:28),(svea7:7)}
-            unitless_steering = 7     
+            svea_name = self.SVEA_MOCAP_NAME.lower()  # Ensure case-insensitivity  
+            unitless_steering = self.unitless_steering_map.get(svea_name, 0)  # Default to 0 if not found
             PERC_TO_LLI_COEFF = 1.27
             MAX_STEERING_ANGLE = 40 * math.pi / 180
             steer_percent = unitless_steering / PERC_TO_LLI_COEFF
@@ -119,7 +125,7 @@ class mpc_navigation:
                 self.publish_trajectory(self.predicted_state[0:3, :self.current_horizon+1], self.predicted_trajectory_pub)
                 self.mpc_last_time = current_time
 
-        # Publish the latest control target and the estimated(mocap) / measured(in/out loc.) speed.
+        # Publish the latest control target and the estimated speed( from mocap or indoors loc. or outdoors loc.).
         self.publish_to_foxglove(self.steering, self.velocity, self.state[3])
         # Visualization data and send control
         self.svea.send_control(self.steering + self.steering_bias, self.velocity) 
@@ -131,19 +137,6 @@ class mpc_navigation:
         self.velocity_measured_pub = rospy.Publisher('/measured_speed', Float32, queue_size=1)
         self.predicted_trajectory_pub = rospy.Publisher('/predicted_path', PoseArray, queue_size=1)
         self.static_trajectory_pub = rospy.Publisher('/static_path', PoseArray, queue_size=1)
-
-    def generate_static_circle_path(self):
-        """
-        Generates a circular path with a specified number of equally spaced points,
-        with the first point starting at theta = -pi and proceeding counterclockwise.
-        """
-        theta_values = np.linspace(-math.pi ,  math.pi , self.N, endpoint=False)
-        x_values = self.CIRCLE_CENTER_X + self.CIRCLE_RADIUS * np.cos(theta_values)
-        y_values = self.CIRCLE_CENTER_Y + self.CIRCLE_RADIUS * np.sin(theta_values)
-        yaw_values = np.arctan2(np.diff(y_values, append=y_values[0]), np.diff(x_values, append=x_values[0]))
-        self.static_path_plan = np.vstack((x_values, y_values, yaw_values))
-        # Publish the static path
-        self.publish_trajectory(self.static_path_plan, self.static_trajectory_pub)
 
     def create_simulator_and_SVEAmanager(self):
         # initial state for simulator.
@@ -233,12 +226,24 @@ class mpc_navigation:
         self.velocity_pub.publish(target_speed)
         self.velocity_measured_pub.publish(measured_speed)
 
+    def generate_static_circle_path(self):
+        """
+        Generates a circular path with a specified number of equally spaced points,
+        with the first point starting at theta = -pi and proceeding counterclockwise.
+        """
+        theta_values = np.linspace(-math.pi ,  math.pi , self.N, endpoint=False)
+        x_values = self.CIRCLE_CENTER_X + self.CIRCLE_RADIUS * np.cos(theta_values)
+        y_values = self.CIRCLE_CENTER_Y + self.CIRCLE_RADIUS * np.sin(theta_values)
+        yaw_values = np.arctan2(np.diff(y_values, append=y_values[0]), np.diff(x_values, append=x_values[0]))
+        self.static_path_plan = np.vstack((x_values, y_values, yaw_values))
+        # Publish the static path
+        self.publish_trajectory(self.static_path_plan, self.static_trajectory_pub)
+
     def generate_static_line_path(self):
         """
         Generates a straight-line path with equally spaced points.
         The line is horizontal (y = const) with x values ranging between specified limits.
         """
-        # Define the range for x values and constant y value
         x_start = self.CIRCLE_CENTER_X + self.CIRCLE_RADIUS
         x_end = self.CIRCLE_CENTER_X - self.CIRCLE_RADIUS
         y_const = self.CIRCLE_CENTER_Y
