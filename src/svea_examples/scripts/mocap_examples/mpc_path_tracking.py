@@ -117,7 +117,7 @@ class mpc_navigation:
                 reference_trajectory = self.get_mpc_current_reference()
                 # Run the MPC to compute control
                 steering_rate, acceleration = self.svea.controller.compute_control(
-                    [self.state[0], self.state[1], self.state[2], self.velocity, self.steering], reference_trajectory
+                    [self.state[0], self.state[1], self.state[2], self.state[3], self.steering], reference_trajectory
                 )
                 self.steering += steering_rate * measured_dt
                 self.velocity += acceleration * measured_dt
