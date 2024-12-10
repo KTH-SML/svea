@@ -110,9 +110,9 @@ class MPC_casadi:
         # Bound the initial state to respect constraints
         bounded_state = self.bound_initial_state(state)
 
-        # Enlarge the reference trajectory with a fictitious velocity and steering value for feasibility.
-        # Add two rows of zeros to the reference_trajectory matrix.
-        reference_trajectory = ca.vertcat(reference_trajectory, ca.DM.zeros(2, reference_trajectory.shape[1]))
+        # Enlarge the reference trajectory with a fictitious steering value for feasibility.
+        # Add one rows of zero to the reference_trajectory matrix.
+        reference_trajectory = ca.vertcat(reference_trajectory,ca.DM.zeros(1, reference_trajectory.shape[1]))
 
         # Set current state and reference trajectory for the active part of the horizon
         self.opti.set_value(self.x_init, bounded_state)
@@ -172,7 +172,7 @@ class MPC_casadi:
         self.objective = 0
         for k in range(self.current_horizon):
             # State error term (ignore delta in reference trajectory)
-            state_error = self.x[0:4, k] - self.x_ref[0:4, k]
+            state_error = self.compute_state_error(self.x[:, k], self.x_ref[:, k])
 
             # Control input rate of change term (u[k+1] - u[k])
             if k < self.current_horizon - 1:
@@ -190,7 +190,7 @@ class MPC_casadi:
                                + ca.mtimes([velocity_penalty.T, self.Qv, velocity_penalty]))
 
         # Final state cost
-        final_state_error = self.x[0:4, self.current_horizon] - self.x_ref[0:4, self.current_horizon]
+        final_state_error = self.compute_state_error(self.x[:, self.current_horizon], self.x_ref[:, self.current_horizon])
         self.objective += ca.mtimes([final_state_error.T, self.Qf, final_state_error])
 
         # Specify type of optimization problem
@@ -250,6 +250,16 @@ class MPC_casadi:
         bounded_state[3] = clamped_velocity
         
         return bounded_state
+    
+    def compute_state_error(self, x, x_ref):
+        """
+        Computes the state error between the current state and the reference state.
+        Adjusts the yaw error to account for angle wrapping in the range [-π, π].
+        """
+        state_error = x[0:4] - x_ref[0:4]
+        yaw_diff = x[2] - x_ref[2]
+        state_error[2] = ca.atan2(ca.sin(yaw_diff), ca.cos(yaw_diff))  # Minimum yaw error 
+        return state_error
 
     def set_new_weight_matrix(self, matrix_name, new_value):
         """

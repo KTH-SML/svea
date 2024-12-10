@@ -12,7 +12,7 @@
     <arg name="use_foxglove"    default="true"/>
     <arg name="svea_mocap_name" default="svea7"/>      <!-- name of SVEA -->    
     <arg name="is_sim"          default="true"/>  
-    <arg name="mpc_mode"        default="goal_position"/> <!-- Options: goal_position, path_tracking -->
+    <arg name="mpc_mode"        default="path_tracking"/> <!-- Options: goal_position, path_tracking -->
 
     <!-- Start map server -->
     <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map)"/>

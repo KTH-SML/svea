@@ -89,8 +89,8 @@ class mpc_navigation:
             "svea7": 7
         }
         if self.IS_SIM is False:
-            # add steering bias of svea0. Other sveas might have different biases.
-            unitless_steering = 28
+            svea_name = self.SVEA_MOCAP_NAME.lower()  # Ensure case-insensitivity  
+            unitless_steering = self.unitless_steering_map.get(svea_name, 0)  # Default to 0 if not found
             PERC_TO_LLI_COEFF = 1.27
             MAX_STEERING_ANGLE = 40 * math.pi / 180
             steer_percent = unitless_steering / PERC_TO_LLI_COEFF
@@ -121,9 +121,7 @@ class mpc_navigation:
             if measured_dt >= self.mpc_dt :
                 reference_trajectory, distance_to_next_point = self.get_mpc_current_reference()
                 if self.is_last_point and distance_to_next_point <= self.APPROACH_TARGET_THR and self.UPDATE_MPC_PARAM:
-                    # Update the prediction horizon and final state weight matrix only once when approaching target
-                    new_horizon = 5
-                  # self.current_horizon = new_horizon
+                    # Update the prediction horizon and final state weight matrix only once when approaching target to achieve better parking.
                     new_Qf = np.array([70, 0, 0, 0,
                                         0, 70, 0, 0,
                                         0, 0, 20, 0,
