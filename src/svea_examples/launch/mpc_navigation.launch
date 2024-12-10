@@ -1,29 +1,29 @@
 <?xml version="1.0"?>
 <launch>
     <!-- 
-        This launch file enables navigation through Model Predictive Control (MPC) and sets the goal position using 
-        clicked points in Foxglove. It is compatible with both simulation and real SVEA vehicles when the Motion Capture 
+        This launch file enables navigation through Model Predictive Control (MPC) 
+        with selectable modes: goal position setting or path tracking.
+        It is compatible with both simulation and real SVEA vehicles when the Motion Capture 
         system is enabled, and the necessary ROS packages (motion_capture_system, svea_mocap) are included in the repository.
     -->
 
     <!-- Launch file arguments -->
     <arg name="map"             default="/svea_ws/src/svea_core/maps/sml.yaml"/>  
     <arg name="use_foxglove"    default="true"/>
-    <arg name="svea_mocap_name" default="svea7"/>      <!-- name of svea-->    
+    <arg name="svea_mocap_name" default="svea7"/>      <!-- name of SVEA -->    
     <arg name="is_sim"          default="true"/>  
-
+    <arg name="mpc_mode"        default="goal_position"/> <!-- Options: goal_position, path_tracking -->
 
     <!-- Start map server -->
     <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map)"/>
 
-    <!-- If is_sim equal to false, then start localization-->
+    <!-- If is_sim equal to false, then start localization -->
     <group unless="$(arg is_sim)">
         <!-- Start low-level interface -->
         <node name="serial_node" pkg="rosserial_python" type="serial_node.py">
             <param name="port" value="/dev/ttyACM0"/>
             <param name="baud" value="250000"/>
         </node>
-
     </group>
 
     <!-- Start Foxglove -->
@@ -31,15 +31,33 @@
         <arg name="port" value="8765" />
     </include>
     
-    <!-- Start main node -->
-    <node name="mpc" pkg="svea_navigation_mpc" type="mpc.py" output="screen">
-        <param name="use_rviz" value="$(arg use_foxglove)"/>
-        <param name="is_sim" value="$(arg is_sim)"/>
-        <param name="mpc_freq" value="10"/> 
-        <param name="delta_s"  value="5"/>
-        <param name="svea_mocap_name" value="$(arg svea_mocap_name)"/>
-        <param name="mpc_config_ns" value='~mpc'/>
-        <rosparam file="$(find svea_core)/params/mpc_default.yaml" />
-    </node>
+    <!-- Start main node based on MPC mode -->
+    <group if="$(eval mpc_mode == 'goal_position')">
+        <node name="mpc" pkg="svea_navigation_mpc" type="mpc.py" output="screen">
+            <param name="use_rviz" value="$(arg use_foxglove)"/>
+            <param name="is_sim" value="$(arg is_sim)"/>
+            <param name="mpc_freq" value="10"/> 
+            <param name="target_speed" value="0.3"/>
+            <param name="delta_s"  value="5"/>
+            <param name="svea_mocap_name" value="$(arg svea_mocap_name)"/>
+            <param name="mpc_config_ns" value="~mpc"/>
+            <rosparam file="$(find svea_core)/params/mpc_default.yaml" />
+        </node>
+    </group>
+
+    <group if="$(eval mpc_mode == 'path_tracking')">
+        <node name="mpc" pkg="svea_navigation_mpc" type="mpc_path_tracking.py" output="screen">
+            <param name="use_rviz" value="$(arg use_foxglove)"/>
+            <param name="is_sim" value="$(arg is_sim)"/>
+            <param name="mpc_freq" value="10"/> 
+            <param name="target_speed" value="1"/>
+            <param name="circle_radius" value="1.5"/>
+            <param name="circle_center_x" value="0"/>
+            <param name="circle_center_y" value="0"/>
+            <param name="svea_mocap_name" value="$(arg svea_mocap_name)"/>
+            <param name="mpc_config_ns" value="~mpc"/>
+            <rosparam file="$(find svea_core)/params/mpc_default_path_tracking.yaml" />
+        </node>
+    </group>
     
 </launch>

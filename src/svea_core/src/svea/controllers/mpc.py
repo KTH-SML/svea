@@ -110,9 +110,9 @@ class MPC_casadi:
         # Bound the initial state to respect constraints
         bounded_state = self.bound_initial_state(state)
 
-        # Enlarge the reference trajectory with a fictitious velocity and steering value for feasibility.
-        # Add two rows of zeros to the reference_trajectory matrix.
-        reference_trajectory = ca.vertcat(reference_trajectory, ca.DM.zeros(2, reference_trajectory.shape[1]))
+        # Enlarge the reference trajectory with a fictitious steering value for feasibility.
+        # Add one rows of zero to the reference_trajectory matrix.
+        reference_trajectory = ca.vertcat(reference_trajectory,ca.DM.zeros(1, reference_trajectory.shape[1]))
 
         # Set current state and reference trajectory for the active part of the horizon
         self.opti.set_value(self.x_init, bounded_state)

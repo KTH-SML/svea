@@ -47,14 +47,15 @@ class mpc_navigation:
         ## ROS Parameters
         self.USE_RVIZ = load_param('~use_rviz', False)
         self.IS_SIM = load_param('~is_sim', False)
-        self.STATE = load_param('~state', [0.3, 0, 0, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
+        self.STATE = load_param('~state', [1, 0, 1, 0])    # [x,y,yaw,v] wrt map frame. Initial state for simulator.
         self.MPC_FREQ = load_param('~mpc_freq', 10)
         self.SVEA_MOCAP_NAME = load_param('~svea_mocap_name')
-        self.N = load_param('~num_points', 16)  # Number of points in the circle
+        self.TARGET_SPEED = load_param('~target_speed', 0.5)  # Target speed 
         self.CIRCLE_RADIUS = load_param('~circle_radius', 5) # Radius of the static circle path
         self.CIRCLE_CENTER_X = load_param('~circle_center_x', 0) # X coordinate of the circle center
         self.CIRCLE_CENTER_Y = load_param('~circle_center_y', 0) # Y coordinate of the circle center
         self.mpc_config_ns = load_param('~mpc_config_ns')  
+        self.mpc_propagation_dt = load_param(f'{self.mpc_config_ns}/time_step') 
         self.initial_horizon = load_param(f'{self.mpc_config_ns}/prediction_horizon')  
 
         ## MPC parameters 
@@ -177,13 +178,16 @@ class mpc_navigation:
         This function finds the closest point on the static path to the current vehicle state.
         It then generates the reference trajectory (`x_ref`) consisting of points from the static path,
         starting from the point after the closest one up to `initial_horizon + 1` steps ahead.
-        
+
         If the vehicle is close to the end of the static path, the function ensures that `x_ref`
         has enough points by either wrapping around the static path (if `WRAP_AROUND_ENABLED` is True, useful for infinite paths)
         or repeating the last point until `x_ref` contains `initial_horizon + 1` points.
-        
+
+        The function also appends an additional row to `x_ref` with all elements equal to `self.TARGET_SPEED`, representing
+        the desired speed for each reference point.
+
         Returns:
-            x_ref (numpy.ndarray): The reference trajectory for the MPC.
+            x_ref (numpy.ndarray): The reference trajectory for the MPC, with the desired speed appended as the last row.
         """
         self.current_index_static_plan = self.find_closest_point_index()
         start_index = self.current_index_static_plan + 1 
@@ -202,7 +206,12 @@ class mpc_navigation:
         else:
             x_ref = self.static_path_plan[:, start_index:end_index]
 
+        # Append a row with the desired speed for each point
+        target_speed_row = np.full((1, x_ref.shape[1]), self.TARGET_SPEED)
+        x_ref = np.concatenate((x_ref, target_speed_row), axis=0)
+
         return x_ref
+
 
 
     def find_closest_point_index(self):
@@ -228,9 +237,23 @@ class mpc_navigation:
 
     def generate_static_circle_path(self):
         """
-        Generates a circular path with a specified number of equally spaced points,
-        with the first point starting at theta = -pi and proceeding counterclockwise.
+        Generates a static circular path with a specified number of equally spaced points.
+        
+        The first point is positioned at theta = -π and the path proceeds counterclockwise.
+        The discretization of the path is carefully chosen to ensure compatibility with 
+        the MPC parameters, specifically the discretization time and the desired traversal speed.
+        
+        To ensure meaningful dynamic propagation within the MPC, the spatial step size of 
+        the path (ds_path) should satisfy the condition:
+        
+            |ds_path - ds_mpc| < epsilon
+
+        where `ds_path` is the spatial step size of the path, `ds_mpc = v_des * discretization_time` 
+        is the MPC's spatial step size, and `epsilon` is a small tolerance value.   
         """
+        path_length = 2 * np.pi * self.CIRCLE_RADIUS
+        ds_des = self.TARGET_SPEED * self.mpc_propagation_dt
+        self.N = int((path_length / ds_des) * 1.15)  # Add 15% buffer
         theta_values = np.linspace(-math.pi ,  math.pi , self.N, endpoint=False)
         x_values = self.CIRCLE_CENTER_X + self.CIRCLE_RADIUS * np.cos(theta_values)
         y_values = self.CIRCLE_CENTER_Y + self.CIRCLE_RADIUS * np.sin(theta_values)

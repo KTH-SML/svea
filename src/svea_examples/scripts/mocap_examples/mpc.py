@@ -57,6 +57,7 @@ class mpc_navigation:
         self.mpc_config_ns = load_param('~mpc_config_ns')  
         self.initial_horizon = load_param(f'{self.mpc_config_ns}/prediction_horizon') 
         self.initial_Qf = load_param(f'{self.mpc_config_ns}/final_state_weight_matrix')  
+        self.TARGET_SPEED = load_param('~target_speed', 0.5)  # Target speed. It is here for generalization, but not weighted in the optimization problem.
 
         ## MPC parameters 
         self.GOAL_REACHED_DIST = 0.2   # The distance threshold (in meters) within which the goal is considered reached.
@@ -213,7 +214,7 @@ class mpc_navigation:
 
         Returns:
             tuple: (x_ref, distance_to_next_point), where x_ref is the reference state for the prediction horizon
-            (shape: [3, N+1]) and distance_to_next_point is the distance to the next or last reference point.
+            (shape: [4, N+1]) and distance_to_next_point is the distance to the next or last reference point.
         """
         if self.is_last_point is False:
             distance_to_next_point = self.compute_distance(self.state,self.static_path_plan[:,self.current_index_static_plan])
@@ -222,13 +223,17 @@ class mpc_navigation:
             if distance_to_next_point < self.NEW_REFERENCE_THR and not self.is_last_point:
                 self.current_index_static_plan += 1  
             reference_state = self.static_path_plan[:,self.current_index_static_plan]
-            x_ref = np.tile(reference_state, (self.initial_horizon+1, 1)).T     
+            x_ref = np.tile(reference_state, (self.initial_horizon+1, 1)).T 
+            target_speed_row = np.full((1, x_ref.shape[1]), self.TARGET_SPEED)                
+            x_ref = np.concatenate((x_ref, target_speed_row), axis=0)
             return x_ref, distance_to_next_point
 
         else:
             distance_to_last_point = self.compute_distance(self.state,self.static_path_plan[:,-1])
             reference_state = self.static_path_plan[:,-1]
             x_ref = np.tile(reference_state, (self.initial_horizon+1, 1)).T
+            target_speed_row = np.full((1, x_ref.shape[1]), self.TARGET_SPEED)
+            x_ref = np.concatenate((x_ref, target_speed_row), axis=0)
             return x_ref, distance_to_last_point
     
     def mpc_target_callback(self, msg):

@@ -5,7 +5,7 @@
 mpc:
   ## Core Parameters
   # The time step in which the optimization problem is divided (unit [s])
-  time_step: 0.4
+  time_step: 0.2
 
   # The prediction horizon steps for the mpc optimization problem
   prediction_horizon: 10
@@ -15,8 +15,8 @@ mpc:
   # Q1
   state_weight_matrix: [100,  0, 0, 0,
                         0, 100, 0, 0,
-                        0,  0, 10, 0,
-                        0,  0, 0, 0]
+                        0,  0, 100, 0,
+                        0,  0, 0, 70]
 
   # Q2
   control_rate_weight_matrix: [0, 0,
@@ -29,8 +29,8 @@ mpc:
   # Qf
   final_state_weight_matrix: [100,  0, 0, 0,
                               0,  100, 0, 0,
-                              0,  0, 10, 0,
-                              0,  0, 0, 0]
+                              0,  0, 100, 0,
+                              0,  0, 0, 70]
 
   # Qv
   # Note: A big value encourage forward movements rather than backwards.
@@ -44,12 +44,12 @@ mpc:
   steering_max: 40
 
   # The min/max steering rate allowed for SVEA (unit [degrees/s])
-  steering_rate_min: -35 
-  steering_rate_max: 35 
+  steering_rate_min: -20
+  steering_rate_max: 20
 
   # The min/max velocity allowed for SVEA (unit [m/s^2])
   velocity_min: -0.4
-  velocity_max: 0.8
+  velocity_max: 1.5
 
   # The min/max acceleration allowed for SVEA (unit [m/s^2])
   acceleration_min: -0.2
