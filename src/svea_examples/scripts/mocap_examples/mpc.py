@@ -27,9 +27,22 @@ def load_param(name, value=None):
 
 class mpc_navigation:
     """
-    ROS Node for controlling and simulating the SVEA vehicle autonomously.
-    """
+    This script implements a ROS node for controlling and simulating the SVEA vehicle autonomously.
 
+    The node uses the default MPC algorithm to compute (plan) an optimal trajectory
+    and control the vehicle to reach a specified target pose. The target pose is set interactively 
+    using Foxglove publishing a geometry_msgs/PoseStamped message. 
+
+    Key Features:
+    - Generates a straight-line trajectory with intermediate points from the vehicle's current position 
+    to the target pose, with a large distance between them to allow the MPC to optimally plan intermediate paths.
+    - Supports both simulation and real-world operation, with integration with Motion Capture (Mocap).
+    - Dynamically updates MPC parameters (final state weight matrix and prediction horizon) as the vehicle approaches the target for precise parking.
+    - Publishes data like predicted paths, control targets, and velocities for visualization and debugging.
+
+    The script is designed for optimal path planning and precise parking but does not handle obstacle avoidance. 
+    It is ideal for scenarios where the vehicle must navigate to a predefined goal position with high accuracy.
+    """
     def __init__(self,sim_dt,mpc):
         self.dt = sim_dt
         self.mpc = mpc
@@ -44,6 +57,7 @@ class mpc_navigation:
         self.mpc_config_ns = load_param('~mpc_config_ns')  
         self.initial_horizon = load_param(f'{self.mpc_config_ns}/prediction_horizon') 
         self.initial_Qf = load_param(f'{self.mpc_config_ns}/final_state_weight_matrix')  
+        self.TARGET_SPEED = load_param('~target_speed', 0.5)  # Target speed. It is here for generalization, but not weighted in the optimization problem.
 
         ## MPC parameters 
         self.GOAL_REACHED_DIST = 0.2   # The distance threshold (in meters) within which the goal is considered reached.
@@ -68,9 +82,15 @@ class mpc_navigation:
         self.velocity = 0
         self.state = []   
 
+        ## Define the unitless steering biases for each SVEA.
+        ## These values represent the measured steering actuations when the SVEA is not actually steering.
+        self.unitless_steering_map = {
+            "svea0": 28,
+            "svea7": 7
+        }
         if self.IS_SIM is False:
-            # add steering bias of sveas. {(svea0:28),(svea7:7)}
-            unitless_steering = 7     
+            svea_name = self.SVEA_MOCAP_NAME.lower()  # Ensure case-insensitivity  
+            unitless_steering = self.unitless_steering_map.get(svea_name, 0)  # Default to 0 if not found
             PERC_TO_LLI_COEFF = 1.27
             MAX_STEERING_ANGLE = 40 * math.pi / 180
             steer_percent = unitless_steering / PERC_TO_LLI_COEFF
@@ -101,7 +121,7 @@ class mpc_navigation:
             if measured_dt >= self.mpc_dt :
                 reference_trajectory, distance_to_next_point = self.get_mpc_current_reference()
                 if self.is_last_point and distance_to_next_point <= self.APPROACH_TARGET_THR and self.UPDATE_MPC_PARAM:
-                    # Update the prediction horizon and final state weight matrix only once when approaching target
+                    # Update the prediction horizon and final state weight matrix only once when approaching target to achieve better parking.
                     new_Qf = np.array([70, 0, 0, 0,
                                         0, 70, 0, 0,
                                         0, 0, 20, 0,
@@ -132,7 +152,7 @@ class mpc_navigation:
                 # Update the last time the MPC was computed
                 self.mpc_last_time = current_time
             
-        # Publish the latest control target and the estimated(mocap) / measured(in/out loc.) speed.
+        # Publish the latest control target and the estimated speed( from mocap or indoors loc. or outdoors loc.).
         self.publish_to_foxglove(self.steering, self.velocity, self.state[3])
         # Visualization data and send control
         self.svea.send_control(self.steering + self.steering_bias, self.velocity) 
@@ -194,7 +214,7 @@ class mpc_navigation:
 
         Returns:
             tuple: (x_ref, distance_to_next_point), where x_ref is the reference state for the prediction horizon
-            (shape: [3, N+1]) and distance_to_next_point is the distance to the next or last reference point.
+            (shape: [4, N+1]) and distance_to_next_point is the distance to the next or last reference point.
         """
         if self.is_last_point is False:
             distance_to_next_point = self.compute_distance(self.state,self.static_path_plan[:,self.current_index_static_plan])
@@ -203,13 +223,17 @@ class mpc_navigation:
             if distance_to_next_point < self.NEW_REFERENCE_THR and not self.is_last_point:
                 self.current_index_static_plan += 1  
             reference_state = self.static_path_plan[:,self.current_index_static_plan]
-            x_ref = np.tile(reference_state, (self.initial_horizon+1, 1)).T     
+            x_ref = np.tile(reference_state, (self.initial_horizon+1, 1)).T 
+            target_speed_row = np.full((1, x_ref.shape[1]), self.TARGET_SPEED)                
+            x_ref = np.concatenate((x_ref, target_speed_row), axis=0)
             return x_ref, distance_to_next_point
 
         else:
             distance_to_last_point = self.compute_distance(self.state,self.static_path_plan[:,-1])
             reference_state = self.static_path_plan[:,-1]
             x_ref = np.tile(reference_state, (self.initial_horizon+1, 1)).T
+            target_speed_row = np.full((1, x_ref.shape[1]), self.TARGET_SPEED)
+            x_ref = np.concatenate((x_ref, target_speed_row), axis=0)
             return x_ref, distance_to_last_point
     
     def mpc_target_callback(self, msg):
