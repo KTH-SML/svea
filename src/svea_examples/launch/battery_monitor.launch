@@ -1,11 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-    <!-- roslaunch svea_examples battery_monitor.launch serial_port:=/dev/ttyACM1 enable_debug:=true -->
     <!-- Launch file arguments -->
 
     <arg name="baud_rate" default="250000"/>
-    <arg name="log_format" default="{:.3f}"/>
-    <arg name="rate" default="50"/>
 
     <!-- Launch the dynamic serial manager node -->
     <node name="rosserial_dynamic" pkg="svea_examples" type="rosserial_dynamic.py" output="screen">
