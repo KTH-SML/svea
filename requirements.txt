@@ -12,3 +12,5 @@ pyserial
 pyubx2
 geopy
 utm
+# This is for NMPC
+casadi==3.5.5
