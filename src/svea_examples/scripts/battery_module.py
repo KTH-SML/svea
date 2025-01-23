@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-
+import rosserial_python.SerialClient as SerialClient
 import rospy
 from std_msgs.msg import Float32
+
 
 def load_param(name, default=None):
     """
@@ -11,8 +12,8 @@ def load_param(name, default=None):
 
 
 class BatteryChargerMonitor:
-
     def __init__(self):
+        rospy.SerialClient()
         ## Initialize node
         rospy.init_node("battery_charger_monitor")
 

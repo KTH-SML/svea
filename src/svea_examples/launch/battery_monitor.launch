@@ -2,24 +2,18 @@
 <launch>
     <!-- roslaunch svea_examples battery_monitor.launch serial_port:=/dev/ttyACM1 enable_debug:=true -->
     <!-- Launch file arguments -->
-    <arg name="serial_port" default="/dev/ttyACM1"/>
-    <arg name="baud_rate" default="115200"/>
+
+    <arg name="baud_rate" default="250000"/>
     <arg name="log_format" default="{:.3f}"/>
     <arg name="rate" default="50"/>
 
-    <!-- Launch the rosserial_python node -->
-    <node name="rosserial_python" pkg="rosserial_python" type="serial_node.py" output="screen">
-        <param name="port" value="$(arg serial_port)"/>
+    <!-- Launch the dynamic serial manager node -->
+    <node name="rosserial_dynamic" pkg="svea_examples" type="rosserial_dynamic.py" output="screen">
+        <!-- Set parameters for the node -->
         <param name="baud" value="$(arg baud_rate)"/>
+        <param name="scan_rate" value="1"/>
     </node>
-
-    <!-- Launch the battery_module node -->
-    <node name="battery_module" pkg="svea_examples" type="battery_module.py" output="screen">
-        <!-- Pass parameters to the node -->
-        <param name="log_format" value="$(arg log_format)"/>
-        <param name="rate" value="$(arg rate)"/>
-    </node>
-
+    
     <!-- Debugging options -->
     <arg name="enable_debug" default="false"/>
     <group if="$(arg enable_debug)">

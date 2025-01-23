@@ -7,63 +7,63 @@
 
 ## Uncomment to build base image for amd64 (x86)/arm64.
 # CONFIG="base-amd64"
-# CONFIG="base-arm64"
+CONFIG="base-arm64"
 
 main() {
 
     withdefault DEBUG "0"
 
-    withdefault ROSDISTRO       "noetic"
-    withdefault WORKSPACE       "/svea_ws"
+    withdefault ROSDISTRO "noetic"
+    withdefault WORKSPACE "/svea_ws"
     withdefault REPOSITORY_PATH "$(climb entrypoint)"
     withdefault REPOSITORY_NAME "$(basename "$REPOSITORY_PATH")"
 
-    withdefault BUILD_CONFIG    "default"
+    withdefault BUILD_CONFIG "default"
     if [ "$BUILD_CONFIG" = "default" ]; then
         # building for host platform
-        withdefault BUILD_PLATFORM  "$(uname -m)"
-        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile"
-        withdefault BUILD_TAG       "ghcr.io/kth-sml/svea:latest"
-        withdefault IMAGE_TAG       "$REPOSITORY_NAME"
-        withdefault IMAGE_PUSH      "0"
+        withdefault BUILD_PLATFORM "$(uname -m)"
+        withdefault BUILD_CONTEXT "$REPOSITORY_PATH"
+        withdefault BUILD_FILE "docker/Dockerfile"
+        withdefault BUILD_TAG "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_TAG "$REPOSITORY_NAME"
+        withdefault IMAGE_PUSH "0"
     elif [ "$BUILD_CONFIG" = "base" ]; then
         # building for host platform
-        withdefault BUILD_PLATFORM  "$(uname -m)"
-        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO"
-        withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
-        withdefault IMAGE_PUSH      "0"
+        withdefault BUILD_PLATFORM "$(uname -m)"
+        withdefault BUILD_CONTEXT "$REPOSITORY_PATH"
+        withdefault BUILD_FILE "docker/Dockerfile.base"
+        withdefault BUILD_TAG "ros:$ROSDISTRO"
+        withdefault IMAGE_TAG "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH "0"
     elif [ "$BUILD_CONFIG" = "base-amd64" ]; then
         # building for x86_64
-        withdefault BUILD_PLATFORM  "linux/amd64"
-        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO"
-        withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
-        withdefault IMAGE_PUSH      "0"
+        withdefault BUILD_PLATFORM "linux/amd64"
+        withdefault BUILD_CONTEXT "$REPOSITORY_PATH"
+        withdefault BUILD_FILE "docker/Dockerfile.base"
+        withdefault BUILD_TAG "ros:$ROSDISTRO"
+        withdefault IMAGE_TAG "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH "0"
     elif [ "$BUILD_CONFIG" = "base-arm64" ]; then
         # building for arm64/aarch64/jetson
-        withdefault BUILD_PLATFORM  "linux/arm64"
-        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO"
-        withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
-        withdefault IMAGE_PUSH      "0"
+        withdefault BUILD_PLATFORM "linux/arm64"
+        withdefault BUILD_CONTEXT "$REPOSITORY_PATH"
+        withdefault BUILD_FILE "docker/Dockerfile.base"
+        withdefault BUILD_TAG "ros:$ROSDISTRO"
+        withdefault IMAGE_TAG "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH "0"
     elif [ "$BUILD_CONFIG" = "ghcr" ]; then
         # building for both amd64 and arm64
-        withdefault BUILD_PLATFORM  "linux/arm64,linux/amd64"
-        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO"
-        withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
-        withdefault IMAGE_PUSH      "1"
+        withdefault BUILD_PLATFORM "linux/arm64,linux/amd64"
+        withdefault BUILD_CONTEXT "$REPOSITORY_PATH"
+        withdefault BUILD_FILE "docker/Dockerfile.base"
+        withdefault BUILD_TAG "ros:$ROSDISTRO"
+        withdefault IMAGE_TAG "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH "1"
     fi
 
     withdefault CONTAINER_NAME "$REPOSITORY_NAME"
-    withdefault SHARED_VOLUME  "$BUILD_CONTEXT/src:$WORKSPACE/src"
-    
+    withdefault SHARED_VOLUME "$BUILD_CONTEXT/src:$WORKSPACE/src"
+
     if istrue DEBUG; then
         echo ""
         echovar BUILD_CONFIG
@@ -85,9 +85,9 @@ main() {
 }
 
 call() {
-    if istrue DEBUG; then 
+    if istrue DEBUG; then
         echo "$@"
-    else 
+    else
         exec "$@"
     fi
 }
@@ -166,9 +166,10 @@ withdefault() {
 # Echo TRUTHY if `istrue NAME` else FALSY
 # > ifelse NAME TRUTHY FALSY
 ifelse() {
-    if istrue "$1"
-    then echo "$2"
-    else echo "$3"
+    if istrue "$1"; then
+        echo "$2"
+    else
+        echo "$3"
     fi
 }
 
@@ -178,7 +179,7 @@ ifelse() {
 switch() {
     VALUE="$1"
     shift
-    if [ "$VALUE" = "$1" ]; then 
+    if [ "$VALUE" = "$1" ]; then
         echo "$2"
     elif [ "$#" -ge 2 ]; then
         shift 2
