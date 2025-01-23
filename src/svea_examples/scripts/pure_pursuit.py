@@ -1,7 +1,20 @@
-#!/usr/bin/env python3
+#! /usr/bin/env python3
+
+import numpy as np
 
 import rospy
-from std_msgs.msg import Float32
+from rospy import Publisher, Rate
+from geometry_msgs.msg import PoseWithCovarianceStamped
+from tf.transformations import quaternion_from_euler
+
+from svea.models.bicycle import SimpleBicycleModel
+from svea.states import VehicleState
+from svea.simulators.sim_SVEA import SimSVEA
+from svea.interfaces import LocalizationInterface
+from svea.controllers.pure_pursuit import PurePursuitController
+from svea.svea_managers.path_following_sveas import SVEAPurePursuit
+from svea.data import TrajDataHandler, RVIZPathHandler
+
 
 def load_param(name, value=None):
     if value is None:
@@ -9,94 +22,130 @@ def load_param(name, value=None):
     return rospy.get_param(name, value)
 
 
-class BatteryChargerMonitor:
+def assert_points(pts):
+    assert isinstance(pts, (list, tuple)), 'points is of wrong type, expected list'
+    for xy in pts:
+        assert isinstance(xy, (list, tuple)), 'points contain an element of wrong type, expected list of two values (x, y)'
+        assert len(xy), 'points contain an element of wrong type, expected list of two values (x, y)'
+        x, y = xy
+        assert isinstance(x, (int, float)), 'points contain a coordinate pair wherein one value is not a number'
+        assert isinstance(y, (int, float)), 'points contain a coordinate pair wherein one value is not a number'
 
-    RATE = 1  # Hz
+
+def publish_initialpose(state, n=10):
+
+    p = PoseWithCovarianceStamped()
+    p.header.frame_id = 'map'
+    p.pose.pose.position.x = state.x
+    p.pose.pose.position.y = state.y
+
+    q = quaternion_from_euler(0, 0, state.yaw)
+    p.pose.pose.orientation.z = q[2]
+    p.pose.pose.orientation.w = q[3]
+
+    pub = Publisher('/initialpose', PoseWithCovarianceStamped, queue_size=10)
+    rate = Rate(10)
+
+    for _ in range(n):
+        pub.publish(p)
+        rate.sleep()
+
+
+class pure_pursuit:
+
+    DELTA_TIME = 0.01
+    TRAJ_LEN = 10
+    TARGET_VELOCITY = 1.0
+    RATE = 1e9
 
     def __init__(self):
 
         ## Initialize node
 
-        rospy.init_node("battery_charger_monitor")
+        rospy.init_node('pure_pursuit')
 
         ## Parameters
 
-        self.log_format = load_param("~log_format", "{:.3f}")
+        self.POINTS = load_param('~points')
+        self.IS_SIM = load_param('~is_sim', False)
+        self.USE_RVIZ = load_param('~use_rviz', False)
+        self.STATE = load_param('~state', [0, 0, 0, 0])
 
-        ## Subscribers
+        assert_points(self.POINTS)
 
-        # Battery topics
-        rospy.Subscriber("/battery/current", Float32, self.battery_current_callback)
-        rospy.Subscriber("/battery/voltage", Float32, self.battery_voltage_callback)
-        rospy.Subscriber("/battery/shunt_voltage", Float32, self.battery_shunt_callback)
+        ## Set initial values for node
 
-        # Charger topics
-        rospy.Subscriber("/charger/current", Float32, self.charger_current_callback)
-        rospy.Subscriber("/charger/voltage", Float32, self.charger_voltage_callback)
-        rospy.Subscriber("/charger/shunt_voltage", Float32, self.charger_shunt_callback)
+        # initial state
+        state = VehicleState(*self.STATE)
+        publish_initialpose(state)
 
-        ## Initialize state
+        # create goal state
+        self.curr = 0
+        self.goal = self.POINTS[self.curr]
+        xs, ys = self.compute_traj(state)
 
-        self.battery_current = 0.0
-        self.battery_voltage = 0.0
-        self.battery_shunt_voltage = 0.0
+        ## Create simulators, models, managers, etc.
 
-        self.charger_current = 0.0
-        self.charger_voltage = 0.0
-        self.charger_shunt_voltage = 0.0
+        if self.IS_SIM:
 
-        ## Log startup message
+            # simulator need a model to simulate
+            self.sim_model = SimpleBicycleModel(state)
 
-        rospy.loginfo("Battery and Charger Monitor initialized and running.")
+            # start the simulator immediately, but paused
+            self.simulator = SimSVEA(self.sim_model,
+                                     dt=self.DELTA_TIME,
+                                     run_lidar=True,
+                                     start_paused=True).start()
+
+        # start the SVEA manager
+        self.svea = SVEAPurePursuit(LocalizationInterface,
+                                    PurePursuitController,
+                                    xs, ys,
+                                    data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
+
+        self.svea.controller.target_velocity = self.TARGET_VELOCITY
+        self.svea.start(wait=True)
+
+        # everything ready to go -> unpause simulator
+        if self.IS_SIM:
+            self.simulator.toggle_pause_simulation()
 
     def run(self):
-        rate = rospy.Rate(self.RATE)
         while self.keep_alive():
             self.spin()
-            rate.sleep()
 
     def keep_alive(self):
         return not rospy.is_shutdown()
 
     def spin(self):
-        rospy.loginfo(self.format_data())
 
-    def format_data(self):
-        return (
-            f"Battery -> Current: {self.log_format.format(self.battery_current)} A, "
-            f"Voltage: {self.log_format.format(self.battery_voltage)} V, "
-            f"Shunt Voltage: {self.log_format.format(self.battery_shunt_voltage)} V\n"
-            f"Charger -> Current: {self.log_format.format(self.charger_current)} A, "
-            f"Voltage: {self.log_format.format(self.charger_voltage)} V, "
-            f"Shunt Voltage: {self.log_format.format(self.charger_shunt_voltage)} V"
-        )
+        # limit the rate of main loop by waiting for state
+        state = self.svea.wait_for_state()
 
-    ## Callback functions for battery
+        if self.svea.is_finished:
+            self.update_goal()
+            xs, ys = self.compute_traj(state)
+            self.svea.update_traj(xs, ys)
 
-    def battery_current_callback(self, msg):
-        self.battery_current = msg.data
+        steering, velocity = self.svea.compute_control()
+        self.svea.send_control(steering, velocity)
 
-    def battery_voltage_callback(self, msg):
-        self.battery_voltage = msg.data
+        self.svea.visualize_data()
 
-    def battery_shunt_callback(self, msg):
-        self.battery_shunt_voltage = msg.data
+    def update_goal(self):
+        self.curr += 1
+        self.curr %= len(self.POINTS)
+        self.goal = self.POINTS[self.curr]
+        self.svea.controller.is_finished = False
 
-    ## Callback functions for charger
-
-    def charger_current_callback(self, msg):
-        self.charger_current = msg.data
-
-    def charger_voltage_callback(self, msg):
-        self.charger_voltage = msg.data
-
-    def charger_shunt_callback(self, msg):
-        self.charger_shunt_voltage = msg.data
+    def compute_traj(self, state):
+        xs = np.linspace(state.x, self.goal[0], self.TRAJ_LEN)
+        ys = np.linspace(state.y, self.goal[1], self.TRAJ_LEN)
+        return xs, ys
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     ## Start node ##
 
-    monitor = BatteryChargerMonitor()
-    monitor.run()
+    pure_pursuit().run()
