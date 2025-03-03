@@ -22,3 +22,11 @@ pyubx2
 geopy
 utm
 nats-py
+
+empy
+numpy
+lark --prefer-binary
+catkin_pkg
+
+# FMQ requirements
+# -r src/ros-fmq-bridge/requirements.txt

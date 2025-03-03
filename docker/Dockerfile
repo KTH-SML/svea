@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Dockerfile for SVEA images
 #
 # Author: Kaj Munhoz Arfvidsson
@@ -14,40 +15,42 @@ RUN . /opt/ros/$ROS_DISTRO/setup.sh \
 &&  colcon build \
 &&  rm -rf log/ build/ src/
 
+=======
+>>>>>>> 28d5445 (ooops)
 # Use the official ROS 2 Jazzy image as the base image
-FROM ros:jazzy-ros-base
+FROM ros:jazzy-ros-core-noble
 
 # Set the ROS distribution as a build argument
 ARG ROSDISTRO="jazzy"
 ENV ROSDISTRO=$ROSDISTRO
 
-COPY --from=micro-ros-agent-builder /svea_ws /svea_ws
-
 # Install bootstrap tools and ROS 2 packages
-RUN apt-get update  -y && \
-    apt-get upgrade -y && \
-    apt-get install --no-install-recommends -y \
+RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     apt-utils lsb-release \
-    cmake \
+    # cmake \
     git vim nano curl iputils-ping \
     python3-colcon-common-extensions \
+    python3-colcon-mixin \
     python3-rosdep \
-    python3-vcstool \
+    # python3-vcstool \
+    # python3-tk \
     python3-pip \
+    # python3-matplotlib \
+    # python3-venv \
     ros-$ROSDISTRO-ament-cmake-python \
-    ros-$ROSDISTRO-ros-base=0.11.0-1* \
-    # ros-$ROSDISTRO-rmw-zenoh-cpp \
-    ros-$ROSDISTRO-teleop-twist-keyboard \
-    ros-$ROSDISTRO-nav2-* \
+    ros-jazzy-ros-base=0.11.0-1* \
     && rm -rf /var/lib/apt/lists/*
 
-# ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
-
-
 # Bootstrap rosdep and setup colcon mixin and metadata
-# RUN rosdep init && \
-RUN rosdep update --rosdistro $ROSDISTRO
+RUN rosdep init && \
+    rosdep update --rosdistro $ROSDISTRO && \
+    colcon mixin add default \
+      https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml && \
+    colcon mixin update && \
+    colcon metadata add default \
+      https://raw.githubusercontent.com/colcon/colcon-metadata-repository/master/index.yaml && \
+    colcon metadata update
 
 # Create a Python virtual environment
 # ENV VIRTUAL_ENV=/opt/venv
@@ -60,6 +63,9 @@ WORKDIR /svea_ws
 # Copy the ROS 2 workspace and utility files into the container
 COPY src ./src
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 28d5445 (ooops)
 COPY requirements.txt ./
 RUN rosdep install \
         --rosdistro $ROSDISTRO \
@@ -67,6 +73,7 @@ RUN rosdep install \
         --ignore-src \
         -qry \
         && \
+<<<<<<< HEAD
     pip install \
         --break-system-packages \
         -r requirements.txt
@@ -77,19 +84,14 @@ RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
 =======
 COPY util ./util
 COPY entrypoint requirements.txt ./
+=======
+    pip install -r requirements.txt
+>>>>>>> 28d5445 (ooops)
 
-# Automatically import extra dependencies if dependency_repos.repos exists
-# in src, git clone --recursive https://github.com/MOCAP4ROS2-Project/mocap4ros2_qualisys.git
-RUN if [ -f src/mocap4ros2_qualisys/dependency_repos.repos ]; then \
-      vcs import src < src/mocap4ros2_qualisys/dependency_repos.repos; \
-    fi
-    
-# Update rosdep and install dependencies for the ROS 2 workspace
-RUN apt-get update -y && \
-    rosdep update --rosdistro $ROSDISTRO && \
-    rosdep install --rosdistro $ROSDISTRO --from-paths src --ignore-src -y && \
-    rm -rf /var/lib/apt/lists/*
+# Run catkin build on workspace (improves build speeds later on).
+RUN catkin build
 
+<<<<<<< HEAD
 # Install Python dependencies in the virtual environment
 # RUN pip install --break-system-packages --upgrade pip && \
 RUN pip install --break-system-packages -r requirements.txt
@@ -121,3 +123,5 @@ ENTRYPOINT ["./entrypoint"]
 # Set the default command to run when the container starts
 CMD ["bash"]
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+>>>>>>> 28d5445 (ooops)
