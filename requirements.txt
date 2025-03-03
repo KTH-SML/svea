@@ -12,5 +12,12 @@ pyserial
 pyubx2
 geopy
 utm
-# This is for NMPC
-casadi==3.5.5
+nats-py
+
+empy
+numpy
+lark --prefer-binary
+catkin_pkg
+
+# FMQ requirements
+# -r src/ros-fmq-bridge/requirements.txt
