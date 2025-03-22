@@ -5,5 +5,5 @@
 
 <launch>
     <!-- Velocity estimation -->
-    <node pkg="svea_localization" exec="actuation_to_twist.py" name="actuation_to_twist" output="screen"/> 
+    <node pkg="svea_sensors" type="actuation_to_twist.py" name="actuation_to_twist" output="screen"/>
 </launch>

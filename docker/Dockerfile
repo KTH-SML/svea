@@ -18,7 +18,7 @@ RUN . /opt/ros/$ROS_DISTRO/setup.sh \
 =======
 >>>>>>> 28d5445 (ooops)
 # Use the official ROS 2 Jazzy image as the base image
-FROM ros:jazzy-ros-core-noble
+FROM ros:jazzy-ros-base-noble
 
 # Set the ROS distribution as a build argument
 ARG ROSDISTRO="jazzy"
@@ -28,29 +28,22 @@ ENV ROSDISTRO=$ROSDISTRO
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     apt-utils lsb-release \
-    # cmake \
+    cmake \
     git vim nano curl iputils-ping \
     python3-colcon-common-extensions \
-    python3-colcon-mixin \
     python3-rosdep \
-    # python3-vcstool \
-    # python3-tk \
+    python3-vcstool \
+    python3-tk \
     python3-pip \
-    # python3-matplotlib \
-    # python3-venv \
+    python3-matplotlib \
+    python3-venv \
     ros-$ROSDISTRO-ament-cmake-python \
     ros-jazzy-ros-base=0.11.0-1* \
     && rm -rf /var/lib/apt/lists/*
 
 # Bootstrap rosdep and setup colcon mixin and metadata
-RUN rosdep init && \
-    rosdep update --rosdistro $ROSDISTRO && \
-    colcon mixin add default \
-      https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml && \
-    colcon mixin update && \
-    colcon metadata add default \
-      https://raw.githubusercontent.com/colcon/colcon-metadata-repository/master/index.yaml && \
-    colcon metadata update
+# RUN rosdep init && \
+RUN rosdep update --rosdistro $ROSDISTRO
 
 # Create a Python virtual environment
 # ENV VIRTUAL_ENV=/opt/venv
@@ -88,9 +81,10 @@ COPY entrypoint requirements.txt ./
     pip install -r requirements.txt
 >>>>>>> 28d5445 (ooops)
 
-# Run catkin build on workspace (improves build speeds later on).
-RUN catkin build
+# Ensure proper environment setup before build
+ENV CMAKE_PREFIX_PATH="/opt/ros/$ROSDISTRO"
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 # Install Python dependencies in the virtual environment
 # RUN pip install --break-system-packages --upgrade pip && \
@@ -99,10 +93,13 @@ RUN pip install --break-system-packages -r requirements.txt
 # Ensure proper environment setup before build
 ENV CMAKE_PREFIX_PATH="/opt/ros/$ROSDISTRO"
 
+=======
+>>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
 # Build the ROS 2 workspace
 RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
     colcon build --symlink-install"
 
+<<<<<<< HEAD
 COPY firmware/disable_fastdds_shm.xml \
      firmware/disable_fastdds_shm_localhost_only.xml \
      /tmp/
@@ -113,6 +110,11 @@ ENV MICROROS_DISABLE_SHM=1
 RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \
     echo "source /svea_ws/install/setup.bash" >> ~/.bashrc && \
     echo "source /svea_ws/install/local_setup.bash" >> ~/.bashrc
+=======
+# Source the setup file in the .bashrc for convenience
+RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \
+    echo "source /svea_ws/install/setup.bash" >> ~/.bashrc
+>>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
 
 # For fixing WSL error
 RUN chmod +x ./entrypoint
@@ -122,6 +124,9 @@ ENTRYPOINT ["./entrypoint"]
 
 # Set the default command to run when the container starts
 CMD ["bash"]
+<<<<<<< HEAD
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 =======
 >>>>>>> 28d5445 (ooops)
+=======
+>>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)

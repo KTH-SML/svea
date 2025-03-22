@@ -1,20 +1,14 @@
-<?xml version="1.0"?>
-
 <launch>
 
     <!-- Args -->
     <arg name="record"                  default="false"/>
-    <let name="is_sim_bool" value="$(eval '\'$(var record)\' == \'true\'')"/>
     <arg name="rosbag_prefix"           default="/svea_ws/src/localization_debugger" />
     <arg name="gps_device"              default="/dev/ttyACM1"/>
     <arg name="rtk_username"            default=""/>
     <arg name="rtk_password"            default=""/>
     <arg name="initial_pose_a"          default="0.0"/>
     <arg name="start_zed_camera"        default="false"/>
-    <let name="start_zed_camera" value="$(eval '\'$(var start_zed_camera)\' == \'true\'')"/>
     <arg name="start_foxglove_bridge"   default="false"/>
-    <let name="start_foxglove_bridge" value="$(eval '\'$(var start_foxglove_bridge)\' == \'true\'')"/>
-    
 
     <!-- ZED Camera Args -->
     <arg name="zed_base_frame"  default="base_link"/>
@@ -27,91 +21,90 @@
 
     <!-- Datum args, if use_datum is true, the datum will be set -->
     <arg name="use_datum"               default="false" />
-    <let name="use_datum" value="$(eval '\'$(var use_datum)\' == \'true\'')"/>
     <arg name="datum_service"           default="/datum" />
     <arg name="datum_file"              default="" />
     <arg name="datum_data"              default="[]" />
 
     <!-- RTK -->
-    <include file="$(find-pkg-share svea_localization)/launch/rtk.xml">
-        <arg name="gps_device"    value="$(var gps_device)"/>
-        <arg name="username"      value="$(var rtk_username)"/>
-        <arg name="password"      value="$(var rtk_password)"/>
+    <include file="$(find svea_localization)/launch/sensors_launch/rtk.launch">
+        <arg name="gps_device"    value="$(arg gps_device)"/>
+        <arg name="username"      value="$(arg rtk_username)"/>
+        <arg name="password"      value="$(arg rtk_password)"/>
     </include>
 
     <!-- Localization -->
-    <include file="$(find-pkg-share svea_localization)/launch/localize.xml">
+    <include file="$(find svea_localization)/launch/localize.launch">
         <arg name="is_indoors"              value="false"/>
         <arg name="start_serial"            value="true"/>
         <arg name="start_wheel_encoders"    value="false"/>
-        <arg name="initial_pose_a"          value="$(var initial_pose_a)"/>
+        <arg name="initial_pose_a"          value="$(arg initial_pose_a)"/>
         <arg name="publish_tf"              value="false"/>
-        <arg name="use_datum"               value="$(var use_datum)"/>
-        <arg name="datum_service"           value="$(var datum_service)"/>
-        <arg name="datum_file"              value="$(var datum_file)"/>
-        <arg name="datum_data"              value="$(var datum_data)"/>
+        <arg name="use_datum"               value="$(arg use_datum)"/>
+        <arg name="datum_service"           value="$(arg datum_service)"/>
+        <arg name="datum_file"              value="$(arg datum_file)"/>
+        <arg name="datum_data"              value="$(arg datum_data)"/>
     </include>
 
     <!-- Vision -->
-    <include if="$(var start_zed_camera)" file="$(find-pkg-share svea_vision)/launch/zed_main.xml">
+    <include if="$(arg start_zed_camera)" file="$(find svea_vision)/launch/zed_main.launch">
         <arg name="enable_sidewalk_segmentation"    value="false"/>
         <arg name="enable_bbox_image"               value="false"/>
         <arg name="enable_state_estimation"         value="false"/>
-        <arg name="zed_base_frame"                  value="$(var zed_base_frame)"/>
-        <arg name="zed_cam_pos_x"                   value="$(var zed_cam_pos_x)"/>
-        <arg name="zed_cam_pos_y"                   value="$(var zed_cam_pos_y)"/>
-        <arg name="zed_cam_pos_z"                   value="$(var zed_cam_pos_z)"/>
-        <arg name="zed_cam_roll"                    value="$(var zed_cam_roll)"/>
-        <arg name="zed_cam_pitch"                   value="$(var zed_cam_pitch)"/>
-        <arg name="zed_cam_yaw"                     value="$(var zed_cam_yaw)"/>
+        <arg name="zed_base_frame"                  value="$(arg zed_base_frame)"/>
+        <arg name="zed_cam_pos_x"                   value="$(arg zed_cam_pos_x)"/>
+        <arg name="zed_cam_pos_y"                   value="$(arg zed_cam_pos_y)"/>
+        <arg name="zed_cam_pos_z"                   value="$(arg zed_cam_pos_z)"/>
+        <arg name="zed_cam_roll"                    value="$(arg zed_cam_roll)"/>
+        <arg name="zed_cam_pitch"                   value="$(arg zed_cam_pitch)"/>
+        <arg name="zed_cam_yaw"                     value="$(arg zed_cam_yaw)"/>
     </include>
 
     <!-- Paths -->
-    <node pkg="svea_localization" exec="odom_to_path_relay.py" name="odom_to_path_relay_1" output="screen" >
+    <node pkg="svea_localization" type="odom_to_path_relay.py" name="odom_to_path_relay_1" output="screen" >
         <param name="odom_topic" value="/odometry/gps"/>
     </node>
-    <node pkg="svea_localization" exec="odom_to_path_relay.py" name="odom_to_path_relay_2" output="screen" >
+    <node pkg="svea_localization" type="odom_to_path_relay.py" name="odom_to_path_relay_2" output="screen" >
         <param name="odom_topic" value="/odometry/filtered"/>
     </node>
-    <node pkg="svea_localization" exec="odom_to_path_relay.py" name="odom_to_path_relay_3" output="screen" >
+    <node pkg="svea_localization" type="odom_to_path_relay.py" name="odom_to_path_relay_3" output="screen" >
         <param name="odom_topic" value="/odometry/filtered/global"/>
     </node>
-    <node if="$(var start_zed_camera)" pkg="svea_localization" exec="odom_to_path_relay.py" name="odom_to_path_relay_4" output="screen" >
+    <node if="$(arg start_zed_camera)" pkg="svea_localization" type="odom_to_path_relay.py" name="odom_to_path_relay_4" output="screen" >
         <param name="odom_topic"            value="/zed/zed_node/odom"/>
-        <param name="initial_yaw_offset"    value="$(var initial_pose_a)"/>
+        <param name="initial_yaw_offset"    value="$(arg initial_pose_a)"/>
     </node>
 
     <!-- Euler angles -->
-    <node pkg="svea_localization" exec="quat_to_euler_relay.py" name="quat_to_euler_relay_1" output="screen" >
+    <node pkg="svea_localization" type="quat_to_euler_relay.py" name="quat_to_euler_relay_1" output="screen" >
         <param name="quat_topic" value="/odometry/gps"/>
     </node>
-    <node pkg="svea_localization" exec="quat_to_euler_relay.py" name="quat_to_euler_relay_2" output="screen" >
+    <node pkg="svea_localization" type="quat_to_euler_relay.py" name="quat_to_euler_relay_2" output="screen" >
         <param name="quat_topic" value="/odometry/filtered"/>
     </node>
-    <node pkg="svea_localization" exec="quat_to_euler_relay.py" name="quat_to_euler_relay_3" output="screen" >
+    <node pkg="svea_localization" type="quat_to_euler_relay.py" name="quat_to_euler_relay_3" output="screen" >
         <param name="quat_topic" value="/odometry/filtered/global"/>
     </node>
-    <node if="$(var start_zed_camera)" pkg="svea_localization" exec="quat_to_euler_relay" name="quat_to_euler_relay_4" output="screen" >
+    <node if="$(arg start_zed_camera)" pkg="svea_localization" type="quat_to_euler_relay.py" name="quat_to_euler_relay_4" output="screen" >
         <param name="quat_topic" value="/zed/zed_node/odom"/>
     </node>
-    <node pkg="svea_localization" exec="quat_to_euler_relay.py" name="quat_to_euler_relay_5" output="screen" >
+    <node pkg="svea_localization" type="quat_to_euler_relay.py" name="quat_to_euler_relay_5" output="screen" >
         <param name="quat_topic" value="/imu/data"/>
     </node>
 
     <!-- GPS to UTM -->
-    <node pkg="svea_localization" exec="gps_to_utm_relay.py" name="gps_to_utm_relay_1" output="screen" >
+    <node pkg="svea_localization" type="gps_to_utm_relay.py" name="gps_to_utm_relay_1" output="screen" >
         <param name="gps_topic" value="/gps/fix"/>
     </node>
-    <node pkg="svea_localization" exec="gps_to_utm_relay.py" name="gps_to_utm_relay_2" output="screen" >
+    <node pkg="svea_localization" type="gps_to_utm_relay.py" name="gps_to_utm_relay_2" output="screen" >
         <param name="gps_topic" value="/gps/filtered"/>
     </node>
 
     <!-- Start Foxglove Bridge -->
-    <include if="$(var start_foxglove_bridge)" file="$(find-pkg-share foxglove_bridge)/launch/foxglove_bridge.launch">
+    <include if="$(eval start_foxglove_bridge)" file="$(find foxglove_bridge)/launch/foxglove_bridge.launch">
         <arg name="port" value="8765" />
     </include>
 
     <!-- Rosbag -->
-    <node if="$(var record)" name="rosbag" pkg="rosbag" exec="record" output="screen" args="-a -o $(var rosbag_prefix)"/>
+    <node if="$(arg record)" name="rosbag" pkg="rosbag" type="record" output="screen" args="-a -o $(arg rosbag_prefix)"/>
+
 </launch>
- 

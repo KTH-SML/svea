@@ -4,48 +4,29 @@
 
     <!-- Launch file arguments -->
 <<<<<<< HEAD
+<<<<<<< HEAD
     <arg name="use_sim_time"  default="true"/>
 =======
     <arg name="use_sim_time"  default="True"/>
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+    <arg name="xavier"      default="false"/>
+    <arg name="camera"      default="rs"/>
+    <arg name="slam_delay"  default="5"/>
+>>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
 
-    <!-- Launch Low-Level Micro-Ros -->
-    <executable cmd="$(find-pkg-share svea_core)/util/start_micro_ros.sh" output="screen"/>
 
-    <!-- Lidar  -->
-    <arg name="lidar_ip"                default="192.168.3.11" />
-    <include file="$(find-pkg-share svea_localization)/launch/lidar.xml">
-        <arg name="lidar_ip"                    value="$(var lidar_ip)"/>
+    <!-- Start the stereo camera -->
+    <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/rs_odometry.launch">
+        <arg name="xavier" value="$(arg xavier)"/>
     </include>
-
-    <!-- Static transforms -->
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster" args="0 0 0 0 0 0 odom base_link"/>
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="lidarlink_broadcaster" 
-        args="0.385 0 0.15 0 0 0 1 base_link laser"/>
-
-    <!-- Robot localization (Local EKF)-->
-    <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
-        <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
-        <param name="imu0"                  value="/lli/sensor/imu"/>
-        <param name="twist0"                value="/lli/sensor/encoders"/>
-        <remap from="/odometry/filtered"    to="/odometry/local"/>
-        <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/>  -->
-    </node>
-
-    <!-- Start Foxglove -->
-    <include file="$(find-pkg-share foxglove_bridge)/launch/foxglove_bridge_launch.xml">
-        <arg name="port" value="8765" />
-    </include>
-
-    <include file="$(find-pkg-share nav2_bringup)/launch/bringup_launch.py">
-        <arg name="use_sim_time" value="$(var use_sim_time)"/>
+    <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
+        <arg name="xavier" value="$(arg xavier)"/>
     </include>
 
     <!-- Start SLAM -->
-    <include file="$(find-pkg-share slam_toolbox)/launch/online_async_launch.py">
-        <arg name="use_sim_time" value="$(var use_sim_time)"/>
-        <arg name="slam_params_file" value="$(find-pkg-share svea_localization)/params/slam_sync.yaml"/>
-    </include>
-    
+    <node pkg="slam_toolbox" type="sync_slam_toolbox_node" name="slam_toolbox" output="screen" launch-prefix="bash -c 'sleep $(arg slam_delay); $0 $@' ">
+        <rosparam command="load" file="$(find svea_sensors)/params/slam_toolbox/slam_sync.yaml" />
+    </node>
 
 </launch>

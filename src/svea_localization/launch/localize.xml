@@ -1,71 +1,65 @@
-<?xml version="1.0"?>
-
 <!--
     Launch default odometry and localization
 -->
 
 <launch>
     <!-- Launch file arguments -->
+
+    <!-- Main argument -->
     <arg name="is_sim"                  default="false"/>
     <arg name="is_indoors"              default="true" />
     <arg name="initial_pose_x"          default="0.0" />
     <arg name="initial_pose_y"          default="0.0" />
     <arg name="initial_pose_a"          default="0.0" />
 
+    <!-- low-level interface (serial) -->
+    <arg name="start_serial"            default="false" /> 
     <!-- Should be set to true, if only the localization is running 
     (i.e. this is needed in order to have wheel encoders and actuation_to_twist working) -->
     <arg name="lli_port"                default="/dev/ttyACM0"/>
 
     <!-- map server -->
-    <arg name="map_file"                default="/svea_ws/src/svea_core/maps/sml.yaml"/>
+    <arg name="map_file"                default=""/>
 
     <!-- Lidar  -->
+<<<<<<< HEAD
 <<<<<<< HEAD
     <arg name="lidar_ip"                default="192.168.0.10" />
 =======
     <arg name="lidar_ip"                default="192.168.3.11" />
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+    <arg name="lidar_ip"                default="" />
+>>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
 
     <!-- GPS -->
-    <arg name="start_rtk"               default="false"/>
-    <let name="start_rtk" value="$(eval '\'$(var start_rtk)\' == \'true\'')"/>
+    <!-- <arg name="start_rtk"               default="false"/>
     <arg name="gps_device"              default="/dev/ttyACM0" />
     <arg name="delay"                   default="2.0"/>
-    <arg name="gps_baud"                default="250000" /> 
-    <!-- 38400 for UART connection -->
+    <arg name="gps_baud"                default="250000" />  -->
+     <!-- 38400 for UART connection -->
     <!-- yaw offest = initial_pose_a -->
 
-    <!-- Datum args, if use_datum is true, the datum will be set -->
+    <!-- Datum args, if use_datum is true, the datum will be set
     <arg name="use_datum"               default="false" />
-    <let name="use_datum" value="$(eval '\'$(var use_datum)\' == \'true\'')"/>
     <arg name="datum_service"           default="/datum" />
     <arg name="datum_file"              default="" />
-    <arg name="datum_data"              default="[]" />
-
-    <!-- odom to map node -->
-    <arg name="map_frame"               default="map"/>
-    <arg name="wait_for_transform"      default="false"/>
-    <let name="wait_for_transform" value="$(eval '\'$(var wait_for_transform)\' == \'true\'')"/>
-    <arg name="publish_odometry"        default="true"/>
-    <let name="publish_odometry" value="$(eval '\'$(var publish_odometry)\' == \'true\'')"/>
-    <arg name="publish_pose"            default="true"/>
-    <let name="publish_pose" value="$(eval '\'$(var publish_pose)\' == \'true\'')"/>
-
-    <!-- ekf tf -->
-    <arg name="publish_tf"              default="true"/>
-    <let name="publish_tf" value="$(eval '\'$(var publish_tf)\' == \'true\'')"/>
+    <arg name="datum_data"              default="[]" /> -->
 
     <!-- Nodes -->
 
-    <!-- Static transforms for sensors -->
-    <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
-        <arg name="is_indoors"  value="$(var is_indoors)"/>
-    </include>
+    <!-- TODO: Start low-level interface -->
+    <!-- <group if="$(arg start_serial)">
+        <node pkg="rosserial_python" exec="serial_node.py" name="serial_node">
+            <param name="port" value="$(arg lli_port)"/>
+            <param name="baud" value="250000"/>
+        </node>
+    </group> -->
 
-    <!-- <node pkg="nav2_map_server" exec="map_server" name="map_server" output="screen">
-        <param name="yaml_filename" value="/svea_ws/src/svea_core/maps/sml.yaml"/>
-    </node> -->
+    <!-- Start map server -->
+    <node if="$(eval map_file != '')" pkg="nav2_map_server" exec="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
 
+<<<<<<< HEAD
         <!-- start all sensors if this is not a simulation -->
 <<<<<<< HEAD
     <group unless="$(var is_sim)">
@@ -78,11 +72,18 @@
         <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
         <group if="$(eval '\'$(var is_indoors)\' == \'true\'')">
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+    <!-- start all sensors if this is not a simulation -->
+    <group unless="$(arg is_sim)">
+        <!-- TODO: <param name="use_sim_time" value="false"/> -->
+        <group if="$(arg is_indoors)">
+>>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
             <!-- Start Lidar -->
-            <include file="$(find-pkg-share svea_localization)/launch/lidar.xml">
-                <arg name="lidar_ip"                    value="$(var lidar_ip)"/>
+            <include file="$(find svea_localization)/launch/sensors/lidar.launch">
+                <arg name="lidar_ip"                    value="$(arg lidar_ip)" if="$(eval lidar_ip != '')"/>
             </include>
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 	    <include file="$(find-pkg-share svea_localization)/launch/localization.py">
 		    <arg name="intial_pose_x" value="$(var initial_pose_x)"/>
@@ -120,33 +121,52 @@
                 <param name="autostart" value="true"/>
                 <param name="node_names" value="['amcl_localization']"/>
             </node> -->
+=======
+            <!-- Start AMCL -->
+            <node pkg="nav2_amcl" exec="nav2_amcl" name="amcl_localization" output="screen">
+                <rosparam command="load"        file="$(find svea_localization)/params/amcl/localize.yaml"/>
+                <param name="scan"              value="scan"/>
+                <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
+                <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
+                <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
+            </node>
+>>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
         </group>
 
         <!-- TODO: Start GPS if outdoor localization -->
-        <!-- <group unless="$(eval '\'$(var is_indoors)\' == \'true\'')"> -->
-            <!-- <group if="$(var start_rtk)"> -->
-                <!-- <include file="$(find-pkg-share svea_localization)/launch/rtk.xml"> -->
-                    <!-- <arg name="gps_device"      value="$(var gps_device)" /> -->
-                    <!-- <arg name="baud"            value="$(var gps_baud)" /> -->
-                <!-- </include> -->
-            <!-- </group> -->
-            <!-- <include file="$(find-pkg-share svea_localization)/launch/navsat.xml"> -->
-                <!-- <arg name="delay"           value="$(var delay)"/> -->
-                <!-- <arg name="yaw_offset"      value="$(var initial_pose_a)"/> -->
-                <!-- <arg name="use_datum"       value="$(var use_datum)" /> -->
-                <!-- <arg name="datum_service"   value="$(var datum_service)" /> -->
-                <!-- <arg name="datum_file"      value="$(var datum_file)" /> -->
-                <!-- <arg name="datum_data"      value="$(var datum_data)" /> -->
-            <!-- </include> -->
-        <!-- </group> -->
+        <!-- <group unless="$(arg is_indoors)">
+            <group if="$(arg start_rtk)">
+                <include file="$(find svea_localization)/launch/sensors/rtk.launch">
+                    <arg name="gps_device"      value="$(arg gps_device)" />
+                    <arg name="baud"            value="$(arg gps_baud)" />
+                </include>
+            </group>
+            <include file="$(find svea_localization)/launch/sensors/navsat.launch">
+                <arg name="delay"           value="$(arg delay)"/>
+                <arg name="yaw_offset"      value="$(arg initial_pose_a)"/>
+                <arg name="use_datum"       value="$(arg use_datum)" />
+                <arg name="datum_service"   value="$(arg datum_service)" />
+                <arg name="datum_file"      value="$(arg datum_file)" />
+                <arg name="datum_data"      value="$(arg datum_data)" />
+            </include>
+        </group> -->
+
+        <!-- Start controller -->
+        <include file="$(find svea_localization)/launch/sensors/controller.xml"></include>
+
+        <!-- Static transforms for sensors -->
+        <include file="$(find svea_localization)/launch/transforms.xml">
+            <arg name="is_indoors"  value="$(arg is_indoors)"/>
+        </include>
     </group>
 
-
-
     <!-- Do not start the sensors, useful when running from a bag file -->
-    <let name="use_sim_time" value="$(var is_sim)" if="$(eval '\'$(var is_sim)\' == \'true\'')"/>
+    <group if="$(arg is_sim)">
+        <param name="use_sim_time"          value="true" />
+    </group>
 
     <!-- Robot localization (Local EKF)-->
+<<<<<<< HEAD
     <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
         <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
 <<<<<<< HEAD
@@ -158,25 +178,35 @@
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
         <remap from="/odometry/filtered"    to="/odometry/local"/>
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/>  -->
+=======
+    <node pkg="robot_localization" exec="ekf_localization_node" name="ekf_local" clear_params="true" output="screen">
+        <rosparam command="load" file="$(find svea_localization)/params/robot_localization/local_ekf.yaml" />
+        <param name="imu0"                  value="imu/data"/>
+        <param name="twist0"                value="actuation_twist"/>
+        <remap from="/odometry/filtered"    to="/odometry/filtered/local"/>
+        <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> -->
+>>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
     </node>
 
     <!-- Global EKF -->
-    <node unless="$(eval '\'$(var is_indoors)\' == \'true\'')" pkg="robot_localization" exec="ekf_node" name="ekf_global" output="screen">
-        <param from="$(find-pkg-share svea_localization)/params/global_ekf.yaml"/>
+    <node unless="$(arg is_indoors)" pkg="robot_localization" exec="ekf_localization_node" name="ekf_global" clear_params="true" output="screen">
+        <rosparam command="load" file="$(find svea_localization)/params/robot_localization/global_ekf.yaml"/>
         <!-- initial_state: [x,          y,          z, 
                              roll,       pitch,      yaw, 
                              x_dot,      y_dot,      z_dot, 
                              roll_dot,   pitch_dot,  yaw_dot, 
                              x_dot_dot,  y_dot_dot,  z_dot_dot]-->
-        <param name="initial_state" value="[$(var initial_pose_x), $(var initial_pose_y), 0.0, 
-                                     0.0, 0.0, $(var initial_pose_a),
-                                     0.0, 0.0, 0.0,
-                                     0.0, 0.0, 0.0,
-                                     0.0, 0.0, 0.0]"/>
+        <rosparam subst_value="true">
+        initial_state: [$(arg initial_pose_x),  $(arg initial_pose_y),  0.0, 
+                        0.0,                    0.0,                    $(arg initial_pose_a), 
+                        0.0,                    0.0,                    0.0, 
+                        0.0,                    0.0,                    0.0, 
+                        0.0,                    0.0,                    0.0]
+        </rosparam>
         <param name="odom0"                 value="odometry/gps"/>
-        <param name="imu0"                  value="/lli/sensor/imu"/>
-        <param name="twist0"                value="/lli/sensor/encoders"/>
-        <remap from="/odometry/filtered"    to="/odometry/global"/>
+        <param name="imu0"                  value="imu/data"/>
+        <param name="twist0"                value="actuation_twist"/>
+        <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> -->
     </node>
 </launch>

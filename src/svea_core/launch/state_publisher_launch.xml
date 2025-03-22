@@ -1,8 +1,7 @@
-<?xml version="1.0"?>
 <launch>
 
     <!-- Launch arguments -->
-    <arg name="map" default="floor2"/>
+    <arg name="map" default="sml"/>
     <arg name="initial_pose_x" default="-2.65488696"/>
     <arg name="initial_pose_y" default="-1.64422277"/>
     <arg name="initial_pose_a" default="1.57"/>
@@ -19,7 +18,7 @@
     </node>
 
     <!-- Start localization -->
-    <include file="$(find-pkg-share svea_localization)/launch/localize.xml">
+    <include file="$(find-pkg-share svea_sensors)/launch/localize_launch.xml">
         <arg name="initial_pose_x" value="$(var initial_pose_x)"/>
         <arg name="initial_pose_y" value="$(var initial_pose_y)"/>
         <arg name="initial_pose_a" value="$(var initial_pose_a)"/>
