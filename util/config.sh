@@ -13,7 +13,7 @@ main() {
 
     withdefault DEBUG "0"
 
-    withdefault ROSDISTRO       "noetic"
+    withdefault ROSDISTRO       "jazzy"
     withdefault WORKSPACE       "/svea_ws"
     withdefault REPOSITORY_PATH "$(climb entrypoint)"
     withdefault REPOSITORY_NAME "$(basename "$REPOSITORY_PATH")"

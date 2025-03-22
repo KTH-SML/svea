@@ -1,5 +1,5 @@
 # Use the official ROS 2 Jazzy image as the base image
-FROM ros:jazzy-ros-core-noble
+FROM ros:jazzy-ros-base-noble
 
 # Set the ROS distribution as a build argument
 ARG ROSDISTRO="jazzy"
@@ -9,29 +9,22 @@ ENV ROSDISTRO=$ROSDISTRO
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     apt-utils lsb-release \
-    # cmake \
+    cmake \
     git vim nano curl iputils-ping \
     python3-colcon-common-extensions \
-    python3-colcon-mixin \
     python3-rosdep \
-    # python3-vcstool \
-    # python3-tk \
+    python3-vcstool \
+    python3-tk \
     python3-pip \
-    # python3-matplotlib \
-    # python3-venv \
+    python3-matplotlib \
+    python3-venv \
     ros-$ROSDISTRO-ament-cmake-python \
     ros-jazzy-ros-base=0.11.0-1* \
     && rm -rf /var/lib/apt/lists/*
 
 # Bootstrap rosdep and setup colcon mixin and metadata
-RUN rosdep init && \
-    rosdep update --rosdistro $ROSDISTRO && \
-    colcon mixin add default \
-      https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml && \
-    colcon mixin update && \
-    colcon metadata add default \
-      https://raw.githubusercontent.com/colcon/colcon-metadata-repository/master/index.yaml && \
-    colcon metadata update
+# RUN rosdep init && \
+RUN rosdep update --rosdistro $ROSDISTRO
 
 # Create a Python virtual environment
 # ENV VIRTUAL_ENV=/opt/venv
@@ -66,6 +59,9 @@ RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
 # Source the setup file in the .bashrc for convenience
 RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \
     echo "source /svea_ws/install/setup.bash" >> ~/.bashrc
+
+# For fixing WSL error
+RUN chmod +x ./entrypoint
 
 # Set the entrypoint to the custom entrypoint script
 ENTRYPOINT ["./entrypoint"]

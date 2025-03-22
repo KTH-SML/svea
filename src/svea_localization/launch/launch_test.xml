@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="svea_localization" exec="odom_to_path_relay" name="odom_to_path_relay" output="screen">
+        <param name="odom_topic" value="/odometry/filtered"/>
+    </node>
+</launch>
