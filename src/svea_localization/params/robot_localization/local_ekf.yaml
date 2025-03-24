@@ -30,28 +30,6 @@ world_frame: odom           # Defaults to the value of odom_frame if unspecified
 
 
 ##########################################
-# RS T265 ################################
-odom0: rs/t265_camera/odom/sample
-
-odom0_config: [false, false, false,
-               false, false, false,
-               false, false, false,
-               true, true, true,
-               false, false, false]
-
-#odom0_config: [x, y, z,
-#               R, P, Y,
-#               x_dot, y_dot, z_dot,
-#               R_dot, P_dot, Y_dot,
-#               x_dot_dot, y_dot_dot, z_dot_dot]
-
-odom0_queue_size: 10
-odom0_nodelay: true
-
-odom0_differential: false
-odom0_relative: true
-
-##########################################
 # BNO055 IMU #############################
 imu0: /imu/data
 imu0_config: [false, false, false,
@@ -86,18 +64,6 @@ twist0_queue_size: 8
 #twist0_rejection_threshold: 2.0                # Note the difference in parameter names
 #imu0_linear_acceleration_rejection_threshold: 1.0  #
 
-##########################################
-# Twist based on wheel encoders ##########
-twist1: /wheel_encoder_twist
-twist1_config: [false, false, false,
-                false, false, false,
-                true,  false, false,
-                false, false, true,
-                false, false, false]
-twist1_nodelay: true
-twist1_differential: true
-twist1_relative: false
-twist1_queue_size: 8
 
 # Control input is not used 
 # (and you should not try to use it)

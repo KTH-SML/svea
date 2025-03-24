@@ -49,51 +49,51 @@
     </group> -->
 
     <!-- Start map server -->
-    <node if="$(eval map_file != '')" pkg="nav2_map_server" exec="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
+    <node if="$(eval 'map_file != \'\'')" pkg="nav2_map_server" exec="map_server" name="map_server" output="screen" args="$(arg map_file)"/>
 
     <!-- start all sensors if this is not a simulation -->
-    <group unless="$(arg is_sim)">
+    <group unless="$(var is_sim)">
         <!-- TODO: <param name="use_sim_time" value="false"/> -->
-        <group if="$(arg is_indoors)">
+        <group if="$(var is_indoors)">
             <!-- Start Lidar -->
-            <include file="$(find svea_localization)/launch/sensors/lidar.launch">
-                <arg name="lidar_ip"                    value="$(arg lidar_ip)" if="$(eval lidar_ip != '')"/>
+            <include file="$(find-pkg-share svea_localization)/launch/sensors/lidar.xml">
+                <arg name="lidar_ip"                    value="$(var lidar_ip)" if="$(eval 'lidar_ip != \'\'')"/>
             </include>
 
             <!-- Start AMCL -->
             <node pkg="nav2_amcl" exec="nav2_amcl" name="amcl_localization" output="screen">
-                <rosparam command="load"        file="$(find svea_localization)/params/amcl/localize.yaml"/>
+                <rosparam command="load"        file="$(find-pkg-share svea_localization)/params/amcl/localize.yaml"/>
                 <param name="scan"              value="scan"/>
-                <param name="initial_pose_x"    value="$(arg initial_pose_x)" />
-                <param name="initial_pose_y"    value="$(arg initial_pose_y)" />
-                <param name="initial_pose_a"    value="$(arg initial_pose_a)" />
+                <param name="initial_pose_x"    value="$(var initial_pose_x)" />
+                <param name="initial_pose_y"    value="$(var initial_pose_y)" />
+                <param name="initial_pose_a"    value="$(var initial_pose_a)" />
             </node>
         </group>
 
         <!-- TODO: Start GPS if outdoor localization -->
         <!-- <group unless="$(arg is_indoors)">
             <group if="$(arg start_rtk)">
-                <include file="$(find svea_localization)/launch/sensors/rtk.launch">
-                    <arg name="gps_device"      value="$(arg gps_device)" />
-                    <arg name="baud"            value="$(arg gps_baud)" />
+                <include file="$(find-pkg-share svea_localization)/launch/sensors/rtk.launch">
+                    <arg name="gps_device"      value="$(var gps_device)" />
+                    <arg name="baud"            value="$(var gps_baud)" />
                 </include>
             </group>
-            <include file="$(find svea_localization)/launch/sensors/navsat.launch">
-                <arg name="delay"           value="$(arg delay)"/>
-                <arg name="yaw_offset"      value="$(arg initial_pose_a)"/>
-                <arg name="use_datum"       value="$(arg use_datum)" />
-                <arg name="datum_service"   value="$(arg datum_service)" />
-                <arg name="datum_file"      value="$(arg datum_file)" />
-                <arg name="datum_data"      value="$(arg datum_data)" />
+            <include file="$(find-pkg-share svea_localization)/launch/sensors/navsat.launch">
+                <arg name="delay"           value="$(var delay)"/>
+                <arg name="yaw_offset"      value="$(var initial_pose_a)"/>
+                <arg name="use_datum"       value="$(var use_datum)" />
+                <arg name="datum_service"   value="$(var datum_service)" />
+                <arg name="datum_file"      value="$(var datum_file)" />
+                <arg name="datum_data"      value="$(var datum_data)" />
             </include>
         </group> -->
 
         <!-- Start controller -->
-        <include file="$(find svea_localization)/launch/sensors/controller.xml"></include>
+        <include file="$(find-pkg-share svea_localization)/launch/sensors/controller.xml"></include>
 
         <!-- Static transforms for sensors -->
-        <include file="$(find svea_localization)/launch/transforms.xml">
-            <arg name="is_indoors"  value="$(arg is_indoors)"/>
+        <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
+            <arg name="is_indoors"  value="$(var is_indoors)"/>
         </include>
     </group>
 
@@ -104,7 +104,7 @@
 
     <!-- Robot localization (Local EKF)-->
     <node pkg="robot_localization" exec="ekf_localization_node" name="ekf_local" clear_params="true" output="screen">
-        <rosparam command="load" file="$(find svea_localization)/params/robot_localization/local_ekf.yaml" />
+        <rosparam command="load" file="$(find-pkg-share svea_localization)/params/robot_localization/local_ekf.yaml" />
         <param name="imu0"                  value="imu/data"/>
         <param name="twist0"                value="actuation_twist"/>
         <remap from="/odometry/filtered"    to="/odometry/filtered/local"/>
@@ -112,15 +112,15 @@
     </node>
 
     <!-- Global EKF -->
-    <node unless="$(arg is_indoors)" pkg="robot_localization" exec="ekf_localization_node" name="ekf_global" clear_params="true" output="screen">
-        <rosparam command="load" file="$(find svea_localization)/params/robot_localization/global_ekf.yaml"/>
+    <node unless="$(var is_indoors)" pkg="robot_localization" exec="ekf_localization_node" name="ekf_global" clear_params="true" output="screen">
+        <rosparam command="load" file="$(find-pkg-share svea_localization)/params/robot_localization/global_ekf.yaml"/>
         <!-- initial_state: [x,          y,          z, 
                              roll,       pitch,      yaw, 
                              x_dot,      y_dot,      z_dot, 
                              roll_dot,   pitch_dot,  yaw_dot, 
                              x_dot_dot,  y_dot_dot,  z_dot_dot]-->
         <rosparam subst_value="true">
-        initial_state: [$(arg initial_pose_x),  $(arg initial_pose_y),  0.0, 
+        initial_state: [$(var initial_pose_x),  $(var initial_pose_y),  0.0, 
                         0.0,                    0.0,                    $(arg initial_pose_a), 
                         0.0,                    0.0,                    0.0, 
                         0.0,                    0.0,                    0.0, 

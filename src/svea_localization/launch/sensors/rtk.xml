@@ -32,21 +32,21 @@
     
 
     <!-- START UBLOX ZED-F9P RTK MANAGER NODE -->
-    <node pkg="svea_sensors" type="rtk_manager.py" name="rtk_manager" output="screen" ns="gps">
-        <param name="device"        value="$(arg gps_device)"/>
-        <param name="baud"          value="$(arg baud)" />
-        <param name="gps_frame"     value="$(arg gps_frame)" />
-        <param name="dynamic_model" value="$(arg dynamic_model)"/>
+    <node pkg="svea_localization" exec="rtk_manager" name="rtk_manager" output="screen" namespace="gps">
+        <param name="device"        value="$(var gps_device)"/>
+        <param name="baud"          value="$(var baud)" />
+        <param name="gps_frame"     value="$(var gps_frame)" />
+        <param name="dynamic_model" value="$(var dynamic_model)"/>
     </node>
 
     <!-- START NTRIP CLIENT -->
-    <include file="$(find ntrip_client)/launch/ntrip_client.launch">
-        <arg name="host"            value="$(arg host)" />
-        <arg name="port"            value="$(arg port)" /> 
-        <arg name="mountpoint"      value="$(arg mountpoint)" />
-        <arg name="authenticate"    value="$(arg authenticate)" />
-        <arg name="username"        value="$(arg username)" />
-        <arg name="password"        value="$(arg password)" />
+    <include file="$(find-pkg-share ntrip_client)/ntrip_client_launch.py">
+        <arg name="host"            value="$(var host)" />
+        <arg name="port"            value="$(var port)" /> 
+        <arg name="mountpoint"      value="$(var mountpoint)" />
+        <arg name="authenticate"    value="$(var authenticate)" />
+        <arg name="username"        value="$(var username)" />
+        <arg name="password"        value="$(var password)" />
     </include>
 
 </launch>
