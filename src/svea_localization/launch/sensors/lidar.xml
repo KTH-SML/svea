@@ -14,6 +14,9 @@
     <arg name="lidar_angle_max"             default="2.355"/>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 7b91b85 (2025/03/24 Meeting update)
     <node pkg="urg_node" exec="urg_node_driver" name="Hokyoulidar">
         <param name="ip_address"        value="$(var lidar_ip)" />
         <param name="frame_id"          value="$(var lidar_frame_id)"/>
@@ -22,6 +25,7 @@
         <param name="publish_multiecho" value="$(var lidar_publish_multiecho)"/>
         <param name="angle_min"         value="$(var lidar_angle_min)"/>
         <param name="angle_max"         value="$(var lidar_angle_max)"/>
+<<<<<<< HEAD
 <<<<<<< HEAD
         <param name="default_user_latency"         value="0.01"/>
         <param name="skip"              value="1"/>
@@ -39,6 +43,8 @@
         <param name="angle_min"         value="$(arg lidar_angle_min)"/>
         <param name="angle_max"         value="$(arg lidar_angle_max)"/>
 >>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
+=======
+>>>>>>> 7b91b85 (2025/03/24 Meeting update)
     </node>
 </launch>
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
