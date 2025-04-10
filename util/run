@@ -10,7 +10,14 @@
 
 CMD="docker run"
 ARGS="$@"
+ARGS="$@"
 
+# Default docker arguments
+if isempty ARGS; then
+    ARGS="--name $CONTAINER_NAME"
+fi
+
+# Other docker arguments
 # Default docker arguments
 if isempty ARGS; then
     ARGS="--name $CONTAINER_NAME"
@@ -41,6 +48,7 @@ append ARGS \
 call $CMD $ARGS
 =======
     -v "$SHARED_VOLUME" \
+    -v "$SHARED_VOLUME" \
     -e "TERM=xterm-256color" \
     --rm \
 
@@ -48,17 +56,10 @@ if istrue DEV; then
     append ARGS \
         -p "8765:8765"
 else
-    # On macOS, reduce privileges to avoid Docker Desktop issues
-    if is_darwin; then
-        append ARGS \
-            --privileged \
-            --network host
-    else
-        append ARGS \
-            -v "/dev:/dev" \
-            --network host \
-            --privileged
-    fi
+    append ARGS \
+        -v "/dev:/dev" \
+        --network host \
+        --privileged
 fi
 
 append ARGS \
