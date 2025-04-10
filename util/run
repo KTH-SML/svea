@@ -9,21 +9,32 @@
 . "$(dirname "$0")/config.sh"
 
 CMD="docker run"
-ARGS=""
+ARGS="$@"
 
-append ARGS \
-    -it \
-    -e "TERM=xterm-256color" \
-    -v "/dev:/dev" \
-    -v "$SHARED_VOLUME" \
-    --rm \
-    --network host \
-    --privileged
-
-# These args are replaced if util/build is called with arguments
-if [ -z "$*" ]
-then append ARGS --name "$CONTAINER_NAME" "$IMAGE_TAG"
-else append ARGS "$@"
+# Default docker arguments
+if isempty ARGS; then
+    ARGS="--name $CONTAINER_NAME"
 fi
 
+# Other docker arguments
+append ARGS \
+    -it \
+    -v "$SHARED_VOLUME" \
+    -e "TERM=xterm-256color" \
+    --rm \
+
+if istrue DEV; then
+    append ARGS \
+        -p "8765:8765"
+else
+    append ARGS \
+        -v "/dev:/dev" \
+        --network host \
+        --privileged
+fi
+
+append ARGS \
+    "$IMAGE_TAG"
+
+# Can be debugged with DEBUG=1 env var
 call $CMD $ARGS

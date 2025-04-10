@@ -204,6 +204,14 @@ istrue() {
     return $?
 }
 
+# Assert shell variable with name NAME is empty
+# > isempty NAME
+isempty() {
+    VALUE="$(eval echo "\$$1")"
+    test -z "$VALUE"
+    return $?
+}
+
 ################################################################################
 ################################################################################
 

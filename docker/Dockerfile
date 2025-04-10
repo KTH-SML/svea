@@ -14,9 +14,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3-colcon-common-extensions \
     python3-rosdep \
     python3-vcstool \
-    python3-tk \
     python3-pip \
-    python3-matplotlib \
     python3-venv \
     ros-$ROSDISTRO-ament-cmake-python \
     ros-jazzy-ros-base=0.11.0-1* \
