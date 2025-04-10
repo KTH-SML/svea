@@ -8,14 +8,25 @@ TODO:
     - Create nice printout for Laplacian
     - Add support for arbitrary communication structures, currently the
       model creation only supports k-nearest neighbor communication.
+<<<<<<< HEAD
 
 Author: Frank Jiang
+=======
+>>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
 """
 
 from typing import Sequence
 
 import numpy as np
 
+<<<<<<< HEAD
+=======
+__license__ = "MIT"
+__maintainer__ = "Frank Jiang"
+__email__ = "frankji@kth.se"
+__status__ = "Development"
+
+>>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
 
 class C_OVRV(object):
     r"""Cooperative model for the SVEA car.

@@ -21,6 +21,7 @@ from geometry_msgs.msg import PoseStamped
 import math
 
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/svea_localization/scripts/odom_to_path_relay.py
 ========
 def load_param(self, name, value=None):
@@ -29,6 +30,8 @@ def load_param(self, name, value=None):
         assert self.has_parameter(name), f'Missing parameter "{name}"'
     return self.get_parameter(name).value
 >>>>>>>> 360ef06 (add svea_localization,modifying to ros2 in progress):src/svea_localization/script/odom_to_path_relay.py
+=======
+>>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
 
 def replace_base(old, new) -> str:
     split_last = lambda xs: (xs[:-1], xs[-1])
@@ -48,6 +51,7 @@ class OdomToPathRelay(Node):
             super().__init__('odom_to_path_relay')
             
             # Topic Parameters
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/svea_localization/scripts/odom_to_path_relay.py
             self.odom_topic = self.load_param('~odom_topic', 'odom')
             
@@ -61,6 +65,13 @@ class OdomToPathRelay(Node):
             self.base_frame_id = load_param(self, '~base_frame_id', 'base_link')
             self.initial_yaw_offset = load_param(self, '~initial_yaw_offset', 0.0)
 >>>>>>>> 360ef06 (add svea_localization,modifying to ros2 in progress):src/svea_localization/script/odom_to_path_relay.py
+=======
+            self.odom_topic = self.load_param('~odom_topic', 'odom')
+            
+            # Other parameters
+            self.base_frame_id = self.load_param('~base_frame_id', 'base_link')
+            self.initial_yaw_offset = self.load_param('~initial_yaw_offset', 0.0)
+>>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
             
             # TF2
             self.tf_buf = tf2_ros.Buffer()
@@ -86,7 +97,10 @@ class OdomToPathRelay(Node):
             
             # Log status
             self.get_logger().info('{} node initialized.'.format(self.get_name()))
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/svea_localization/scripts/odom_to_path_relay.py
+=======
+>>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
     
     def load_param(self, name, value=None):
         self.declare_parameter(name, value)
@@ -94,9 +108,12 @@ class OdomToPathRelay(Node):
             assert self.has_parameter(name), f'Missing parameter "{name}"'
         return self.get_parameter(name).value
     
+<<<<<<< HEAD
 ========
             
 >>>>>>>> 360ef06 (add svea_localization,modifying to ros2 in progress):src/svea_localization/script/odom_to_path_relay.py
+=======
+>>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
     def run(self) -> None:
         try:
             rclpy.spin(self)

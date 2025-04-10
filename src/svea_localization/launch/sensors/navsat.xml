@@ -15,10 +15,14 @@
         <param name="wait_for_datum"                                    value="$(var use_datum)"/>
         <param name="delay"                                             value="$(var delay)" />
 <<<<<<< HEAD
+<<<<<<< HEAD
         <param name="magnetic_declination_radians"                      value='0.0'/>
 =======
         <param name="magnetic_declination_radians"                      value="0"/>
 >>>>>>> cf824d9 (2025/03/24 Meeting update)
+=======
+        <param name="magnetic_declination_radians"                      value='0.0'/>
+>>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
         <param name="yaw_offset"                                        value="$(var yaw_offset)"/>
         <param name="zero_altitude"                                     value="true" />
         <param name="broadcast_cartesian_transform_as_parent_frame"     value="true"/>

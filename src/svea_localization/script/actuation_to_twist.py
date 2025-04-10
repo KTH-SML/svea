@@ -5,15 +5,14 @@
 
 
 import math
-# import rospy
+# import rclpy
 import rclpy
-import rclpy.logging
+import rclpy.clock
 from rclpy.node import Node
-import rclpy.timer
 import rclpy.utilities
 from svea_msgs.msg import LLIControl as lli_ctrl
 from geometry_msgs.msg import TwistWithCovarianceStamped
-from svea.states import SVEAControlValues
+from svea_core.states import SVEAControlValues
 
 
 __author__ = "Tobias Bolin"
@@ -24,12 +23,6 @@ __version__ = "0.0.1"
 __maintainer__ = "Tobia Bolin"
 __email__ = "tbolin@kth.se"
 __status__ = "Beta"
-
-def load_param(self, name, value=None):
-    self.declare_parameter(name, value)
-    if value is None:
-        assert self.has_parameter(name), f'Missing parameter "{name}"'
-    return self.get_parameter(name).value
 
 
 class Republish(Node):
@@ -49,24 +42,24 @@ class Republish(Node):
         super().__init__('actuation_to_twist')
         ## Pull necessary ROS parameters from launch file:
         # Read control message topic
-        self.ctrl_msg_top = load_param(self,"~ctrl_message_topic", "lli/ctrl_actuated")
+        self.ctrl_msg_top = self.load_param("~ctrl_message_topic", "lli/ctrl_actuated")
         # Read twist message topic
-        self.twist_msg_top = load_param(self,"~twist_message_topic", "actuation_twist")
+        self.twist_msg_top = self.load_param("~twist_message_topic", "actuation_twist")
         # Read vehicle frame id topic
-        self.vehicle_frame_id = load_param(self,"~frame_id", "base_link")
+        self.vehicle_frame_id = self.load_param("~frame_id", "base_link")
         # Read max speed for gear 0 and 1
-        self.max_speed_0 = load_param(self,"~max_speed_0", self.MAX_SPEED_0)
-        self.max_speed_1 = load_param(self,"~max_speed_1", self.MAX_SPEED_1)
+        self.max_speed_0 = self.load_param("~max_speed_0", self.MAX_SPEED_0)
+        self.max_speed_1 = self.load_param("~max_speed_1", self.MAX_SPEED_1)
         # Read max steering angle
-        self.max_steering_angle = load_param(self,"~max_steering_angle", self.MAX_STEERING_ANGLE)
+        self.max_steering_angle = self.load_param("~max_steering_angle", self.MAX_STEERING_ANGLE)
         # Read covariance values
-        self.lin_cov = load_param(self,"~linear_covariance", 0.1)
-        self.ang_cov = load_param(self,"~angular_covariance", 0.1)
+        self.lin_cov = self.load_param("~linear_covariance", 0.1)
+        self.ang_cov = self.load_param("~angular_covariance", 0.1)
         # Publishing rate
-        self.rate = load_param(self,"~rate", 50)
+        self.rate = self.load_param("~rate", 50)
         # Acceleration coefficient for gear 0 and gear 1
-        self.tau0 = load_param(self,"~tau0", self.TAU0)
-        self.tau1 = load_param(self,"~tau1", self.TAU1)
+        self.tau0 = self.load_param("~tau0", self.TAU0)
+        self.tau1 = self.load_param("~tau1", self.TAU1)
 
         # Initialize class variables
         self.twist_msg = TwistWithCovarianceStamped()
@@ -84,9 +77,15 @@ class Republish(Node):
             self.twist_msg_top, 
             10)
 
+    def load_param(self, name, value=None):
+        self.declare_parameter(name, value)
+        if value is None:
+            assert self.has_parameter(name), f'Missing parameter "{name}"'
+        return self.get_parameter(name).value
+
     def ctrl_calc_and_pub(self):
         # initialize message
-        rate = rclpy.timer.Rate(self.rate)
+        rate = self.create_rate(self.rate)
         
         while rclpy.utilities.ok():
             if self._actuation_values.gear is not None:
@@ -99,7 +98,7 @@ class Republish(Node):
 
                 # Build Header for current time stamp
                 self.twist_msg.header.seq += 1
-                self.twist_msg.header.stamp = rospy.Time.now()
+                self.twist_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
 
                 # Build Twist using bicycle model
                 self.twist_msg.twist.twist.linear.x = vel
@@ -108,7 +107,8 @@ class Republish(Node):
                 # Publish message
                 self.twist_pub.publish(self.twist_msg)
                 rate.sleep()
-        rclpy.spin()
+        
+        rclpy.spin(self)
 
     def cov_matrix_build(self):
         # sigma_yy = 0 given svea's kinematics
@@ -124,7 +124,7 @@ class Republish(Node):
     def ctrl_msg_callback(self, ctrl_msg):
         self._is_reverse = self._detect_reverse_state(ctrl_msg)
         self.velocity = self.calc_current_velocity()
-        self._actuation_values.ctrl_msg = ctrl_msg
+        self._ctrl_calc_and_pubactuation_values.ctrl_msg = ctrl_msg
 
     def _detect_reverse_state(self, msg):
         dead_zone = 5 # velocities with abs values <= than this = 0 to ESC
@@ -147,7 +147,7 @@ class Republish(Node):
 
     def calc_current_velocity(self):
         act_values = self._actuation_values
-        time_now = self.get_clock().now()
+        time_now = self.get_Clock().now().to_msg()
         if self._last_calc_time is not None:
             dt = (time_now - self._last_calc_time).sec()
         else:
@@ -192,9 +192,13 @@ class Republish(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    republish = Republish()
-    republish.ctrl_calc_and_pub()
-    rclpy.logging.get_logger().info("actuation_to_twist node successfuly initilized")
+    try:
+        republish = Republish()
+        republish.ctrl_calc_and_pub()
+        republish.get_logger().info("actuation_to_twist node successfuly initilized")
+    except rclpy.exceptions.ROSInterruptException:
+        republish.get_logger().info("actuation_to_twist node interrupted")
+        pass
 
 
 if __name__ == '__main__':

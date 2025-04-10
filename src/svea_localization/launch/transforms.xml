@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <launch>
   <!-- Launch file arguments -->
   <arg name="is_indoors" default="true" description="Whether the robot is operating indoors"/>
@@ -50,4 +51,20 @@
         <node pkg="tf2_ros" exec="static_transform_publisher" name="lidarlink_broadcaster"  args="0.284 0 0.2 0 0 0 1 base_link laser" />
     </group>
 >>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
+=======
+<launch>
+  <!-- Launch file arguments -->
+  <arg name="is_indoors" default="true" description="Whether the robot is operating indoors"/>
+  
+  <!-- Static transforms -->
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster" args="0 0 0 0 0 0 map odom"/>
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster" args="0 0 0 0 0 0 odom base_link"/>
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="imulink_broadcaster" args="0 0 0.1 0 0 0 base_link imu"/>
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="gpslink_broadcaster" args="0.04 0.103 0.140 0 0 0 base_link gps"/>
+  
+  <!-- Conditional lidar transform (ROS2 doesn't have <group> but supports if/unless on nodes) -->
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="lidarlink_broadcaster" 
+        args="0.284 0 0.2 0 0 0 1 base_link laser"
+        if="$(var is_indoors)"/>
+>>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
 </launch>

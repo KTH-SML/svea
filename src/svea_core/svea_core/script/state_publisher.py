@@ -4,8 +4,8 @@ import rclpy
 from rclpy.node import Node 
 from geometry_msgs.msg import PointStamped
 from svea_msgs.msg import VehicleState as VehicleStateMsg
-from svea.states import VehicleState
-from svea.data import RVIZPathHandler
+from svea_core.states import VehicleState
+from svea_core.data import RVIZPathHandler
 
 
 class StatePublisher(Node):
@@ -34,7 +34,7 @@ class StatePublisher(Node):
         self.state = VehicleState()
         
         # Wait for the first state message
-        self.state.state_msg = self.wait_for_message('state', VehicleStateMsg)
+        # self.state.state_msg = self.wait_for_message('state', VehicleStateMsg)
         self.create_subscription(
             VehicleStateMsg,
             'state',
@@ -82,8 +82,6 @@ def main(args=None):
     rclpy.init(args=args)
     node = StatePublisher()
     node.run()
-    node.destroy_node()
-    rclpy.shutdown()
 
 
 if __name__ == '__main__':

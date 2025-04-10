@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 """
+<<<<<<< HEAD
 TODO: Test module for svea.simulators.states
+=======
+Test module for svea.simulators.states
+>>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
 """
 
 
@@ -17,6 +21,11 @@ from geometry_msgs.msg import PoseWithCovariance
 from geometry_msgs.msg import Twist, TwistStamped
 from geometry_msgs.msg import TwistWithCovariance
 from nav_msgs.msg import Odometry
+<<<<<<< HEAD
+=======
+from svea_msgs.msg import lli_ctrl
+from svea_msgs.msg import VehicleState as MsgVehicleState
+>>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
 import svea_core.models.states as states
 from svea_core.models.states import VehicleState
 from svea_core.models.states import SVEAControlValues
