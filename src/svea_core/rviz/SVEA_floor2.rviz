@@ -95,7 +95,7 @@ Visualization Manager:
       Color: 0; 170; 255
       Enabled: true
       Name: SVEA
-      Topic: /3D_car
+      Topic: /car_3D
       Unreliable: false
       Value: true
     - Alpha: 1

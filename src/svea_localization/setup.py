@@ -18,7 +18,7 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.xml')),
         # Include config files
-        (os.path.join('share', package_name, 'config'), glob('param/**/*.yaml')),
+        (os.path.join('share', package_name, 'config'), glob('params/**/*.yaml')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

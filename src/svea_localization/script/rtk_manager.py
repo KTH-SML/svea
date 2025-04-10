@@ -10,7 +10,9 @@ from pyubx2 import (
     RTCM3_PROTOCOL,  # 4
 )
 
-import rospy
+import rclpy
+import rclpy.clock
+from rclpy.node import Node
 from threading import Thread
 from sensor_msgs.msg import NavSatFix, NavSatStatus
 from nmea_msgs.msg import Sentence
@@ -57,28 +59,33 @@ GPS_QUALITIES = {
 }
 
 
-class RTKManager:
+class RTKManager(Node):
     RATE = 50
 
     def __init__(self):
+        super().__init__("rtk_manager")
         # Read parameters
-        self.device = rospy.get_param("~device", "/dev/ttyACM0") #UART: /dev/ttyS0
+        self.declare_parameter('device', '/dev/ttyACM0')
+        self.device = self.get_parameter('device').value #UART: /dev/ttyS0
         if "/dev/ttyACM" in self.device or "/dev/gps" in self.device:
             self.rateUART1 = 0
             self.rateUSB = 1
         else:
             self.rateUART1 = 1
             self.rateUSB = 0
-        self.baud = rospy.get_param("~baud", 250000) #UART: 38400
-        self.frame_id = rospy.get_param("~gps_frame", "gps")
-        self.dynamic_model = rospy.get_param("~dynamic_model", "portable")
+        self.declare_parameter('~baud', 250000)
+        self.baud = self.get_parameter('~baud').value #UART: 38400
+        self.declare_parameter('~gps_frame', 'gps')
+        self.frame_id = self.get_parameter('~gps_frame').value
+        self.declare_parameter('~dynamic_model', 'portable')
+        self.dynamic_model = self.get_parameter('~dynamic_model').value
         # Setup ROS Rate
-        self.rate = rospy.Rate(self.RATE)
+        self.rate = self.create_rate(self.RATE)
         #  Open serial port
         try:
             self.serial = Serial(self.device, self.baud, bytesize=EIGHTBITS, parity=PARITY_NONE,stopbits=STOPBITS_ONE,timeout=1, exclusive=True)
         except SerialException as ex:
-            rospy.logfatal(
+            self.get_logger().fatal(
                 "Could not open serial port: I/O error({0}): {1}".format(
                     ex.errno, ex.strerror
                 )
@@ -99,38 +106,29 @@ class RTKManager:
     def _init_pub(self):
         """Initializes publishers for necessary and sufficient topics"""
         # Nmea message which get sent to virtual NTRIP servers which give correction message from closes base station based on own location
-        self.nmea_pub = rospy.Publisher("/nmea", Sentence, queue_size=10)
+        self.nmea_pub = self.create_publisher(Sentence, "/nmea", 10)
         # Publish the satellite fix
-        self.fix_pub = rospy.Publisher("fix", NavSatFix, queue_size=10)
+        self.fix_pub = self.create_publisher(NavSatFix, "/fix", 10)
         # Heading of 2-D motion in [deg]
-        self.heading_motion_pub = rospy.Publisher(
-            "heading_motion", Float64, queue_size=10
-        )
+        self.heading_motion_pub = self.create_publisher(Float64, "/heading_motion", 10)
         # Heading of vehicle in 2-D in [deg]
-        self.heading_vehicle_pub = rospy.Publisher(
-            "heading_vehicle", Float64, queue_size=10
-        )
+        self.heading_vehicle_pub = self.create_publisher(Float64, "/heading_vehicle", 10)
         # Combined heading accuracy of vehicle and motion headings in [deg]
-        self.headingAcc_pub = rospy.Publisher(
-            "heading_accuracy", Float64, queue_size=10
-        )
+        self.headingAcc_pub = self.create_publisher(Float64, "/heading_accuracy", 10)
         # Ground speed (2-D) in [m/s]
-        self.speed_pub = rospy.Publisher("speed", Float64, queue_size=10)
+        self.speed_pub = self.create_publisher(Float64, "/speed", 10)
         # Estimate of ground speed accuracy in [m/s]
-        self.speedAcc_pub = rospy.Publisher("speed_accuracy", Float64, queue_size=10)
+        self.speedAcc_pub = self.create_publisher(Float64, "/speed_accuracy", 10)
         # Magnetic declination in [deg]
-        self.magDec_pub = rospy.Publisher(
-            "magnetic_declination", Float64, queue_size=10
-        )
+        self.magDec_pub = self.create_publisher(Float64, "/magnetic_declination", 10)
         # Accuracy of magnetic declination in [deg]
-        self.magDecAcc_pub = rospy.Publisher(
-            "magnetic_declination_accuracy", Float64, queue_size=10
-        )
+        self.magDecAcc_pub = self.create_publisher(Float64, "/magnetic_declination_accuracy", 10)
+
 
     def _init_sub(self):
         """Initialize subscribers"""
         # Subscribe to RTCM correction messages from NTRIP Client
-        rospy.Subscriber("/rtcm", Message, self._handle_rtcm_cb)
+        self.create_subscription(Message, "/rtcm", self._handle_rtcm_cb, 10)
 
     def set_config(self, msgClass, msgID, **kwargs):
         """Utility function which write a configuration message to receiver and awaits an acknowledgement."""
@@ -148,8 +146,8 @@ class RTKManager:
         # To understand the CFG-NAV5 msg https://github.com/KumarRobotics/ublox/blob/master/ublox_msgs/msg/CfgNAV5.msg
         # and https://github.com/semuconsulting/pyubx2/blob/935f678a78a1038860d07aa64e600505bdc7ac00/src/pyubx2/ubxtypes_get.py#L566C6-L600
         if DYN_MODEL_MAP.get(model, None) is None:
-            rospy.logwarn(
-                f'Invalid Dynamic Model Provided: {self.model}. Supported models are {", ".join(DYN_MODEL_MAP.keys())}.'
+            self.get_logger().warn(
+                f'Invalid Dynamic Model Provided: {model}. Supported models are {", ".join(DYN_MODEL_MAP.keys())}.'
             )
         else:
             cfg = UBXMessage(
@@ -192,11 +190,11 @@ class RTKManager:
 
     def _read_serial_handler(self):
         """Manager of all incoming messages from Serial port, reads from serial port at self.RATE [Hz]"""
-        while not rospy.is_shutdown():
+        while self.ok():
             raw_msg, parsed_msg = self.ubx_reader.read()
             msg_protocol = protocol(raw_msg)
             if msg_protocol == UBX_PROTOCOL:
-                self.nav_sat_fix_msg.header.stamp = rospy.Time().now()
+                self.nav_sat_fix_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
                 self.nav_sat_fix_msg.header.frame_id = self.frame_id
                 if parsed_msg.identity == "NAV-PVT":
                     # Understanding the PVT message
@@ -327,7 +325,7 @@ class RTKManager:
                     self.nmea_pub.publish(nmea_sentence_msg)
 
                 except UnicodeError as e:
-                    rospy.logwarn(
+                    self.get_logger().warn(
                         "Skipped adding a NMEA sentence from serial device becuase it could not be decoded as an ASCII string. The bytes were {0}".format(
                             raw_msg
                         )
@@ -335,8 +333,10 @@ class RTKManager:
 
             self.rate.sleep()
 
+def main(args=None):
+    rclpy.init(args=args)
+    rtk_manager = RTKManager()
+    rclpy.spin(rtk_manager)
 
 if __name__ == "__main__":
-    rospy.init_node("rtk_manager", anonymous=False)
-    rtk_manager = RTKManager()
-    rospy.spin()
+    main()

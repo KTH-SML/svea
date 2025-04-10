@@ -15,11 +15,6 @@ from geometry_msgs.msg import PoseStamped
 import math
 
 
-def load_param(self, name, value=None):
-    self.declare_parameter(name, value)
-    if value is None:
-        assert self.has_parameter(name), f'Missing parameter "{name}"'
-    return self.get_parameter(name).value
 
 def replace_base(old, new) -> str:
     split_last = lambda xs: (xs[:-1], xs[-1])
@@ -39,11 +34,11 @@ class OdomToPathRelay(Node):
             super().__init__('odom_to_path_relay')
             
             # Topic Parameters
-            self.odom_topic = load_param(self, '~odom_topic', 'odom')
+            self.odom_topic = self.load_param('~odom_topic', 'odom')
             
             # Other parameters
-            self.base_frame_id = load_param(self, '~base_frame_id', 'base_link')
-            self.initial_yaw_offset = load_param(self, '~initial_yaw_offset', 0.0)
+            self.base_frame_id = self.load_param('~base_frame_id', 'base_link')
+            self.initial_yaw_offset = self.load_param('~initial_yaw_offset', 0.0)
             
             # TF2
             self.tf_buf = tf2_ros.Buffer()
@@ -69,7 +64,13 @@ class OdomToPathRelay(Node):
             
             # Log status
             self.get_logger().info('{} node initialized.'.format(self.get_name()))
-            
+    
+    def load_param(self, name, value=None):
+        self.declare_parameter(name, value)
+        if value is None:
+            assert self.has_parameter(name), f'Missing parameter "{name}"'
+        return self.get_parameter(name).value
+    
     def run(self) -> None:
         try:
             rclpy.spin(self)

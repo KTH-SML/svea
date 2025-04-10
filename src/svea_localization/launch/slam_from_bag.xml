@@ -5,20 +5,22 @@
 
     <!-- Static transforms -->
     <arg name="xavier" default="false"/>
+    <let name="xavier" value="$(eval '\'$(var xavier)\' == \'true\'')"/>
     <arg name="use_rs" default="false"/>
-    <include file="$(find svea_sensors)/launch/transforms.launch">
-        <arg name="xavier" value="$(arg xavier)"/>
+    <let name="use_rs" value="$(eval '\'$(var use_rs)\' == \'true\'')"/>
+    <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
+        <arg name="xavier" value="$(var xavier)"/>
     </include>
 
     <!-- If ZED is used -->
     <group unless="$(arg use_rs)">
         <arg name="camera_model" default="zedm" /> <!-- 'zed' or 'zedm' -->
-        <param name="zed_description" textfile="$(find svea_sensors)/urdf/$(arg camera_model).urdf"/>
+        <param name="zed_description" textfile="$(find-pkg-share svea_localization)/urdf/$(arg camera_model).urdf"/>
         <node name="zed_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
             <remap from="robot_description" to="zed_description" />
         </node>
         <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
-            <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/zed_ekf.yaml" />
+            <param from="$(find-pkg-share svea_localization)/config/zed_ekf.yaml" />
             <param name="imu0" value="/imu/data"/>
             <param name="odom0" value="/zed/zed_node/odom"/>
         </node>
@@ -26,7 +28,7 @@
     <!-- If Realsense T265 is used -->
     <group if="$(arg use_rs)">
         <node pkg="robot_localization" type="ekf_localization_node" name="ekf_rs" clear_params="true" >
-            <rosparam command="load" file="$(find svea_sensors)/params/robot_localization/rs_ekf.yaml" />
+            <param from="$(find-pkg-share svea_localization)/config/rs_ekf.yaml" />
             <param name="use_sim_time" value="true" />
             <param name="publish_tf" value="true" />
             <param name="odom0" value="/rs/t265_camera/odom/sample" />
@@ -37,7 +39,7 @@
     <!-- SLAM -->
     <arg name="slam_delay" default="5" /> <!-- Delay before starting SLAM node -->
     <node pkg="slam_toolbox" type="sync_slam_toolbox_node" name="slam_toolbox" output="screen" launch-prefix="bash -c 'sleep $(arg slam_delay); $0 $@' ">
-        <rosparam command="load" file="$(find svea_sensors)/params/slam_toolbox/slam_sync.yaml" />
+        <param from="$(find-pkg-share svea_localization)/config/slam_sync.yaml" />
     </node>
 
     <!-- Bag player-->

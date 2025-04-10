@@ -95,7 +95,7 @@ Visualization Manager:
       Color: 25; 255; 0
       Enabled: true
       Name: Leader
-      Topic: /SVEA0/3D_car
+      Topic: /SVEA0/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -118,7 +118,7 @@ Visualization Manager:
       Color: 0; 255; 255
       Enabled: true
       Name: Follower 1
-      Topic: /SVEA1/3D_car
+      Topic: /SVEA1/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -126,7 +126,7 @@ Visualization Manager:
       Color: 255; 85; 0
       Enabled: true
       Name: Follower 2
-      Topic: /SVEA2/3D_car
+      Topic: /SVEA2/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -134,7 +134,7 @@ Visualization Manager:
       Color: 255; 0; 255
       Enabled: true
       Name: Follower 3
-      Topic: /SVEA3/3D_car
+      Topic: /SVEA3/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -142,7 +142,7 @@ Visualization Manager:
       Color: 85; 170; 255
       Enabled: true
       Name: Follower 4
-      Topic: /SVEA4/3D_car
+      Topic: /SVEA4/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -150,7 +150,7 @@ Visualization Manager:
       Color: 181; 253; 86
       Enabled: true
       Name: Follower 5
-      Topic: /SVEA5/3D_car
+      Topic: /SVEA5/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -158,7 +158,7 @@ Visualization Manager:
       Color: 170; 255; 0
       Enabled: true
       Name: Follower 6
-      Topic: /SVEA6/3D_car
+      Topic: /SVEA6/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -166,7 +166,7 @@ Visualization Manager:
       Color: 227; 62; 211
       Enabled: true
       Name: Follower 7
-      Topic: /SVEA7/3D_car
+      Topic: /SVEA7/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -174,7 +174,7 @@ Visualization Manager:
       Color: 0; 255; 127
       Enabled: true
       Name: Follower 8
-      Topic: /SVEA8/3D_car
+      Topic: /SVEA8/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -182,7 +182,7 @@ Visualization Manager:
       Color: 255; 255; 127
       Enabled: true
       Name: Follower 9
-      Topic: /SVEA9/3D_car
+      Topic: /SVEA9/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -190,7 +190,7 @@ Visualization Manager:
       Color: 255; 0; 127
       Enabled: true
       Name: Follower 10
-      Topic: /SVEA10/3D_car
+      Topic: /SVEA10/car_3D
       Unreliable: false
       Value: true
     - Alpha: 1

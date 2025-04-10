@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+
+    <node pkg="svea_core" exec="plot_map" name="plot_map" output="screen"/>
+
+</launch>

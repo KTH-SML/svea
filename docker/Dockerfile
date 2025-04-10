@@ -20,7 +20,11 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3-venv \
     ros-$ROSDISTRO-ament-cmake-python \
     ros-jazzy-ros-base=0.11.0-1* \
+    ros-$ROSDISTRO-rmw-zenoh-cpp\
     && rm -rf /var/lib/apt/lists/*
+
+# ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
+
 
 # Bootstrap rosdep and setup colcon mixin and metadata
 # RUN rosdep init && \

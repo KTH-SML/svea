@@ -18,7 +18,7 @@
     </node>
 
     <!-- Start localization -->
-    <include file="$(find-pkg-share svea_sensors)/launch/localize_launch.xml">
+    <include file="$(find-pkg-share svea_localization)/launch/localize.xml">
         <arg name="initial_pose_x" value="$(var initial_pose_x)"/>
         <arg name="initial_pose_y" value="$(var initial_pose_y)"/>
         <arg name="initial_pose_a" value="$(var initial_pose_a)"/>

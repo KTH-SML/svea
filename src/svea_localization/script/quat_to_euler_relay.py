@@ -72,9 +72,9 @@ class QuatToEulerRelay(Node):
         
         def get_topic_type(self, topic: str, timeout: float = 1.0) -> str:
             # Get topic type
-            time = self.get_clock().now()
-            while (self.get_clock().now() - time).nanoseconds / 1e9 < timeout:
-                topic_names_and_types = self.get_topic_type(topic)
+            time = self.get_Clock().now().to_msg()
+            while (self.get_Clock().now().to_msg() - time).nanoseconds / 1e9 < timeout:
+                topic_names_and_types = self.get_topic_names_and_types()
                 for name, types in topic_names_and_types:
                     if name == topic:
                         return types[0], ""

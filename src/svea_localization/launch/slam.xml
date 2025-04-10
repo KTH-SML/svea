@@ -9,16 +9,18 @@
 
 
     <!-- Start the stereo camera -->
-    <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/rs_odometry.launch">
-        <arg name="xavier" value="$(arg xavier)"/>
-    </include>
-    <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
-        <arg name="xavier" value="$(arg xavier)"/>
-    </include>
+    <!-- <include file="$(find-pkg-share svea_sensors)/launch/rs_odometry.launch.xml" if="$(eval '\'$(var camera)\' == \'rs\'')">
+        <arg name="xavier" value="$(var xavier)"/>
+    </include> -->
+
+    <!-- <include file="$(find-pkg-share svea_sensors)/launch/zed_odometry.launch.xml" if="$(eval '\'$(var camera)\' == \'zed\'')">
+        <arg name="xavier" value="$(var xavier)"/>
+    </include> -->
+
 
     <!-- Start SLAM -->
-    <node pkg="slam_toolbox" type="sync_slam_toolbox_node" name="slam_toolbox" output="screen" launch-prefix="bash -c 'sleep $(arg slam_delay); $0 $@' ">
-        <rosparam command="load" file="$(find svea_sensors)/params/slam_toolbox/slam_sync.yaml" />
-    </node>
+    <!-- <node pkg="slam_toolbox" exec="sync_slam_toolbox_node" name="slam_toolbox" output="screen" launch-prefix="bash -c 'sleep $(arg slam_delay); $0 $@' ">
+        <param from="$(find-pkg-share svea_localization)/params/slam_sync.yaml" />
+    </node> -->
 
 </launch>

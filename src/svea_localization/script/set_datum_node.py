@@ -16,12 +16,6 @@ import ast
 import yaml
 
 
-def load_param(self, name, value=None):
-    self.declare_parameter(name, value)
-    if value is None:
-        assert self.has_parameter(name), f'Missing parameter "{name}"'
-    return self.get_parameter(name).value
-
 
 class SetDatumNode(Node):
     def __init__(self) -> None:
@@ -30,12 +24,12 @@ class SetDatumNode(Node):
             super().__init__('set_datum_node')
             
             # Topic Parameters
-            self.datum_service = load_param(self,'~datum_service', 'datum')
+            self.datum_service = self.load_param('~datum_service', 'datum')
             
             # Other Parameters
-            self.datum_file = load_param(self,'~datum_file', "")
-            self.datum_data = load_param(self,'~datum_data', "[]")
-            self.service_timeout = load_param(self,'~service_timeout', 60)
+            self.datum_file = self.load_param(self,'~datum_file', "")
+            self.datum_data = self.load_param(self,'~datum_data', "[]")
+            self.service_timeout = self.load_param(self,'~service_timeout', 60)
             try:
                 self.datum_data = ast.literal_eval(self.datum_data)
             except Exception as e:
@@ -82,6 +76,12 @@ class SetDatumNode(Node):
             # Set datum
             self.set_datum()
 
+    
+    def load_param(self, name, value=None):
+        self.declare_parameter(name, value)
+        if value is None:
+            assert self.has_parameter(name), f'Missing parameter "{name}"'
+        return self.get_parameter(name).value
     
 
     def load_datum_from_yaml(self, file_path):

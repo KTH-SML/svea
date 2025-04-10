@@ -59,10 +59,18 @@ class GPSToUTMRelay(Node):
         point.point.z = msg.altitude
         self.utm_pub.publish(point)
 
-def main():
-    rclpy.init()
-    node = GPSToUTMRelay()
-    node.run()
+def main(args=None):
+    rclpy.init(args=args)
+    try:
+        # Initialize node
+        gps_to_utm_relay = GPSToUTMRelay()
+        rclpy.spin(gps_to_utm_relay)  
+    except KeyboardInterrupt:
+        # Capture Ctrl+C and shutdown node
+        gps_to_utm_relay.get_logger().info('Shutting down {}'.format(gps_to_utm_relay.get_name()))
+    finally:
+        # Cleanup
+        rclpy.shutdown()
             
         
 if __name__ == '__main__':
