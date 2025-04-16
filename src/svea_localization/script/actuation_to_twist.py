@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 """ ROS node that approximates velocity based on actuated values
+
+Author: Tobias Bolin
 """
 
 
@@ -14,15 +16,6 @@ from svea_msgs.msg import LLIControl as lli_ctrl
 from geometry_msgs.msg import TwistWithCovarianceStamped
 from svea_core.states import SVEAControlValues
 
-
-__author__ = "Tobias Bolin"
-__copyright__ = "Copyright 2020, Tobias Bolin"
-__credits__ = ["Tobias Bolin"]
-__license__ = "MIT"
-__version__ = "0.0.1"
-__maintainer__ = "Tobia Bolin"
-__email__ = "tbolin@kth.se"
-__status__ = "Beta"
 
 
 class Republish(Node):

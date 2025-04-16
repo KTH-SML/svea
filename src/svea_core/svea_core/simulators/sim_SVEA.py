@@ -2,6 +2,8 @@
 Simulation module for the SVEA platform. Creates fake ROS
 subscriptions and publications that match the real car platform.
 Intended for debugging code BEFORE running on a real car.
+
+Author: Frank Jiang
 """
 
 import math
@@ -9,7 +11,6 @@ import numpy as np
 from threading import Thread
 import rclpy
 import rclpy.clock
-import rclpy.logging
 from rclpy.node import Node
 import tf2_ros
 from geometry_msgs.msg import TransformStamped
@@ -18,12 +19,8 @@ from svea_msgs.msg import LLIEmergency as lli_emergency
 from svea_core.states import SVEAControlValues
 from .sim_lidar import SimLidar
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
+from svea_core.models.bicycle import SimpleBicycleModel
 
-
-__license__ = "MIT"
-__maintainer__ = "Frank Jiang"
-__email__ = "frankji@kth.se"
-__status__ = "Development"
 
 qos_default = QoSProfile(
     reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
@@ -32,7 +29,7 @@ qos_default = QoSProfile(
     durability=QoSDurabilityPolicy.VOLATILE     # Volatile
 )
 
-class SimSVEA(object):
+class SimSVEA(Node):
     """
     Handles simulation of a SVEA vehicle. The object takes in a model
     and pretends to be the low-level of a SVEA vehicle. It will spin up
@@ -76,9 +73,8 @@ class SimSVEA(object):
     # scaling factor, percentage to lli actuation
     PERC_TO_LLI_COEFF = 1.27
 
-    def __init__(self,
-                 Node=Node, 
-                 initialized_model=None,
+    def __init__(self, 
+                 initialized_model=SimpleBicycleModel(),
                  vehicle_name='',
                  dt=0.02,
                  start_paused=False,
@@ -87,7 +83,7 @@ class SimSVEA(object):
                  publish_pose=False,
                  publish_odometry=False):
         
-        self.node = Node       
+        super().__init__('sim_svea')     
         sub_namespace = vehicle_name + '/' if vehicle_name else ''
         self._state_topic = sub_namespace + 'state'
         self._request_topic = sub_namespace + 'lli/ctrl_request'
@@ -97,7 +93,7 @@ class SimSVEA(object):
         if vehicle_name:
             self.vehicle_name = vehicle_name
         else:
-            namespace = self.node.get_namespace()
+            namespace = self.get_namespace()
             self.vehicle_name = namespace.split('/')[-2]
 
         self._map_frame_id = 'map'
@@ -113,7 +109,7 @@ class SimSVEA(object):
         self.publish_tf = publish_tf
         if self.publish_tf:
             # for broadcasting fake tf tree
-            self.tf_br = tf2_ros.TransformBroadcaster(self.node)
+            self.tf_br = tf2_ros.TransformBroadcaster(self)
         self.publish_pose = publish_pose
         if self.publish_pose:
             self._pose_topic = sub_namespace + 'pose'
@@ -133,7 +129,7 @@ class SimSVEA(object):
 
         self._run_lidar = run_lidar
         if self._run_lidar:
-            self.simulated_lidar = SimLidar(self.node, vehicle_name).start()
+            self.simulated_lidar = SimLidar(vehicle_name).start()
 
     def start(self):
         """
@@ -147,24 +143,30 @@ class SimSVEA(object):
         return self
 
     def _init_and_spin_ros(self):
-        # self.get_logger().info("Starting Simulation Node: \n"
-        #               + str(self))
-        self._collect_srvs()
-        self._start_publish()
-        # self.get_logger().info("{} Simulation successfully initialized".format(
-        #     self.vehicle_name))
-        self._start_listen()
-        rclpy.spin(self.node)
+        try:
+            self.get_logger().info("Starting Simulation Node: \n"
+                        + str(self))
+            self._collect_srvs()
+            self._start_publish()
+            self.get_logger().info("{} Simulation successfully initialized".format(
+                self.vehicle_name))
+            self._start_listen()
+            rclpy.spin(self)
+        except Exception as e:
+            self.get_logger().error(f"Exception in ROS thread: {e}")
+        finally:
+            rclpy.shutdown()
+
 
     def _collect_srvs(self):
         pass
 
     def _start_listen(self):
-        self.node.create_subscription(lli_ctrl,
+        self.create_subscription(lli_ctrl,
                                  self._request_topic,
                                  self._update_ctrl_request,
                                  10)
-        self.node.create_subscription(lli_emergency,
+        self.create_subscription(lli_emergency,
                                  self._emergency_topic,
                                  self._update_emergency,
                                  10)
@@ -178,36 +180,21 @@ class SimSVEA(object):
             history=QoSHistoryPolicy.KEEP_LAST,
             depth=1)
         
-        self.svea_state_pub = self.node.create_publisher(type(self.current_state.state_msg),
+        self.svea_state_pub = self.create_publisher(type(self.current_state.state_msg),
                                                     self._state_topic, 
                                                     qos_profile)
-        # self.svea_state_pub = rclpy.Publisher(self._state_topic,
-        #                                       type(self.current_state.state_msg),
-        #                                       queue_size=1,
-        #                                       tcp_nodelay=True)
-        self.ctrl_actuated_pub = self.node.create_publisher(lli_ctrl,
+        self.ctrl_actuated_pub = self.create_publisher(lli_ctrl,
                                                        self._actuated_topic,
                                                        qos_profile)
-        # self.ctrl_actuated_pub = rclpy.Publisher(self._actuated_topic,
-        #                                          lli_ctrl,
-        #                                          queue_size=1,
-        #                                          tcp_nodelay=True)
+
         if self.publish_pose:
-            self.pose_pub = self.node.create_publisher(type(self.current_state.pose_msg),
+            self.pose_pub = self.create_publisher(type(self.current_state.pose_msg),
                                             self._pose_topic,
                                             qos_profile)
-            # self.pose_pub = rclpy.Publisher(self._pose_topic,
-            #                                 type(self.current_state.pose_msg),
-            #                                 queue_size=1,
-            #                                 tcp_nodelay=True)
         if self.publish_odometry:
-            self.odometry_pub = self.node.reate_publisher(type(self.current_state.odometry_msg),
+            self.odometry_pub = self.reate_publisher(type(self.current_state.odometry_msg),
                                                 self._odometry_topic,
                                                 qos_profile)
-            # self.odometry_pub = rclpy.Publisher(self._odometry_topic,
-            #                                     type(self.current_state.odometry_msg),
-            #                                     queue_size=1,
-            #                                     tcp_nodelay=True)
 
     def _percent_to_steer(self, steering):
         """Convert radians to percent of max steering actuation"""
@@ -227,10 +214,10 @@ class SimSVEA(object):
         """Toggle between pause and play simulation"""
         self.is_pause = not self.is_pause
         status = "paused" if self.is_pause else "playing"
-        self.node.get_logger().info("Simulation is now {0}".format(status))
+        self.get_logger().info("Simulation is now {0}".format(status))
 
     def _start_simulation(self):
-        rate = self.node.create_rate(1.0 / self.dt)
+        rate = self.create_rate(1.0 / self.dt)
         while rclpy.ok():
             curr_time = rclpy.clock.Clock().now().to_msg()
             if not self.is_pause:
@@ -252,14 +239,11 @@ class SimSVEA(object):
                     self.simulated_lidar.update_lidar_position(self.model.state)
 
                 # publish fake localization data
-                if (curr_time - self._last_pub_time) > 1.0/self.LOC_PUB_FREQ:
-                    self.svea_state_pub.publish(self.current_state.state_msg)
+                if (curr_time.sec - self._last_pub_time.sec) > 1.0/self.LOC_PUB_FREQ:
                     if self.publish_tf:
                         self._broadcast_tf()
-                    if self.publish_pose:
-                        self.pose_pub.publish(self.current_state.pose_msg)
-                    if self.publish_odometry:
-                        self.odometry_pub.publish(self.current_state.odometry_msg)
+                    #TODO: change following msg to odemetry msg type
+                    self.odometry_pub.publish(self.current_state.odometry_msg)
                     self._last_pub_time = rclpy.clock.Clock().now().to_msg()
             rate.sleep()  # force update frequency to be realistic
 
@@ -328,3 +312,12 @@ class SimSVEA(object):
 
     def __str__(self):
         return self._build_param_printout()
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = SimSVEA()
+    node.start()
+
+
+if __name__ == '__main__':
+    main()

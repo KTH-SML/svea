@@ -8,16 +8,13 @@ TODO:
     - Create nice printout for Laplacian
     - Add support for arbitrary communication structures, currently the
       model creation only supports k-nearest neighbor communication.
+
+Author: Frank Jiang
 """
 
 from typing import Sequence
 
 import numpy as np
-
-__license__ = "MIT"
-__maintainer__ = "Frank Jiang"
-__email__ = "frankji@kth.se"
-__status__ = "Development"
 
 
 class C_OVRV(object):

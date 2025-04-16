@@ -4,6 +4,8 @@
 TODO:
     * Implement handling of covaraiances
     * Handling of state messages
+
+Author: Tobias Bolin
 """
 
 import math
@@ -18,11 +20,6 @@ from geometry_msgs.msg import TwistWithCovarianceStamped
 from nav_msgs.msg import Odometry
 import svea_msgs.msg
 from svea_msgs.msg import LLIControl as lli_ctrl
-
-__license__ = "MIT"
-__maintainer__ = "Tobias Bolin"
-__email__ = "tbolin@kth.se"
-__status__ = "Development"
 
 class VehicleState(object):
     """

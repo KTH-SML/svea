@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-
-__author__ = "Sulthan Suresh Fazeela"
-__email__ = "sultha@kth.se"
-__license__ = "MIT"
+"""
+Author: Sulthan Suresh Fazeela
+"""
 
 import rclpy
 import rclpy.exceptions

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+
+"""
+Author: Mustafa Al-Janabi
+"""
 from serial import Serial, SerialException, EIGHTBITS, PARITY_NONE, STOPBITS_ONE
 from pyubx2 import (
     UBXReader,
@@ -18,10 +22,6 @@ from sensor_msgs.msg import NavSatFix, NavSatStatus
 from nmea_msgs.msg import Sentence
 from std_msgs.msg import Float64
 from rtcm_msgs.msg import Message
-__author__ = "Mustafa Al-Janabi"
-__email__ = "musaj@kth.se"
-__license__ = "MIT"
-__copyright__ = "Copyright 2023, Mustafa Al-Janabi"
 
 
 # MAP dynamic model string to corresponding number

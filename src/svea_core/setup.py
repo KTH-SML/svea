@@ -44,6 +44,9 @@ setup(
             'lli_test = svea_core.script.lli_test:main',
             'plot_map = svea_core.script.plot_map:main',
             'save_map = svea_core.script.save_map:main',
+            'sim_svea = svea_core.simulators.sim_SVEA:main',
+            'sim_lidar = svea_core.simulators.sim_lidar:main',
+            # 'pure_pursuit = svea_core.script.pure_pursuit:main',
         ],
     },
 )
