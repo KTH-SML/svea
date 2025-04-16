@@ -9,11 +9,10 @@ from tf_transformations import quaternion_from_euler
 
 from svea_core.models.bicycle import SimpleBicycleModel
 from svea_core.states import VehicleState
-from svea_core.simulators.sim_SVEA import SimSVEA
 from svea_core.interfaces import LocalizationInterface
 from svea_core.controllers.pure_pursuit import PurePursuitController
 from svea_core.svea_managers.path_following_sveas import SVEAPurePursuit
-from svea_core.data import TrajDataHandler, RVIZPathHandler
+from svea_core.interfaces import ActuationInterface
 
 def assert_points(pts):
     assert isinstance(pts, (list, tuple)), 'points is of wrong type, expected list'
@@ -42,7 +41,6 @@ class pure_pursuit(Node):  # Inherit from Node
         if isinstance(self.POINTS[0], str):
             self.POINTS = [eval(point) for point in self.POINTS]
         self.IS_SIM = self.load_param('~is_sim', True)
-        self.USE_RVIZ = self.load_param('~use_rviz', True)
         self.STATE = self.load_param('~state', [0.0, 0.0, 0.0, 0.0])
 
         assert_points(self.POINTS)
@@ -55,41 +53,17 @@ class pure_pursuit(Node):  # Inherit from Node
         self.get_logger().info(f'Initial state: {state}')
         self.publish_initialpose(state)
 
-
         # create goal state
         self.curr = 0
         self.goal = self.POINTS[self.curr]
         self.get_logger().info(f'Compute Trajectory to goal')
-        xs, ys = self.compute_traj(state)
 
-        ## Create simulators, models, managers, etc.
-        if self.IS_SIM:
-            
-            self.get_logger().info('Running in simulation mode')
-            # simulator need a model to simulate
-            self.sim_model = SimpleBicycleModel(state)
-
-            # start the simulator immediately, but paused
-            self.simulator = SimSVEA(Node=self,
-                                     initialized_model=self.sim_model,
-                                     dt=self.DELTA_TIME,
-                                     run_lidar=True,
-                                     start_paused=True).start()
-
-        # start the SVEA manager
-        self.svea = SVEAPurePursuit(Node=self,
-                                    localizer=LocalizationInterface,
-                                    controller=PurePursuitController,
-                                    traj_x=xs, traj_y=ys,
-                                    data_handler=RVIZPathHandler if self.USE_RVIZ else TrajDataHandler)
-
-        self.svea.controller.target_velocity = self.TARGET_VELOCITY
-        self.svea.start(wait=True)
-
-        # everything ready to go -> unpause simulator
-        if self.IS_SIM:
-            self.simulator.toggle_pause_simulation()
-
+        # create vehicle model
+        self.localizer=LocalizationInterface(self).start()
+        self.actuator=ActuationInterface().start(wait=True)
+        self.controller=PurePursuitController()
+        self.controller.target_velocity = self.TARGET_VELOCITY
+       
     def load_param(self, name, value=None):
         self.declare_parameter(name, value)
         if value is None:
@@ -117,8 +91,6 @@ class pure_pursuit(Node):  # Inherit from Node
 
         steering, velocity = self.svea.compute_control()
         self.svea.send_control(steering, velocity)
-
-        self.svea.visualize_data()
 
     def update_goal(self):
         self.curr += 1

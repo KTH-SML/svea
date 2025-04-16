@@ -1,6 +1,8 @@
 """
 Simulation module for the Lidars. Creates fake ROS publications that
 match the publications made by a Lidar driver.
+
+Author: Frank Jiang, Javier Cerna
 """
 
 import rclpy
@@ -12,19 +14,12 @@ from threading import Thread
 from multiprocessing import Pool
 
 import rclpy.clock
-import rclpy.logging
 from sensor_msgs.msg import LaserScan, PointCloud
 from visualization_msgs.msg import Marker
 
-from .viz_utils import publish_lidar_points, publish_lidar_rays, publish_edges
-
-__license__ = "MIT"
-__maintainer__ = "Javier Cerna, Frank Jiang"
-__email__ = "frankji@kth.se"
-__status__ = "Development"
 
 
-class SimLidar(object):
+class SimLidar(Node):
     """Simulated 1-band lidar. It works by taking a list of obstacles,
     and simulates the detected points. Parameters are based on the
     Hokuyo UST-10LX (reduce computation).
@@ -51,9 +46,9 @@ class SimLidar(object):
 
     LIDAR_OFFSET = 0.30 # dist between SVEA rear axle and lidar mount point [m]
 
-    def __init__(self, Node=Node, vehicle_name=''):
+    def __init__(self, vehicle_name=''):
 
-        self.node = Node
+        super().__init__('sim_lidar')
 
         sub_namespace = vehicle_name + '/' if vehicle_name else ''
         self._viz_points_topic = sub_namespace + 'viz_lidar_points'
@@ -63,7 +58,7 @@ class SimLidar(object):
         if vehicle_name:
             self.vehicle_name = vehicle_name
         else:
-            namespace = self.node.get_namespace()
+            namespace = self.get_namespace()
             self.vehicle_name = namespace.split('/')[-2]
 
         self._lidar_position = None # [x, y, yaw] -> [m, m, rad]
@@ -99,39 +94,42 @@ class SimLidar(object):
         return self
 
     def _init_and_spin_ros(self):
-        # self.get_logger().info("Initializing Lidar Simulation Node: \n"
-        #                                  + str(self))
-        self._start_publish()
-        # self.get_logger().info("{} Simulated Lidar successfully initialized".format(
-        #     self.vehicle_name))
-        self._start_simulation()
-        rclpy.spin(self.node)
+        try:
+            self.get_logger().info("Initializing Lidar Simulation Node: \n"
+                                         + str(self))
+            self._start_publish()
+            self.get_logger().info("{} Simulated Lidar successfully initialized".format(
+                self.vehicle_name))
+            self._start_simulation()
+            rclpy.spin(self)
+        except Exception as e:
+            self.get_logger().error(f"Exception in ROS thread: {e}")
+        finally:
+            rclpy.shutdown()
 
     def _start_publish(self):
-        self._scan_pub = self.node.create_publisher(LaserScan,
+        self._scan_pub = self.create_publisher(LaserScan,
                                                '/scan', 1,)
         # self._scan_pub = rclpy.Publisher('/scan', LaserScan,
         #                                  queue_size=1, tcp_nodelay=True)
-        self._viz_points_pub = self.node.create_publisher(PointCloud,
+        self._viz_points_pub = self.create_publisher(PointCloud,
                                                      self._viz_points_topic,
                                                      1)
-        self._viz_rays_pub = self.node.create_publisher(Marker,
+        self._viz_rays_pub = self.create_publisher(Marker,
                                                    self._viz_rays_topic,
                                                    1)
-        self._viz_edges_pub = self.node.create_publisher(Marker,
+        self._viz_edges_pub = self.create_publisher(Marker,
                                                     self._viz_edges_topic,
                                                     1)
 
     def _start_simulation(self):
-        rate = self.node.create_rate(1.0 / self.SCAN_TIME)
+        rate = self.create_rate(1.0 / self.SCAN_TIME)
         while rclpy.ok():
             if self._lidar_position is None or self.obstacles is None:
                 continue
             self._update_visible_edges()
             self._update_scan()
             self.publish_scan()
-            self.publish_viz_points()
-            self.publish_viz_rays()
             rate.sleep()
 
     def update_lidar_position(self, vehicle_state):
@@ -158,11 +156,11 @@ class SimLidar(object):
         if self._obstacles is not None:
             return self._obstacles
         
-        self.node.declare_parameter('obstacles', [])
-        obstacles_param = self.node.get_parameter('obstacles')
+        self.declare_parameter('obstacles', [])
+        obstacles_param = self.get_parameter('obstacles')
         # obstacles_param = rclpy.search_param('obstacles')
-        self.node.declare_parameter(obstacles_param, [])
-        obstacles_from_param = self.node.get_parameter(obstacles_param)
+        self.declare_parameter(obstacles_param, [])
+        obstacles_from_param = self.get_parameter(obstacles_param)
 
         if type(obstacles_from_param) == type([]):
             self._obstacles = obstacles_from_param
@@ -220,12 +218,6 @@ class SimLidar(object):
 
     def publish_scan(self):
         self._scan_pub.publish(self._scan_msg)
-
-    def publish_viz_points(self):
-        publish_lidar_points(self._viz_points_pub, self.viz_points)
-
-    def publish_viz_rays(self):
-        publish_lidar_rays(self._viz_rays_pub, self._lidar_position, self.viz_points)
 
 
 def beam_intersection(beam_and_edges):
@@ -330,3 +322,12 @@ def _compute_lineline_intersection(line1_pt1, line1_pt2,
     p_y = ((x1*y2 - y1*x2) * (y3 - y4) - (y1 - y2) * (x3*y4 - y3*x4)) \
             / denominator
     return (p_x, p_y)
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = SimLidar()
+    node.start()
+
+
+if __name__ == '__main__':
+    main()

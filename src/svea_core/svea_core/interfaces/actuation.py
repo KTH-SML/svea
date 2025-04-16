@@ -1,8 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 54289ac (2025/04/16 Meeting Update)
 """
 Author: Frank Jiang, Tobias Bolin
 """
 from threading import Event
+<<<<<<< HEAD
 from collections import deque
 from math import pi, isnan
 from typing import Optional, Self
@@ -31,34 +35,28 @@ class ActuationInterface(rx.Field):
     r"""Interface object for sending actuation commands to the SVEA car's low-level
 =======
 from threading import Thread, Event
+=======
+>>>>>>> 54289ac (2025/04/16 Meeting Update)
 from collections import deque
 from math import pi, isnan
-from typing import Optional
+from typing import Optional, Self
 
 import rclpy
 import rclpy.clock
 import rclpy.duration
-import rclpy.logging
 from rclpy.node import Node
-
-import rclpy.validate_namespace
 from svea_msgs.msg import LLIControl as lli_ctrl
-
-__license__ = "MIT"
-__maintainer__ = "Tobias Bolin, Frank Jiang"
-__email__ = "tbolin@kth.se "
-__status__ = "Development"
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
 
 __all__ = [
     'ActuationInterface',
 ]
 
-
 def cmp(a, b):
     return (a > b) - (a < b)
 
 
-class ActuationInterface(object):
+class ActuationInterface[N:Node]:
     """Interface object for sending actuation commands to the SVEA car's low-level
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
     controller.
@@ -260,23 +258,12 @@ class ActuationInterface(object):
     # Bit indicating emergency stop engaged
     EMERGENCY_MASK = 0b00001000
 
-    def __init__(
-        self,
-        Node = Node,
-        vehicle_name: str = '',
-        log_length: int = 100,
-    ):  
-        self.node = Node
-        self.sub_namespace = vehicle_name + '/' if vehicle_name else ''
-        self._request_topic = '{}lli/ctrl_request'.format(self.sub_namespace)
-        self._actuated_topic = '{}lli/ctrl_actuated'.format(self.sub_namespace)
-        self._remote_topic = '{}lli/remote'.format(self.sub_namespace)
-        self.namespace = vehicle_name
-        if vehicle_name:
-            self.vehicle_name = vehicle_name
-        else:
-            self.namespace = self.node.get_namespace()
-            self.vehicle_name = self.namespace.split('/')[-2]
+    def __init__(self, node: N, log_length: int = 100) -> None:  
+        self.node = node
+        self._request_topic = 'lli/ctrl_request' 
+        self._actuated_topic = 'lli/ctrl_actuated' 
+        self._remote_topic = 'lli/remote' 
+       
         
         self._previous_velocity = None
         self._is_reverse = False
@@ -295,7 +282,7 @@ class ActuationInterface(object):
         self.ctrl_actuated_log = deque(maxlen=log_length)
         self.remote_log = deque(maxlen=log_length)
 
-    def start(self, wait: bool = False) -> 'ActuationInterface':
+    def start(self) -> Self:
         """Spins up ROS background thread; must be called to start receiving
         and sending data.
 
@@ -303,33 +290,21 @@ class ActuationInterface(object):
             wait: True if the interface should call `wait_until_ready` before
                 returning.
         """
-        Thread(target=self._init_and_spin_ros, args=()).start()
-        if wait:
-            self.wait_until_ready()
+        self.node.get_logger().info('Starting Control Interface Node...')
+        self.node_name = 'control_interface'
+        self._start_publish()
+        self._start_listen()
+        duration = rclpy.duration.Duration(seconds=0.1)
+        rclpy.clock.Clock().sleep_for(duration)
+        self._wait_until_ready()
+        if not self.is_ready:
+            self.node.get_logger().info("LLI interface not responding during start of "
+                                            "Control Interface. Seting ready anyway.")
+        self.is_ready = True
+        self.node.get_logger().info("Control Interface ready...") 
+
         return self
 
-    def wait_until_ready(self, timeout: float = 10.0) -> bool:
-        """Wait until the interface is ready.
-
-        Args:
-            timeout: Number of seconds to wait for a response from the low
-                level interface.
-
-        Returns:
-            False if timed out or rospy is shutdown, true otherwise. Will
-            return when the interface is ready, after `timeout` seconds or if
-            rospy is shutdown.
-        """
-        num_attempts = 0
-        attempt_limit = int(timeout) or 1
-        part_timeout = 1.0 if attempt_limit >= 1 else timeout
-        is_ready = self.is_ready
-        while (not is_ready and
-               rclpy.ok() and
-               num_attempts < attempt_limit):
-            is_ready = self._ready_event.wait(part_timeout)
-            num_attempts += 1
-        return is_ready
 
     def _wait_until_ready(self, timeout: float = 10.0) -> bool:
         """Internal method for waiting until the Control Interface is ready.
@@ -355,46 +330,31 @@ class ActuationInterface(object):
             self.is_ready = self._ready_event.wait(part_timeout)
         return self.is_ready
 
-    def _init_and_spin_ros(self):
-        self.node.get_logger().info('Starting Control Interface Node for '
-                                        + self.vehicle_name)
-        self.node_name = 'control_interface'
-        self._start_publish()
-        self._start_listen()
-        duration = rclpy.duration.Duration(seconds=0.1)
-        rclpy.clock.Clock().sleep_for(duration)
-        self._wait_until_ready()
-        if not self.is_ready:
-            self.node.get_logger().info("LLI interface not responding during start of "
-                                            "Control Interface. Seting ready anyway.")
-        self.is_ready = True
-        self.node.get_logger().info("Control Interface ready for {}".format(self.vehicle_name)) 
-        rclpy.spin(self.node)
-        rclpy.shutdown()
-
     def _start_listen(self):
-        self.node.create_subscription(lli_ctrl, self._actuated_topic,
-                                 self._read_ctrl_actuated, 10)
-        # rospy.Subscriber(self._actuated_topic,
-        #                  lli_ctrl,
-        #                  self._read_ctrl_actuated,
-        #                  tcp_nodelay=True)
-        self.node.create_subscription(lli_ctrl, self._remote_topic,
-                                 self._read_remote,10)
-        # rospy.Subscriber(self._remote_topic,
-        #                  lli_ctrl,
-        #                  self._read_remote,
-        #                  tcp_nodelay=True)
+        qos_profile = QoSProfile(
+            reliability=QoSReliabilityPolicy.RMW_QOS_POLICY_RELIABILITY_RELIABLE,
+            durability=QoSReliabilityPolicy.RMW_QOS_POLICY_DURABILITY_VOLATILE,
+            depth=1,)
+        
+        self.node.create_subscription(lli_ctrl, 
+                                      self._actuated_topic,
+                                      self._read_ctrl_actuated, 
+                                      qos_profile=qos_profile)
+        
+        self.node.create_subscription(lli_ctrl, 
+                                      self._remote_topic,
+                                      self._read_remote,
+                                      qos_profile=qos_profile)
 
     def _start_publish(self):
-        self.ctrl_request_pub = self.node.create_publisher(
-            lli_ctrl,
-            self._request_topic,
-            1,)
-        # self.ctrl_request_pub = rospy.Publisher(self._request_topic,
-        #                                         lli_ctrl,
-        #                                         queue_size=1,
-        #                                         tcp_nodelay=True)
+        qos_profile = QoSProfile(
+            reliability=QoSReliabilityPolicy.RMW_QOS_POLICY_RELIABILITY_RELIABLE,
+            durability=QoSReliabilityPolicy.RMW_QOS_POLICY_DURABILITY_VOLATILE,
+            depth=1,)
+        
+        self.ctrl_request_pub = self.node.create_publisher(lli_ctrl,
+                                                           self._request_topic,
+                                                           qos_profile=qos_profile)
 
     def _read_ctrl_actuated(self, msg):
         self._is_reverse = self._detect_reverse_state(msg)

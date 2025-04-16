@@ -5,7 +5,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import PointStamped
 from svea_msgs.msg import VehicleState as VehicleStateMsg
 from svea_core.states import VehicleState
-from svea_core.data import RVIZPathHandler
+
 
 
 class StatePublisher(Node):
@@ -26,9 +26,6 @@ class StatePublisher(Node):
 
         # spin rate
         self.rate = self.create_rate(self.SPIN_RATE)
-
-        # Visualization tool
-        self.rviz = RVIZPathHandler()
 
         # Vehicle state
         self.state = VehicleState()
@@ -74,8 +71,6 @@ class StatePublisher(Node):
 
     def spin(self):
         self.get_logger().info('[%f, %f, %f]' % (self.state.x, self.state.y, self.state.yaw))
-        self.rviz.log_state(self.state)
-        self.rviz.visualize_data()
 
 
 def main(args=None):

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 """
 Author: Frank Jiang
 """
@@ -17,21 +18,20 @@ __all__ = [
 
 class Bicycle4D:
 =======
+=======
+"""
+Author: Frank Jiang
+"""
+>>>>>>> 54289ac (2025/04/16 Meeting Update)
 import numpy as np
 import math
 from typing import Optional
 
 import rclpy
-import rclpy.time
 import rclpy.clock
 import rclpy.duration
 from rclpy.clock import ClockType
 from svea_core.states import VehicleState
-
-__license__ = "MIT"
-__maintainer__ = "Frank Jiang"
-__email__ = "frankji@kth.se"
-__status__ = "Development"
 
 
 class SimpleBicycleModel:

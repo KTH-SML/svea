@@ -2,6 +2,8 @@
 
 """
 Module containing teleoperation interfaces for the RC remote
+
+Author: Frank Jiang
 """
 
 import math
@@ -15,10 +17,6 @@ from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 from svea_msgs.msg import LLIControl as lli_ctrl
 from svea_core.states import SVEAControlValues
 
-__license__ = "MIT"
-__maintainer__ = "Frank Jiang"
-__email__ = "frankji@kth.se "
-__status__ = "Development"
 
 
 class RCInterface(object):

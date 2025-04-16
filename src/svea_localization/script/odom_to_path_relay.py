@@ -2,12 +2,15 @@
 """
 Author: Sulthan Suresh Fazeela
 """
+<<<<<<< HEAD
 
 <<<<<<<< HEAD:src/svea_localization/scripts/odom_to_path_relay.py
 ========
 __author__ = "Sulthan Suresh Fazeela"
 __email__ = "sultha@kth.se"
 __license__ = "MIT"
+=======
+>>>>>>> 54289ac (2025/04/16 Meeting Update)
 
 >>>>>>>> 360ef06 (add svea_localization,modifying to ros2 in progress):src/svea_localization/script/odom_to_path_relay.py
 import rclpy

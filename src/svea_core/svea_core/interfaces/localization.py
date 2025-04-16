@@ -1,13 +1,20 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 54289ac (2025/04/16 Meeting Update)
 """
 Author: Tobias Bolin, Frank Jiang
 """
 
+<<<<<<< HEAD
 from typing import Self, Optional
 =======
 from threading import Thread, Event
 from typing import Callable
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+from typing import Callable, Self
+>>>>>>> 54289ac (2025/04/16 Meeting Update)
 
 import rclpy
 from rclpy.node import Node
@@ -28,6 +35,7 @@ from .. import rosonic as rx
 
 =======
 import rclpy.clock
+<<<<<<< HEAD
 <<<<<<< HEAD
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
@@ -53,24 +61,19 @@ class LocalizationInterface(rx.Field):
 =======
 import rclpy.context
 import rclpy.logging
+=======
+>>>>>>> 54289ac (2025/04/16 Meeting Update)
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
-from svea_core.states import VehicleState
-from svea_msgs.msg import VehicleState as VehicleStateMsg
 
 from tf_transformations import quaternion_from_euler, euler_from_quaternion
 from nav_msgs.msg import Odometry
 
 
-__license__ = "MIT"
-__maintainer__ = "Tobias Bolin, Frank Jiang"
-__email__ = "tbolin@kth.se "
-__status__ = "Development"
-
 __all__ = [
     'LocalizationInterface',
 ]
 
-class LocalizationInterface(object):
+class LocalizationInterface[N:Node]:
     """Interface handling the reception of state information from the
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
     localization stack.
@@ -240,58 +243,26 @@ class LocalizationInterface(object):
             corresponding localization node i.e `namespace/vehicle_name/state`.
     """
 
-    def __init__(
-        self,
-        Node,
-        vehicle_name: str = '',
-    ):
+    def __init__(self, node: N)-> None:
         
-        self.node = Node
-        self.vehicle_name = vehicle_name
-        sub_namespace = vehicle_name + '/' if vehicle_name else ''
-        self._state_topic = sub_namespace + 'state'
+        self.node = node
+        self._odom_topic = 'odometry/local'
 
-        self.state = VehicleState()
         self.last_time = float('nan')
-
-        self.is_ready = False
-        self._ready_event = Event()
-        rclpy.Context().on_shutdown(self._shutdown_callback)
 
         # list of functions to call whenever a new state comes in
         self.callbacks = []
 
-    def start(self) -> 'LocalizationInterface':
+    def start(self) -> Self:
         """Spins up ROS background thread; must be called to start receiving
         data.
         """
-        Thread(target=self._init_and_spin_ros, args=()).start()
-        return self
-
-    def _wait_until_ready(self, timeout=20.0):
-        tic= rclpy.clock.Clock().now().to_msg().sec
-        self._ready_event.wait(timeout)
-        toc = rclpy.clock.Clock().now().to_msg().sec
-        wait = toc - tic
-        return wait < timeout
-
-    def _shutdown_callback(self):
-        self._ready_event.set()
-
-
-    def _init_and_spin_ros(self):
-        self.node.get_logger().info("Starting Localization Interface Node for "
-                                        + self.vehicle_name)
+        self.node.get_logger().info("Starting Localization Interface Node...")
         self.node_name = 'localization_node'
         self._start_listen()
-        self.is_ready = self._wait_until_ready()
-        if not self.is_ready:
-            self.node.get_logger().warn("Localization not responding during start of "
-                                            "Localization Interface. Setting ready anyway.")
-        self.is_ready = True
-        self.node.get_logger().info("Localization Interface for {} is ready"
-                                        .format(self.vehicle_name))
-        rclpy.spin(self.node)
+
+        self.node.get_logger().info("Localization Interface is ready")
+        return self
 
     def _start_listen(self):
         qos_profile = QoSProfile(
@@ -300,25 +271,23 @@ class LocalizationInterface(object):
             history=QoSHistoryPolicy.KEEP_LAST,
             depth=1)
         
-        self.node.create_subscription(VehicleStateMsg, self._state_topic,
-                                 self._read_state_msg, qos_profile)
-        # rospy.Subscriber(self._state_topic,
-        #                  VehicleStateMsg,
-        #                  self._read_state_msg,
-        #                  tcp_nodelay=True,
-        #                  queue_size=1)
-
-    def _read_state_msg(self, msg):
-        self.state.state_msg = msg
-        self.last_time = rclpy.clock.Clock().now().to_msg()
-        self._ready_event.set()
-        self._ready_event.clear()
-
+        self.node.create_subscription(Odometry, self._odom_topic,
+                                 self.odom_callback, qos_profile)
+        
+    def odom_callback(self, msg):
+        self.last_odom = msg
         for cb in self.callbacks:
-            cb(self.state)
+            try:
+                cb(msg)
+            except Exception as e:
+                self.node.get_logger().error(f"Error in callback: {e}")
 
+<<<<<<< HEAD
     def add_callback(self, cb: Callable[[VehicleState], None]):
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+    def add_callback(self, cb: Callable[[N], None])->None:
+>>>>>>> 54289ac (2025/04/16 Meeting Update)
         """Add state callback.
 
         Every function passed into this method will be called whenever new
@@ -340,8 +309,12 @@ class LocalizationInterface(object):
         """
         self.callbacks.append(cb)
 
+<<<<<<< HEAD
     def remove_callback(self, cb: Callable[[VehicleState], None]):
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+    def remove_callback(self, cb: Callable[[N], None])->None:
+>>>>>>> 54289ac (2025/04/16 Meeting Update)
         """Remove callback so it will no longer be called when state
         information is received.
 
@@ -451,84 +424,89 @@ class LocalizationInterface(object):
         msg.child_frame_id = child_frame
         return msg
 
-    @staticmethod
-    def as_tuple(msg):
-        return (State.get_x(msg), State.get_y(msg), State.get_yaw(msg), State.get_vel(msg))
+    def get_state(self):
+        return (LocalizationInterface.get_x(self.last_odom),
+                LocalizationInterface.get_y(self.last_odom), 
+                LocalizationInterface.get_yaw(self.last_odom), 
+                LocalizationInterface.get_vel(self.last_odom))
 
-    @staticmethod
-    def get_x(msg):
+     
+    def get_x(self):
         """ Extract the x position from a odpmetry message
         :param msg: An Odometry message
         :return: The x position
         :rtype: float
         """
-        return msg.pose.pose.position.x
+        return self.last_odom.pose.pose.position.x
 
-    @staticmethod
-    def get_y(msg):
+     
+    def get_y(self):
         """ Extract the y position from a odpmetry message
         :param msg: An Odometry message
         :return: The y position
         :rtype: float
         """
-        return msg.pose.pose.position.y
+        return self.last_odom.pose.pose.position.y
 
-    @staticmethod
-    def get_yaw(msg):
+     
+    def get_yaw(self):
         """ Extract the yaw from a odpmetry message
         :param msg: An Odometry message
         :return: The yaw
         :rtype: float
         """
-        quat = [msg.pose.pose.orientation.x,
-                msg.pose.pose.orientation.y,
-                msg.pose.pose.orientation.z,
-                msg.pose.pose.orientation.w]
+        quat = [self.last_odom.pose.pose.orientation.x,
+                self.last_odom.pose.pose.orientation.y,
+                self.last_odom.pose.pose.orientation.z,
+                self.last_odom.pose.pose.orientation.w]
         return euler_from_quaternion(quat)[2]
 
-    @staticmethod
-    def get_vel(msg):
+     
+    def get_vel(self):
         """ Extract the velocity from a odpmetry message
         :param msg: An Odometry message
         :return: The velocity
         :rtype: float
         """
-        return msg.twist.twist.linear.x
+        return self.last_odom.twist.twist.linear.x
 
-    @staticmethod
-    def set_x(msg, x):
+    def set_x(self, x):
         """ Set the x position in an Odometry message
         :param msg: An Odometry message
         :param x: The new x position
         """
-        msg.pose.pose.position.x = x
+        self.last_odom.pose.pose.position.x = x
 
-    @staticmethod
-    def set_y(msg, y):
+    def set_y(self, y):
         """ Set the y position in an Odometry message
         :param msg: An Odometry message
         :param y: The new y position
         """
-        msg.pose.pose.position.y = y
+        self.last_odom.pose.pose.position.y = y
 
-    @staticmethod
-    def set_yaw(msg, yaw):
+    def set_yaw(self, yaw):
         """ Set the yaw in an Odometry message
         :param msg: An Odometry message
         :param yaw: The new yaw
         """
         quat = quaternion_from_euler(0.0, 0.0, yaw)
-        msg.pose.pose.orientation.x = quat[0]
-        msg.pose.pose.orientation.y = quat[1]
-        msg.pose.pose.orientation.z = quat[2]
-        msg.pose.pose.orientation.w = quat[3]
+        self.last_odom.pose.pose.orientation.x = quat[0]
+        self.last_odom.pose.pose.orientation.y = quat[1]
+        self.last_odom.pose.pose.orientation.z = quat[2]
+        self.last_odom.pose.pose.orientation.w = quat[3]
 
-    @staticmethod
-    def set_vel(msg, vel):
+    def set_vel(self, vel):
         """ Set the velocity in an Odometry message
         :param msg: An Odometry message
         :param vel: The new velocity
         """
+<<<<<<< HEAD
         msg.twist.twist.linear.x = vel
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+<<<<<<< HEAD
 >>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+=======
+        self.last_odom.twist.twist.linear.x = vel
+>>>>>>> 54289ac (2025/04/16 Meeting Update)
+>>>>>>> bc58fab (2025/04/16 Meeting Update)

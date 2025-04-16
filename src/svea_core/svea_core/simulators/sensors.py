@@ -3,6 +3,8 @@
 """
 Sensor module that contains ROS interface objects for various sensors.
 Currently supporting: Lidars, Wheel Encoders
+
+Author: Frank Jiang, Tobias Bolin
 """
 
 from threading import Thread
@@ -31,7 +33,7 @@ class Lidar():
     scan.
     """
 
-    def __init__(self, Node):
+    def __init__(self, Node:Node):
         self.node = Node
         self.scan = []
         # list of functions to call whenever a new scan comes in
