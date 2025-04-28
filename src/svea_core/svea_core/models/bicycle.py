@@ -31,8 +31,9 @@ import rclpy
 import rclpy.clock
 import rclpy.duration
 from rclpy.clock import ClockType
-from svea_core.states import VehicleState
-
+from builtin_interfaces.msg import Time
+from nav_msgs.msg import Odometry
+import tf_transformations as tf
 
 class SimpleBicycleModel:
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
@@ -111,10 +112,10 @@ class Bicycle4DWithESC(Bicycle4D):
 
     TAU = 0.1 # gain for simulating SVEA's ESC
 
-    def __init__(self, state: Optional[VehicleState] = None):
-        self.state = state if state is not None else VehicleState()
+    def __init__(self):
+        self.state = Odometry()
         self.steering = 0
-        self.state.time_stamp = rclpy.clock.Clock(clock_type=ClockType.ROS_TIME).now()
+        self.state.header.stamp = rclpy.clock.Clock(clock_type=ClockType.ROS_TIME).now().to_msg()
     def __repr__(self):
         return self.state.__repr__()
 
@@ -128,11 +129,20 @@ class Bicycle4DWithESC(Bicycle4D):
     def _update(self, state, accel, delta, dt):
         # update state using simple bicycle model dynamics
         delta = np.clip(delta, -self.DELTA_MAX, self.DELTA_MAX)
-        x, y, yaw, v = state
-        state.x += v * np.cos(yaw) * dt
-        state.y += v * np.sin(yaw) * dt
-        state.yaw += v / self.L * np.tan(delta) * dt
-        state.v += accel * dt
+        x = state.pose.pose.position.x
+        y = state.pose.pose.position.y
+        yaw = tf.euler_from_quaternion([
+            state.pose.pose.orientation.x,
+            state.pose.pose.orientation.y,
+            state.pose.pose.orientation.z,
+            state.pose.pose.orientation.w])[2]
+        v = state.twist.twist.linear.x
+        # update state
+        self.state.pose.pose.position.x = x + v * np.cos(yaw) * dt
+        self.state.pose.pose.position.y = y + v * np.sin(yaw) * dt
+        self.state.pose.pose.orientation = tf.quaternion_from_euler(
+            yaw + v / self.L * np.tan(delta) * dt)
+        self.state.twist.twist.linear.x = v + accel * dt
 
     def update(self, steering: float, velocity: float, dt: float):
         """Updates state.
@@ -158,5 +168,22 @@ class Bicycle4DWithESC(Bicycle4D):
         delta = steering
         self.steering = steering
         self._update(self.state, accel, delta, dt)
+<<<<<<< HEAD
         self.state.time_stamp += rclpy.duration.Duration(seconds=dt)
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+        self.state.header.stamp = self.add_time(rclpy.duration.Duration(seconds=dt).to_msg())
+
+    def add_time(self, delta_time: Time) -> Time:
+        """Update time to the state.
+
+        Args:
+            delta_time: Time to add to the state
+        """
+        total_sec = self.state.header.stamp.sec + delta_time.sec
+        total_nanosec = self.state.header.stamp.nanosec + delta_time.nanosec
+        if total_nanosec >= 1e9:
+            total_sec += 1
+            total_nanosec -= 1e9
+        return Time(sec=total_sec, nanosec=total_nanosec)
+>>>>>>> 7ecd314 (20250428 update)

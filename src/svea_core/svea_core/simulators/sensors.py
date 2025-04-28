@@ -18,15 +18,6 @@ from svea_msgs.msg import LLIEncoder as lli_encoder
 from geometry_msgs.msg import TwistWithCovarianceStamped
 
 
-__author__ = "Frank Jiang and Tobias Bolin"
-__copyright__ = "Copyright 2020, Frank Jiang"
-__credits__ = ["Frank Jiang", "Tobias Bolin"]
-__license__ = "MIT"
-__maintainer__ = "Frank Jiang"
-__email__ = "frankji@kth.se"
-__status__ = "Development"
-
-
 class Lidar():
     """
     Basic interface for handling a Lidar. Collects and stores the most recent

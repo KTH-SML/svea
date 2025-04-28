@@ -2,10 +2,14 @@
 
 """
 <<<<<<< HEAD
+<<<<<<< HEAD
 TODO: Test module for svea.simulators.states
 =======
 Test module for svea.simulators.states
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+TODO: Test module for svea.simulators.states
+>>>>>>> 7ecd314 (20250428 update)
 """
 
 

@@ -14,7 +14,7 @@ from geometry_msgs.msg import PoseStamped
 
         
 
-class PlannerInterface(object):
+class PlannerInterface[N:Node]:
     _path_interface = None
     _gridmap_msg = None
     _gridmap_sub = None
@@ -24,8 +24,8 @@ class PlannerInterface(object):
     _path_topic = None
     _points_path = None
 
-    def __init__(self,Node):
-        self.node = Node
+    def __init__(self,node:N) -> None:
+        self.node = node
         # Map interface
         self._map_topic = self.load_param('~map_topic', '/map')
         self.init_gridmap_subscribers()

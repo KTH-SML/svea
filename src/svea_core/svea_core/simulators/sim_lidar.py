@@ -7,13 +7,14 @@ Author: Frank Jiang, Javier Cerna
 
 import rclpy
 from rclpy.node import Node
+import rclpy.clock
 import numpy as np
 from copy import deepcopy
 from math import cos, sin, sqrt, radians
 from threading import Thread
 from multiprocessing import Pool
+from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
-import rclpy.clock
 from sensor_msgs.msg import LaserScan, PointCloud
 from visualization_msgs.msg import Marker
 
@@ -29,9 +30,6 @@ class SimLidar(Node):
     is to ensure it can be directly used within the SimSVEA class.
 
     #TODO: add updating list of visible edges
-
-    :param vehicle_name: Name of vehicle lidar is attached to
-    :type vehicle_name: str, optional
     """
 
     ANGLE_MIN = radians(-135.0) # start angle of scan [rad]
@@ -46,20 +44,12 @@ class SimLidar(Node):
 
     LIDAR_OFFSET = 0.30 # dist between SVEA rear axle and lidar mount point [m]
 
-    def __init__(self, vehicle_name=''):
+    def __init__(self):
 
         super().__init__('sim_lidar')
-
-        sub_namespace = vehicle_name + '/' if vehicle_name else ''
-        self._viz_points_topic = sub_namespace + 'viz_lidar_points'
-        self._viz_rays_topic = sub_namespace + 'viz_lidar_rays'
-        self._viz_edges_topic = sub_namespace + 'viz_edges'
-
-        if vehicle_name:
-            self.vehicle_name = vehicle_name
-        else:
-            namespace = self.get_namespace()
-            self.vehicle_name = namespace.split('/')[-2]
+        self._viz_points_topic = 'viz_lidar_points'
+        self._viz_rays_topic = 'viz_lidar_rays'
+        self._viz_edges_topic = 'viz_edges'
 
         self._lidar_position = None # [x, y, yaw] -> [m, m, rad]
         self._last_visibility_pos = None # [x, y, yaw] -> [m, m, rad]
@@ -98,8 +88,7 @@ class SimLidar(Node):
             self.get_logger().info("Initializing Lidar Simulation Node: \n"
                                          + str(self))
             self._start_publish()
-            self.get_logger().info("{} Simulated Lidar successfully initialized".format(
-                self.vehicle_name))
+            self.get_logger().info("Simulated Lidar successfully initialized")
             self._start_simulation()
             rclpy.spin(self)
         except Exception as e:
@@ -108,19 +97,22 @@ class SimLidar(Node):
             rclpy.shutdown()
 
     def _start_publish(self):
+        qos_profile = QoSProfile(
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            durability=QoSDurabilityPolicy.VOLATILE,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            depth=1)
         self._scan_pub = self.create_publisher(LaserScan,
-                                               '/scan', 1,)
-        # self._scan_pub = rclpy.Publisher('/scan', LaserScan,
-        #                                  queue_size=1, tcp_nodelay=True)
+                                               '/scan', qos_profile)
         self._viz_points_pub = self.create_publisher(PointCloud,
                                                      self._viz_points_topic,
-                                                     1)
+                                                     qos_profile)
         self._viz_rays_pub = self.create_publisher(Marker,
                                                    self._viz_rays_topic,
-                                                   1)
+                                                   qos_profile)
         self._viz_edges_pub = self.create_publisher(Marker,
                                                     self._viz_edges_topic,
-                                                    1)
+                                                    qos_profile)
 
     def _start_simulation(self):
         rate = self.create_rate(1.0 / self.SCAN_TIME)

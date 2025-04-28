@@ -12,8 +12,8 @@
     <arg name="initial_pose_a"  default="1.57" /> <!-- wrt to map-->
 
     <!-- Start map server -->
-    <!-- <node name="map_server" pkg="nav2_map_server" exec="map_server" args="$(find-pkg-share svea_core)/maps/$(var map).yaml" output="screen"/> -->
-
+    <node name="map_server" pkg="nav2_map_server" exec="map_server" args="$(find-pkg-share svea_core)/maps/$(var map).yaml" output="screen"/>
+    
     <!-- <param from="$(find-pkg-share svea_core)/params/$(var obstacle_map).yaml" /> -->
 
     <!-- If is_sim equal to false, then include all these tags-->
@@ -33,15 +33,23 @@
     </group>
 
     <!-- Start Foxglove -->
-    <!-- <include if="$(var use_foxglove)" file="$(find-pkg-share foxglove_bridge)/launch/foxglove_bridge_launch.xml">
+    <include if="$(var use_foxglove)" file="$(find-pkg-share foxglove_bridge)/launch/foxglove_bridge_launch.xml">
         <arg name="port" value="8765" />
-    </include> -->
+    </include>
 
     <!-- Start pure_pursuit -->
-    <node name="pure_pursuit" pkg="svea_example" exec="pure_pursuit" output="screen" launch-prefix="python3 -m pdb">
+    <node name="pure_pursuit" pkg="svea_example" exec="pure_pursuit" output="screen">
         <param name="use_rviz" value="$(var use_foxglove)"/>
         <param name="is_sim" value="$(var is_sim)"/>
         <param name="state" value="[-7.4, -15.3, 0.9, 0.0]" />
         <param name="points" value="['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]']" />
     </node>
+
+    <group if="$(var is_sim)">
+        <!-- Start simulation -->
+        <node name = "simSVEA" pkg="svea_core" exec="simSVEA" output="screen">
+            <param name="use_rviz" value="$(var use_foxglove)"/>
+            <param name="state" value="[-7.4, -15.3, 0.9, 0.0]" />
+            <param name="points" value="['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]']" />
+        </include>
 </launch>
