@@ -9,7 +9,6 @@ packages=[
     'svea_core.controllers',
     'svea_core.models',
     'svea_core.simulators',
-    'svea_core.svea_managers',
     'svea_core.tests',
     'svea_core.script',
 ]

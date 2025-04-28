@@ -158,8 +158,8 @@ class ActuationInterface[N:Node]:
 
     def _start_listen(self):
         qos_profile = QoSProfile(
-            reliability=QoSReliabilityPolicy.RMW_QOS_POLICY_RELIABILITY_RELIABLE,
-            durability=QoSReliabilityPolicy.RMW_QOS_POLICY_DURABILITY_VOLATILE,
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            durability=QoSDurabilityPolicy.VOLATILE,
             depth=1,)
         
         self.node.create_subscription(lli_ctrl, 
@@ -174,8 +174,8 @@ class ActuationInterface[N:Node]:
 
     def _start_publish(self):
         qos_profile = QoSProfile(
-            reliability=QoSReliabilityPolicy.RMW_QOS_POLICY_RELIABILITY_RELIABLE,
-            durability=QoSReliabilityPolicy.RMW_QOS_POLICY_DURABILITY_VOLATILE,
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            durability=QoSDurabilityPolicy.VOLATILE,
             depth=1,)
         
         self.ctrl_request_pub = self.node.create_publisher(lli_ctrl,

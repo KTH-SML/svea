@@ -3,8 +3,8 @@
 import rclpy
 from rclpy.node import Node 
 from geometry_msgs.msg import PointStamped
-from svea_msgs.msg import VehicleState as VehicleStateMsg
-from svea_core.states import VehicleState
+from nav_msgs.msg import Odometry
+from tf_transformations import euler_from_quaternion
 
 
 
@@ -23,19 +23,17 @@ class StatePublisher(Node):
         super().__init__('state_publisher')
 
         ## Create node resources
-
+        self.odometry = Odometry()
         # spin rate
         self.rate = self.create_rate(self.SPIN_RATE)
-
-        # Vehicle state
-        self.state = VehicleState()
         
         # Wait for the first state message
-        # self.state.state_msg = self.wait_for_message('state', VehicleStateMsg)
+        self.state.state_msg = self.wait_for_message('odometry/local', Odometry)
+
         self.create_subscription(
-            VehicleStateMsg,
-            'state',
-            lambda msg: setattr(self.state, 'state_msg', msg),
+            Odometry,
+            'odometry/local',
+            lambda msg: setattr(self.odometry, 'odometry/local', msg),
             10
         )
 
@@ -70,7 +68,12 @@ class StatePublisher(Node):
         return rclpy.ok()
 
     def spin(self):
-        self.get_logger().info('[%f, %f, %f]' % (self.state.x, self.state.y, self.state.yaw))
+        quaternion = [self.odometry.pose.pose.orientation.x,
+                       self.odometry.pose.pose.orientation.y,
+                       self.odometry.pose.pose.orientation.z,
+                       self.odometry.pose.pose.orientation.w]
+        _, _, yaw = euler_from_quaternion(quaternion)
+        self.get_logger().info('[%f, %f, %f]' % (self.odometry.pose.pose.position.x, self.odometry.pose.pose.position.y, yaw))
 
 
 def main(args=None):

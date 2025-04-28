@@ -14,6 +14,7 @@ import rclpy.clock
 from rclpy.node import Node
 import tf2_ros
 from geometry_msgs.msg import TransformStamped
+from nav_msgs.msg import Odometry
 from svea_msgs.msg import LLIControl as lli_ctrl
 from svea_msgs.msg import LLIEmergency as lli_emergency
 from svea_core.states import SVEAControlValues
@@ -75,7 +76,6 @@ class SimSVEA(Node):
 
     def __init__(self, 
                  initialized_model=SimpleBicycleModel(),
-                 vehicle_name='',
                  dt=0.02,
                  start_paused=False,
                  run_lidar=False,
@@ -84,26 +84,21 @@ class SimSVEA(Node):
                  publish_odometry=False):
         
         super().__init__('sim_svea')     
-        sub_namespace = vehicle_name + '/' if vehicle_name else ''
-        self._state_topic = sub_namespace + 'state'
-        self._request_topic = sub_namespace + 'lli/ctrl_request'
-        self._actuated_topic = sub_namespace + 'lli/ctrl_actuated'
-        self._emergency_topic = sub_namespace + 'lli/emergency'
-
-        if vehicle_name:
-            self.vehicle_name = vehicle_name
-        else:
-            namespace = self.get_namespace()
-            self.vehicle_name = namespace.split('/')[-2]
+        self._state_topic = 'state'
+        self._request_topic = 'lli/ctrl_request'
+        self._actuated_topic = 'lli/ctrl_actuated'
+        self._emergency_topic = 'lli/emergency'
 
         self._map_frame_id = 'map'
-        self._odom_frame_id = sub_namespace + 'odom'
-        self._base_link_frame_id = sub_namespace + 'base_link'
+        self._odom_frame_id = 'odom'
+        self._base_link_frame_id = 'base_link'
+
+        self.current_state = Odometry()
 
         self.model = initialized_model
         self.dt = dt
         self.current_state = self.model.state
-        self.current_state.frame_id = self._map_frame_id
+        self.current_state.header.frame_id = self._map_frame_id
         self.current_state.child_frame_id = self._base_link_frame_id
 
         self.publish_tf = publish_tf
@@ -111,14 +106,12 @@ class SimSVEA(Node):
             # for broadcasting fake tf tree
             self.tf_br = tf2_ros.TransformBroadcaster(self)
         self.publish_pose = publish_pose
-        if self.publish_pose:
-            self._pose_topic = sub_namespace + 'pose'
         self.publish_odometry = publish_odometry
-        if self.publish_odometry:
-            self._odometry_topic = sub_namespace + 'odometry/corrected'
+        
+        self._odometry_topic = 'odometry/local'
         self._last_pub_time = rclpy.clock.Clock().now().to_msg()
 
-        self.node_name = "simulated_" + self.vehicle_name
+        self.node_name = "simulated_car"
         self.is_pause = start_paused
         self.control_values = SVEAControlValues(0, 0, 0, False, False)
 
@@ -129,7 +122,7 @@ class SimSVEA(Node):
 
         self._run_lidar = run_lidar
         if self._run_lidar:
-            self.simulated_lidar = SimLidar(vehicle_name).start()
+            self.simulated_lidar = SimLidar().start()
 
     def start(self):
         """
@@ -148,8 +141,7 @@ class SimSVEA(Node):
                         + str(self))
             self._collect_srvs()
             self._start_publish()
-            self.get_logger().info("{} Simulation successfully initialized".format(
-                self.vehicle_name))
+            self.get_logger().info(" Simulation successfully initialized")
             self._start_listen()
             rclpy.spin(self)
         except Exception as e:
@@ -180,21 +172,14 @@ class SimSVEA(Node):
             history=QoSHistoryPolicy.KEEP_LAST,
             depth=1)
         
-        self.svea_state_pub = self.create_publisher(type(self.current_state.state_msg),
-                                                    self._state_topic, 
-                                                    qos_profile)
+
         self.ctrl_actuated_pub = self.create_publisher(lli_ctrl,
                                                        self._actuated_topic,
                                                        qos_profile)
 
-        if self.publish_pose:
-            self.pose_pub = self.create_publisher(type(self.current_state.pose_msg),
-                                            self._pose_topic,
-                                            qos_profile)
-        if self.publish_odometry:
-            self.odometry_pub = self.reate_publisher(type(self.current_state.odometry_msg),
-                                                self._odometry_topic,
-                                                qos_profile)
+        self.odometry_pub = self.create_publisher(type(self.current_state),
+                                                      self._odometry_topic,
+                                                      qos_profile)
 
     def _percent_to_steer(self, steering):
         """Convert radians to percent of max steering actuation"""
@@ -243,20 +228,20 @@ class SimSVEA(Node):
                     if self.publish_tf:
                         self._broadcast_tf()
                     #TODO: change following msg to odemetry msg type
-                    self.odometry_pub.publish(self.current_state.odometry_msg)
+                    self.odometry_pub.publish(self.current_state)
                     self._last_pub_time = rclpy.clock.Clock().now().to_msg()
             rate.sleep()  # force update frequency to be realistic
 
     def _broadcast_tf(self):
         map2odom = TransformStamped()
-        map2odom.header.stamp = self.current_state.pose_msg.header.stamp
+        map2odom.header.stamp = self.current_state.state.header.stamp
         map2odom.header.frame_id = self._map_frame_id
         map2odom.child_frame_id = self._odom_frame_id
         map2odom.transform.rotation.w = 1.0
         self.tf_br.sendTransform(map2odom)
 
         odom2base = TransformStamped()
-        odom2base.header.stamp = self.current_state.pose_msg.header.stamp
+        odom2base.header.stamp = self.current_state.state.header.stamp
         odom2base.header.frame_id = self._odom_frame_id
         odom2base.child_frame_id = self._base_link_frame_id
         pose = self.current_state.pose_msg.pose.pose
@@ -299,12 +284,12 @@ class SimSVEA(Node):
 
     def _build_param_printout(self):
         param_str = ''
-        # param_str = "### {0} Simulation:\n".format(self.vehicle_name)
-        # param_str += "### Sim dt: {0}\n".format(self.dt)
-        # param_str += "  -vehicle state:\n"
-        # param_str += "{0}\n".format(self.model)
-        # param_str += "  -ctrl request:\n"
-        # param_str += str(self.control_values)
+        param_str = "### Simulation:\n"
+        param_str += "### Sim dt: {0}\n".format(self.dt)
+        param_str += "  -vehicle state:\n"
+        param_str += "{0}\n".format(self.model)
+        param_str += "  -ctrl request:\n"
+        param_str += str(self.control_values)
         return param_str
 
     def __repr__(self):
