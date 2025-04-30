@@ -7,6 +7,7 @@ Author: Tobias Bolin, Frank Jiang
 """
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 from typing import Self, Optional
 =======
 from threading import Thread, Event
@@ -15,6 +16,10 @@ from typing import Callable
 =======
 from typing import Callable, Self
 >>>>>>> 54289ac (2025/04/16 Meeting Update)
+=======
+from typing import Callable, Self, Optional
+from threading import Event
+>>>>>>> 5598423 (update to interface design pattern)
 
 import rclpy
 from rclpy.node import Node
@@ -73,7 +78,19 @@ __all__ = [
     'LocalizationInterface',
 ]
 
-class LocalizationInterface[N:Node]:
+def wait_for_message(node, topic, msg_type, timeout=None):
+    future = rclpy.task.Future()
+    sub = node.create_subscription(
+        msg_type,
+        topic,
+        lambda msg: future.set_result(msg),
+        10
+    )
+    rclpy.spin_until_future_complete(node, future, timeout_sec=timeout)
+    node.destroy_subscription(sub)
+    return future.result()
+
+class LocalizationInterface:
     """Interface handling the reception of state information from the
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
     localization stack.
@@ -238,56 +255,87 @@ class LocalizationInterface[N:Node]:
     def add_callback(self, cb, as_state=False) -> None:
 =======
     Args:
-        vehicle_name: Name of vehicle being controlled; The name will be
-            effectively be added as a namespace to the topics used by the
-            corresponding localization node i.e `namespace/vehicle_name/state`.
+        node: The ROS2 node that this interface is attached to. This is used
+            to create the subscription to the odometry topic.
+        odom_top: The topic name for the odometry message. Defaults to
+            'odometry/local'.
     """
 
-    def __init__(self, node: N)-> None:
-        
-        self.node = node
-        self._odom_topic = 'odometry/local'
+    _odom_top = 'odometry/local'
 
-        self.last_time = float('nan')
+    def __init__(self, node: Node, *, mode='sub', init_odom=None, **kwds)-> None:
+        
+        self._node = node
+
+        assert mode in ['sub', 'pub'], "Invalid mode. Use 'sub' or 'pub'."
+        self._mode = mode
+
+        ## Odometry ##
+
+        # Create a new odometry message with default values
+        if odom := kwds.get('init_odom', None):
+            self._odom_msg = init_odom
+        else:
+            self._odom_msg = Odometry()
+            self._odom_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
+            self._odom_msg.header.frame_id = 'map'
+            self._odom_msg.child_frame_id = 'base_link'
+        
+        if odom_top := kwds.get('odom_top', None):
+            self._odom_top = odom_top
 
         # list of functions to call whenever a new state comes in
-        self.callbacks = []
+        self._odom_callbacks = []
 
     def start(self) -> Self:
         """Spins up ROS background thread; must be called to start receiving
         data.
         """
-        self.node.get_logger().info("Starting Localization Interface Node...")
-        self.node_name = 'localization_node'
-        self._start_listen()
+        self._node.get_logger().info("Starting Localization Interface Node...")
 
-        self.node.get_logger().info("Localization Interface is ready")
-        return self
-
-    def _start_listen(self):
         qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.RELIABLE,
             durability=QoSDurabilityPolicy.VOLATILE,
             history=QoSHistoryPolicy.KEEP_LAST,
             depth=1)
-        
-        self.node.create_subscription(Odometry, self._odom_topic,
-                                 self.odom_callback, qos_profile)
-        
-    def odom_callback(self, msg):
-        self.last_odom = msg
-        for cb in self.callbacks:
+
+        if self._mode == 'sub':
+            self._node.create_subscription(Odometry, self._odom_top, self._odom_cb, qos_profile)
+
+        if self._mode == 'pub':
+            self._odom_pub = self._node.create_publisher(Odometry, self._odom_top, qos_profile)
+
+        self._node.get_logger().info("Localization Interface is ready.")
+        return self
+
+    def wait(self, timeout: Optional[float] = None) -> Odometry:
+        """Wait for a message on the interface topic.
+
+        Args:
+            timeout: The time to wait for a message in seconds.
+        """
+        return wait_for_message(self._node, self._odom_top, Odometry, timeout=timeout)
+
+    ## Mode: sub ##
+
+    def _odom_cb(self, msg: Odometry) -> None:
+        self._odom_msg = msg
+        for cb in self._odom_callbacks:
             try:
                 cb(msg)
             except Exception as e:
-                self.node.get_logger().error(f"Error in callback: {e}")
+                self._node.get_logger().error(f"Error in callback: {e}")
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     def add_callback(self, cb: Callable[[VehicleState], None]):
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
 =======
     def add_callback(self, cb: Callable[[N], None])->None:
 >>>>>>> 54289ac (2025/04/16 Meeting Update)
+=======
+    def add_callback(self, cb: Callable[[N], None], as_state=False) -> None:
+>>>>>>> 5598423 (update to interface design pattern)
         """Add state callback.
 
         Every function passed into this method will be called whenever new
@@ -296,6 +344,7 @@ class LocalizationInterface[N:Node]:
         Args:
             cb: A callback function intended for responding to the reception of
                 state info.
+<<<<<<< HEAD
 <<<<<<< HEAD
             as_state: If True, the callback will be called with the state tuple
                 (x, y, yaw, vel) instead of the odometry message.
@@ -306,15 +355,25 @@ class LocalizationInterface[N:Node]:
 
     def remove_callback(self, cb) -> None:
 =======
+=======
+            as_state: If True, the callback will be called with the state tuple
+                (x, y, yaw, vel) instead of the odometry message.
+>>>>>>> 5598423 (update to interface design pattern)
         """
-        self.callbacks.append(cb)
+        if as_state:
+            cb = lambda msg: cb(self.get_state(msg))
+        self._odom_callbacks.append(cb)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     def remove_callback(self, cb: Callable[[VehicleState], None]):
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
 =======
     def remove_callback(self, cb: Callable[[N], None])->None:
 >>>>>>> 54289ac (2025/04/16 Meeting Update)
+=======
+    def remove_callback(self, cb: Callable[[N], None]) -> None:
+>>>>>>> 5598423 (update to interface design pattern)
         """Remove callback so it will no longer be called when state
         information is received.
 
@@ -322,6 +381,7 @@ class LocalizationInterface[N:Node]:
             cb: A callback function that should be no longer used in response
             to the reception of state info.
         """
+<<<<<<< HEAD
 <<<<<<< HEAD
         while cb in self._odom_callbacks:
             self._odom_callbacks.pop(self._odom_callbacks.index(cb))
@@ -406,100 +466,158 @@ class LocalizationInterface[N:Node]:
 =======
         while cb in self.callbacks:
             self.callbacks.pop(self.callbacks.index(cb))
+=======
+        while cb in self._odom_callbacks:
+            self._odom_callbacks.pop(self._odom_callbacks.index(cb))
+>>>>>>> 5598423 (update to interface design pattern)
 
-    @staticmethod
-    def new_state(x,y,yaw,vel,stamp=None,frame_id='map',child_frame='base_link'):
-        msg = Odometry()
-        msg.pose.pose.position.x = x
-        msg.pose.pose.position.y = y
-        quat = quaternion_from_euler(0.0, 0.0, yaw)
-        msg.pose.pose.orientation.x = quat[0]
-        msg.pose.pose.orientation.y = quat[1]
-        msg.pose.pose.orientation.z = quat[2]
-        msg.pose.pose.orientation.w = quat[3]
-        msg.twist.twist.linear.x = vel
-        msg.header.stamp = (stamp if stamp is not None else 
-                            rclpy.clock.Clock().now().to_msg())
-        msg.header.frame_id = frame_id
-        msg.child_frame_id = child_frame
-        return msg
+    def get_state(self, odom=None) -> tuple[float, float, float, float]:
+        """Get the current state of the localization interface.
+        
+        Args:
+            odom: An optional odometry message to use instead of the last
+                received message.
 
-    def get_state(self):
-        return (LocalizationInterface.get_x(self.last_odom),
-                LocalizationInterface.get_y(self.last_odom), 
-                LocalizationInterface.get_yaw(self.last_odom), 
-                LocalizationInterface.get_vel(self.last_odom))
+        Returns:
+            A tuple containing the x position, y position, yaw angle, and
+            velocity of the robot.
+        """
 
+        if odom is None:
+            odom = self._odom_msg
+
+        return (self.get_x(odom), self.get_y(odom), self.get_yaw(odom), self.get_vel(odom))
      
-    def get_x(self):
+    def get_x(self, odom=None) -> float:
         """ Extract the x position from a odpmetry message
-        :param msg: An Odometry message
-        :return: The x position
-        :rtype: float
-        """
-        return self.last_odom.pose.pose.position.x
 
-     
-    def get_y(self):
+        Args:
+            odom: An optional odometry message to use instead of the last
+            received message.
+
+        Returns:
+            The x position.
+        """
+        if odom is None:
+            odom = self._odom_msg
+        return odom.pose.pose.position.x
+
+    def get_y(self, odom=None) -> float:
         """ Extract the y position from a odpmetry message
-        :param msg: An Odometry message
-        :return: The y position
-        :rtype: float
+        Args:
+            odom: An optional odometry message to use instead of the last
+            received message.
+        Returns:
+            The y position.
         """
-        return self.last_odom.pose.pose.position.y
+        if odom is None:
+            odom = self._odom_msg
+        return odom.pose.pose.position.y
 
      
-    def get_yaw(self):
+    def get_yaw(self, odom=None) -> float:
         """ Extract the yaw from a odpmetry message
-        :param msg: An Odometry message
-        :return: The yaw
-        :rtype: float
+        Args:
+            odom: An optional odometry message to use instead of the last
+            received message.
+        Returns:
+            The yaw angle in radians.
         """
-        quat = [self.last_odom.pose.pose.orientation.x,
-                self.last_odom.pose.pose.orientation.y,
-                self.last_odom.pose.pose.orientation.z,
-                self.last_odom.pose.pose.orientation.w]
+        if odom is None:
+            odom = self._odom_msg
+        quat = [odom.pose.pose.orientation.x,
+                odom.pose.pose.orientation.y,
+                odom.pose.pose.orientation.z,
+                odom.pose.pose.orientation.w]
         return euler_from_quaternion(quat)[2]
 
-     
-    def get_vel(self):
+    def get_vel(self, odom=None) -> float:
         """ Extract the velocity from a odpmetry message
-        :param msg: An Odometry message
-        :return: The velocity
-        :rtype: float
+        Args:
+            odom: An optional odometry message to use instead of the last
+            received message.
+        Returns:
+            The velocity in m/s.
         """
-        return self.last_odom.twist.twist.linear.x
+        if odom is None:
+            odom = self._odom_msg
+        return odom.twist.twist.linear.x
 
-    def set_x(self, x):
-        """ Set the x position in an Odometry message
-        :param msg: An Odometry message
-        :param x: The new x position
-        """
-        self.last_odom.pose.pose.position.x = x
+    ## Mode: pub ##
 
-    def set_y(self, y):
-        """ Set the y position in an Odometry message
-        :param msg: An Odometry message
-        :param y: The new y position
-        """
-        self.last_odom.pose.pose.position.y = y
+    def publish(self, odom=None) -> None:
+        """Publish the current odometry message to the topic.
 
-    def set_yaw(self, yaw):
-        """ Set the yaw in an Odometry message
-        :param msg: An Odometry message
-        :param yaw: The new yaw
+        Args:
+            odom: An optional odometry message to publish instead of the last
+                received message.
         """
+        if odom is None:
+            odom = self._odom_msg
+        self._odom_pub.publish(odom)
+
+    def set_state(x, y, yaw, vel, odom=None) -> None:
+        """ Set the state in an Odometry message.
+        Args:
+            x: The x position to set.
+            y: The y position to set.
+            yaw: The yaw angle in radians to set.
+            vel: The velocity in m/s to set.
+            odom: An optional odometry message to use instead of the last
+                received message.
+        """
+        if odom is None:
+            odom = self._odom_msg
+        self.set_x(x, odom)
+        self.set_y(y, odom)
+        self.set_yaw(yaw, odom)
+        self.set_vel(vel, odom)
+
+    def set_x(self, x, odom=None) -> None:
+        """ Set the x position in an Odometry message.
+        Args:
+            x: The x position to set.
+            odom: An optional odometry message to use instead of the last
+                received message.
+        """
+        if odom is None:
+            odom = self._odom_msg
+        odom.pose.pose.position.x = x
+
+    def set_y(self, y, odom=None) -> None:
+        """ Set the y position in an Odometry message.
+        Args:
+            y: The y position to set.
+            odom: An optional odometry message to use instead of the last
+                received message.
+        """
+        if odom is None:
+            odom = self._odom_msg
+        odom.pose.pose.position.y = y
+
+    def set_yaw(self, yaw, odom=None) -> None:
+        """ Set the yaw in an Odometry message.
+        Args:
+            yaw: The yaw angle in radians to set.
+            odom: An optional odometry message to use instead of the last
+                received message.
+        """
+        if odom is None:
+            odom = self._odom_msg
         quat = quaternion_from_euler(0.0, 0.0, yaw)
-        self.last_odom.pose.pose.orientation.x = quat[0]
-        self.last_odom.pose.pose.orientation.y = quat[1]
-        self.last_odom.pose.pose.orientation.z = quat[2]
-        self.last_odom.pose.pose.orientation.w = quat[3]
+        odom.pose.pose.orientation.x = quat[0]
+        odom.pose.pose.orientation.y = quat[1]
+        odom.pose.pose.orientation.z = quat[2]
+        odom.pose.pose.orientation.w = quat[3]
 
-    def set_vel(self, vel):
-        """ Set the velocity in an Odometry message
-        :param msg: An Odometry message
-        :param vel: The new velocity
+    def set_vel(self, vel, odom=None) -> None:
+        """ Set the velocity in an Odometry message.
+        Args:
+            vel: The velocity in m/s to set.
+            odom: An optional odometry message to use instead of the last
+                received message.
         """
+<<<<<<< HEAD
 <<<<<<< HEAD
         msg.twist.twist.linear.x = vel
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
@@ -509,4 +627,12 @@ class LocalizationInterface[N:Node]:
 =======
         self.last_odom.twist.twist.linear.x = vel
 >>>>>>> 54289ac (2025/04/16 Meeting Update)
+<<<<<<< HEAD
 >>>>>>> bc58fab (2025/04/16 Meeting Update)
+=======
+=======
+        if odom is None:
+            odom = self._odom_msg
+        odom.twist.twist.linear.x = vel
+>>>>>>> 5598423 (update to interface design pattern)
+>>>>>>> 7b79d5b (update to interface design pattern)
