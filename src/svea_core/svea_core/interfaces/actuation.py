@@ -10,18 +10,19 @@ import rclpy
 import rclpy.clock
 import rclpy.duration
 from rclpy.node import Node
-from svea_msgs.msg import LLIControl as lli_ctrl
+from svea_msgs.msg import LLIControl
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
 
 __all__ = [
     'ActuationInterface',
 ]
 
+
 def cmp(a, b):
     return (a > b) - (a < b)
 
 
-class ActuationInterface[N:Node]:
+class ActuationInterface:
     """Interface object for sending actuation commands to the SVEA car's low-level
     controller.
 
@@ -84,18 +85,18 @@ class ActuationInterface[N:Node]:
     # Bit indicating emergency stop engaged
     EMERGENCY_MASK = 0b00001000
 
-    def __init__(self, node: N, log_length: int = 100) -> None:  
-        self.node = node
-        self._request_topic = 'lli/ctrl_request' 
-        self._actuated_topic = 'lli/ctrl_actuated' 
-        self._remote_topic = 'lli/remote' 
-       
+    _ctrl_request_top   = 'lli/ctrl_request' 
+    _ctrl_actuated_top  = 'lli/ctrl_actuated' 
+
+    def __init__(self, node: Node, log_length: int = 100) -> None:  
+        
+        self._node = node
         
         self._previous_velocity = None
         self._is_reverse = False
 
         self.ctrl_request = _ControlRequest() # Stores the last controls sent
-        self.ctrl_msg = lli_ctrl()  # Message to send to ROS
+        self.ctrl_msg = LLIControl()  # Message to send to ROS
         self.last_ctrl_update = rclpy.clock.Clock().now().to_msg()
 
         self._is_stop = False
@@ -106,9 +107,8 @@ class ActuationInterface[N:Node]:
         # log of control requests and control actuated
         self.ctrl_request_log = deque(maxlen=log_length)
         self.ctrl_actuated_log = deque(maxlen=log_length)
-        self.remote_log = deque(maxlen=log_length)
 
-    def start(self) -> Self:
+    def start(self, wait=True) -> Self:
         """Spins up ROS background thread; must be called to start receiving
         and sending data.
 
@@ -116,34 +116,42 @@ class ActuationInterface[N:Node]:
             wait: True if the interface should call `wait_until_ready` before
                 returning.
         """
-        self.node.get_logger().info('Starting Control Interface Node...')
-        self.node_name = 'control_interface'
-        self._start_publish()
-        self._start_listen()
-        duration = rclpy.duration.Duration(seconds=0.1)
-        rclpy.clock.Clock().sleep_for(duration)
-        self._wait_until_ready()
-        if not self.is_ready:
-            self.node.get_logger().info("LLI interface not responding during start of "
-                                            "Control Interface. Seting ready anyway.")
-        self.is_ready = True
-        self.node.get_logger().info("Control Interface ready...") 
+        self._node.get_logger().info('Starting Control Interface Node...')
 
+        qos_profile = QoSProfile(
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            durability=QoSDurabilityPolicy.VOLATILE,
+            depth=1,
+        )
+        
+        ## Publishers ##
+
+        self._publish_ctrl_request = self._node.create_publisher(LLIControl,
+                                                                 self._ctrl_request_top,
+                                                                 qos_profile=qos_profile)
+
+        ## Subscribers ##
+        
+        self._node.create_subscription(LLIControl, 
+                                       self._ctrl_actuated_top,
+                                       self._read_ctrl_actuated, 
+                                       qos_profile=qos_profile)
+        
+        # duration = rclpy.duration.Duration(seconds=0.1)
+        # rclpy.clock.Clock().sleep_for(duration)
+        
+        if wait:
+            self.wait(10.0)
+
+        if not self.is_ready:
+            self._node.get_logger().info("LLI interface not responding during start of "
+                                         "Control Interface. Seting ready anyway.")
+        self.is_ready = True
+
+        self._node.get_logger().info("Control Interface ready...") 
         return self
 
-
-    def _wait_until_ready(self, timeout: float = 10.0) -> bool:
-        """Internal method for waiting until the Control Interface is ready.
-
-        Args:
-            timeout: Number of seconds to wait for a response from the low
-                level interface.
-
-        Returns:
-            False if timed out or rospy is shutdown, true otherwise. Will
-            return when the interface is ready, after `timeout` seconds or if
-            rospy is shutdown.
-        """
+    def wait(self, timeout: Optional[None] = None):
         num_attempts = 0
         attempt_limit = int(timeout) or 1
         part_timeout = 1.0 if attempt_limit >= 1 else timeout
@@ -154,33 +162,6 @@ class ActuationInterface[N:Node]:
             num_attempts += 1
             self.send_control(ctrl_code=num_attempts)
             self.is_ready = self._ready_event.wait(part_timeout)
-        return self.is_ready
-
-    def _start_listen(self):
-        qos_profile = QoSProfile(
-            reliability=QoSReliabilityPolicy.RELIABLE,
-            durability=QoSDurabilityPolicy.VOLATILE,
-            depth=1,)
-        
-        self.node.create_subscription(lli_ctrl, 
-                                      self._actuated_topic,
-                                      self._read_ctrl_actuated, 
-                                      qos_profile=qos_profile)
-        
-        self.node.create_subscription(lli_ctrl, 
-                                      self._remote_topic,
-                                      self._read_remote,
-                                      qos_profile=qos_profile)
-
-    def _start_publish(self):
-        qos_profile = QoSProfile(
-            reliability=QoSReliabilityPolicy.RELIABLE,
-            durability=QoSDurabilityPolicy.VOLATILE,
-            depth=1,)
-        
-        self.ctrl_request_pub = self.node.create_publisher(lli_ctrl,
-                                                           self._request_topic,
-                                                           qos_profile=qos_profile)
 
     def _read_ctrl_actuated(self, msg):
         self._is_reverse = self._detect_reverse_state(msg)
@@ -200,9 +181,6 @@ class ActuationInterface[N:Node]:
                 return self._is_reverse
         finally:
             self._previous_velocity = velocity
-
-    def _read_remote(self, msg):
-        self.remote_log.append(msg)
 
     def _build_param_printout(self):
         # collect important params
@@ -277,20 +255,20 @@ class ActuationInterface[N:Node]:
             current_velocity = 0
         else:
             current_velocity = self._previous_velocity
-        reverse_msg = lli_ctrl()
+        reverse_msg = LLIControl()
         reverse_msg.steering = -128
         if reverse:
             reverse_msg.velocity = -15
-            self.ctrl_request_pub.publish(reverse_msg)
+            self._publish_ctrl_request.publish(reverse_msg)
             duration = rclpy.duration.Duration(seconds=0.05)
             rclpy.clock.Clock().sleep_for(duration)
             reverse_msg.velocity = 0
-            self.ctrl_request_pub.publish(reverse_msg)
+            self._publish_ctrl_request.publish(reverse_msg)
             duration = rclpy.duration.Duration(seconds=0.05)
             rclpy.clock.Clock().sleep_for(duration)
         else:
             reverse_msg.velocity = 15
-            self.ctrl_request_pub.publish(reverse_msg)
+            self._publish_ctrl_request.publish(reverse_msg)
             duration = rclpy.duration.Duration(seconds=0.05)
             rclpy.clock.Clock().sleep_for(duration)
             reverse_msg.velocity = current_velocity
@@ -382,7 +360,7 @@ class ActuationInterface[N:Node]:
         self.ctrl_request.ctrl_code = ctrl_code
 
         if not self.is_stop:
-            self.ctrl_request_pub.publish(self.ctrl_msg)
+            self._publish_ctrl_request.publish(self.ctrl_msg)
             self.ctrl_request_log.append(self.ctrl_request)
 
     @property
