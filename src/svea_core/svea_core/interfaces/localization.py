@@ -37,11 +37,6 @@ class LocalizationInterface:
     This object can take on several callback functions and execute them as soon
     as state information is available.
 
-    Args:
-        node: The ROS2 node that this interface is attached to. This is used
-            to create the subscription to the odometry topic.
-        odom_top: The topic name for the odometry message. Defaults to
-            'odometry/local'.
     """
 
     _odom_top = 'odometry/local'
@@ -70,7 +65,7 @@ class LocalizationInterface:
         # list of functions to call whenever a new state comes in
         self._odom_callbacks = []
 
-    def start(self) -> Self:
+    def start(self, wait=True) -> Self:
         """Spins up ROS background thread; must be called to start receiving
         data.
         """
@@ -86,7 +81,10 @@ class LocalizationInterface:
             self._node.create_subscription(Odometry, self._odom_top, self._odom_cb, qos_profile)
 
         if self._mode == 'pub':
-            self._odom_pub = self._node.create_publisher(Odometry, self._odom_top, qos_profile)
+            self._publish_odom = self._node.create_publisher(Odometry, self._odom_top, qos_profile)
+
+        if wait:
+            self.wait()
 
         self._node.get_logger().info("Localization Interface is ready.")
         return self
@@ -109,7 +107,7 @@ class LocalizationInterface:
             except Exception as e:
                 self._node.get_logger().error(f"Error in callback: {e}")
 
-    def add_callback(self, cb: Callable[[N], None], as_state=False) -> None:
+    def add_callback(self, cb, as_state=False) -> None:
         """Add state callback.
 
         Every function passed into this method will be called whenever new
@@ -125,7 +123,7 @@ class LocalizationInterface:
             cb = lambda msg: cb(self.get_state(msg))
         self._odom_callbacks.append(cb)
 
-    def remove_callback(self, cb: Callable[[N], None]) -> None:
+    def remove_callback(self, cb) -> None:
         """Remove callback so it will no longer be called when state
         information is received.
 
@@ -219,7 +217,7 @@ class LocalizationInterface:
         """
         if odom is None:
             odom = self._odom_msg
-        self._odom_pub.publish(odom)
+        self._publish_odom.publish(odom)
 
     def set_state(x, y, yaw, vel, odom=None) -> None:
         """ Set the state in an Odometry message.
