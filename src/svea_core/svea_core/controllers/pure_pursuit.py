@@ -4,7 +4,12 @@ Adapted from Atsushi Sakai's PythonRobotics pure pursuit example
 import math
 
 
-class PurePursuitController(object):
+class PurePursuitController:
+    """
+
+    TODO:
+        - Separate trajectory-related parts into inherited controller
+    """
 
     k = 0.6  # look forward gain
     Lfc = 0.2  # look-ahead distance

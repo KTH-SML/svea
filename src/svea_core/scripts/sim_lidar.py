@@ -5,22 +5,22 @@ match the publications made by a Lidar driver.
 Author: Frank Jiang, Javier Cerna
 """
 
-import rclpy
-from rclpy.node import Node
-import rclpy.clock
-import numpy as np
 from copy import deepcopy
 from math import cos, sin, sqrt, radians
 from threading import Thread
 from multiprocessing import Pool
-from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
+import numpy as np
+
+import rclpy
+import rclpy.clock
+from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 from sensor_msgs.msg import LaserScan, PointCloud
 from visualization_msgs.msg import Marker
 
+from svea_core import rosonic as rx
 
-
-class SimLidar(Node):
+class sim_lidar(rx.Node):
     """Simulated 1-band lidar. It works by taking a list of obstacles,
     and simulates the detected points. Parameters are based on the
     Hokuyo UST-10LX (reduce computation).
@@ -30,6 +30,9 @@ class SimLidar(Node):
     is to ensure it can be directly used within the SimSVEA class.
 
     #TODO: add updating list of visible edges
+
+
+    TODO: Update for rosonic.
     """
 
     ANGLE_MIN = radians(-135.0) # start angle of scan [rad]
@@ -44,9 +47,9 @@ class SimLidar(Node):
 
     LIDAR_OFFSET = 0.30 # dist between SVEA rear axle and lidar mount point [m]
 
+
     def __init__(self):
 
-        super().__init__('sim_lidar')
         self._viz_points_topic = 'viz_lidar_points'
         self._viz_rays_topic = 'viz_lidar_rays'
         self._viz_edges_topic = 'viz_edges'

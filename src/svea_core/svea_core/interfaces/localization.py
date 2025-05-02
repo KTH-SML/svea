@@ -81,7 +81,7 @@ class LocalizationInterface:
             self._node.create_subscription(Odometry, self._odom_top, self._odom_cb, qos_profile)
 
         if self._mode == 'pub':
-            self._publish_odom = self._node.create_publisher(Odometry, self._odom_top, qos_profile)
+            self._odom_pub = self._node.create_publisher(Odometry, self._odom_top, qos_profile)
 
         if wait:
             self.wait()
@@ -217,7 +217,7 @@ class LocalizationInterface:
         """
         if odom is None:
             odom = self._odom_msg
-        self._publish_odom.publish(odom)
+        self._odom_pub.publish(odom)
 
     def set_state(x, y, yaw, vel, odom=None) -> None:
         """ Set the state in an Odometry message.

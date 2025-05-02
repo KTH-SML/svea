@@ -1,12 +1,3 @@
-#!/usr/bin/env python
-
-"""
-Sensor module that contains ROS interface objects for various sensors.
-Currently supporting: Lidars, Wheel Encoders
-
-Author: Frank Jiang, Tobias Bolin
-"""
-
 from threading import Thread
 import math
 import rclpy
@@ -18,10 +9,12 @@ from svea_msgs.msg import LLIEncoder as lli_encoder
 from geometry_msgs.msg import TwistWithCovarianceStamped
 
 
-class Lidar():
+class LidarInterface:
     """
     Basic interface for handling a Lidar. Collects and stores the most recent
     scan.
+
+    TODO: Update similar to LocalizationInterface.
     """
 
     def __init__(self, Node:Node):
