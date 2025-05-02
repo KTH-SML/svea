@@ -5,6 +5,10 @@ import rclpy.logging
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 from sensor_msgs.msg import LaserScan
+<<<<<<< HEAD
+=======
+from svea_msgs.msg import LLIEncoder as lli_encoder
+>>>>>>> 11eeed9 (Fundamental changes.)
 from geometry_msgs.msg import TwistWithCovarianceStamped
 
 

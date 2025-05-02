@@ -26,6 +26,7 @@ Author: Frank Jiang
 import numpy as np
 import math
 from typing import Optional
+from abc import ABC, abstractmethod
 
 import rclpy
 import rclpy.clock
@@ -112,15 +113,9 @@ class Bicycle4DWithESC(Bicycle4D):
 
     TAU = 0.1 # gain for simulating SVEA's ESC
 
-    def __init__(self):
-        self.state = Odometry()
-        self.steering = 0
+    def __init__(self, state: Optional[Odometry] = None):
+        self.state = Odometry() if state is None else state
         self.state.header.stamp = rclpy.clock.Clock(clock_type=ClockType.ROS_TIME).now().to_msg()
-    def __repr__(self):
-        return self.state.__repr__()
-
-    def __str__(self):
-        return self.state.__str__()
 
     def _sim_esc(self, velocity, target_velocity):
         # simulates esc dynamics
@@ -166,7 +161,6 @@ class Bicycle4DWithESC(Bicycle4D):
 =======
         accel = self._sim_esc(self.state.v, velocity)
         delta = steering
-        self.steering = steering
         self._update(self.state, accel, delta, dt)
 <<<<<<< HEAD
         self.state.time_stamp += rclpy.duration.Duration(seconds=dt)
