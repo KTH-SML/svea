@@ -266,12 +266,9 @@ class LocalizationInterface:
 
     _odom_top = 'odometry/local'
 
-    def __init__(self, node: Node, *, mode='sub', init_odom=None, **kwds)-> None:
+    def __init__(self, node: Node, *, init_odom=None, **kwds)-> None:
         
         self._node = node
-
-        assert mode in ['sub', 'pub'], "Invalid mode. Use 'sub' or 'pub'."
-        self._mode = mode
 
         ## Odometry ##
 
@@ -302,11 +299,7 @@ class LocalizationInterface:
             history=QoSHistoryPolicy.KEEP_LAST,
             depth=1)
 
-        if self._mode == 'sub':
-            self._node.create_subscription(Odometry, self._odom_top, self._odom_cb, qos_profile)
-
-        if self._mode == 'pub':
-            self._odom_pub = self._node.create_publisher(Odometry, self._odom_top, qos_profile)
+        self._node.create_subscription(Odometry, self._odom_top, self._odom_cb, qos_profile)
 
         if wait:
             self.wait()
@@ -321,8 +314,6 @@ class LocalizationInterface:
             timeout: The time to wait for a message in seconds.
         """
         return wait_for_message(self._node, self._odom_top, Odometry, timeout=timeout)
-
-    ## Mode: sub ##
 
     def _odom_cb(self, msg: Odometry) -> None:
         self._odom_msg = msg
@@ -441,6 +432,7 @@ class LocalizationInterface:
         if odom is None:
             odom = self._odom_msg
         return odom.pose.pose.position.y
+<<<<<<< HEAD
      
     def get_yaw(self, odom=None) -> float:
         """ Extract the yaw from a odpmetry message
@@ -527,6 +519,8 @@ class LocalizationInterface:
             odom = self._odom_msg
         return odom.pose.pose.position.y
 
+=======
+>>>>>>> d574325 (try (unsuccessfully, but without crash) to run pure_pursuit in simulation.)
      
     def get_yaw(self, odom=None) -> float:
         """ Extract the yaw from a odpmetry message
@@ -555,6 +549,7 @@ class LocalizationInterface:
         if odom is None:
             odom = self._odom_msg
         return odom.twist.twist.linear.x
+<<<<<<< HEAD
 
     ## Mode: pub ##
 
@@ -648,4 +643,9 @@ class LocalizationInterface:
             odom = self._odom_msg
         odom.twist.twist.linear.x = vel
 >>>>>>> 5598423 (update to interface design pattern)
+<<<<<<< HEAD
 >>>>>>> 7b79d5b (update to interface design pattern)
+=======
+=======
+>>>>>>> d574325 (try (unsuccessfully, but without crash) to run pure_pursuit in simulation.)
+>>>>>>> 2af5048 (try (unsuccessfully, but without crash) to run pure_pursuit in simulation.)

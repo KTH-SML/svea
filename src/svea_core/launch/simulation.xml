@@ -1,4 +1,5 @@
 <launch>
+<<<<<<< HEAD
     <arg name="map"             default="floor2"/>
     <arg name="obstacle_map"    default="$(var map)_obstacles"/>
     <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
@@ -13,4 +14,10 @@
         <param from="$(find-pkg-share svea_core)/params/$(var obstacle_map).yaml"/>
     </node>
     
+=======
+    <node name="sim_svea" pkg="svea_core" exec="sim_svea.py" output="screen">
+        <param name="state" value="[-7.4, -15.3, 0.9, 0.0]" />
+        <param name="points" value="['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]']" />
+    </node>
+>>>>>>> d574325 (try (unsuccessfully, but without crash) to run pure_pursuit in simulation.)
 </launch>
