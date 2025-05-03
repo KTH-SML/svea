@@ -1,2 +1,2 @@
-from .bicycle import Bicycle
+from .bicycle import *
 from .platooning import C_OVRV

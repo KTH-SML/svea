@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Simulation module for the Lidars. Creates fake ROS publications that
 match the publications made by a Lidar driver.
