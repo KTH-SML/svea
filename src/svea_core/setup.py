@@ -20,17 +20,12 @@ setup(
     version='0.0.0',
     packages=find_packages(include=[package_name, f"{package_name}.*"]),
     data_files=[
-        ('share/ament_index/resource_index/packages',
-            [f'resource/{package_name}']),
+        ('share/ament_index/resource_index/packages', [f'resource/{package_name}']),
         (f'share/{package_name}', ['package.xml']),
-        # Script files
+        (f'share/{package_name}/launch', glob('launch/*.xml')),
+        (f'share/{package_name}/params', glob('params/*.yaml')),
+        (f'share/{package_name}/maps', glob('maps/*')),
         (f'lib/{package_name}', glob('scripts/*.py')),  # Install raw executables to lib/{package_name}
-        # Launch files
-        (os.path.join('share', package_name, 'launch'), glob(f'src/{package_name}/launch/*.xml')),
-        # Params/config files
-        (os.path.join('share', package_name, 'params'), glob(f'src/{package_name}/params/*.yaml')),
-        # Maps
-        (os.path.join('share', package_name, 'maps'), glob(f'src/{package_name}/maps/*')),
     ],
     install_requires=['setuptools','pyyaml'],
     zip_safe=True,
