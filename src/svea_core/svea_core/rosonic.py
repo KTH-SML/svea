@@ -530,26 +530,72 @@ __all__ = [
     'Parameter',
 ]
 
-class Member: 
-    pass
+class Member:
+    """
+    Base class for all rosonic members of a ROS 2 node.
+
+    A rosonic member is a class that has specific hooks for, e.g., initialization
+    and shutdown. This class is used to define the interface for all rosonic
+    members, such as parameters, services, publishers, subscribers, and timers.
+    This class is not meant to be used directly, but rather as a base class for
+    other classes that implement specific functionality.
+    """
+
+    __rosonic_node__ = None
+    __rosonic_name__ = None
+    __rosonic_active__ = False
+    __rosonic_members__ = ()
+
+    def __set_name__(self, owner, name):
+        
+        self.__rosonic_name__ = name
+
+        if issubclass(owner, Member):
+            owner.__rosonic_members__ += ((name, self),)
+
+    def _rosonic_members(self):
+        """
+        Return a dictionary of all rosonic members of the node.
+        This method is used to get all the members of the node that are
+        rosonic members. It returns a dictionary with the member names as keys
+        and the member objects as values.
+        """
+        return dict(self.__rosonic_members__)
+
+    def _startup(self, node):
+        """
+        Called when the node is started.
+        This method is used to declare parameters and set up the node.
+        """
+        
+        for member in self._rosonic_members().values():
+            member._startup(node)
+
+        self.__rosonic_node__ = node
+        self.__rosonic_active__ = True
+
+        if hasattr(self, 'on_startup'):
+            self.on_startup()
+        
+    def _shutdown(self, node):
+        """
+        Called when the node is shutting down.
+        This method is used to clean up resources and stop the node.
+        """
+
+        if hasattr(self, 'on_shutdown'):
+            self.on_shutdown()
+
+        self.__rosonic_active__ = False
+
+        for member in self._rosonic_members().values():
+            member._shutdown(node)
 
 class Parameter(Member):
     """
     Class to represent a parameter in a ROS 2 node.
     This class is used to define parameters for the node and provides
     functionality to set and get parameter values.
-
-    Usage:
-        ```python
-        import rosonic as rx
-
-        class MyNode(rx.Node):
-            meaning = rx.Parameter(42) # Name is 'meaning' and default value is 42
-
-            @rx.Parameter('Hello!', name='printer')
-            def printer_callback(self, value):
-                self.get_logger().info(f"Parameter 'printer' changed to {value}")
-        ```
     """
 
     def __init__(self, *args, name=None, **kwds):
@@ -560,24 +606,6 @@ class Parameter(Member):
         self._args = args
         self._kwds = kwds
 
-        self._callback = None
-        self._parameter = None
-
-    def __set_name__(self, owner, name):
-        """
-        Set the name of the parameter when it is assigned to a class.
-        """
-        if self._name is None:
-            self._name = name
-
-    def __call__(self, func):
-        """
-        Decorator to mark a method as a callback for the parameter.
-        This method will be called when the parameter is set or changed.
-        """
-        self._callback = func
-        return self
-
     def __get__(self, instance, owner):
         """
         Get the value of the parameter.
@@ -585,21 +613,34 @@ class Parameter(Member):
         if instance is None:
             return self
 
-        if self._callback is not None:
+        if not self.__rosonic_active__:
             return self
+
+        parameters = self.__rosonic_node__.__rosonic_parameters__
         
-        return instance.get_parameter(self._name).value
+        return parameters[self._name].value
     
-    def on_startup(self, node):
+    def on_startup(self):
         """
         Called when the node is started.
         This method is used to declare the parameter in the node.
         """
-        if self._parameter is None:
-            self._parameter = node.declare_parameter(self._name, *self._args, **self._kwds)
+        if self._name is None:
+            self._name = self.__rosonic_name__
+        
+        node = self.__rosonic_node__
+        parameters = node.__rosonic_parameters__
 
+<<<<<<< HEAD
 class Node(rclpy.node.Node):
 >>>>>>> 11eeed9 (Fundamental changes.)
+=======
+        if self._name not in parameters:
+            node.declare_parameter(self._name, *self._args, **self._kwds)
+            parameters[self._name] = node.get_parameter(self._name)
+
+class Node(Member, rclpy.node.Node):
+>>>>>>> 4b0286b (More work on simulator)
     """
     Base class for all SVEA nodes.
     This class provides a simple interface for creating ROS 2 nodes with
@@ -623,10 +664,14 @@ class Node(rclpy.node.Node):
 
         logger.info("Starting up...")
 <<<<<<< HEAD
+<<<<<<< HEAD
         node.__rosonic_startup__(node)
 =======
         node._startup()
 >>>>>>> 11eeed9 (Fundamental changes.)
+=======
+        node._startup(node)
+>>>>>>> 4b0286b (More work on simulator)
         logger.debug("Startup complete.")
 
         logger.info("Running...")
@@ -637,6 +682,7 @@ class Node(rclpy.node.Node):
         finally:
 
             logger.info("Shutting down...")
+<<<<<<< HEAD
 <<<<<<< HEAD
             node.__rosonic_shutdown__(node)
             logger.debug("Shutdown complete.")
@@ -653,6 +699,9 @@ class Node(rclpy.node.Node):
 
 =======
             node._shutdown()
+=======
+            node._shutdown(node)
+>>>>>>> 4b0286b (More work on simulator)
             logger.debug("Shutdown complete.")
 
             node.destroy_node()
@@ -663,33 +712,10 @@ class Node(rclpy.node.Node):
         name = name if name is not None else type(self).__name__
         super().__init__(name)
 
-        for member in dir(self):
-            if isinstance(member, Member):
-                pass
-
         ## Parameter initialization
 
-        callbacks = {
-            member._name: member._callback
-            for member in dir(self) 
-            if isinstance(member, Parameter)
-        }
+        self.__rosonic_parameters__ = {}
 
-        def _parameter_callback(params):
-            """
-            Callback function to handle parameter changes.
-            This function is called when a parameter is set or changed.
-            """
-            for param in params:
-                if cb := callbacks.get(param.name, None):
-                    cb(self, param.value)
-                else:
-                    self.get_logger().warn(f"No registered callback for {param.name}.")
-
-        if len(callbacks) > 0:
-            self.add_on_set_parameters_callback(_parameter_callback)
-            self.get_logger().debug("* Added parameter callback.")
-            
         ## Service initialization
 
         # TODO?
@@ -706,6 +732,7 @@ class Node(rclpy.node.Node):
 
         # TODO?
 
+<<<<<<< HEAD
     def _startup(self):
         """
         Called when the node is started.
@@ -732,6 +759,8 @@ class Node(rclpy.node.Node):
                 member.on_shutdown(self)
         
 >>>>>>> 11eeed9 (Fundamental changes.)
+=======
+>>>>>>> 4b0286b (More work on simulator)
     def run(self):
         """
         Main loop for the node.
