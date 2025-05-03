@@ -14,6 +14,8 @@ __all__ = [
     'Node',
     'Member',
     'Parameter',
+    'Publisher',
+    'Subscriber',
 ]
 
 class Member:
@@ -120,6 +122,79 @@ class Parameter(Member):
         if self._name not in parameters:
             node.declare_parameter(self._name, *self._args, **self._kwds)
             parameters[self._name] = node.get_parameter(self._name)
+    
+
+class Publisher(Member):
+    """
+    Class to represent a publisher in a ROS 2 node.
+    This class is used to define publishers for the node and provides
+    functionality to publish messages.
+    """
+
+    def __init__(self, topic, msg_type, qos_profile=None):
+        """
+        Initialize the publisher with a topic, message type, and optional QoS profile.
+        """
+        self._topic = topic
+        self._msg_type = msg_type
+        self._qos_profile = qos_profile
+        self._publisher = None
+
+    def publish(self, msg):
+        """
+        Publish a message to the topic.
+        Raise an exception if the publisher is not started.
+        """
+        if self._publisher is None:
+            raise RuntimeError(f"Publisher for topic '{self._topic}' is not started yet.")
+        self._publisher.publish(msg)
+
+    def on_startup(self):
+        """
+        Called when the node is started.
+        This method is used to create the publisher in the node.
+        """
+        node = self.__rosonic_node__
+        self._publisher = node.create_publisher(self._msg_type, self._topic, self._qos_profile)
+
+
+class Subscriber(Member):
+    """
+    Class to represent a subscriber in a ROS 2 node.
+    This class is used to define subscribers for the node and provides
+    functionality to handle incoming messages via a callback.
+    """
+
+    def __init__(self, topic, msg_type, qos_profile=None):
+        """
+        Initialize the subscriber with a topic, message type, and optional QoS profile.
+        """
+        self._topic = topic
+        self._msg_type = msg_type
+        self._qos_profile = qos_profile
+        self._subscriber = None
+        self._callback = None
+
+    def __call__(self, callback):
+        """
+        Use this subscriber as a decorator to set the callback function.
+        """
+        self._callback = callback
+        return self
+
+    def on_startup(self):
+        """
+        Called when the node is started.
+        This method is used to create the subscriber in the node.
+        """
+        if self._callback is None:
+            raise RuntimeError(f"Subscriber for topic '{self._topic}' requires a callback function.")
+        
+        node = self.__rosonic_node__
+        self._subscriber = node.create_subscription(
+            self._msg_type, self._topic, self._callback, self._qos_profile
+        )
+
 
 class Node(Member, rclpy.node.Node):
     """
@@ -155,8 +230,9 @@ class Node(Member, rclpy.node.Node):
             node._shutdown(node)
             logger.debug("Shutdown complete.")
 
-            node.destroy_node()
-            rclpy.shutdown()
+            # # Perhaps causes more errors than help 
+            # node.destroy_node()
+            # rclpy.shutdown()
 
     def __init__(self, name: Optional[str] = None):
         
