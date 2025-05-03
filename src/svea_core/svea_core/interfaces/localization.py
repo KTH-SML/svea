@@ -41,12 +41,9 @@ class LocalizationInterface:
 
     _odom_top = 'odometry/local'
 
-    def __init__(self, node: Node, *, mode='sub', init_odom=None, **kwds)-> None:
+    def __init__(self, node: Node, *, init_odom=None, **kwds)-> None:
         
         self._node = node
-
-        assert mode in ['sub', 'pub'], "Invalid mode. Use 'sub' or 'pub'."
-        self._mode = mode
 
         ## Odometry ##
 
@@ -77,11 +74,7 @@ class LocalizationInterface:
             history=QoSHistoryPolicy.KEEP_LAST,
             depth=1)
 
-        if self._mode == 'sub':
-            self._node.create_subscription(Odometry, self._odom_top, self._odom_cb, qos_profile)
-
-        if self._mode == 'pub':
-            self._odom_pub = self._node.create_publisher(Odometry, self._odom_top, qos_profile)
+        self._node.create_subscription(Odometry, self._odom_top, self._odom_cb, qos_profile)
 
         if wait:
             self.wait()
@@ -96,8 +89,6 @@ class LocalizationInterface:
             timeout: The time to wait for a message in seconds.
         """
         return wait_for_message(self._node, self._odom_top, Odometry, timeout=timeout)
-
-    ## Mode: sub ##
 
     def _odom_cb(self, msg: Odometry) -> None:
         self._odom_msg = msg
@@ -176,7 +167,6 @@ class LocalizationInterface:
         if odom is None:
             odom = self._odom_msg
         return odom.pose.pose.position.y
-
      
     def get_yaw(self, odom=None) -> float:
         """ Extract the yaw from a odpmetry message
@@ -205,81 +195,3 @@ class LocalizationInterface:
         if odom is None:
             odom = self._odom_msg
         return odom.twist.twist.linear.x
-
-    ## Mode: pub ##
-
-    def publish(self, odom=None) -> None:
-        """Publish the current odometry message to the topic.
-
-        Args:
-            odom: An optional odometry message to publish instead of the last
-                received message.
-        """
-        if odom is None:
-            odom = self._odom_msg
-        self._odom_pub.publish(odom)
-
-    def set_state(x, y, yaw, vel, odom=None) -> None:
-        """ Set the state in an Odometry message.
-        Args:
-            x: The x position to set.
-            y: The y position to set.
-            yaw: The yaw angle in radians to set.
-            vel: The velocity in m/s to set.
-            odom: An optional odometry message to use instead of the last
-                received message.
-        """
-        if odom is None:
-            odom = self._odom_msg
-        self.set_x(x, odom)
-        self.set_y(y, odom)
-        self.set_yaw(yaw, odom)
-        self.set_vel(vel, odom)
-
-    def set_x(self, x, odom=None) -> None:
-        """ Set the x position in an Odometry message.
-        Args:
-            x: The x position to set.
-            odom: An optional odometry message to use instead of the last
-                received message.
-        """
-        if odom is None:
-            odom = self._odom_msg
-        odom.pose.pose.position.x = x
-
-    def set_y(self, y, odom=None) -> None:
-        """ Set the y position in an Odometry message.
-        Args:
-            y: The y position to set.
-            odom: An optional odometry message to use instead of the last
-                received message.
-        """
-        if odom is None:
-            odom = self._odom_msg
-        odom.pose.pose.position.y = y
-
-    def set_yaw(self, yaw, odom=None) -> None:
-        """ Set the yaw in an Odometry message.
-        Args:
-            yaw: The yaw angle in radians to set.
-            odom: An optional odometry message to use instead of the last
-                received message.
-        """
-        if odom is None:
-            odom = self._odom_msg
-        quat = quaternion_from_euler(0.0, 0.0, yaw)
-        odom.pose.pose.orientation.x = quat[0]
-        odom.pose.pose.orientation.y = quat[1]
-        odom.pose.pose.orientation.z = quat[2]
-        odom.pose.pose.orientation.w = quat[3]
-
-    def set_vel(self, vel, odom=None) -> None:
-        """ Set the velocity in an Odometry message.
-        Args:
-            vel: The velocity in m/s to set.
-            odom: An optional odometry message to use instead of the last
-                received message.
-        """
-        if odom is None:
-            odom = self._odom_msg
-        odom.twist.twist.linear.x = vel

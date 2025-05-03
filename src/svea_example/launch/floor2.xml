@@ -45,11 +45,6 @@
         <param name="points" value="['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]']" />
     </node>
 
-    <group if="$(var is_sim)">
-        <!-- Start simulation -->
-        <node name = "simSVEA" pkg="svea_core" exec="simSVEA" output="screen">
-            <param name="use_rviz" value="$(var use_foxglove)"/>
-            <param name="state" value="[-7.4, -15.3, 0.9, 0.0]" />
-            <param name="points" value="['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]']" />
-        </include>
+    <!-- Start simulation -->
+    <include file="$(find-pkg-share svea_core)/launch/simulation.xml"/>
 </launch>
