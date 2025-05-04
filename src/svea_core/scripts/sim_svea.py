@@ -68,14 +68,26 @@ from svea_msgs.msg import LLIControl as LLIControl
 from svea_msgs.msg import LLIEmergency as LLIEmergency
 
 
-qos_default = QoSProfile(
-    reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
-    history=QoSHistoryPolicy.KEEP_LAST,         # Keep the last N messages
-    depth=10,                                          # Size of the queue
-    durability=QoSDurabilityPolicy.VOLATILE     # Volatile
+qos_pubber = QoSProfile(
+    reliability=QoSReliabilityPolicy.RELIABLE,
+    durability=QoSDurabilityPolicy.VOLATILE,
+    history=QoSHistoryPolicy.KEEP_LAST,
+    depth=1,
 )
 
+
+qos_subber = QoSProfile(
+    reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
+    history=QoSHistoryPolicy.KEEP_LAST,         # Keep the last N messages
+    durability=QoSDurabilityPolicy.VOLATILE,    # Volatile
+    depth=10,                                   # Size of the queue
+)
+
+<<<<<<< HEAD
 >>>>>>> 11eeed9 (Fundamental changes.)
+=======
+
+>>>>>>> c56a41e (progressing on simulation, still not working)
 class sim_svea(rx.Node):
     """
     Handles simulation of a SVEA vehicle. The object takes in a model
@@ -190,6 +202,39 @@ class sim_svea(rx.Node):
     odom_frame = rx.Parameter('odom')
     self_frame = rx.Parameter('base_link')
 
+    ## Publishers ##
+
+    ctrl_actuated_pub = rx.Publisher(LLIControl, actuated_top, qos_pubber)
+    odometry_pub = rx.Publisher(Odometry, odometry_top, qos_pubber)
+
+    ## Subscribers ##
+
+    @rx.Subscriber(LLIControl, request_top, qos_subber)
+    def ctrl_request_cb(self, ctrl_request_msg):
+        print(self)
+        print(ctrl_request_msg)
+        
+        self.last_ctrl_time = self.clock.now().to_msg()
+        changed = self.inputs.update_from_msg(ctrl_request_msg)
+        if changed:
+            self.ctrl_actuated_pub.publish(self.inputs.ctrl_msg)
+
+    @rx.Subscriber(LLIEmergency, emergency_top, qos_subber)
+    def _update_emergency(self, emergency_msg):
+        emergency = emergency_msg.emergency
+        sender_id = emergency_msg.sender_id
+        if self.is_emergency and (sender_id == self.sender_id):
+            # only one who stated emergency allowed to change it
+            if not emergency:
+                # this means sender is calling not emergency
+                self.is_emergency = False
+                self.sender_id = None
+        elif emergency:
+            self.is_emergency = True
+            self.sender_id = sender_id
+
+    ## Main Methods ##
+
     def on_startup(self):
 
         self.clock = rclpy.clock.Clock()
@@ -205,9 +250,8 @@ class sim_svea(rx.Node):
 
         self.is_emergency = False
         self.sender_id = None
-
-        ## Publishers ##
         
+<<<<<<< HEAD
         qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.RELIABLE,
             durability=QoSDurabilityPolicy.VOLATILE,
@@ -235,6 +279,8 @@ class sim_svea(rx.Node):
                                  10)
 
 >>>>>>> 11eeed9 (Fundamental changes.)
+=======
+>>>>>>> c56a41e (progressing on simulation, still not working)
         ## Timers ##
 
         self.create_timer(self.time_step, self.sim_loop)
@@ -408,12 +454,6 @@ if __name__ == '__main__':
 >>>>>>> 4b0286b (More work on simulator)
         self.tf_br.sendTransform(odom2base)
 
-    def _update_ctrl_request(self, ctrl_request_msg):
-        self.last_ctrl_time = self.clock.now().to_msg()
-        changed = self.inputs.update_from_msg(ctrl_request_msg)
-        if changed:
-            self.ctrl_actuated_pub.publish(self.inputs.ctrl_msg)
-
     @property
     def emergency(self):
         """Check if the emergency flag is set. Emulating actuation
@@ -424,19 +464,6 @@ if __name__ == '__main__':
         :rtype: bool
         """
         return self.is_emergency
-
-    def _update_emergency(self, emergency_msg):
-        emergency = emergency_msg.emergency
-        sender_id = emergency_msg.sender_id
-        if self.is_emergency and (sender_id == self.sender_id):
-            # only one who stated emergency allowed to change it
-            if not emergency:
-                # this means sender is calling not emergency
-                self.is_emergency = False
-                self.sender_id = None
-        elif emergency:
-            self.is_emergency = True
-            self.sender_id = sender_id
 
 main = sim_svea.main
 
