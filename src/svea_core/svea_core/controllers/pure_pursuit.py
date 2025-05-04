@@ -44,19 +44,24 @@ class PurePursuitController:
             # allow manual setting of target
             self.target = target
 
+        x, y, yaw, vel = state
+
         tx, ty = self.target
-        alpha = math.atan2(ty - state.y, tx - state.x) - state.yaw
-        if state.v < 0:  # back
+        alpha = math.atan2(ty - y, tx - x) - yaw
+        if vel < 0:  # back
             alpha = math.pi - alpha
-        Lf = self.k * state.v + self.Lfc
+        Lf = self.k * vel + self.Lfc
         delta = math.atan2(2.0 * self.L * math.sin(alpha) / Lf, 1.0)
         return delta
 
     def compute_velocity(self, state):
         if self.is_finished:
             return 0.0
+
+        x, y, yaw, vel = state
+
         # speed control
-        error = self.target_velocity - state.v
+        error = self.target_velocity - vel
         self.error_sum += error * self.dt
         P = error * self.K_p
         I = self.error_sum * self.K_i
@@ -70,13 +75,16 @@ class PurePursuitController:
         self.target = (tx, ty)
 
     def _calc_target_index(self, state):
+
+        x, y, yaw, vel = state
+
         # search nearest point index
-        dx = [state.x - icx for icx in self.traj_x]
-        dy = [state.y - icy for icy in self.traj_y]
+        dx = [x - icx for icx in self.traj_x]
+        dy = [y - icy for icy in self.traj_y]
         d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
         ind = d.index(min(d))
         dist = 0.0
-        Lf = self.k * state.v + self.Lfc
+        Lf = self.k * vel + self.Lfc
 
         # search look ahead target point index
         while Lf > dist and (ind + 1) < len(self.traj_x):

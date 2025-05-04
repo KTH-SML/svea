@@ -32,6 +32,7 @@ class Member:
     __rosonic_node__ = None
     __rosonic_name__ = None
     __rosonic_active__ = False
+    __rosonic_parent__ = None
     __rosonic_members__ = ()
 
     def __set_name__(self, owner, name):
@@ -57,6 +58,7 @@ class Member:
         """
         
         for member in self._rosonic_members().values():
+            member.__rosonic_parent__ = self
             member._startup(node)
 
         self.__rosonic_node__ = node
@@ -131,7 +133,7 @@ class Publisher(Member):
     functionality to publish messages.
     """
 
-    def __init__(self, topic, msg_type, qos_profile=None):
+    def __init__(self, msg_type, topic, qos_profile=None):
         """
         Initialize the publisher with a topic, message type, and optional QoS profile.
         """
@@ -155,7 +157,21 @@ class Publisher(Member):
         This method is used to create the publisher in the node.
         """
         node = self.__rosonic_node__
-        self._publisher = node.create_publisher(self._msg_type, self._topic, self._qos_profile)
+        msg_type = self._msg_type
+        topic = self._topic
+        qos_profile = self._qos_profile
+
+        if isinstance(topic, Parameter):
+            topic = self.__rosonic_node__.__rosonic_parameters__[topic._name].value
+
+        if not isinstance(msg_type, type):
+            raise RuntimeError(f"Message type must be a class, not {type(msg_type)}")
+        if not isinstance(topic, str):
+            raise RuntimeError(f"Topic name must be a string, not {type(topic)}")
+        if not isinstance(qos_profile, rclpy.qos.QoSProfile):
+            raise RuntimeError(f"QoS profile must be a QoSProfile, not {type(qos_profile)}")
+
+        self._publisher = node.create_publisher(msg_type, topic, qos_profile)
 
 
 class Subscriber(Member):
@@ -165,7 +181,7 @@ class Subscriber(Member):
     functionality to handle incoming messages via a callback.
     """
 
-    def __init__(self, topic, msg_type, qos_profile=None):
+    def __init__(self, msg_type, topic, qos_profile=None):
         """
         Initialize the subscriber with a topic, message type, and optional QoS profile.
         """
@@ -187,13 +203,32 @@ class Subscriber(Member):
         Called when the node is started.
         This method is used to create the subscriber in the node.
         """
-        if self._callback is None:
-            raise RuntimeError(f"Subscriber for topic '{self._topic}' requires a callback function.")
-        
+
         node = self.__rosonic_node__
-        self._subscriber = node.create_subscription(
-            self._msg_type, self._topic, self._callback, self._qos_profile
-        )
+        msg_type = self._msg_type
+        topic = self._topic
+        qos_profile = self._qos_profile
+
+        if isinstance(topic, Parameter):
+            topic = self.__rosonic_node__.__rosonic_parameters__[topic._name].value
+
+        if not isinstance(msg_type, type):
+            raise RuntimeError(f"Message type must be a class, not {type(msg_type)}")
+        if not isinstance(topic, str):
+            raise RuntimeError(f"Topic name must be a string, not {type(topic)}")
+        if not isinstance(qos_profile, rclpy.qos.QoSProfile):
+            raise RuntimeError(f"QoS profile must be a QoSProfile, not {type(qos_profile)}")
+
+        if self._callback is None:
+            raise RuntimeError(f"Callback for subscriber '{self._topic}' is not set.")
+
+        _callback = self._callback
+        _parent = self.__rosonic_parent__
+
+        def callback(msg):
+            return _callback(_parent, msg)
+
+        self._subscriber = node.create_subscription(msg_type, topic, callback, qos_profile)
 
 
 class Node(Member, rclpy.node.Node):
