@@ -46,7 +46,7 @@ class DynamicSerialManager:
         detected_ports = {
             f"/dev/{dev}"
             for dev in os.listdir("/dev")
-            if dev.startswith("ttyACM") or dev.startswith("ttyUSB")
+            if "ttyACM" in dev or "USB" in dev
         }
 
         # Start clients for new devices
