@@ -8,21 +8,23 @@
     -->
 
     <!-- Launch file arguments -->
-    <arg name="map"             default="/svea_ws/src/svea_core/maps/sml.yaml"/>  
+    <arg name="map"             default="/svea_ws/src/svea_core/maps/sml_20250512.yaml"/>  
     <arg name="use_foxglove"    default="true"/>
     <arg name="svea_mocap_name" default="svea7"/>      <!-- name of SVEA -->    
     <arg name="is_sim"          default="true"/>  
     <arg name="mpc_mode"        default="goal_position"/> <!-- Options: goal_position, path_tracking -->
 
+    <arg name="serial_baud_rate"	default="250000"/>
+    
     <!-- Start map server -->
     <node if="$(eval map != '')" pkg="map_server" type="map_server" name="map_server" output="screen" args="$(arg map)"/>
 
     <!-- If is_sim equal to false, then start localization -->
     <group unless="$(arg is_sim)">
         <!-- Start low-level interface -->
-        <node name="serial_node" pkg="rosserial_python" type="serial_node.py">
-            <param name="port" value="/dev/ttyACM0"/>
-            <param name="baud" value="250000"/>
+        <node name="rosserial_dynamic" pkg="svea_sensors" type="rosserial_dynamic.py">
+            <param name="baud" value="$(arg serial_baud_rate)"/>
+            <param name="scan_rate" value="1"/>
         </node>
     </group>
 
