@@ -102,6 +102,7 @@ class Bicycle4D:
         y += vel * np.sin(yaw) * dt
         yaw += vel / self.L * np.tan(delta) * dt
         vel += accel * dt
+<<<<<<< HEAD
         self.state = (x, y, yaw, vel)
 
         return self.state
@@ -151,6 +152,8 @@ class Bicycle4DWithESC(Bicycle4D):
         y += vel * np.sin(yaw) * self.dt
         yaw += vel / self.L * np.tan(delta) * self.dt
         vel += accel * self.dt
+=======
+>>>>>>> 217dc92 (05/12/2025 meeting update)
         self.state = (x, y, yaw, vel)
 
         return self.state

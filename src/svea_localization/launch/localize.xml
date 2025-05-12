@@ -184,7 +184,7 @@
         </group>
 
         <!-- Start controller -->
-        <node pkg="svea_localization" exec="actuation_to_twist" name="actuation_to_twist" output="screen"/>
+        <node pkg="svea_localization" exec="actuation_to_twist.py" name="actuation_to_twist" output="screen"/>
 
         <!-- Static transforms for sensors -->
         <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">

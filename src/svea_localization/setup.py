@@ -4,6 +4,17 @@ from glob import glob
 
 package_name = 'svea_localization'
 
+def generate_console_scripts(script_dir):
+    console_scripts = []
+    for path in glob(os.path.join(script_dir, '*.py')):
+        filename = os.path.basename(path)
+        module_name = filename[:-3]
+        if module_name == '__init__':
+            continue
+        entry = f'{module_name} = scripts.{module_name}:main'
+        console_scripts.append(entry)
+    return console_scripts
+
 setup(
     name=package_name,
     version='0.0.0',
@@ -19,6 +30,8 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob('launch/*.xml')),
         # Include config files
         (os.path.join('share', package_name, 'config'), glob('params/**/*.yaml')),
+        # Install raw executables to lib/{package_name}
+        (f'lib/{package_name}', glob('scripts/*.py')),  
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -28,15 +41,11 @@ setup(
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
-        'console_scripts': [
-            'actuation_to_twist = script.actuation_to_twist:main',
-            'gps_to_utm_relay = script.gps_to_utm_relay:main',
-            'odom_to_path_relay = script.odom_to_path_relay:main',
-            'plot_localization = script.plot_localization:main',
-            'quat_to_euler_relay = script.quat_to_euler_relay:main',
-            'rtk_manager = script.rtk_manager:main',
-            'set_datum_node = script.set_datum_node:main',
-        ],
+        'console_scripts': generate_console_scripts('scripts'),
+        # 'console_scripts': [
+        #     'svea_example = script.svea_example:main',
+        #     'svea_example2 = script.svea_example2:main',
+        # ],
     },
 )
 

@@ -67,42 +67,42 @@
     </include>
 
     <!-- Paths -->
-    <node pkg="svea_localization" exec="odom_to_path_relay" name="odom_to_path_relay_1" output="screen" >
+    <node pkg="svea_localization" exec="odom_to_path_relay.py" name="odom_to_path_relay_1" output="screen" >
         <param name="odom_topic" value="/odometry/gps"/>
     </node>
-    <node pkg="svea_localization" exec="odom_to_path_relay" name="odom_to_path_relay_2" output="screen" >
+    <node pkg="svea_localization" exec="odom_to_path_relay.py" name="odom_to_path_relay_2" output="screen" >
         <param name="odom_topic" value="/odometry/filtered"/>
     </node>
-    <node pkg="svea_localization" exec="odom_to_path_relay" name="odom_to_path_relay_3" output="screen" >
+    <node pkg="svea_localization" exec="odom_to_path_relay.py" name="odom_to_path_relay_3" output="screen" >
         <param name="odom_topic" value="/odometry/filtered/global"/>
     </node>
-    <node if="$(var start_zed_camera)" pkg="svea_localization" exec="odom_to_path_relay" name="odom_to_path_relay_4" output="screen" >
+    <node if="$(var start_zed_camera)" pkg="svea_localization" exec="odom_to_path_relay.py" name="odom_to_path_relay_4" output="screen" >
         <param name="odom_topic"            value="/zed/zed_node/odom"/>
         <param name="initial_yaw_offset"    value="$(var initial_pose_a)"/>
     </node>
 
     <!-- Euler angles -->
-    <node pkg="svea_localization" exec="quat_to_euler_relay" name="quat_to_euler_relay_1" output="screen" >
+    <node pkg="svea_localization" exec="quat_to_euler_relay.py" name="quat_to_euler_relay_1" output="screen" >
         <param name="quat_topic" value="/odometry/gps"/>
     </node>
-    <node pkg="svea_localization" exec="quat_to_euler_relay" name="quat_to_euler_relay_2" output="screen" >
+    <node pkg="svea_localization" exec="quat_to_euler_relay.py" name="quat_to_euler_relay_2" output="screen" >
         <param name="quat_topic" value="/odometry/filtered"/>
     </node>
-    <node pkg="svea_localization" exec="quat_to_euler_relay" name="quat_to_euler_relay_3" output="screen" >
+    <node pkg="svea_localization" exec="quat_to_euler_relay.py" name="quat_to_euler_relay_3" output="screen" >
         <param name="quat_topic" value="/odometry/filtered/global"/>
     </node>
     <node if="$(var start_zed_camera)" pkg="svea_localization" exec="quat_to_euler_relay" name="quat_to_euler_relay_4" output="screen" >
         <param name="quat_topic" value="/zed/zed_node/odom"/>
     </node>
-    <node pkg="svea_localization" exec="quat_to_euler_relay" name="quat_to_euler_relay_5" output="screen" >
+    <node pkg="svea_localization" exec="quat_to_euler_relay.py" name="quat_to_euler_relay_5" output="screen" >
         <param name="quat_topic" value="/imu/data"/>
     </node>
 
     <!-- GPS to UTM -->
-    <node pkg="svea_localization" exec="gps_to_utm_relay" name="gps_to_utm_relay_1" output="screen" >
+    <node pkg="svea_localization" exec="gps_to_utm_relay.py" name="gps_to_utm_relay_1" output="screen" >
         <param name="gps_topic" value="/gps/fix"/>
     </node>
-    <node pkg="svea_localization" exec="gps_to_utm_relay" name="gps_to_utm_relay_2" output="screen" >
+    <node pkg="svea_localization" exec="gps_to_utm_relay.py" name="gps_to_utm_relay_2" output="screen" >
         <param name="gps_topic" value="/gps/filtered"/>
     </node>
 

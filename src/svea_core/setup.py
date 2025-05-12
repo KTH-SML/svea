@@ -4,14 +4,14 @@ from glob import glob
 
 package_name = 'svea_core'
 
-def generate_console_scripts(script_dir=f'src/{package_name}/script'):
+def generate_console_scripts(script_dir):
     console_scripts = []
     for path in glob(os.path.join(script_dir, '*.py')):
         filename = os.path.basename(path)
         module_name = filename[:-3]
         if module_name == '__init__':
             continue
-        entry = f'{module_name} = script.{module_name}:main'
+        entry = f'{module_name} = scripts.{module_name}:main'
         console_scripts.append(entry)
     return console_scripts
 
@@ -39,4 +39,11 @@ setup(
     description='TODO: Package description',
     license='TODO: License declaration',
     tests_require=['pytest'],
+    entry_points={
+        'console_scripts': generate_console_scripts('scripts'),
+        # 'console_scripts': [
+        #     'svea_example = script.svea_example:main',
+        #     'svea_example2 = script.svea_example2:main',
+        # ],
+    },
 )

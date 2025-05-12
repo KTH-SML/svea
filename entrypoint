@@ -26,8 +26,5 @@ fi
 # To build anything that has been added by volume...
 colcon build --symlink-install
 
-# https://github.com/osrf/docker_images/issues/114
-printf "\nsource '$PWD/install/setup.bash'" >> $HOME/.bashrc
-
 # source "/opt/ros/$ROS_DISTRO/setup.bash" --
 exec "$@"

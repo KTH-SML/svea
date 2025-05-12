@@ -594,6 +594,7 @@ class Member:
             member._shutdown(node)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 class Parameter(Member):
     """
     Class to represent a parameter in a ROS 2 node.
@@ -752,6 +753,8 @@ class Subscriber(Member):
 
     def on_shutdown(self) -> None: ...
 
+=======
+>>>>>>> 217dc92 (05/12/2025 meeting update)
 class Node(Member, rclpy.node.Node):
 >>>>>>> 4b0286b (More work on simulator)
     """
@@ -1175,7 +1178,6 @@ class Parameter(Resource):
             self.node.declare_parameter(self.param_name, *self.param_args, **self.param_kwds)
             parameters[self.param_name] = self.node.get_parameter(self.param_name)
     
-
 class Publisher(Member):
     """
     Class to represent a publisher in a ROS 2 node.
@@ -1260,6 +1262,7 @@ class Publisher(Member):
         self.publisher = node.create_publisher(msg_type, topic, qos_profile)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 class Subscriber(NamedField):
     """
     Declarative ROS 2 Subscriber resource.
@@ -1314,6 +1317,8 @@ class Subscriber(NamedField):
         self.topic = topic
 =======
 
+=======
+>>>>>>> 217dc92 (05/12/2025 meeting update)
 class Subscriber(Member):
     """
     Class to represent a subscriber in a ROS 2 node.

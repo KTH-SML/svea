@@ -16,7 +16,6 @@ find_package(nav_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(svea_msgs
-  "msg/VehicleState.msg"
   "msg/LLIControl.msg"
   "msg/LLIEncoder.msg"
   "msg/LLIEmergency.msg"
