@@ -12,9 +12,9 @@
 
 
     <!-- Start the stereo camera -->
-    <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/rs_odometry.launch">
+    <!-- <include if="$(eval camera == 'rs')" file="$(find svea_sensors)/launch/rs_odometry.launch">
         <arg name="xavier" value="$(arg xavier)"/>
-    </include>
+    </include> -->
     <include if="$(eval camera == 'zed')" file="$(find svea_sensors)/launch/zed_odometry.launch">
         <arg name="xavier" value="$(arg xavier)"/>
     </include>

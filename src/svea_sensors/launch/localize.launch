@@ -14,13 +14,14 @@
     <arg name="initial_pose_a"          default="0.0" />
 
     <!-- low-level interface (serial) -->
-    <arg name="start_serial"            default="false" /> 
+    <arg name="start_serial"            default="false" />
+    <arg name="serial_baud_rate"	default="250000"/>
+
     <!-- Should be set to true, if only the localization is running 
     (i.e. this is needed in order to have wheel encoders and actuation_to_twist working) -->
-    <arg name="lli_port"                default="/dev/ttyACM0"/>
 
     <!-- map server -->
-    <arg name="map_file"                default=""/>
+    <arg name="map_file"                default="$(find svea_core)/maps/sml_20250512.yaml"/>
 
     <!-- Lidar  -->
     <arg name="lidar_ip"                default="192.168.3.11" />
@@ -58,9 +59,9 @@
 
     <!-- Start low-level interface -->
     <group if="$(arg start_serial)">
-        <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
-            <param name="port" value="$(arg lli_port)"/>
-            <param name="baud" value="250000"/>
+        <node pkg="svea_sensors" type="rosserial_dynamic.py" name="rosserial_dynamic">
+            <param name="baud" value="$(arg serial_baud_rate)"/>
+            <param name="scan_rate" value="1"/>
         </node>
     </group>
 
@@ -71,9 +72,6 @@
     <group unless="$(arg is_sim)">
         <param name="use_sim_time" value="false"/>
         <group if="$(arg is_indoors)">
-            <!-- Start the Real Sense camera -->
-            <include file="$(find svea_sensors)/launch/sensors_launch/real_sense_camera.launch"></include>
-
             <!-- Start Lidar -->
             <include file="$(find svea_sensors)/launch/sensors_launch/lidar.launch">
                 <arg name="lidar_ip"                    value="$(arg lidar_ip)" />
@@ -113,9 +111,6 @@
         <!-- Start controller -->
         <include file="$(find svea_sensors)/launch/sensors_launch/controller.launch"></include>
 
-        <!-- Start wheel encoder -->
-        <include if="$(arg start_wheel_encoders)" file="$(find svea_sensors)/launch/sensors_launch/wheel_encoder.launch"></include>
-
         <!-- Static transforms for sensors -->
         <include file="$(find svea_sensors)/launch/transforms.launch">
             <arg name="is_indoors"  value="$(arg is_indoors)"/>
@@ -150,10 +145,8 @@
                         0.0,                    0.0,                    0.0]
         </rosparam>
         <param name="publish_tf"            value="$(arg publish_tf)"/>
-        <param name="odom0"                 value="rs/t265_camera/odom/sample"/>
-        <param name="imu0"                  value="imu/data"/>
-        <param name="twist0"                value="actuation_twist"/>
-        <param name="twist1"                value="wheel_encoder_twist"/>
+	<param name="imu0"                  value="imu/data"/>
+	<param name="twist0"                value="encoder/wheel_speed"/>
     </node>
 
     <!-- Global EKF -->
@@ -174,8 +167,7 @@
         <param name="publish_tf"            value="$(arg publish_tf)"/>
         <param name="odom0"                 value="odometry/gps"/>
         <param name="imu0"                  value="imu/data"/>
-        <param name="twist0"                value="actuation_twist"/>
-        <param name="twist1"                value="wheel_encoder_twist"/>
+        <param name="twist0"                value="encoder/wheel_speed"/>
         <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
         <remap from="/set_pose"             to="/global/set_pose"/>
     </node>
