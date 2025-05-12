@@ -69,10 +69,10 @@ class Bicycle4D:
         x, y, yaw, vel = self.state
 
         # Update
-        x += vel * np.cos(yaw) * self.dt
-        y += vel * np.sin(yaw) * self.dt
-        yaw += vel / self.L * np.tan(delta) * self.dt
-        vel += accel * self.dt
+        x += vel * np.cos(yaw) * dt
+        y += vel * np.sin(yaw) * dt
+        yaw += vel / self.L * np.tan(delta) * dt
+        vel += accel * dt
         self.state = (x, y, yaw, vel)
 
         return self.state

@@ -79,10 +79,6 @@ class Member:
         for member in self._rosonic_members().values():
             member._shutdown(node)
 
-    def on_startup(self) -> None: ...
-
-    def on_shutdown(self) -> None: ...
-
 class Node(Member, rclpy.node.Node):
     """
     Base class for all SVEA nodes.
@@ -209,7 +205,6 @@ class Parameter(Resource):
             self.node.declare_parameter(self.param_name, *self.param_args, **self.param_kwds)
             parameters[self.param_name] = self.node.get_parameter(self.param_name)
     
-
 class Publisher(Member):
     """
     Class to represent a publisher in a ROS 2 node.
@@ -263,7 +258,6 @@ class Publisher(Member):
             raise RuntimeError(f"QoS profile must be a QoSProfile, not {type(qos_profile)}")
 
         self.publisher = node.create_publisher(msg_type, topic, qos_profile)
-
 
 class Subscriber(Member):
     """

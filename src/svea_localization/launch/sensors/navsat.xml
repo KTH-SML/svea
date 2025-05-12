@@ -25,7 +25,7 @@
     </node> 
 
     <!-- Atleast one of the datum_file or datum_data must be set, if both are set, datum_file will be used -->
-    <node if="$(var use_datum)" pkg="svea_localization" exec="set_datum_node" name="set_datum_node" output="screen">
+    <node if="$(var use_datum)" pkg="svea_localization" exec="set_datum_node.py" name="set_datum_node" output="screen">
         <param name="datum_service"     value="$(var datum_service)" />
         <param name="service_timeout"   value="60.0" />
         <param name="datum_file"        value="$(var datum_file)" />

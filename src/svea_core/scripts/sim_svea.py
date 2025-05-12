@@ -47,7 +47,7 @@ class sim_svea(rx.Node):
     """
     Handles simulation of a SVEA vehicle. The object takes in a model
     and pretends to be the low-level of a SVEA vehicle. It will spin up
-    a continuous loop that updates the state of the fake vehicle using
+    a continuous loop that updates the state of the flake vehicle using
     the model dynamics at a fixed rate and takes control inputs by
     subscribing to the same low-level interface ROS topic the actual
     SVEA low-level system uses and even publishes actuated control to
@@ -70,10 +70,9 @@ class sim_svea(rx.Node):
 
     ## Parameters ##
 
-    time_step = rx.Parameter(0.02)
+    time_step = rx.Parameter(0.1)
     publish_tf = rx.Parameter(True)
 
-    state_top = rx.Parameter('state')
     request_top = rx.Parameter('lli/ctrl_request')
     actuated_top = rx.Parameter('lli/ctrl_actuated')
     emergency_top = rx.Parameter('lli/emergency')
@@ -92,8 +91,8 @@ class sim_svea(rx.Node):
 
     @rx.Subscriber(LLIControl, request_top, qos_subber)
     def ctrl_request_cb(self, ctrl_request_msg):
-        print(self)
-        print(ctrl_request_msg)
+        # print(self)
+        # print(ctrl_request_msg)
         
         self.last_ctrl_time = self.clock.now().to_msg()
         changed = self.inputs.update_from_msg(ctrl_request_msg)
@@ -151,6 +150,8 @@ class sim_svea(rx.Node):
         if self.is_emergency:
             velocity = 0
 
+
+        self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}, Time step: {self.time_step}")
         self.model.update(steering, velocity, dt=self.time_step)
 
         # update the state message

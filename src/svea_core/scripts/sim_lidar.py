@@ -18,9 +18,30 @@ import rclpy
 import rclpy.clock
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 from sensor_msgs.msg import LaserScan, PointCloud
+from nav_msgs.msg import Odometry
 from visualization_msgs.msg import Marker
+from tf_transformations import euler_from_quaternion
 
 from svea_core import rosonic as rx
+import ast
+
+
+qos_pubber = QoSProfile(
+    reliability=QoSReliabilityPolicy.RELIABLE,
+    durability=QoSDurabilityPolicy.VOLATILE,
+    history=QoSHistoryPolicy.KEEP_LAST,
+    depth=1,
+)
+
+
+qos_subber = QoSProfile(
+    reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
+    history=QoSHistoryPolicy.KEEP_LAST,         # Keep the last N messages
+    durability=QoSDurabilityPolicy.VOLATILE,    # Volatile
+    depth=10,                                   # Size of the queue
+)
+
+
 
 class sim_lidar(rx.Node):
     """Simulated 1-band lidar. It works by taking a list of obstacles,
@@ -37,12 +58,14 @@ class sim_lidar(rx.Node):
     TODO: Update for rosonic.
     """
 
+     ## Constants ##
+
     ANGLE_MIN = radians(-135.0) # start angle of scan [rad]
     ANGLE_MAX = radians(135.0) # end angle of the scan [rad]
     # INCREMENT = radians(0.25) # angular distance between measurements [rad]
     INCREMENT = radians(2) # angular distance between measurements [rad]
     TIME_INCREMENT = 0.00002 # time between each beam measurement [s]
-    SCAN_TIME = 0.025 # time between scans/between publication [seconds]
+    SCAN_TIME = 0.025 # time between scans/between publication [seconds]localize
     RANGE_MIN = 0.02 # min range of lidar [m]
     # RANGE_MAX = 30.0 # max range of lidar [m]
     RANGE_MAX = 15.0 # max range of lidar [m]
@@ -50,11 +73,50 @@ class sim_lidar(rx.Node):
     LIDAR_OFFSET = 0.30 # dist between SVEA rear axle and lidar mount point [m]
 
 
-    def __init__(self):
+    ## Parameters ##
 
-        self._viz_points_topic = 'viz_lidar_points'
-        self._viz_rays_topic = 'viz_lidar_rays'
-        self._viz_edges_topic = 'viz_edges'
+    _viz_points_topic = rx.Parameter('viz_lidar_points')
+    _viz_rays_topic = rx.Parameter('viz_lidar_rays')
+    _viz_edges_topic = rx.Parameter('viz_edges')
+    odometry_top = rx.Parameter('odometry/local')
+
+    ## Publishers ##
+    _scan_pub = rx.Publisher(LaserScan, '/scan', qos_pubber)
+    _viz_points_pub = rx.Publisher(PointCloud, _viz_points_topic, qos_pubber)
+    _viz_rays_pub = rx.Publisher(Marker, _viz_rays_topic, qos_pubber)
+    _viz_edges_pub = rx.Publisher(Marker, _viz_edges_topic, qos_pubber)
+
+    obstacles = rx.Publisher(['',''])
+    
+    
+    ## Subscribers ##
+    @rx.Subscriber(Odometry, odometry_top, qos_subber)
+    def update_lidar_position(self, odmetry_msg):
+        """Updates the lidar position using the vehicle state and the
+        known offset between the SVEA rear axle and lidar mount
+
+        :param vehicle_state: State of vehicle lidar is attached to
+        :type vehicle_state: VehicleState
+        """
+        vehicle_xy = np.array([odmetry_msg.pose.pose.position.x, odmetry_msg.pose.pose.position.y])
+        quaternion = odmetry_msg.pose.pose.orientation
+        _,_,yaw = euler_from_quaternion([quaternion.x, quaternion.y, quaternion.z, quaternion.w])
+
+        offset = [self.LIDAR_OFFSET, 0.0]
+        rot = np.matrix([[np.cos(-yaw), np.sin(-yaw)],
+                         [-np.sin(-yaw), np.cos(-yaw)]])
+        rot_offset = np.dot(rot, offset).tolist()[0]
+        lidar_xy = vehicle_xy + np.array(rot_offset)
+
+        self._lidar_position = np.append(lidar_xy, yaw)
+        self.get_logger().debug(f"Lidar position: {self._lidar_position}")
+
+
+    ## Main Methods ##
+
+    def on_startup(self):
+
+        self.get_logger().info("Startup complete.")
 
         self._lidar_position = None # [x, y, yaw] -> [m, m, rad]
         self._last_visibility_pos = None # [x, y, yaw] -> [m, m, rad]
@@ -77,75 +139,24 @@ class sim_lidar(rx.Node):
         self._scan_msg.range_min = self.RANGE_MIN
         self._scan_msg.range_max = self.RANGE_MAX
 
-    def start(self):
-        """
-        Spins up ROS background thread; must be called to start
-        receiving and sending data
+        self._obstacles = self.load_param('obstacles', '')
+        self._obstacles = ast.literal_eval(self._obstacles) 
 
-        :return: itself
-        :rtype: SimLidar
-        """
-        Thread(target=self._init_and_spin_ros, args=()).start()
-        return self
+        self.create_timer(self.SCAN_TIME, self.sim_loop)
 
-    def _init_and_spin_ros(self):
-        try:
-            self.get_logger().info("Initializing Lidar Simulation Node: \n"
-                                         + str(self))
-            self._start_publish()
-            self.get_logger().info("Simulated Lidar successfully initialized")
-            self._start_simulation()
-            rclpy.spin(self)
-        except Exception as e:
-            self.get_logger().error(f"Exception in ROS thread: {e}")
-        finally:
-            rclpy.shutdown()
-
-    def _start_publish(self):
-        qos_profile = QoSProfile(
-            reliability=QoSReliabilityPolicy.RELIABLE,
-            durability=QoSDurabilityPolicy.VOLATILE,
-            history=QoSHistoryPolicy.KEEP_LAST,
-            depth=1)
-        self._scan_pub = self.create_publisher(LaserScan,
-                                               '/scan', qos_profile)
-        self._viz_points_pub = self.create_publisher(PointCloud,
-                                                     self._viz_points_topic,
-                                                     qos_profile)
-        self._viz_rays_pub = self.create_publisher(Marker,
-                                                   self._viz_rays_topic,
-                                                   qos_profile)
-        self._viz_edges_pub = self.create_publisher(Marker,
-                                                    self._viz_edges_topic,
-                                                    qos_profile)
-
-    def _start_simulation(self):
-        rate = self.create_rate(1.0 / self.SCAN_TIME)
-        while rclpy.ok():
-            if self._lidar_position is None or self.obstacles is None:
-                continue
+    def load_param(self, name, value=None):
+        self.declare_parameter(name, value)
+        if value is None:
+            assert self.has_parameter(name), f'Missing parameter "{name}"'
+        return self.get_parameter(name).value
+    
+    def sim_loop(self):
+        if self._lidar_position is None or self.obstacles is None:
+            pass
+        else:
             self._update_visible_edges()
             self._update_scan()
             self.publish_scan()
-            rate.sleep()
-
-    def update_lidar_position(self, vehicle_state):
-        """Updates the lidar position using the vehicle state and the
-        known offset between the SVEA rear axle and lidar mount
-
-        :param vehicle_state: State of vehicle lidar is attached to
-        :type vehicle_state: VehicleState
-        """
-        vehicle_xy = np.array([vehicle_state.x, vehicle_state.y])
-        yaw = vehicle_state.yaw
-
-        offset = [self.LIDAR_OFFSET, 0.0]
-        rot = np.matrix([[np.cos(-yaw), np.sin(-yaw)],
-                         [-np.sin(-yaw), np.cos(-yaw)]])
-        rot_offset = np.dot(rot, offset).tolist()[0]
-        lidar_xy = vehicle_xy + np.array(rot_offset)
-
-        self._lidar_position = np.append(lidar_xy, yaw)
 
     @property
     def obstacles(self):
@@ -154,10 +165,7 @@ class sim_lidar(rx.Node):
             return self._obstacles
         
         self.declare_parameter('obstacles', [])
-        obstacles_param = self.get_parameter('obstacles')
-        # obstacles_param = rclpy.search_param('obstacles')
-        self.declare_parameter(obstacles_param, [])
-        obstacles_from_param = self.get_parameter(obstacles_param)
+        obstacles_from_param = self.get_parameter('obstacles')
 
         if type(obstacles_from_param) == type([]):
             self._obstacles = obstacles_from_param
@@ -166,6 +174,8 @@ class sim_lidar(rx.Node):
                 obstacle_edges += [obstacle_edges[0]]
         else:
             self._obstacles = []
+
+        self.get_logger.info(self._obstacles)
         return self._obstacles
 
     def _update_visible_edges(self):
@@ -320,11 +330,7 @@ def _compute_lineline_intersection(line1_pt1, line1_pt2,
             / denominator
     return (p_x, p_y)
 
-def main(args=None):
-    rclpy.init(args=args)
-    node = SimLidar()
-    node.start()
-
+main = sim_lidar.main
 
 if __name__ == '__main__':
     main()
