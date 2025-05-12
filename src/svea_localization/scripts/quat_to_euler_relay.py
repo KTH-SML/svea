@@ -3,6 +3,7 @@
 Author: Sulthan Suresh Fazeela
 """
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/svea_localization/scripts/quat_to_euler_relay.py
 ========
 __author__ = "Sulthan Suresh Fazeela"
@@ -10,6 +11,8 @@ __email__ = "sultha@kth.se"
 __license__ = "MIT"
 
 >>>>>>>> 360ef06 (add svea_localization,modifying to ros2 in progress):src/svea_localization/script/quat_to_euler_relay.py
+=======
+>>>>>>> 914c44e (update on 05/12/2025)
 import rclpy
 import rclpy.exceptions
 from rclpy.node import Node
@@ -78,6 +81,7 @@ class QuatToEulerRelay(Node):
         
         def get_topic_type(self, topic: str, timeout: float = 1.0) -> str:
             # Get topic type
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/svea_localization/scripts/quat_to_euler_relay.py
             time = self.get_Clock().now().to_msg()
             while (self.get_Clock().now().to_msg() - time).nanoseconds / 1e9 < timeout:
@@ -87,6 +91,11 @@ class QuatToEulerRelay(Node):
             while (self.get_clock().now() - time).nanoseconds / 1e9 < timeout:
                 topic_names_and_types = self.get_topic_type(topic)
 >>>>>>>> 360ef06 (add svea_localization,modifying to ros2 in progress):src/svea_localization/script/quat_to_euler_relay.py
+=======
+            time = self.get_Clock().now().to_msg()
+            while (self.get_Clock().now().to_msg() - time).nanoseconds / 1e9 < timeout:
+                topic_names_and_types = self.get_topic_names_and_types()
+>>>>>>> 914c44e (update on 05/12/2025)
                 for name, types in topic_names_and_types:
                     if name == topic:
                         return types[0], ""

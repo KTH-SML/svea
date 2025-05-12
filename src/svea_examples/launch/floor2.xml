@@ -3,7 +3,9 @@
     <!-- Launch file arguments -->
     <arg name="map"             default="floor2"/>
     <arg name="is_sim"          default="true"/>
+<<<<<<< HEAD
     <arg name="use_foxglove"    default="true"/>
+<<<<<<< HEAD
 <<<<<<< HEAD
     <arg name="initial_pose_x"  default="-7.3699"/>
     <arg name="initial_pose_y"  default="-15.383940368977647"/>
@@ -12,10 +14,18 @@
     <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
     <arg name="points" default="['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]']" />
 =======
+=======
+=======
+    <let name="is_sim" value="$(eval '\'$(var is_sim)\' == \'true\'')"/>
+    <arg name="use_foxglove"    default="true"/>
+    <let name="use_foxglove" value="$(eval '\'$(var use_foxglove)\' == \'true\'')"/>
+>>>>>>> 914c44e (update on 05/12/2025)
+>>>>>>> f567493 (update on 05/12/2025)
     <arg name="initial_pose_x"  default="-2.65488696"/>
     <arg name="initial_pose_y"  default="-1.64422277"/>
     <arg name="initial_pose_a"  default="1.57" /> <!-- wrt to map-->
     <arg name="map_path" default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
+<<<<<<< HEAD
     <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
     <arg name="points" default="['[-2.3, -7.1]', '[3.51, 1.95]', '[10.5, 11.7]', '[5.7, 15.0]', '[-1.18, 4.69]', '[-7.0, -4.0]']" />
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
@@ -35,13 +45,54 @@
         <arg name="state" value="$(var state)" />
         <arg name="map" value="$(var map)" />
     </include>   
+=======
+
+    <!-- Start map server -->
+    <!-- more info about nav2_map_server:https://answers.ros.org/question/398095/-->
+    <node name="lifecycle_manager" pkg="nav2_util" exec="lifecycle_bringup" args="map_server"/>
+    <node name="map_server" pkg="nav2_map_server" exec="map_server" output="screen">
+        <param name="yaml_filename" value="$(var map_path)" />
+        <param name="use_sim_time" value="false" />
+        <param name="topic_name" value="map" />
+    </node>
+
+    <!-- If is_sim equal to false, then include all these tags-->
+    <group unless="$(var is_sim)">
+        <!-- Start low-level interface -->
+        <node name="serial_node" pkg="rosserial_python" exec="serial_node">
+            <param name="port" value="/dev/ttyACM0"/>
+            <param name="baud" value="250000"/>
+        </node>
+
+        <!-- Start localization -->
+        <include file="$(find-pkg-share svea_sensors)/launch/localize.launch">
+            <arg name="initial_pose_x" value="$(var initial_pose_x)" />
+            <arg name="initial_pose_y" value="$(var initial_pose_y)" />
+            <arg name="initial_pose_a" value="$(var initial_pose_a)" />
+        </include>
+    </group>
+
+    <!-- Start Foxglove -->
+    <include if="$(var use_foxglove)" file="$(find-pkg-share foxglove_bridge)/launch/foxglove_bridge_launch.xml">
+        <arg name="port" value="8765" />
+    </include>
+>>>>>>> 914c44e (update on 05/12/2025)
 
     <!-- Start pure_pursuit -->
     <node name="pure_pursuit" pkg="svea_examples" exec="pure_pursuit.py" output="screen">
         <param name="use_rviz" value="$(var use_foxglove)"/>
         <param name="is_sim" value="$(var is_sim)"/>
+<<<<<<< HEAD
         <param name="state" value="$(var state)" />
         <param name="points" value="$(var points)" />
     </node>
 
+=======
+        <param name="state" value="[-7.4, -15.3, 0.9, 0.0]" />
+        <param name="points" value="['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]']" />
+    </node>
+
+    <!-- Start simulation -->
+    <include file="$(find-pkg-share svea_core)/launch/simulation.xml"/>
+>>>>>>> 914c44e (update on 05/12/2025)
 </launch>

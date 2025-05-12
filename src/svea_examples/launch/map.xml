@@ -1,0 +1,21 @@
+<launch>
+    <arg name="map_path" default="$(find-pkg-share svea_core)/maps/floor2.yaml"/>
+    <arg name="use_foxglove"    default="true"/>
+    <let name="use_foxglove" value="$(eval '\'$(var use_foxglove)\' == \'true\'')"/>
+
+    <!-- more info about nav2_map_server:https://answers.ros.org/question/398095/-->
+    <node name="lifecycle_manager" pkg="nav2_util" exec="lifecycle_bringup" args="map_server" output="screen"/>
+
+    <node name="map_server" pkg="nav2_map_server" exec="map_server" output="screen">
+        <param name="yaml_filename" value="$(var map_path)" />
+        <param name="use_sim_time" value="false" />
+        <param name="topic_name" value="map" />
+    </node>
+
+
+    <!-- Start Foxglove -->
+    <include if="$(var use_foxglove)" file="$(find-pkg-share foxglove_bridge)/launch/foxglove_bridge_launch.xml">
+        <arg name="port" value="8765" />
+    </include>
+
+</launch>

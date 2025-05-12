@@ -2,6 +2,10 @@
 
 import numpy as np
 
+<<<<<<< HEAD
+=======
+import rclpy
+>>>>>>> 914c44e (update on 05/12/2025)
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from tf_transformations import quaternion_from_euler
 
@@ -9,11 +13,15 @@ from svea_core.interfaces import LocalizationInterface
 from svea_core.controllers.pure_pursuit import PurePursuitController
 from svea_core.interfaces import ActuationInterface
 from svea_core import rosonic as rx
+<<<<<<< HEAD
 from svea_core.utils import PlaceMarker, ShowPath
+=======
+>>>>>>> 914c44e (update on 05/12/2025)
 
 
 class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
+<<<<<<< HEAD
     r"""Pure Pursuit example script for SVEA.
 
     #**Background**
@@ -84,10 +92,25 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         The controller is set to not finished initially, and a timer is created
         to call the loop method at regular intervals.
         """
+=======
+    DELTA_TIME = 0.1
+    TRAJ_LEN = 10
+
+    points = rx.Parameter(['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]'])
+    is_sim = rx.Parameter(True)
+    target_velocity = rx.Parameter(1.0)
+
+    def on_startup(self):
+>>>>>>> 914c44e (update on 05/12/2025)
         # Convert POINTS to numerical lists if loaded as strings
         if isinstance(self.points[0], str):
             self._points = [eval(point) for point in self.points]
 
+<<<<<<< HEAD
+=======
+        self.localizer = LocalizationInterface(self).start()
+        self.actuation = ActuationInterface(self).start()
+>>>>>>> 914c44e (update on 05/12/2025)
         self.controller = PurePursuitController()
         self.controller.target_velocity = self.target_velocity
 
@@ -96,12 +119,16 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
         self.curr = 0
         self.goal = self._points[self.curr]
+<<<<<<< HEAD
         self.mark.marker('goal','blue',self.goal)
+=======
+>>>>>>> 914c44e (update on 05/12/2025)
         self.update_traj(x, y)
 
         self.create_timer(self.DELTA_TIME, self.loop)
 
     def loop(self):
+<<<<<<< HEAD
         """
         Main loop of the Pure Pursuit controller. It retrieves the current state
         from the localization interface, computes the steering and velocity
@@ -110,6 +137,8 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         If the controller has finished following the path, it updates the goal
         and trajectory based on the next point in the path.
         """
+=======
+>>>>>>> 914c44e (update on 05/12/2025)
         state = self.localizer.get_state()
         x, y, yaw, vel = state
 
@@ -119,8 +148,11 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
         steering, velocity = self.controller.compute_control(state)
 <<<<<<< HEAD
+<<<<<<< HEAD
         self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
 =======
+=======
+>>>>>>> f567493 (update on 05/12/2025)
         # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
         self.actuation.send_control(steering, velocity)
@@ -131,10 +163,16 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         is reached, it wraps around to the beginning. The current index is
         incremented, and the goal marker is updated.
         """
+=======
+        self.actuation.send_control(steering, velocity)
+
+    def update_goal(self):
+>>>>>>> 914c44e (update on 05/12/2025)
         self.curr += 1
         self.curr %= len(self._points)
         self.goal = self._points[self.curr]
         self.controller.is_finished = False
+<<<<<<< HEAD
         # Mark the goal
         self.mark.marker('goal','blue',self.goal)
 
@@ -145,18 +183,36 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         position, and updates the controller's trajectory points.
         The trajectory is visualized using the ShowPath interface.
         """
+=======
+
+    def update_traj(self, x, y):
+>>>>>>> 914c44e (update on 05/12/2025)
         xs = np.linspace(x, self.goal[0], self.TRAJ_LEN)
         ys = np.linspace(y, self.goal[1], self.TRAJ_LEN)
         self.controller.traj_x = xs
         self.controller.traj_y = ys
+<<<<<<< HEAD
 <<<<<<< HEAD
         #self.path.publish_path(xs,ys)
 
 if __name__ == '__main__':
     pure_pursuit.main()
 =======
+=======
+>>>>>>> f567493 (update on 05/12/2025)
         self.path.publish_path(xs,ys)
 
 if __name__ == '__main__':
     pure_pursuit.main()
+<<<<<<< HEAD
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+=======
+
+main = pure_pursuit.main
+
+
+if __name__ == '__main__':
+    main()
+>>>>>>> 914c44e (update on 05/12/2025)
+>>>>>>> f567493 (update on 05/12/2025)
