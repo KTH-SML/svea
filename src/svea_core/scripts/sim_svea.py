@@ -474,8 +474,12 @@ if __name__ == '__main__':
         """
         return self.is_emergency
 
-main = sim_svea.main
 
+<<<<<<< HEAD
 if __name__ == '__main__':
     main()
 >>>>>>> 11eeed9 (Fundamental changes.)
+=======
+if __name == '__main__':
+    sim_svea.main()
+>>>>>>> 5a67854 (Confirmed that symlink works)

@@ -50,8 +50,5 @@ class state_publisher(rx.Node):
             self.rate.sleep()
 
 
-main = StatePublisher.main
-
-
 if __name__ == '__main__':
-    main()
+    StatePublisher.main()

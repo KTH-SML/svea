@@ -209,10 +209,14 @@ if __name__ == '__main__':
 =======
 =======
 
-main = pure_pursuit.main
-
-
 if __name__ == '__main__':
+<<<<<<< HEAD
     main()
 >>>>>>> 914c44e (update on 05/12/2025)
+<<<<<<< HEAD
 >>>>>>> f567493 (update on 05/12/2025)
+=======
+=======
+    pure_pursuit.main()
+>>>>>>> 5a67854 (Confirmed that symlink works)
+>>>>>>> 48e60ec (Confirmed that symlink works)
