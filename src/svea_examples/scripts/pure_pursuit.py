@@ -63,8 +63,5 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         self.controller.traj_x = xs
         self.controller.traj_y = ys
 
-main = pure_pursuit.main
-
-
 if __name__ == '__main__':
-    main()
+    pure_pursuit.main()

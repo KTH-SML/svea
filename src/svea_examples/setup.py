@@ -4,27 +4,15 @@ from glob import glob
 
 package_name = 'svea_examples'
 
-def generate_console_scripts(script_dir):
-    console_scripts = []
-    for path in glob(os.path.join(script_dir, '*.py')):
-        filename = os.path.basename(path)
-        module_name = filename[:-3]
-        if module_name == '__init__':
-            continue
-        entry = f'{module_name} = scripts.{module_name}:main'
-        console_scripts.append(entry)
-    return console_scripts
-
 setup(
     name=package_name,
     version='0.0.0',
-    packages=find_packages(exclude=['test']),
+    packages=find_packages(include=[package_name, f"{package_name}.*"]),
     data_files=[
         ('share/ament_index/resource_index/packages', [f'resource/{package_name}']),
         (f'share/{package_name}', ['package.xml']),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
         (f'share/{package_name}/launch', glob('launch/*.xml')),
-        (f'lib/{package_name}', glob('scripts/*.py')),  # Install raw executables to lib/{package_name}
+        (f'lib/{package_name}', glob('scripts/*.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -33,11 +21,4 @@ setup(
     description='TODO: Package description',
     license='TODO: License declaration',
     tests_require=['pytest'],
-    entry_points={
-        'console_scripts': generate_console_scripts('scripts'),
-        # 'console_scripts': [
-        #     'svea_example = script.svea_example:main',
-        #     'svea_example2 = script.svea_example2:main',
-        # ],
-    },
 )

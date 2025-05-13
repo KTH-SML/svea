@@ -330,7 +330,5 @@ def _compute_lineline_intersection(line1_pt1, line1_pt2,
             / denominator
     return (p_x, p_y)
 
-main = sim_lidar.main
-
 if __name__ == '__main__':
-    main()
+    sim_lidar.main()

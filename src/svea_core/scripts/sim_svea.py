@@ -226,7 +226,6 @@ class sim_svea(rx.Node):
         """
         return self.is_emergency
 
-main = sim_svea.main
 
-if __name__ == '__main__':
-    main()
+if __name == '__main__':
+    sim_svea.main()
