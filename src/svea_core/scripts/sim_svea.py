@@ -84,8 +84,12 @@ qos_subber = QoSProfile(
 )
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 11eeed9 (Fundamental changes.)
 =======
+=======
+qos = QoSProfile(depth=10)
+>>>>>>> 2b88bc9 (fix some bugs in rosnoic.Subscriber, fix issue about odometry from sim_svea being slow)
 
 >>>>>>> c56a41e (progressing on simulation, still not working)
 class sim_svea(rx.Node):
@@ -126,6 +130,9 @@ class sim_svea(rx.Node):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2b88bc9 (fix some bugs in rosnoic.Subscriber, fix issue about odometry from sim_svea being slow)
     time_step = 0.025
     publish_tf = rx.Parameter(True)
 
@@ -211,22 +218,21 @@ class sim_svea(rx.Node):
 
     ## Publishers ##
 
-    ctrl_actuated_pub = rx.Publisher(LLIControl, actuated_top, qos_pubber)
-    odometry_pub = rx.Publisher(Odometry, odometry_top, qos_pubber)
+    ctrl_actuated_pub = rx.Publisher(LLIControl, actuated_top, qos)
+    odometry_pub = rx.Publisher(Odometry, odometry_top, qos)
 
     ## Subscribers ##
 
-    @rx.Subscriber(LLIControl, request_top, qos_subber)
+    @rx.Subscriber(LLIControl, request_top, qos)
     def ctrl_request_cb(self, ctrl_request_msg):
         # print(self)
         # print(ctrl_request_msg)
-        
         self.last_ctrl_time = self.clock.now().to_msg()
         changed = self.inputs.update_from_msg(ctrl_request_msg)
         if changed:
             self.ctrl_actuated_pub.publish(self.inputs.ctrl_msg)
 
-    @rx.Subscriber(LLIEmergency, emergency_top, qos_subber)
+    @rx.Subscriber(LLIEmergency, emergency_top, qos)
     def _update_emergency(self, emergency_msg):
         emergency = emergency_msg.emergency
         sender_id = emergency_msg.sender_id
@@ -348,8 +354,6 @@ class sim_svea(rx.Node):
         if self.is_emergency:
             velocity = 0
 
-
-        self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}, Time step: {self.time_step}")
         self.model.update(steering, velocity, dt=self.time_step)
 
         # update the state message
@@ -369,13 +373,18 @@ class sim_svea(rx.Node):
         odom_msg.twist.twist.linear.x = vel
         
         # publish fake localization data
-        if (curr_time.sec - self.last_pub_time.sec) > 1.0/self.LOC_PUB_FREQ:
-            if self.publish_tf:
-                self._broadcast_tf(odom_msg)
+        if self.publish_tf:
+            self._broadcast_tf(odom_msg)
 
+<<<<<<< HEAD
             self.odometry_pub.publish(odom_msg)
             self.last_pub_time = self.clock.now().to_msg()
 >>>>>>> 11eeed9 (Fundamental changes.)
+=======
+        self.odometry_pub.publish(odom_msg)
+        self.last_pub_time = self.clock.now().to_msg()
+            
+>>>>>>> 2b88bc9 (fix some bugs in rosnoic.Subscriber, fix issue about odometry from sim_svea being slow)
 
     def _percent_to_steer(self, steering):
         """Convert radians to percent of max steering actuation"""
@@ -476,10 +485,14 @@ if __name__ == '__main__':
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 if __name__ == '__main__':
     main()
 >>>>>>> 11eeed9 (Fundamental changes.)
 =======
 if __name == '__main__':
+=======
+if __name__ == '__main__':
+>>>>>>> 2b88bc9 (fix some bugs in rosnoic.Subscriber, fix issue about odometry from sim_svea being slow)
     sim_svea.main()
 >>>>>>> 5a67854 (Confirmed that symlink works)

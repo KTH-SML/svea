@@ -1249,8 +1249,12 @@ class Publisher(Member):
         qos_profile = self.qos_profile
 
         if isinstance(topic, Parameter):
+<<<<<<< HEAD
             topic = self.__rosonic_node__.__rosonic_parameters__[topic._name].value
 >>>>>>> 24b9acb (minor structural changes to rosonic)
+=======
+            topic = self.__rosonic_node__.__rosonic_parameters__[topic.name].value
+>>>>>>> 2b88bc9 (fix some bugs in rosnoic.Subscriber, fix issue about odometry from sim_svea being slow)
 
         if not isinstance(msg_type, type):
             raise RuntimeError(f"Message type must be a class, not {type(msg_type)}")
@@ -1377,8 +1381,12 @@ class Subscriber(Member):
         qos_profile = self.qos_profile
 
         if isinstance(topic, Parameter):
+<<<<<<< HEAD
             topic = self.__rosonic_node__.__rosonic_parameters__[topic._name].value
 >>>>>>> 24b9acb (minor structural changes to rosonic)
+=======
+            topic = self.__rosonic_node__.__rosonic_parameters__[topic.name].value
+>>>>>>> 2b88bc9 (fix some bugs in rosnoic.Subscriber, fix issue about odometry from sim_svea being slow)
 
         if not isinstance(msg_type, type):
             raise RuntimeError(f"Message type must be a class, not {type(msg_type)}")
@@ -1390,6 +1398,7 @@ class Subscriber(Member):
         if self.callback is None:
             raise RuntimeError(f"Callback for subscriber '{self.topic}' is not set.")
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         user_callback = self.callback
         owner = self.__rosonic_owner__
@@ -1486,11 +1495,19 @@ class Timer(NamedField):
 >>>>>>> 11eeed9 (Fundamental changes.)
 =======
         callback = self.callback
+=======
+        user_callback = self.callback
+>>>>>>> 2b88bc9 (fix some bugs in rosnoic.Subscriber, fix issue about odometry from sim_svea being slow)
         parent = self.__rosonic_parent__
 
-        def callback(msg):
-            return callback(parent, msg)
+        def wrapped_callback(msg):
+            """
+            Wrapper for the user-defined callback to include the parent context.
+            """
+            return user_callback(parent, msg)
 
-        self.subscriber = node.create_subscription(msg_type, topic, callback, qos_profile)
-
+<<<<<<< HEAD
 >>>>>>> 24b9acb (minor structural changes to rosonic)
+=======
+        self.subscriber = node.create_subscription(msg_type, topic, wrapped_callback, qos_profile)
+>>>>>>> 2b88bc9 (fix some bugs in rosnoic.Subscriber, fix issue about odometry from sim_svea being slow)
