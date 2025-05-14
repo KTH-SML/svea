@@ -41,7 +41,7 @@ qos_subber = QoSProfile(
     depth=10,                                   # Size of the queue
 )
 
-
+qos = QoSProfile(depth=10)
 
 class sim_lidar(rx.Node):
     """Simulated 1-band lidar. It works by taking a list of obstacles,
@@ -81,16 +81,14 @@ class sim_lidar(rx.Node):
     odometry_top = rx.Parameter('odometry/local')
 
     ## Publishers ##
-    _scan_pub = rx.Publisher(LaserScan, '/scan', qos_pubber)
-    _viz_points_pub = rx.Publisher(PointCloud, _viz_points_topic, qos_pubber)
-    _viz_rays_pub = rx.Publisher(Marker, _viz_rays_topic, qos_pubber)
-    _viz_edges_pub = rx.Publisher(Marker, _viz_edges_topic, qos_pubber)
+    _scan_pub = rx.Publisher(LaserScan, '/scan', qos)
+    _viz_points_pub = rx.Publisher(PointCloud, _viz_points_topic, qos)
+    _viz_rays_pub = rx.Publisher(Marker, _viz_rays_topic, qos)
+    _viz_edges_pub = rx.Publisher(Marker, _viz_edges_topic, qos)
 
-    obstacles = rx.Publisher(['',''])
-    
     
     ## Subscribers ##
-    @rx.Subscriber(Odometry, odometry_top, qos_subber)
+    @rx.Subscriber(Odometry, odometry_top, qos)
     def update_lidar_position(self, odmetry_msg):
         """Updates the lidar position using the vehicle state and the
         known offset between the SVEA rear axle and lidar mount
@@ -109,7 +107,6 @@ class sim_lidar(rx.Node):
         lidar_xy = vehicle_xy + np.array(rot_offset)
 
         self._lidar_position = np.append(lidar_xy, yaw)
-        self.get_logger().debug(f"Lidar position: {self._lidar_position}")
 
 
     ## Main Methods ##
@@ -164,8 +161,8 @@ class sim_lidar(rx.Node):
         if self._obstacles is not None:
             return self._obstacles
         
-        self.declare_parameter('obstacles', [])
         obstacles_from_param = self.get_parameter('obstacles')
+        obstacles_from_param = ast.literal_eval(obstacles_from_param) 
 
         if type(obstacles_from_param) == type([]):
             self._obstacles = obstacles_from_param

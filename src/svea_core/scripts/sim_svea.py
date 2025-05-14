@@ -42,6 +42,7 @@ qos_subber = QoSProfile(
     depth=10,                                   # Size of the queue
 )
 
+qos = QoSProfile(depth=10)
 
 class sim_svea(rx.Node):
     """
@@ -70,7 +71,7 @@ class sim_svea(rx.Node):
 
     ## Parameters ##
 
-    time_step = rx.Parameter(0.1)
+    time_step = 0.025
     publish_tf = rx.Parameter(True)
 
     request_top = rx.Parameter('lli/ctrl_request')
@@ -84,22 +85,21 @@ class sim_svea(rx.Node):
 
     ## Publishers ##
 
-    ctrl_actuated_pub = rx.Publisher(LLIControl, actuated_top, qos_pubber)
-    odometry_pub = rx.Publisher(Odometry, odometry_top, qos_pubber)
+    ctrl_actuated_pub = rx.Publisher(LLIControl, actuated_top, qos)
+    odometry_pub = rx.Publisher(Odometry, odometry_top, qos)
 
     ## Subscribers ##
 
-    @rx.Subscriber(LLIControl, request_top, qos_subber)
+    @rx.Subscriber(LLIControl, request_top, qos)
     def ctrl_request_cb(self, ctrl_request_msg):
         # print(self)
         # print(ctrl_request_msg)
-        
         self.last_ctrl_time = self.clock.now().to_msg()
         changed = self.inputs.update_from_msg(ctrl_request_msg)
         if changed:
             self.ctrl_actuated_pub.publish(self.inputs.ctrl_msg)
 
-    @rx.Subscriber(LLIEmergency, emergency_top, qos_subber)
+    @rx.Subscriber(LLIEmergency, emergency_top, qos)
     def _update_emergency(self, emergency_msg):
         emergency = emergency_msg.emergency
         sender_id = emergency_msg.sender_id
@@ -150,8 +150,6 @@ class sim_svea(rx.Node):
         if self.is_emergency:
             velocity = 0
 
-
-        self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}, Time step: {self.time_step}")
         self.model.update(steering, velocity, dt=self.time_step)
 
         # update the state message
@@ -171,12 +169,12 @@ class sim_svea(rx.Node):
         odom_msg.twist.twist.linear.x = vel
         
         # publish fake localization data
-        if (curr_time.sec - self.last_pub_time.sec) > 1.0/self.LOC_PUB_FREQ:
-            if self.publish_tf:
-                self._broadcast_tf(odom_msg)
+        if self.publish_tf:
+            self._broadcast_tf(odom_msg)
 
-            self.odometry_pub.publish(odom_msg)
-            self.last_pub_time = self.clock.now().to_msg()
+        self.odometry_pub.publish(odom_msg)
+        self.last_pub_time = self.clock.now().to_msg()
+            
 
     def _percent_to_steer(self, steering):
         """Convert radians to percent of max steering actuation"""
@@ -227,5 +225,5 @@ class sim_svea(rx.Node):
         return self.is_emergency
 
 
-if __name == '__main__':
+if __name__ == '__main__':
     sim_svea.main()
