@@ -21,7 +21,7 @@
     (i.e. this is needed in order to have wheel encoders and actuation_to_twist working) -->
 
     <!-- map server -->
-    <arg name="map_file"                default="$(find svea_core)/maps/sml_20250512.yaml"/>
+    <arg name="map_file"                default=""/>
 
     <!-- Lidar  -->
     <arg name="lidar_ip"                default="192.168.3.11" />
@@ -145,8 +145,8 @@
                         0.0,                    0.0,                    0.0]
         </rosparam>
         <param name="publish_tf"            value="$(arg publish_tf)"/>
-	<param name="imu0"                  value="imu/data"/>
-	<param name="twist0"                value="encoder/wheel_speed"/>
+	    <param name="imu0"                  value="imu/data"/>
+	    <param name="twist0"                value="encoder/wheel_speed"/>
     </node>
 
     <!-- Global EKF -->
