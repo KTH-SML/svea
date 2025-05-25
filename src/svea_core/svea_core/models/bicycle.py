@@ -3,12 +3,7 @@ Author: Frank Jiang
 """
 import numpy as np
 import math
-from typing import Optional
-from abc import ABC, abstractmethod
 
-import rclpy
-import rclpy.clock
-import rclpy.duration
 from rclpy.clock import ClockType
 from builtin_interfaces.msg import Time
 from nav_msgs.msg import Odometry

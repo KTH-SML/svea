@@ -85,12 +85,12 @@ class sim_svea(rx.Node):
 
     ## Publishers ##
 
-    ctrl_actuated_pub = rx.Publisher(LLIControl, actuated_top, qos)
-    odometry_pub = rx.Publisher(Odometry, odometry_top, qos)
+    ctrl_actuated_pub = rx.Publisher(LLIControl, actuated_top, qos_pubber)
+    odometry_pub = rx.Publisher(Odometry, odometry_top, qos_pubber)
 
     ## Subscribers ##
 
-    @rx.Subscriber(LLIControl, request_top, qos)
+    @rx.Subscriber(LLIControl, request_top, qos_subber)
     def ctrl_request_cb(self, ctrl_request_msg):
         # print(self)
         # print(ctrl_request_msg)
@@ -99,7 +99,7 @@ class sim_svea(rx.Node):
         if changed:
             self.ctrl_actuated_pub.publish(self.inputs.ctrl_msg)
 
-    @rx.Subscriber(LLIEmergency, emergency_top, qos)
+    @rx.Subscriber(LLIEmergency, emergency_top, qos_subber)
     def _update_emergency(self, emergency_msg):
         emergency = emergency_msg.emergency
         sender_id = emergency_msg.sender_id

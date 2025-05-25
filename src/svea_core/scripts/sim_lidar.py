@@ -21,6 +21,8 @@ from sensor_msgs.msg import LaserScan, PointCloud
 from nav_msgs.msg import Odometry
 from visualization_msgs.msg import Marker
 from tf_transformations import euler_from_quaternion
+from tf2_ros import TransformBroadcaster
+from geometry_msgs.msg import TransformStamped
 
 from svea_core import rosonic as rx
 import ast
@@ -41,7 +43,6 @@ qos_subber = QoSProfile(
     depth=10,                                   # Size of the queue
 )
 
-qos = QoSProfile(depth=10)
 
 class sim_lidar(rx.Node):
     """Simulated 1-band lidar. It works by taking a list of obstacles,
@@ -74,21 +75,13 @@ class sim_lidar(rx.Node):
 
 
     ## Parameters ##
-
-    _viz_points_topic = rx.Parameter('viz_lidar_points')
-    _viz_rays_topic = rx.Parameter('viz_lidar_rays')
-    _viz_edges_topic = rx.Parameter('viz_edges')
     odometry_top = rx.Parameter('odometry/local')
 
     ## Publishers ##
-    _scan_pub = rx.Publisher(LaserScan, '/scan', qos)
-    _viz_points_pub = rx.Publisher(PointCloud, _viz_points_topic, qos)
-    _viz_rays_pub = rx.Publisher(Marker, _viz_rays_topic, qos)
-    _viz_edges_pub = rx.Publisher(Marker, _viz_edges_topic, qos)
-
+    _scan_pub = rx.Publisher(LaserScan, '/scan', qos_pubber)
     
     ## Subscribers ##
-    @rx.Subscriber(Odometry, odometry_top, qos)
+    @rx.Subscriber(Odometry, odometry_top, qos_subber)
     def update_lidar_position(self, odmetry_msg):
         """Updates the lidar position using the vehicle state and the
         known offset between the SVEA rear axle and lidar mount
@@ -107,6 +100,10 @@ class sim_lidar(rx.Node):
         lidar_xy = vehicle_xy + np.array(rot_offset)
 
         self._lidar_position = np.append(lidar_xy, yaw)
+
+        self.publish_tf(odmetry_msg)
+        self._scan_msg.header.stamp = odmetry_msg.header.stamp
+        self.sim_loop()
 
 
     ## Main Methods ##
@@ -139,7 +136,9 @@ class sim_lidar(rx.Node):
         self._obstacles = self.load_param('obstacles', '')
         self._obstacles = ast.literal_eval(self._obstacles) 
 
-        self.create_timer(self.SCAN_TIME, self.sim_loop)
+        self.tf_broadcaster = TransformBroadcaster(self)
+
+        # self.create_timer(self.SCAN_TIME, self.sim_loop)
 
     def load_param(self, name, value=None):
         self.declare_parameter(name, value)
@@ -222,6 +221,17 @@ class sim_lidar(rx.Node):
 
     def publish_scan(self):
         self._scan_pub.publish(self._scan_msg)
+
+    def publish_tf(self, odom_msg):
+        t = TransformStamped()
+        t.header.stamp = odom_msg.header.stamp
+        t.header.frame_id = 'base_link'
+        t.child_frame_id = 'laser'
+        t.transform.translation.x = 0.18
+        t.transform.translation.y = -0.05
+        t.transform.translation.z = 0.0
+        t.transform.rotation.w = 1.0
+        self.tf_broadcaster.sendTransform(t)
 
 
 def beam_intersection(beam_and_edges):
