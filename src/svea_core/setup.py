@@ -23,6 +23,7 @@ setup(
         (os.path.join('share', package_name, 'maps'), glob(f'src/{package_name}/maps/*')),
 =======
         (f'share/{package_name}/launch', glob('launch/*.xml')),
+        (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
         (f'share/{package_name}/params', glob('params/*.yaml')),
         (f'share/{package_name}/maps', glob('maps/*')),
         (f'lib/{package_name}', glob('scripts/*.py')),

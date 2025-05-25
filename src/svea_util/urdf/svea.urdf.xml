@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<robot name="svea">
+
+ <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  <material name="grey">
+    <color rgba="0.5 0.5 0.5 1"/>
+  </material>
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://svea_util/meshes/body.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="-1.57079632679 0 0" xyz="0 0 0.05785"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <link name="tire1">
+    <visual>
+      <geometry>
+        <mesh filename="package://svea_util/meshes/tire.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="3.1415926 0 0" xyz="0 0 0.05785"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_tire1_front_left" type="fixed">
+    <parent link="base_link"/>
+    <child link="tire1"/>
+    <origin xyz="0.19 0.06 0"/>
+  </joint>
+
+  <link name="tire2">
+    <visual>
+      <geometry>
+        <mesh filename="package://svea_util/meshes/tire.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.05785"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_tire2_front_right" type="fixed">
+    <parent link="base_link"/>
+    <child link="tire2"/>
+    <origin xyz="0.19 -0.06 0"/>
+  </joint>
+
+  <link name="tire3">
+    <visual>
+      <geometry>
+        <mesh filename="package://svea_util/meshes/tire.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="3.1415926 0 0" xyz="0 0 0.05785"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_tire3_back_left" type="fixed">
+    <parent link="base_link"/>
+    <child link="tire3"/>
+    <origin xyz="-0.15 0.06 0"/>
+  </joint>
+
+  <link name="tire4">
+    <visual>
+      <geometry>
+        <mesh filename="package://svea_util/meshes/tire.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.05785"/>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_tire4_back_right" type="fixed">
+    <parent link="base_link"/>
+    <child link="tire4"/>
+    <origin xyz="-0.15 -0.06 0"/>
+  </joint>
+
+  <link name="mount_body">
+    <visual>
+      <geometry>
+        <mesh filename="package://svea_util/meshes/body166.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="0 0 1.57079632679" xyz="0 0 0"/>
+      <material name="grey"/>
+    </visual>
+  </link>
+  
+  <joint name="base_to_mount_body" type="fixed">
+    <parent link="base_link"/>
+    <child link="mount_body"/>
+    <origin xyz="-0.01 0.015 0.1"/>
+  </joint>
+
+</robot>
