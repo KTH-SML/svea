@@ -30,4 +30,4 @@ catkin_pkg
 plotly
 
 # FMQ requirements
-# -r src/ros-fmq-bridge/requirements.txt
+# -r src/ros_fmq_bridge/requirements.txt

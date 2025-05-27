@@ -4,16 +4,23 @@ from tf_transformations import quaternion_from_euler
 
 from svea_core.interfaces import LocalizationInterface
 from svea_core.interfaces import ActuationInterface
+<<<<<<< HEAD
 from svea_core.utils import ShowPath
+=======
+>>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
 from svea_core import rosonic as rx
 from geometry_msgs.msg import Twist
 from rclpy.qos import QoSProfile
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
 qos_subber = QoSProfile(depth=10 # Size of the queue 
                         )
 
 class teleop_control(rx.Node):  # Inherit from rx.Node
+<<<<<<< HEAD
     """ Teleoperation control node for Svea.
 
     #**Background**
@@ -78,6 +85,14 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
     # Path Visualization
     path = ShowPath()
 
+=======
+
+    DELTA_TIME = 0.1
+
+    is_sim = rx.Parameter(True)
+    target_velocity = rx.Parameter(1.0)
+
+>>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
     ## Subscribers ##
     @rx.Subscriber(Twist, 'cmd_vel', qos_subber)
     def ctrl_request_twist(self, twist_msg):
@@ -85,6 +100,7 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
         self.steering = twist_msg.angular.z
 
     def on_startup(self):
+<<<<<<< HEAD
         self.velocity = 0.0
         self.steering = 0.0
         self.create_timer(self.DELTA_TIME, self.loop)
@@ -94,7 +110,29 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
 <<<<<<< HEAD
 =======
         self.localizer.get_state()
+<<<<<<< HEAD
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+=======
+
+        self.localizer = LocalizationInterface(self).start()
+        self.actuation = ActuationInterface(self).start()
+
+        self.velocity = 0.0
+        self.steering = 0.0
+
+        state = self.localizer.get_state()
+
+        self.create_timer(self.DELTA_TIME, self.loop)
+
+    def loop(self):
+        state = self.localizer.get_state()
+        
+        self.actuation.send_control(self.steering, self.velocity)
+
+
+>>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
+>>>>>>> 710b561 (Teleop control in simulation with teleop_twist_keyboard added)
 
 if __name__ == '__main__':
     teleop_control.main()

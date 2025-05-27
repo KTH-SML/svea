@@ -3,9 +3,12 @@
 import numpy as np
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import rclpy
 >>>>>>> 914c44e (update on 05/12/2025)
+=======
+>>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from tf_transformations import quaternion_from_euler
 
@@ -149,12 +152,19 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         steering, velocity = self.controller.compute_control(state)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
 =======
 =======
 >>>>>>> f567493 (update on 05/12/2025)
         # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+        # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
+=======
+        self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
+>>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
+>>>>>>> 710b561 (Teleop control in simulation with teleop_twist_keyboard added)
         self.actuation.send_control(steering, velocity)
 
     def update_goal(self):

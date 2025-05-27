@@ -78,7 +78,7 @@
     </include>
 >>>>>>> 914c44e (update on 05/12/2025)
 
-    <include file="$(find-pkg-share svea_util)/launch/svea_vizualization.launch.py"/>
+    <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py"/>
 
     <!-- Start pure_pursuit -->
     <node name="pure_pursuit" pkg="svea_examples" exec="pure_pursuit.py" output="screen">

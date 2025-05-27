@@ -23,8 +23,9 @@ if [ "$MICROROS_DISABLE_SHM" = "1" ] ; then
     fi
 fi
 
+source "/opt/ros/$ROS_DISTRO/setup.bash" --
+
 # To build anything that has been added by volume...
 colcon build --symlink-install
 
-# source "/opt/ros/$ROS_DISTRO/setup.bash" --
 exec "$@"
