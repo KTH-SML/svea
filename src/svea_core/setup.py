@@ -16,6 +16,8 @@ setup(
         (f'share/{package_name}/params', glob('params/*.yaml')),
         (f'share/{package_name}/maps', glob('maps/*')),
         (f'lib/{package_name}', glob('scripts/*.py')),
+        (os.path.join('share', package_name), glob('urdf/*')),
+        (os.path.join('share', package_name, 'meshes'), glob('meshes/*')),
     ],
     install_requires=['setuptools','pyyaml'],
     zip_safe=True,

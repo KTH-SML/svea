@@ -2,7 +2,6 @@
 
 import numpy as np
 
-import rclpy
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from tf_transformations import quaternion_from_euler
 
@@ -49,6 +48,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
             self.update_traj(x, y)
 
         steering, velocity = self.controller.compute_control(state)
+        self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
         self.actuation.send_control(steering, velocity)
 
     def update_goal(self):

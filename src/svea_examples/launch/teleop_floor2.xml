@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Launch file arguments -->
+    <arg name="map"             default="floor2"/>
+    <arg name="is_sim"          default="true"/>
+    <let name="is_sim" value="$(eval '\'$(var is_sim)\' == \'true\'')"/>
+    <arg name="use_foxglove"    default="true"/>
+    <let name="use_foxglove" value="$(eval '\'$(var use_foxglove)\' == \'true\'')"/>
+    <arg name="initial_pose_x"  default="-2.65488696"/>
+    <arg name="initial_pose_y"  default="-1.64422277"/>
+    <arg name="initial_pose_a"  default="1.57" /> <!-- wrt to map-->
+    <arg name="map_path" default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
+
+    <!-- Start map server -->
+    <!-- more info about nav2_map_server:https://answers.ros.org/question/398095/-->
+    <node name="lifecycle_manager" pkg="nav2_util" exec="lifecycle_bringup" args="map_server"/>
+    <node name="map_server" pkg="nav2_map_server" exec="map_server" output="screen">
+        <param name="yaml_filename" value="$(var map_path)" />
+        <param name="use_sim_time" value="false" />
+        <param name="topic_name" value="map" />
+    </node>
+
+    <!-- If is_sim equal to false, then include all these tags-->
+    <group unless="$(var is_sim)">
+        <!-- Start low-level interface -->
+        <node name="serial_node" pkg="rosserial_python" exec="serial_node">
+            <param name="port" value="/dev/ttyACM0"/>
+            <param name="baud" value="250000"/>
+        </node>
+
+        <!-- Start localization -->
+        <include file="$(find-pkg-share svea_sensors)/launch/localize.launch">
+            <arg name="initial_pose_x" value="$(var initial_pose_x)" />
+            <arg name="initial_pose_y" value="$(var initial_pose_y)" />
+            <arg name="initial_pose_a" value="$(var initial_pose_a)" />
+        </include>
+    </group>
+
+    <!-- Start Foxglove -->
+    <include if="$(var use_foxglove)" file="$(find-pkg-share foxglove_bridge)/launch/foxglove_bridge_launch.xml">
+        <arg name="port" value="8765" />
+    </include>
+
+    <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py"/>
+
+    <node name="teleop_control" pkg="svea_examples" exec="teleop_control" output="screen"/>
+
+    <!-- Start simulation -->
+    <include file="$(find-pkg-share svea_core)/launch/simulation.xml"/>
+</launch>

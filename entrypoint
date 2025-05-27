@@ -13,9 +13,9 @@ source util/config.sh
 # https://stackoverflow.com/a/65912397
 remote_ros() { source util/remote_ros.sh; }; remote_ros
 
+source "/opt/ros/$ROS_DISTRO/setup.bash" --
+
 # To build anything that has been added by volume...
 colcon build --symlink-install
 
-# source "/opt/ros/$ROS_DISTRO/setup.bash" --
 exec "$@"
-

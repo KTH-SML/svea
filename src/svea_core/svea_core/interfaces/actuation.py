@@ -145,7 +145,7 @@ class ActuationInterface:
 
         if not self.is_ready:
             self._node.get_logger().info("LLI interface not responding during start of "
-                                         "Control Interface. Seting ready anyway.")
+                                         "Control Interface. Setting ready anyway.")
         self.is_ready = True
 
         self._node.get_logger().info("Control Interface ready...") 

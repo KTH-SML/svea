@@ -6,7 +6,9 @@ ARG ROSDISTRO="jazzy"
 ENV ROSDISTRO=$ROSDISTRO
 
 # Install bootstrap tools and ROS 2 packages
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt-get update  -y && \
+    apt-get upgrade -y && \
+    apt-get install --no-install-recommends -y \
     build-essential \
     apt-utils lsb-release \
     cmake \
@@ -15,10 +17,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3-rosdep \
     python3-vcstool \
     python3-pip \
-    python3-venv \
     ros-$ROSDISTRO-ament-cmake-python \
-    ros-jazzy-ros-base=0.11.0-1* \
+    ros-$ROSDISTRO-ros-base=0.11.0-1* \
     ros-$ROSDISTRO-rmw-zenoh-cpp\
+    ros-$ROSDISTRO-teleop-twist-keyboard\
     && rm -rf /var/lib/apt/lists/*
 
 # ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
