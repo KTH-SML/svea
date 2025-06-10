@@ -19,8 +19,10 @@ class DynamicSerialManager:
 
         # Parameters
         self.baud_rate = load_param("~baud", 115200)
-        self.rate = rospy.Rate(load_param("~scan_rate", 0.1))  # Scanning interval in seconds
-        
+        self.rate = rospy.Rate(
+            load_param("~scan_rate", 0.1)
+        )  # Scanning interval in seconds
+
         # Active serial clients
         self.active_clients = {}
 
@@ -36,13 +38,16 @@ class DynamicSerialManager:
             self.monitor_devices()
             self.rate.sleep()
 
-
     def monitor_devices(self):
         """
         Detect connected devices and start or stop clients accordingly.
         """
         # Detect all /dev/ttyACM* devices
-        detected_ports = {f"/dev/{dev}" for dev in os.listdir("/dev") if dev.startswith("ttyACM")}
+        detected_ports = {
+            f"/dev/{dev}"
+            for dev in os.listdir("/dev")
+            if "ttyACM" in dev or "USB" in dev
+        }
 
         # Start clients for new devices
         for port in detected_ports - self.active_clients.keys():
