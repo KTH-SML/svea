@@ -18,8 +18,11 @@ from typing import Callable, Self
 >>>>>>> 54289ac (2025/04/16 Meeting Update)
 =======
 from typing import Callable, Self, Optional
+<<<<<<< HEAD
 from threading import Event
 >>>>>>> 5598423 (update to interface design pattern)
+=======
+>>>>>>> 5981df3 (add micro-ros agent in docker)
 
 import rclpy
 from rclpy.node import Node
@@ -288,9 +291,7 @@ class LocalizationInterface:
         self._odom_callbacks = []
 
     def start(self, wait=True) -> Self:
-        """Spins up ROS background thread; must be called to start receiving
-        data.
-        """
+        
         self._node.get_logger().info("Starting Localization Interface Node...")
 
         qos_profile = QoSProfile(

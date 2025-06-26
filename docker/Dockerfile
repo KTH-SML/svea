@@ -1,11 +1,15 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Dockerfile for SVEA images
 #
 # Author: Kaj Munhoz Arfvidsson
 =======
 FROM ros:jazzy-ros-base AS micro-ros-agent-builder
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+FROM ros:jazzy AS micro-ros-agent-builder
+>>>>>>> c1156cb (add micro-ros agent in docker)
 
 ARG DEBIAN_FRONTEND=noninteractive
 WORKDIR /svea_ws
@@ -15,14 +19,19 @@ RUN . /opt/ros/$ROS_DISTRO/setup.sh \
 &&  colcon build \
 &&  rm -rf log/ build/ src/
 
+<<<<<<< HEAD
 =======
 >>>>>>> 28d5445 (ooops)
+=======
+>>>>>>> c1156cb (add micro-ros agent in docker)
 # Use the official ROS 2 Jazzy image as the base image
 FROM ros:jazzy-ros-base-noble
 
 # Set the ROS distribution as a build argument
 ARG ROSDISTRO="jazzy"
 ENV ROSDISTRO=$ROSDISTRO
+
+COPY --from=micro-ros-agent-builder /svea_ws /svea_ws
 
 # Install bootstrap tools and ROS 2 packages
 RUN apt-get update  -y && \
@@ -38,7 +47,7 @@ RUN apt-get update  -y && \
     python3-pip \
     ros-$ROSDISTRO-ament-cmake-python \
     ros-$ROSDISTRO-ros-base=0.11.0-1* \
-    ros-$ROSDISTRO-rmw-zenoh-cpp\
+    # ros-$ROSDISTRO-rmw-zenoh-cpp\
     ros-$ROSDISTRO-teleop-twist-keyboard\
     && rm -rf /var/lib/apt/lists/*
 
@@ -104,6 +113,7 @@ RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
     colcon build --symlink-install"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 COPY firmware/disable_fastdds_shm.xml \
      firmware/disable_fastdds_shm_localhost_only.xml \
      /tmp/
@@ -119,6 +129,16 @@ RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \
 RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \
     echo "source /svea_ws/install/setup.bash" >> ~/.bashrc
 >>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
+=======
+COPY disable_fastdds_shm.xml disable_fastdds_shm_localhost_only.xml /tmp/
+ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+ENV MICROROS_DISABLE_SHM=1
+
+# Source the setup file in the .bashrc for convenience
+RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \
+    echo "source /svea_ws/install/setup.bash" >> ~/.bashrc && \
+    echo "source /svea_ws/install/local_setup.bash" >> ~/.bashrc
+>>>>>>> c1156cb (add micro-ros agent in docker)
 
 # For fixing WSL error
 RUN chmod +x ./entrypoint

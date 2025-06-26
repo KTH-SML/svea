@@ -9,7 +9,6 @@ Author: Frank Jiang, Javier Cerna
 
 from copy import deepcopy
 from math import cos, sin, sqrt, radians
-from threading import Thread
 from multiprocessing import Pool
 
 import numpy as np
