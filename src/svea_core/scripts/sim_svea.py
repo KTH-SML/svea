@@ -10,7 +10,6 @@ Author: Frank Jiang
 
 import math
 import numpy as np
-from threading import Thread
 
 import rclpy
 import rclpy.clock
