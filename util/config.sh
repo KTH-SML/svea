@@ -31,7 +31,7 @@ main() {
         # building for host platform
         withdefault BUILD_PLATFORM  "$(uname -m)"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
@@ -39,7 +39,7 @@ main() {
         # building for x86_64
         withdefault BUILD_PLATFORM  "linux/amd64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
@@ -47,7 +47,7 @@ main() {
         # building for arm64/aarch64/jetson
         withdefault BUILD_PLATFORM  "linux/arm64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
@@ -55,7 +55,7 @@ main() {
         # building for both amd64 and arm64
         withdefault BUILD_PLATFORM  "linux/arm64,linux/amd64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "1"
