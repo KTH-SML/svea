@@ -59,6 +59,7 @@ else
     # On macOS, reduce privileges to avoid Docker Desktop issues
     if is_darwin; then
         append ARGS \
+<<<<<<< HEAD
             --privileged \
             --network host
     else
@@ -67,6 +68,16 @@ else
             --network host \
             --privileged
     fi
+=======
+            -p "11311:11311" \
+            -p "8080:8080" \
+            -p "9090:9090"
+else
+    append ARGS \
+        -v "/dev:/dev" \
+        --network host \
+        --privileged
+>>>>>>> e34f9a7 (mac compatibility)
 fi
 
 append ARGS \

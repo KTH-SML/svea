@@ -13,6 +13,11 @@
 =======
 >>>>>>> 7f3be22 (fixed typo in config)
 
+## Auto-detect platform for macOS with Apple Silicon
+if [ "$(uname -s)" = "Darwin" ]; then
+    BUILD_CONFIG="arm64"
+fi
+
 main() {
 
     if isempty BUILD_CONFIG && is_darwin; then
