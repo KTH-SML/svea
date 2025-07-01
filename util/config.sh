@@ -9,6 +9,11 @@
 # BUILD_CONFIG="base-amd64"
 # BUILD_CONFIG="base-arm64"
 
+## Auto-detect platform for macOS with Apple Silicon
+if [ "$(uname -s)" = "Darwin" ]; then
+    BUILD_CONFIG="arm64"
+fi
+
 main() {
 
     withdefault DEBUG "0"

@@ -27,6 +27,13 @@ if istrue DEV; then
     append ARGS \
         -p "8765:8765"
 else
+    # On macOS, reduce privileges to avoid Docker Desktop issues
+    if is_darwin; then
+        append ARGS \
+            -p "11311:11311" \
+            -p "8080:8080" \
+            -p "9090:9090"
+else
     append ARGS \
         -v "/dev:/dev" \
         --network host \
