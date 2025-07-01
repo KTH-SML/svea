@@ -60,6 +60,7 @@ else
     if is_darwin; then
         append ARGS \
 <<<<<<< HEAD
+<<<<<<< HEAD
             --privileged \
             --network host
     else
@@ -72,6 +73,10 @@ else
             -p "11311:11311" \
             -p "8080:8080" \
             -p "9090:9090"
+=======
+            --privileged \
+            --network host
+>>>>>>> 776b857 (adjusted perms to resemble linux more)
 else
     append ARGS \
         -v "/dev:/dev" \
