@@ -8,7 +8,10 @@
 ## Uncomment to build base image for amd64 (x86) or arm64.
 # BUILD_CONFIG="base-amd64"
 # BUILD_CONFIG="base-arm64"
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7f3be22 (fixed typo in config)
 
 main() {
 
