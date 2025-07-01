@@ -1,4 +1,4 @@
-FROM ros:jazzy AS micro-ros-agent-builder
+FROM ros:jazzy-ros-base-noble AS micro-ros-agent-builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 WORKDIR /svea_ws
