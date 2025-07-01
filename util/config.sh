@@ -6,8 +6,8 @@
 # Author: Kaj Munhoz Arfvidsson
 
 ## Uncomment to build base image for amd64 (x86)/arm64.
-# CONFIG="base-amd64"
-# CONFIG="base-arm64"
+# BUILD_CONFIG="base-amd64"
+# BUILD_CONFIG="base-arm64"
 
 main() {
 
