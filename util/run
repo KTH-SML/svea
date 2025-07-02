@@ -70,6 +70,7 @@ else
             --privileged
     fi
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
             -p "11311:11311" \
             -p "8080:8080" \
@@ -86,6 +87,8 @@ else
 >>>>>>> e34f9a7 (mac compatibility)
 =======
 >>>>>>> 1a13035 (Update run)
+=======
+>>>>>>> 8ef5826 (fixed if statement typo)
 fi
 
 append ARGS \
