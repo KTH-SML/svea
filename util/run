@@ -69,6 +69,7 @@ else
             --network host \
             --privileged
     fi
+<<<<<<< HEAD
 =======
             -p "11311:11311" \
             -p "8080:8080" \
@@ -83,6 +84,8 @@ else
         --network host \
         --privileged
 >>>>>>> e34f9a7 (mac compatibility)
+=======
+>>>>>>> 1a13035 (Update run)
 fi
 
 append ARGS \
