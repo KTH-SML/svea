@@ -32,11 +32,12 @@ else
         append ARGS \
             --privileged \
             --network host
-else
-    append ARGS \
-        -v "/dev:/dev" \
-        --network host \
-        --privileged
+    else
+        append ARGS \
+            -v "/dev:/dev" \
+            --network host \
+            --privileged
+    fi
 fi
 
 append ARGS \
