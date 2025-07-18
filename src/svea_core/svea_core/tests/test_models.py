@@ -17,8 +17,6 @@ from geometry_msgs.msg import PoseWithCovariance
 from geometry_msgs.msg import Twist, TwistStamped
 from geometry_msgs.msg import TwistWithCovariance
 from nav_msgs.msg import Odometry
-from svea_msgs.msg import lli_ctrl
-from svea_msgs.msg import VehicleState as MsgVehicleState
 import svea_core.models.states as states
 from svea_core.models.states import VehicleState
 from svea_core.models.states import SVEAControlValues

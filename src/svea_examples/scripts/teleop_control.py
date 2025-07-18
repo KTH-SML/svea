@@ -18,6 +18,9 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
     is_sim = rx.Parameter(True)
     target_velocity = rx.Parameter(1.0)
 
+    actuation = ActuationInterface()
+    localizer = LocalizationInterface()
+
     ## Subscribers ##
     @rx.Subscriber(Twist, 'cmd_vel', qos_subber)
     def ctrl_request_twist(self, twist_msg):
@@ -25,9 +28,6 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
         self.steering = twist_msg.angular.z
 
     def on_startup(self):
-
-        self.localizer = LocalizationInterface(self).start()
-        self.actuation = ActuationInterface(self).start()
 
         self.velocity = 0.0
         self.steering = 0.0
