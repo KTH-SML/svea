@@ -26,7 +26,7 @@ class mpc(rx.Node):
     delta_s = rx.Parameter(5)  # m
     mpc_config_ns = rx.Parameter('/mpc')
     target_speed = rx.Parameter(0.5)  # m/s
-    prediction_horizon = rx.Parameter(10)
+    prediction_horizon = rx.Parameter(5)
     final_state_weight_matrix = rx.Parameter(None)  # Weight matrix for the final state in MPC
 
     actuation = ActuationInterface()
@@ -38,7 +38,6 @@ class mpc(rx.Node):
     UPDATE_MPC_PARAM = True   # A flag indicating if the MPC parameters can be updated when the system is approaching the target.
     RESET_MPC_PARAM = False   # A flag indicating if the MPC parameters should be reset when the system is moving away from the target.
     predicted_state = None
-    current_horizon = prediction_horizon
 
     ## Static Planner parameters
     APPROACH_TARGET_THR = 5   # The distance threshold (in meters) to define when the system is "approaching" the target.

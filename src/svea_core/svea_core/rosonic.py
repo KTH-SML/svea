@@ -201,6 +201,7 @@ class Parameter(Resource):
             self.param_name = self.__rosonic_name__
         
         parameters = self.node.__rosonic_parameters__
+        
 
         if self.param_name not in parameters:
             self.node.declare_parameter(self.param_name, *self.param_args, **self.param_kwds)
