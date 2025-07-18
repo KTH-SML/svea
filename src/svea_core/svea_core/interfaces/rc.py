@@ -10,13 +10,38 @@ import math
 from threading import Thread
 from collections import deque
 import rclpy
-import rclpy.logging
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy, QoSHistoryPolicy
 
 from svea_msgs.msg import LLIControl as lli_ctrl
 from svea_core.states import SVEAControlValues
 
+
+from rosonic import rx
+from std_msgs.msg import Int8, Bool
+
+QoS_DEFAULT = QoSProfile(depth = 10)
+QoS_RELIABLE = QoSProfile(
+    reliability=QoSReliabilityPolicy.RELIABLE,
+    durability=QoSDurabilityPolicy.VOLATILE,
+    history=QoSHistoryPolicy.KEEP_LAST,
+    depth=1,
+    )
+
+class RCInterface(rx.Resource):
+
+
+    @rx.Subscriber(Int8, '/lli/ctrl/steering', QoS_DEFAULT)
+    def steering_cb(self, msg): ...
+
+
+    @rx.Subscriber(Int8, '/lli/ctrl/throttle', QoS_DEFAULT)
+    def throttle_cb(self, msg): ...
+
+    @rx.Subscriber(Bool, '/lli/ctrl/high_gear', QoS_RELIABLE)
+    def highgear_cb(self, msg): ...
+
+    ...
 
 
 class RCInterface(object):

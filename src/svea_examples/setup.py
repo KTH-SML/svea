@@ -13,6 +13,7 @@ setup(
         (f'share/{package_name}', ['package.xml']),
         (f'share/{package_name}/launch', glob('launch/*.xml')),
         (f'lib/{package_name}', glob('scripts/*.py')),
+        (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

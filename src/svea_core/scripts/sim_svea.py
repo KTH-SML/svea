@@ -18,13 +18,10 @@ import tf2_ros
 from tf_transformations import quaternion_from_euler
 from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
+from std_msgs.msg import Bool, Int8
 
 from svea_core import rosonic as rx
-from svea_core.states import SVEAControlValues
 from svea_core.models.bicycle import Bicycle4DWithESC
-from svea_msgs.msg import LLIControl as LLIControl
-from svea_msgs.msg import LLIEmergency as LLIEmergency
-
 
 qos_pubber = QoSProfile(
     reliability=QoSReliabilityPolicy.RELIABLE,
@@ -73,44 +70,43 @@ class sim_svea(rx.Node):
     time_step = 0.025
     publish_tf = rx.Parameter(True)
 
-    request_top = rx.Parameter('lli/ctrl_request')
-    actuated_top = rx.Parameter('lli/ctrl_actuated')
-    emergency_top = rx.Parameter('lli/emergency')
+    steering_request_top = rx.Parameter('lli/ctrl/steering')
+    throttle_request_top = rx.Parameter('lli/ctrl/throttle')
+    highgear_request_top = rx.Parameter('lli/ctrl/highgear')
+    diff_request_top = rx.Parameter('lli/ctrl/diff')
+
     odometry_top = rx.Parameter('odometry/local')
 
     map_frame = rx.Parameter('map')
     odom_frame = rx.Parameter('odom')
     self_frame = rx.Parameter('base_link')
+    
+    state = rx.Parameter([0.0, 0.0, 0.0, 0.0])  # x, y, yaw, velocity
 
     ## Publishers ##
-
-    ctrl_actuated_pub = rx.Publisher(LLIControl, actuated_top, qos_pubber)
     odometry_pub = rx.Publisher(Odometry, odometry_top, qos_pubber)
 
     ## Subscribers ##
 
-    @rx.Subscriber(LLIControl, request_top, qos_subber)
-    def ctrl_request_cb(self, ctrl_request_msg):
-        # print(self)
-        # print(ctrl_request_msg)
+    @rx.Subscriber(Int8, steering_request_top, qos_subber)
+    def steering_request_cb(self, steering_request_msg):
+        self.steering_req = steering_request_msg.data
         self.last_ctrl_time = self.clock.now().to_msg()
-        changed = self.inputs.update_from_msg(ctrl_request_msg)
-        if changed:
-            self.ctrl_actuated_pub.publish(self.inputs.ctrl_msg)
+    
+    @rx.Subscriber(Int8, throttle_request_top, qos_subber)
+    def throttle_request_cb(self, throttle_request_msg):
+        self.velocity_req = throttle_request_msg.data
+        self.last_ctrl_time = self.clock.now().to_msg()
+    
+    @rx.Subscriber(Bool, highgear_request_top, qos_subber)
+    def highgear_request_cb(self, highgear_request_msg):
+        self.highgear = highgear_request_msg.data
+        self.last_ctrl_time = self.clock.now().to_msg()
 
-    @rx.Subscriber(LLIEmergency, emergency_top, qos_subber)
-    def _update_emergency(self, emergency_msg):
-        emergency = emergency_msg.emergency
-        sender_id = emergency_msg.sender_id
-        if self.is_emergency and (sender_id == self.sender_id):
-            # only one who stated emergency allowed to change it
-            if not emergency:
-                # this means sender is calling not emergency
-                self.is_emergency = False
-                self.sender_id = None
-        elif emergency:
-            self.is_emergency = True
-            self.sender_id = sender_id
+    @rx.Subscriber(Bool, diff_request_top, qos_subber)
+    def diff_request_cb(self, diff_request_msg):
+        self.diff = diff_request_msg.data
+        self.last_ctrl_time = self.clock.now().to_msg()
 
     ## Main Methods ##
 
@@ -120,15 +116,15 @@ class sim_svea(rx.Node):
         self.last_ctrl_time = self.clock.now().to_msg()
         self.last_pub_time = self.clock.now().to_msg()
 
-        self.model = Bicycle4DWithESC()
-        self.inputs = SVEAControlValues(0, 0, 0, False, False)
+        self.model = Bicycle4DWithESC(initial_state=self.state)
+        self.steering_req = 0.0
+        self.velocity_req = 0.0
+        self.highgear = False
+        self.diff = False
 
         if self.publish_tf:
             # for broadcasting fake tf tree
             self.tf_br = tf2_ros.TransformBroadcaster(self)
-
-        self.is_emergency = False
-        self.sender_id = None
         
         ## Timers ##
 
@@ -137,17 +133,14 @@ class sim_svea(rx.Node):
     def sim_loop(self):
         curr_time = self.clock.now().to_msg()
 
-        steering = self._percent_to_steer(self.inputs.steering / self.PERC_TO_LLI_COEFF)
+        steering = self._percent_to_steer(self.steering_req / self.PERC_TO_LLI_COEFF)
         steering += np.random.normal(0, self.STEER_NOISE_STD)
         
-        velocity = self._percent_to_vel(self.inputs.velocity / self.PERC_TO_LLI_COEFF)
+        velocity = self._percent_to_vel(self.velocity_req / self.PERC_TO_LLI_COEFF)
         velocity += np.random.normal(0, self.SPEED_NOISE_STD)
         
         if not (curr_time.sec - self.last_ctrl_time.sec) < self.CTRL_WAIT_TIME:
             steering, velocity = 0.0, 0.0
-
-        if self.is_emergency:
-            velocity = 0
 
         self.model.update(steering, velocity, dt=self.time_step)
 
@@ -183,9 +176,9 @@ class sim_svea(rx.Node):
 
     def _percent_to_vel(self, vel_percent):
         vel_percent = float(vel_percent)
-        if self.inputs.gear == 0:
+        if self.highgear == False:
             velocity = vel_percent*self.MAX_SPEED_0 / 100
-        elif self.inputs.gear == 1:
+        elif self.highgear == True:
             velocity = vel_percent*self.MAX_SPEED_1 / 100
         return velocity
 
@@ -211,18 +204,6 @@ class sim_svea(rx.Node):
         odom2base.transform.translation.z = odom_msg.pose.pose.position.z
         odom2base.transform.rotation = odom_msg.pose.pose.orientation
         self.tf_br.sendTransform(odom2base)
-
-    @property
-    def emergency(self):
-        """Check if the emergency flag is set. Emulating actuation
-        interface emergency check.
-
-        :return: `True` if emergency flag is set, `False` otherwise,
-                 `None` if no information has been received.
-        :rtype: bool
-        """
-        return self.is_emergency
-
 
 if __name__ == '__main__':
     sim_svea.main()

@@ -9,6 +9,7 @@ Kaj Munhoz Arfvidsson
 from typing import Optional
 
 import rclpy
+from rclpy.node import Node
 
 __all__ = [
     'Node',
@@ -79,7 +80,7 @@ class Member:
         for member in self._rosonic_members().values():
             member._shutdown(node)
 
-class Node(Member, rclpy.node.Node):
+class Node(Member, Node):
     """
     Base class for all SVEA nodes.
     This class provides a simple interface for creating ROS 2 nodes with

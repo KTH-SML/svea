@@ -20,13 +20,14 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
     is_sim = rx.Parameter(True)
     target_velocity = rx.Parameter(1.0)
 
+    actuation = ActuationInterface()
+    localizer = LocalizationInterface()
+
     def on_startup(self):
         # Convert POINTS to numerical lists if loaded as strings
         if isinstance(self.points[0], str):
             self._points = [eval(point) for point in self.points]
 
-        self.localizer = LocalizationInterface(self).start()
-        self.actuation = ActuationInterface(self).start()
         self.controller = PurePursuitController()
         self.controller.target_velocity = self.target_velocity
 

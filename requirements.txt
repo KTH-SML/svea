@@ -20,5 +20,5 @@ lark --prefer-binary
 catkin_pkg
 plotly
 
-# FMQ requirements
-# -r src/ros_fmq_bridge/requirements.txt
+# This is for NMPC
+casadi==3.6.0
