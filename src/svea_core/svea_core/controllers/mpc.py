@@ -4,12 +4,6 @@ import casadi as ca
 import numpy as np
 from rclpy.node import Node
 
-def load_param(self, name, value=None):
-        self._node.declare_parameter(name, value)
-        if value is None:
-            assert self._node.has_parameter(name), f'Missing parameter "{name}"'
-        return self._node.get_parameter(name).value
-
 class MPC_casadi:
 
     def __init__(self, node: Node, config_ns='/mpc') -> None:
@@ -55,46 +49,46 @@ class MPC_casadi:
         self._node = node
 
         # The prediction horizon steps for the mpc optimization problem.
-        self.N = load_param(f'{config_ns}/prediction_horizon')
+        self.N = self.load_param('prediction_horizon')
         self.current_horizon = self.N # Initially set to max horizon
 
         # The time step in which the optimization problem is divided (unit [s]).
-        self.dt = ca.DM(load_param(f'{config_ns}/time_step'))
+        self.dt = ca.DM(self.load_param('time_step'))
         
         ## Load weight matrices 
         # Note: we convert to dense matrix to allow symbolic operations.
 
-        self.Q1_list = load_param(f'{config_ns}/state_weight_matrix')
+        self.Q1_list = self.load_param('state_weight_matrix')
         self.Q1 = ca.DM(np.array(self.Q1_list).reshape((4, 4)))
 
-        self.Q2_list = load_param(f'{config_ns}/control_rate_weight_matrix')
+        self.Q2_list = self.load_param('control_rate_weight_matrix')
         self.Q2 = ca.DM(np.array(self.Q2_list).reshape((2, 2)))
 
-        self.Q3_list = load_param(f'{config_ns}/control_weight_matrix')
+        self.Q3_list = self.load_param('control_weight_matrix')
         self.Q3 = ca.DM(np.array(self.Q3_list).reshape((2, 2)))
 
-        self.Qf_list = load_param(f'{config_ns}/final_state_weight_matrix')
+        self.Qf_list = self.load_param('final_state_weight_matrix')
         self.Qf = ca.DM(np.array(self.Qf_list).reshape((4, 4)))
 
-        self.Qv_num  = load_param(f'{config_ns}/forward_speed_weight')
+        self.Qv_num  = self.load_param('forward_speed_weight')
         self.Qv = ca.DM(self.Qv_num)
         
         ## Model Parameters
 
-        self.min_steering = np.radians(load_param(f'{config_ns}/steering_min'))
-        self.max_steering = np.radians(load_param(f'{config_ns}/steering_max'))
+        self.min_steering = np.radians(self.load_param('steering_min'))
+        self.max_steering = np.radians(self.load_param('steering_max'))
 
-        self.min_steering_rate = np.radians(load_param(f'{config_ns}/steering_rate_min'))
-        self.max_steering_rate = np.radians(load_param(f'{config_ns}/steering_rate_max'))
+        self.min_steering_rate = np.radians(self.load_param('steering_rate_min'))
+        self.max_steering_rate = np.radians(self.load_param('steering_rate_max'))
 
-        self.min_velocity = load_param(f'{config_ns}/velocity_min')
-        self.max_velocity = load_param(f'{config_ns}/velocity_max')
+        self.min_velocity = self.load_param('velocity_min')
+        self.max_velocity = self.load_param('velocity_max')
 
-        self.min_acceleration = load_param(f'{config_ns}/acceleration_min')
-        self.max_acceleration = load_param(f'{config_ns}/acceleration_max')
+        self.min_acceleration = self.load_param('acceleration_min')
+        self.max_acceleration = self.load_param('acceleration_max')
 
         # Wheelbase of the vehicle (unit [m]).
-        self.L = ca.DM(load_param(f'{config_ns}/wheelbase'))
+        self.L = ca.DM(self.load_param('wheelbase'))
         
         ## Setup CasADi
 
@@ -107,7 +101,10 @@ class MPC_casadi:
         self.set_solver_options()
 
     def load_param(self, name, value=None):
-        self._node.declare_parameter(name, value)
+        try:
+            self._node.declare_parameter(name, value)
+        except Exception as e:
+            None
         if value is None:
             assert self._node.has_parameter(name), f'Missing parameter "{name}"'
         return self._node.get_parameter(name).value
