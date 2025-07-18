@@ -51,6 +51,9 @@ class mpc(rx.Node):
     mpc_config_ns = rx.Parameter('/mpc')
     target_speed = rx.Parameter(0.5)  # m/s
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f756136 (remove svea_msgs)
     prediction_horizon = rx.Parameter(5)
     final_state_weight_matrix = rx.Parameter(None)  # Weight matrix for the final state in MPC
 
@@ -74,9 +77,12 @@ class mpc(rx.Node):
     RESET_MPC_PARAM = False   # A flag indicating if the MPC parameters should be reset when the system is moving away from the target.
     predicted_state = None
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     current_horizon = prediction_horizon
 >>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
+=======
+>>>>>>> f756136 (remove svea_msgs)
 
     ## Static Planner parameters
     APPROACH_TARGET_THR = 5   # The distance threshold (in meters) to define when the system is "approaching" the target.

@@ -15,7 +15,6 @@
   <!-- <depend>rosserial_python</depend> -->
   <depend>python3-yaml</depend>
   <depend>std_msgs</depend>
-  <depend>svea_msgs</depend>
   <depend>foxglove_bridge</depend>
   <depend>tf_transformations</depend>
 

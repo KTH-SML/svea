@@ -13,7 +13,6 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy, QoSHistoryPolicy
 
-from svea_msgs.msg import LLIControl as lli_ctrl
 from svea_core.states import SVEAControlValues
 
 
