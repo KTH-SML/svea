@@ -47,8 +47,9 @@ RUN apt-get update  -y && \
     python3-pip \
     ros-$ROSDISTRO-ament-cmake-python \
     ros-$ROSDISTRO-ros-base=0.11.0-1* \
-    # ros-$ROSDISTRO-rmw-zenoh-cpp\
-    ros-$ROSDISTRO-teleop-twist-keyboard\
+    # ros-$ROSDISTRO-rmw-zenoh-cpp \
+    ros-$ROSDISTRO-teleop-twist-keyboard \
+    ros-$ROSDISTRO-nav2-* \
     && rm -rf /var/lib/apt/lists/*
 
 # ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp

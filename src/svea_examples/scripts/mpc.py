@@ -32,10 +32,17 @@ qos_pubber = QoSProfile(
 from svea_core.controllers.mpc import MPC_casadi
 from std_msgs.msg import Float32
 from geometry_msgs.msg import PoseArray, PoseStamped
+from rclpy.qos import QoSProfile
 
 from svea_core import rosonic as rx
 
+<<<<<<< HEAD
 >>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
+=======
+qos_subber = QoSProfile(depth=10 # Size of the queue 
+                        )
+
+>>>>>>> 25280bf (add mpc (in progress), clean up)
 class mpc(rx.Node):
     is_sim = rx.Parameter(True)
     state = rx.Parameter([-3.0, 0.0, 0.0, 0.0])  # x, y, yaw, velocity
@@ -53,7 +60,12 @@ class mpc(rx.Node):
     prediction_horizon = rx.Parameter(10)
     final_state_weight_matrix = rx.Parameter(None)  # Weight matrix for the final state in MPC
 
+<<<<<<< HEAD
 >>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
+=======
+    actuation = ActuationInterface()
+    localizer = LocalizationInterface()
+>>>>>>> 25280bf (add mpc (in progress), clean up)
 
     ## MPC parameters 
     GOAL_REACHED_DIST = 0.2   # The distance threshold (in meters) within which the goal is considered reached.
@@ -82,6 +94,7 @@ class mpc(rx.Node):
     dt =0.01
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     steering_pub = rx.Publisher(Float32, '/target_steering_angle', qos_profile=qos_subber)
     velocity_pub = rx.Publisher(Float32, '/target_speed', qos_profile=qos_subber)
     velocity_measured_pub = rx.Publisher(Float32, '/measured_speed', qos_profile=qos_subber)
@@ -89,6 +102,9 @@ class mpc(rx.Node):
     static_trajectory_pub = rx.Publisher(PoseArray, '/static_path', qos_profile=qos_pubber)
 
     @rx.Subscriber(PoseStamped, '/mpc_target', qos_pubber)
+=======
+    @rx.Subscriber(PoseStamped, 'mpc_target', qos_subber)
+>>>>>>> 25280bf (add mpc (in progress), clean up)
     def mpc_target_callback(self, msg):
         """
         Callback function that sets a new goal position and calculates a trajectory.
@@ -101,8 +117,11 @@ class mpc(rx.Node):
         self.compute_trajectory()
     
 
+<<<<<<< HEAD
 =======
 >>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
+=======
+>>>>>>> 25280bf (add mpc (in progress), clean up)
     def on_startup(self):
 
         ## Define the unitless steering biases for each SVEA.
@@ -112,6 +131,7 @@ class mpc(rx.Node):
             "svea7": 7
         }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         self.controller = MPC(self)
         self.DELTA_TIME = 1.0/self.mpc_freq
@@ -309,6 +329,9 @@ class mpc(rx.Node):
 =======
         self.mpc = MPC_casadi
         self.get_logger().info(f"Using MPC frequency: {self.final_state_weight_matrix} Hz")
+=======
+        self.controller = MPC_casadi(self)
+>>>>>>> 25280bf (add mpc (in progress), clean up)
         self.DELTA_TIME = 1.0/self.mpc_freq
         print(self.DELTA_TIME)
 
@@ -326,30 +349,102 @@ class mpc(rx.Node):
 
     def loop(self):
         self.get_logger().info(f"Using MPC frequency: {self.final_state_weight_matrix} Hz")
-
-    def load_param(self, name, value=None):
-        self.declare_parameter(name, value)
-        if value is None:
-            assert self.has_parameter(name), f'Missing parameter "{name}"'
-        return self.get_parameter(name).value
         
     def create_simulator_and_SVEAmanager(self):
         # Create simulators, models, managers, etc.
-        if self.IS_SIM:
+        if self.is_sim:
 
             # simulator need a model to simulate
             self.sim_model = Bicycle4DWithESC()
 
         # start the SVEA manager (needed for both sim and real world)
-        if not self.IS_SIM:
-            self.svea.localizer.update_name(self.SVEA_MOCAP_NAME)
+        if not self.is_sim:
+            self.localizer.update_name(self.SVEA_MOCAP_NAME)
 
         self.svea.start(wait=True)
 
         # everything ready to go -> unpause simulator
-        if self.IS_SIM:
+        if self.is_sim:
             self.simulator.toggle_pause_simulation()
 >>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
+
+    def compute_trajectory(self):
+        """
+        Compute a straight-line trajectory from the current position to the goal using DELTA_S,
+        including the heading for each point, and publish the path.
+        """
+        if not self.goal_pose or not self.state:
+            self.get_logger().warning("Missing goal or current state for trajectory computation.")
+            return
+        # Reset previous trajectory related variables
+        self.current_index_static_plan = 0
+        self.is_last_point = False
+        self.static_path_plan = np.empty((3, 0))
+        # reset control actions
+        self.velocity = 0
+        self.steering = 0
+        # reset mpc parameters
+        self.UPDATE_MPC_PARAM = True  
+        self.RESET_MPC_PARAM = False
+        self.mpc_last_time = self.clock.Clock().now().to_msg()
+        self.controller.reset_parameters()
+
+        # Calculate the straight-line trajectory between current state and goal position
+        start_x, start_y = self.state[0], self.state[1]
+        goal_x, goal_y = self.goal_pose.pose.position.x, self.goal_pose.pose.position.y
+        distance = self.compute_distance([start_x, start_y], [goal_x, goal_y])
+        goal_yaw = self.get_yaw_from_pose(self.goal_pose)
+
+        # Compute intermediate points at intervals of DELTA_S
+        num_points = int(distance // self.delta_s)
+
+        for i in range(num_points):
+            ratio = ((i+1) * self.DELTA_S) / distance
+            x = start_x + ratio * (goal_x - start_x)
+            y = start_y + ratio * (goal_y - start_y)
+            
+            # Calculate the heading for this point
+            heading = math.atan2(goal_y - start_y, goal_x - start_x)
+            
+            # Stack the computed point as a new column in the array
+            new_point = np.array([[x], [y], [heading]])
+            self.static_path_plan = np.hstack((self.static_path_plan, new_point))
+
+        # Calculate distance between the last appended point and the goal point.
+        if self.static_path_plan.size != 0:
+            last_appended_x = self.static_path_plan[0, -1]
+            last_appended_y = self.static_path_plan[1, -1]    
+            distance = self.compute_distance([last_appended_x, last_appended_y], [goal_x, goal_y])
+
+            # If the distance to the goal is too small, replace the last point with the goal directly.
+            if distance < self.DELTA_S / 2:
+                # Replace the last appended point with the goal point
+                self.static_path_plan[:, -1] = np.array([goal_x, goal_y, goal_yaw])
+            else:
+                # Otherwise, append the last point as usual
+                new_point = np.array([[goal_x], [goal_y], [goal_yaw]])
+                self.static_path_plan = np.hstack((self.static_path_plan, new_point))
+        else:
+            # Otherwise, append the last point as usual
+            new_point = np.array([[goal_x], [goal_y], [goal_yaw]])
+            self.static_path_plan = np.hstack((self.static_path_plan, new_point))
+        
+    def compute_distance(self,point1,point2):
+        return np.sqrt((point1[0]-point2[0])**2 + (point1[1]-point2[1])**2)
+    
+    def get_yaw_from_pose(self,pose_stamped):
+        """
+        Extracts the yaw from a PoseStamped message.
+        """
+        # Convert the quaternion to Euler angles
+        orientation = pose_stamped.pose.orientation
+        quaternion = (orientation.x, orientation.y, orientation.z, orientation.w)
+        
+        # Use tf to convert quaternion to Euler angles
+        euler = tf.euler_from_quaternion(quaternion)
+        
+        # Return the yaw
+        return euler[2]  
 
 if __name__ == '__main__':
     mpc.main()

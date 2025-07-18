@@ -41,84 +41,87 @@ def generate_launch_description():
         [LaunchConfiguration('map'), '.yaml']
     ])
 
-    # # Map server
-    # map_server = Node(
-    #     package='nav2_map_server',
-    #     executable='map_server',
-    #     name='map_server',
-    #     output='screen',
-    #     parameters=[{
-    #         'yaml_filename': map_path,
-    #         'use_sim_time': False,
-    #         'topic_name': 'map'
-    #     }]
-    # )
+    # Map server
+    map_server = Node(
+        package='nav2_map_server',
+        executable='map_server',
+        name='map_server',
+        output='screen',
+        parameters=[{
+            'yaml_filename': map_path,
+            'use_sim_time': False,
+            'topic_name': 'map'
+        }]
+    )
 
-    # lifecycle_manager = Node(
-    #     package='nav2_util',
-    #     executable='lifecycle_bringup',
-    #     name='lifecycle_manager',
-    #     arguments=['map_server']
-    # )
+    lifecycle_manager = Node(
+        package='lifecycle_manager',
+        executable='nav2_lifecycle_manager',
+        name='lifecycle_manager',
+        parameters=[{
+            'node_names': ['map_server'],
+            'autostarts': True,
+        }]
+    )
 
-    # #Micro-ROS agent for SVEA
+    #Micro-ROS agent for SVEA
 
-    # import glob
-    # device_path = glob.glob('/dev/serial/by-id/*SVEA-LLI*')
-    # device = device_path[0] if device_path else '/dev/ttyUSB0'
+    import glob
+    device_path = glob.glob('/dev/serial/by-id/*SVEA-LLI*')
+    device = device_path[0] if device_path else '/dev/ttyUSB0'
 
-    # micro_ros_agent = Node(
-    #     package='micro_ros_agent',
-    #     executable='micro_ros_agent',
-    #     name='micro_ros_agent',
-    #     arguments=[
-    #         'serial',
-    #         '--dev', device,
-    #         '-b', '1000000'
-    #     ],
-    #     output='screen'
-    # )
+    micro_ros_agent = Node(
+        package='micro_ros_agent',
+        executable='micro_ros_agent',
+        name='micro_ros_agent',
+        arguments=[
+            'serial',
+            '--dev', device,
+            '-b', '1000000'
+        ],
+        output='screen'
+    )
 
-    # # Hardware interface (only when not in simulation)
-    # hardware_interface = GroupAction(
-    #     condition=UnlessCondition(LaunchConfiguration('is_sim')),
-    #     actions=[
-    #         micro_ros_agent,
-    #     ]
-    # )
+    # Hardware interface (only when not in simulation)
+    hardware_interface = GroupAction(
+        condition=UnlessCondition(LaunchConfiguration('is_sim')),
+        actions=[
+            micro_ros_agent,
+        ]
+    )
 
-    # # Simulation (only when in simulation)
-    # simulation = GroupAction(
-    #     condition=IfCondition(LaunchConfiguration('is_sim')),
-    #     actions=[
-    #         IncludeLaunchDescription(
-    #             PathJoinSubstitution([
-    #                 FindPackageShare('svea_core'),
-    #                 'launch/simulation.xml'
-    #             ]))
-    #     ]
-    # )
+    # Simulation (only when in simulation)
+    simulation = GroupAction(
+        condition=IfCondition(LaunchConfiguration('is_sim')),
+        actions=[
+            IncludeLaunchDescription(
+                PathJoinSubstitution([
+                    FindPackageShare('svea_core'),
+                    'launch/simulation.xml'
+                ]))
+        ]
+    )
 
-    # # Foxglove bridge
-    # foxglove_bridge = Node(
-    #     package='foxglove_bridge',
-    #     executable='foxglove_bridge',
-    #     name='foxglove_bridge',
-    #     output='screen',
-    #     condition=IfCondition(LaunchConfiguration('use_foxglove')),
-    #     parameters=[{
-    #         'port': 8765,
-    #         'use_sim_time': False
-    #     }]
-    # )
+    # Foxglove bridge
+    foxglove_bridge = Node(
+        package='foxglove_bridge',
+        executable='foxglove_bridge',
+        name='foxglove_bridge',
+        output='screen',
+        condition=IfCondition(LaunchConfiguration('use_foxglove')),
+        parameters=[{
+            'port': 8765,
+            'use_sim_time': False
+        }]
+    )
 
-    # # Visualization
-    # visualization = IncludeLaunchDescription(
-    #     PathJoinSubstitution([
-    #         FindPackageShare('svea_core'),
-    #         'launch/svea_vizualization.launch.py'
-    #     ])
-    # )
+    # Visualization
+    visualization = IncludeLaunchDescription(
+        PathJoinSubstitution([
+            FindPackageShare('svea_core'),
+            'launch/svea_vizualization.launch.py'
+        ])
+    )
     
     # MPC Goal Position Mode
     mpc_goal = Node(
@@ -187,5 +190,5 @@ def generate_launch_description():
         # foxglove_bridge,
         # visualization,
         mpc_goal,
-        mpc_path_tracking
+        mpc_path_tracking,
     ])
