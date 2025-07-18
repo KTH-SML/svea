@@ -183,7 +183,7 @@ class Bicycle4DWithESC(Bicycle4D):
 <<<<<<< HEAD
 
         # With ESC dynamics
-        delta = steering
+        delta = steering * -1
         accel = 1/self.TAU * (velocity - self.vel)
 
         return super().update(delta, accel, **kwds)

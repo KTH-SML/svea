@@ -363,12 +363,6 @@ class mpc(rx.Node):
             # simulator need a model to simulate
             self.sim_model = Bicycle4DWithESC()
 
-        # start the SVEA manager (needed for both sim and real world)
-        if not self.is_sim:
-            self.localizer.update_name(self.SVEA_MOCAP_NAME)
-
-        self.svea.start(wait=True)
-
         # everything ready to go -> unpause simulator
         if self.is_sim:
             self.simulator.toggle_pause_simulation()
