@@ -57,6 +57,7 @@ COPY util ./util
 COPY entrypoint requirements.txt ./
 
 # Automatically import extra dependencies if dependency_repos.repos exists
+# in src, git clone --recursive https://github.com/MOCAP4ROS2-Project/mocap4ros2_qualisys.git
 RUN if [ -f src/mocap4ros2_qualisys/dependency_repos.repos ]; then \
       vcs import src < src/mocap4ros2_qualisys/dependency_repos.repos; \
     fi
