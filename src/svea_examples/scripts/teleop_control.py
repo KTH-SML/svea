@@ -92,7 +92,13 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
     is_sim = rx.Parameter(True)
     target_velocity = rx.Parameter(1.0)
 
+<<<<<<< HEAD
 >>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
+=======
+    actuation = ActuationInterface()
+    localizer = LocalizationInterface()
+
+>>>>>>> 01b7a7d (teleop example bug fixed)
     ## Subscribers ##
     @rx.Subscriber(Twist, 'cmd_vel', qos_subber)
     def ctrl_request_twist(self, twist_msg):
@@ -114,9 +120,6 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 =======
 =======
-
-        self.localizer = LocalizationInterface(self).start()
-        self.actuation = ActuationInterface(self).start()
 
         self.velocity = 0.0
         self.steering = 0.0

@@ -104,8 +104,8 @@ class ActuationInterface:
 =======
 >>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
     # saturation input limits to keep hardware healthy
-    MAX_STEER_PERCENT = 95          # [%]
-    MAX_SPEED_PERCENT = 95          # [%]
+    MAX_STEER_PERCENT = 90          # [%]
+    MAX_SPEED_PERCENT = 90          # [%]
     # assumed maximum steering angle, approximately 40 degrees
     MAX_STEERING_ANGLE = 40*pi/180  # [rad]
     # By testing, the max velocity in Gear 0 is around 1.7 m/s.
