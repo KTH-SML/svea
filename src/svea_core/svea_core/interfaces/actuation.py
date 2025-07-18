@@ -41,21 +41,29 @@ from collections import deque
 from math import pi, isnan
 from typing import Optional, Self
 
-import rclpy
-import rclpy.clock
-import rclpy.duration
-from rclpy.node import Node
-from svea_msgs.msg import LLIControl
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
+from rclpy.node import Node
 
-__all__ = [
-    'ActuationInterface',
-]
+from enum import IntEnum
+from .. import rosonic as rx
+from std_msgs.msg import Bool, Int8
+
+QoS_DEFAULT = QoSProfile(depth = 10)
+QoS_RELIABLE = QoSProfile(
+    reliability=QoSReliabilityPolicy.RELIABLE,
+    durability=QoSDurabilityPolicy.VOLATILE,
+    depth=1,
+)
+
+class Controls(IntEnum):
+    """Enum for control codes sent to the low-level interface."""
+    STEERING = 0
+    VELOCITY = 1
 
 
-def cmp(a, b):
-    return (a > b) - (a < b)
+class ActuationInterface(rx.Resource):
 
+<<<<<<< HEAD
 
 class ActuationInterface:
     """Interface object for sending actuation commands to the SVEA car's low-level
@@ -93,15 +101,18 @@ class ActuationInterface:
     # arduino's expected input frequency
     OPERATING_FREQ = 50             # [Hz]
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
     # saturation input limits to keep hardware healthy
-    MAX_STEER_PERCENT = 90          # [%]
-    MAX_SPEED_PERCENT = 90          # [%]
+    MAX_STEER_PERCENT = 95          # [%]
+    MAX_SPEED_PERCENT = 95          # [%]
     # assumed maximum steering angle, approximately 40 degrees
     MAX_STEERING_ANGLE = 40*pi/180  # [rad]
     # By testing, the max velocity in Gear 0 is around 1.7 m/s.
     # The max velocity in Gear 2 is around 3.6 m/s.
     MAX_SPEED_0 = 1.7               # [m/s]
     MAX_SPEED_1 = 3.6               # [m/s]
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     BIAS_STEERING = -9
@@ -111,6 +122,8 @@ class ActuationInterface:
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 =======
 >>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+>>>>>>> 0ff0a7d (added mpc control and example, but still in working progress)
 
     steering_pub = rx.Publisher(Int8, 'lli/ctrl/steering', qos_profile=QoS_DEFAULT)
     throttle_pub = rx.Publisher(Int8, 'lli/ctrl/throttle', qos_profile=QoS_DEFAULT)
@@ -241,176 +254,123 @@ class ActuationInterface:
     # An approximation of the range of velocity inputs around zero
     # which will not be enough to make the car move.
     VELOCITY_DEADBAND = 15.0        # [%]
+=======
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
 
-    ## Binary masks ##
+    steering_pub = rx.Publisher(Int8, 'lli/ctrl/steering', qos_profile=QoS_DEFAULT)
+    throttle_pub = rx.Publisher(Int8, 'lli/ctrl/throttle', qos_profile=QoS_DEFAULT)
+    highgear_pub = rx.Publisher(Bool, 'lli/ctrl/highgear', qos_profile=QoS_RELIABLE)
+    diff_pub = rx.Publisher(Bool, 'lli/ctrl/diff', qos_profile=QoS_RELIABLE)
 
-    # Bit indicating status of the transmission
-    TRANSMISSION_MASK = 0b00000001
-    # Bit indicating status of the forward differential
-    FDIFF_MASK = 0b00000010
-    # Bit indicating status of the rear differential
-    RDIFF_MASK = 0b00000100
-    # Bit indicating software idle
-    SOFTWARE_IDLE_MASK = 0b00000001
-    # Bit indicating remote idle
-    REMOTE_IDLE_MASK = 0b00000010
-    # Bit indicating remote override
-    REMOTE_OVERRIDE_MASK = 0b00000100
-    # Bit indicating emergency stop engaged
-    EMERGENCY_MASK = 0b00001000
+    def __init__(self, rate=20, use_acceleration=False, highgear=False, diff=False):
+        self.acceleration = use_acceleration
+        self.rate = rate
+        self.latest_controls = [0., 0.] # [steering, velocity]
+        self.highgear_msg = Bool()
+        self.highgear_msg.data = highgear
+        self.diff_msg = Bool()
+        self.diff_msg.data = diff
+        self.steering_msg = Int8()
+        self.steering_msg.data = 0
+        self.velocity_msg = Int8()
+        self.velocity_msg.data = 0
 
-    _ctrl_request_top   = 'lli/ctrl_request' 
-    _ctrl_actuated_top  = 'lli/ctrl_actuated' 
+    def on_startup(self):
+        self.node.get_logger().info("Starting Actuation Interface Node...")
+        self.node.create_timer(1/self.rate, self.loop)
+        self.highgear_pub.publish(self.highgear_msg)
+        self.diff_pub.publish(self.diff_msg)
+        self.node.get_logger().info("Actuation Interface is ready.")
 
-    def __init__(self, node: Node, log_length: int = 100) -> None:  
+    def loop(self):
+        """Main loop to publish control messages."""
+        self.steering_msg.data = int(self.latest_controls[Controls.STEERING] * 1.27)  # 1.27 is a factor to convert from percent to the range of -127 to 127
+        self.velocity_msg.data = int(self.latest_controls[Controls.VELOCITY] * 1.27) # 1.27 is a factor to convert from percent to the range of -127 to 127
+        self.steering_pub.publish(self.steering_msg)
+        self.throttle_pub.publish(self.velocity_msg)
+
+    def send_control(self,
+                     steering:Optional[float] = None,
+                     vel_or_acc:Optional[float] = None):
+        """Send control inputs to the low-level interface."""
+        # Steering
+        if steering is not None and not isnan(steering):
+            steer_percent = self._steer_to_percent_and_clip(steering) 
+            self.__send_steering(steer_percent)
         
-        self._node = node
-        
-        self._previous_velocity = None
-        self._is_reverse = False
-
-        self.ctrl_request = _ControlRequest() # Stores the last controls sent
-        self.ctrl_msg = LLIControl()  # Message to send to ROS
-        self.last_ctrl_update = rclpy.clock.Clock().now().to_msg()
-
-        self._is_stop = False
-        self.is_emergency = False
-        self.is_ready = False
-        self._ready_event = Event()
-
-        # log of control requests and control actuated
-        self.ctrl_request_log = deque(maxlen=log_length)
-        self.ctrl_actuated_log = deque(maxlen=log_length)
-
-    def start(self, wait=True) -> Self:
-        """Spins up ROS background thread; must be called to start receiving
-        and sending data.
-
-        Args:
-            wait: True if the interface should call `wait_until_ready` before
-                returning.
-        """
-        self._node.get_logger().info('Starting Control Interface Node...')
-
-        qos_profile = QoSProfile(
-            reliability=QoSReliabilityPolicy.RELIABLE,
-            durability=QoSDurabilityPolicy.VOLATILE,
-            depth=1,
-        )
-        
-        ## Publishers ##
-
-        self._publish_ctrl_request = self._node.create_publisher(LLIControl,
-                                                                 self._ctrl_request_top,
-                                                                 qos_profile=qos_profile)
-
-        ## Subscribers ##
-        
-        self._node.create_subscription(LLIControl, 
-                                       self._ctrl_actuated_top,
-                                       self._read_ctrl_actuated, 
-                                       qos_profile=qos_profile)
-        
-        # duration = rclpy.duration.Duration(seconds=0.1)
-        # rclpy.clock.Clock().sleep_for(duration)
-        
-        if wait:
-            self.wait(10.0)
-
-        if not self.is_ready:
-            self._node.get_logger().info("LLI interface not responding during start of "
-                                         "Control Interface. Setting ready anyway.")
-        self.is_ready = True
-
-        self._node.get_logger().info("Control Interface ready...") 
-        return self
-
-    def wait(self, timeout: Optional[None] = None):
-        num_attempts = 0
-        attempt_limit = int(timeout) or 1
-        part_timeout = 1.0 if attempt_limit >= 1 else timeout
-        self._ready_event.clear()
-        while (not self.is_ready and
-               rclpy.ok() and
-               num_attempts < attempt_limit):
-            num_attempts += 1
-            self.send_control(ctrl_code=num_attempts)
-            self.is_ready = self._ready_event.wait(part_timeout)
-
-    def _read_ctrl_actuated(self, msg):
-        self._is_reverse = self._detect_reverse_state(msg)
-        self.ctrl_actuated_log.append(msg)
-        self._ready_event.set()
-
-    def _detect_reverse_state(self, msg):
-        dead_zone = 2 # velocities with abs values <= than this = 0 to ESC
-        velocity = msg.velocity
-        try:
-            if velocity > dead_zone or self._previous_velocity is None:
-                return False
-            elif (self._previous_velocity < dead_zone and
-                  abs(velocity) <= dead_zone):
-                return True
+        if vel_or_acc is not None or not isnan(vel_or_acc):
+            if self.acceleration:
+                self.__send_acceleration(vel_or_acc)                            
             else:
-                return self._is_reverse
-        finally:
-            self._previous_velocity = velocity
+                vel_percent = self._speed_to_percent(vel_or_acc) 
+                vel_percent = self._speed_clip(vel_percent)
+                self.__send_velocity(vel_percent)
+            
+            
+            
+    def __send_steering(self, steering):
+        self.latest_controls[Controls.STEERING] = steering
 
-    def _build_param_printout(self):
-        # collect important params
-        steering = self.ctrl_request.steering
-        velocity = self.ctrl_request.velocity
-        transmission = self.ctrl_request.transmission
-        differential_front = self.ctrl_request.differential_front
-        differential_rear = self.ctrl_request.differential_rear
-        ctrl_code = self.ctrl_request.ctrl_code
+    def __send_velocity(self, velocity):
+        self.latest_controls[Controls.VELOCITY] = velocity
 
-        return  ("## Vehicle: {0}\n".format(self.vehicle_name)
-                +"  -ctrl request:\n"
-                +"      steering[%] - {0}\n".format(steering)
-                +"      velocity[%] - {0}\n".format(velocity)
-                +"      trans       - {0}\n".format(transmission)
-                +"      diff_front  - {0}\n".format(differential_front)
-                +"      diff_rear   - {0}\n".format(differential_rear)
-                +"      ctrl_code   - {0}\n".format(ctrl_code)
-                +"  -Is stopped:   {0}\n".format(self.is_stop)
-                +"  -In reverse:   {0}\n".format(self._is_reverse)
-                +"  -Gear:         {0}\n".format(self.gear)
-                +"  -Diff_front:   {0}\n".format(self.differential_front)
-                +"  -Diff_rear:    {0}\n".format(self.differential_rear)
-                +"  -SW idle:      {0}\n".format(self.software_idle)
-                +"  -Remote idle:  {0}\n".format(self.remote_idle)
-                +"  -Rem override: {0}\n".format(self.remote_override)
-                +"  -SW emergency: {0}\n".format(self.emergency))
+    def __send_acceleration(self, acceleration):        
+        acc_percent = self._speed_to_percent(acceleration) 
+        vel_percent = self._speed_clip(self.latest_controls[Controls.VELOCITY] + acc_percent)
+        self.__send_velocity(vel_percent)
 
-    def __repr__(self):
-        return self._build_param_printout()
 
-    def __str__(self):
-        return self._build_param_printout()
+    def toggle_highgear(self):
+        """Toggle the high gear state."""
+        if self.highgear_msg.data:
+            self.disable_highgear()
+        else:
+            self.enable_highgear()
 
-    def _steer_to_percent(self, steering):
+    def enable_highgear(self):
+        """Enable high gear."""
+        self.highgear_msg.data = True
+        self.highgear_pub.publish(self.highgear_msg)
+
+    def disable_highgear(self):
+        """Disable high gear."""
+        self.highgear_msg.data = False
+        self.highgear_pub.publish(self.highgear_msg)
+
+    def toggle_diff(self):
+        """Toggle the differential lock state."""
+        if self.diff_msg.data:
+            self.disable_diff()
+        else:
+            self.enable_diff()
+
+    def enable_diff(self): 
+        """Enable the differential lock."""
+        self.diff_msg.data = True
+        self.diff_pub.publish(self.diff_msg)
+
+    def disable_diff(self):
+        """Disable the differential lock."""
+        self.diff_msg.data = False
+        self.diff_pub.publish(self.diff_msg)
+
+    def _steer_to_percent_and_clip(self, steering):
         """Convert radians to percent of max steering actuation"""
         steering = float(steering)
         steer_percent = steering*100.0/self.MAX_STEERING_ANGLE
-        return steer_percent
-
-    def _vel_to_percent(self, velocity):
-        velocity = float(velocity)
-        vel_percent = velocity/self.max_speed * 100
-        return int(vel_percent)
-
-    def _clip_ctrl(self, steer_percent, vel_percent):
-        clipped_steering = self._clip_steering(steer_percent)
-        clipped_velocity = self._clip_velocity(vel_percent)
-        return clipped_steering, clipped_velocity
-
-    def _clip_steering(self, steer_percent):
         return min(self.MAX_STEER_PERCENT,
                                max(-self.MAX_STEER_PERCENT, steer_percent))
-
-    def _clip_velocity(self, vel_percent):
+    
+    def _speed_to_percent(self, speed):
+        """Convert m/s to percent of max speed actuation"""
+        speed = float(speed)
+        speed_percent = speed*100.0/self.max_speed
+        return speed_percent
+    
+    def _speed_clip(self, speed):
+        """Clip speed to the maximum speed"""
         return min(self.MAX_SPEED_PERCENT,
+<<<<<<< HEAD
                                max(-self.MAX_SPEED_PERCENT, vel_percent))
 
     def _remove_velocity_deadzone(self, vel_percent):
@@ -552,6 +512,9 @@ class ActuationInterface:
         """
         self._is_stop = is_stop
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+                               max(-self.MAX_SPEED_PERCENT, speed))
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
 
     @property
     def max_speed(self) -> float:
@@ -560,6 +523,7 @@ class ActuationInterface:
         Returns:
             The maximum speed, independent of direction
         """
+<<<<<<< HEAD
 <<<<<<< HEAD
         return self.MAX_SPEED_1 if self.highgear_msg.data else self.MAX_SPEED_0
 =======
@@ -689,3 +653,6 @@ class _ControlRequest(object):
         self.differential_rear = False
         self.ctrl_code = 0
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+        return self.MAX_SPEED_1 if self.highgear_msg.data else self.MAX_SPEED_0
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)

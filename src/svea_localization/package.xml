@@ -18,6 +18,7 @@
   <depend>tf2_ros</depend>
   <depend>tf_transformations</depend>
   <depend>ntrip_client</depend>
+  <depend>svea_core</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
@@ -28,7 +29,7 @@
   <exec_depend>nav2_map_server</exec_depend>
   <exec_depend>slam_toolbox</exec_depend>
   <!-- <exec_depend>slam_toolbox_msgs</exec_depend> -->
-  <exec_depend>svea_core</exec_depend>
+  <!-- <exec_depend>svea_core</exec_depend> -->
   <exec_depend>urg_node</exec_depend>
 
   <export>

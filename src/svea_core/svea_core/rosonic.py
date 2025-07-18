@@ -523,6 +523,7 @@ class Node(Resource, NodeBase):
 from typing import Optional
 
 import rclpy
+from rclpy.node import Node
 
 __all__ = [
     'Node',
@@ -593,6 +594,7 @@ class Member:
         for member in self._rosonic_members().values():
             member._shutdown(node)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 class Parameter(Member):
@@ -757,6 +759,9 @@ class Subscriber(Member):
 >>>>>>> 217dc92 (05/12/2025 meeting update)
 class Node(Member, rclpy.node.Node):
 >>>>>>> 4b0286b (More work on simulator)
+=======
+class Node(Member, Node):
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
     """
     Base class for all SVEA nodes.
     This class provides a simple interface for creating ROS 2 nodes with

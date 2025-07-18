@@ -8,6 +8,7 @@ Author: Tobias Bolin, Frank Jiang
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from typing import Self, Optional
 =======
 from threading import Thread, Event
@@ -23,6 +24,9 @@ from threading import Event
 >>>>>>> 5598423 (update to interface design pattern)
 =======
 >>>>>>> 5981df3 (add micro-ros agent in docker)
+=======
+from typing import Self, Optional
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
 
 import rclpy
 from rclpy.node import Node
@@ -75,25 +79,18 @@ from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoS
 
 from tf_transformations import quaternion_from_euler, euler_from_quaternion
 from nav_msgs.msg import Odometry
+from .. import rosonic as rx
+import time
+
+qos_profile = QoSProfile(
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            durability=QoSDurabilityPolicy.VOLATILE,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            depth=1)
 
 
-__all__ = [
-    'LocalizationInterface',
-]
 
-def wait_for_message(node, topic, msg_type, timeout=None):
-    future = rclpy.task.Future()
-    sub = node.create_subscription(
-        msg_type,
-        topic,
-        lambda msg: future.set_result(msg),
-        10
-    )
-    rclpy.spin_until_future_complete(node, future, timeout_sec=timeout)
-    node.destroy_subscription(sub)
-    return future.result()
-
-class LocalizationInterface:
+class LocalizationInterface(rx.Resource):
     """Interface handling the reception of state information from the
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
     localization stack.
@@ -269,12 +266,19 @@ class LocalizationInterface:
 
     _odom_top = 'odometry/local'
 
-    def __init__(self, node: Node, *, init_odom=None, **kwds)-> None:
+    @rx.Subscriber(Odometry, _odom_top, qos_profile=qos_profile)
+    def _odom_cb(self, msg: Odometry) -> None:
+        self._odom_msg = msg
+        for cb in self._odom_callbacks:
+            try:
+                cb(msg)
+            except Exception as e:
+                self.node.get_logger().error(f"Error in callback: {e}")
+
+
+    def __init__(self, *, init_odom=None, **kwds) -> None:
         
-        self._node = node
-
         ## Odometry ##
-
         # Create a new odometry message with default values
         if odom := kwds.get('init_odom', None):
             self._odom_msg = init_odom
@@ -286,43 +290,20 @@ class LocalizationInterface:
         
         if odom_top := kwds.get('odom_top', None):
             self._odom_top = odom_top
-
+        
         # list of functions to call whenever a new state comes in
         self._odom_callbacks = []
 
-    def start(self, wait=True) -> Self:
-        
-        self._node.get_logger().info("Starting Localization Interface Node...")
 
-        qos_profile = QoSProfile(
-            reliability=QoSReliabilityPolicy.RELIABLE,
-            durability=QoSDurabilityPolicy.VOLATILE,
-            history=QoSHistoryPolicy.KEEP_LAST,
-            depth=1)
+    def on_startup(self):
+        """Start the localization interface by subscribing to the odometry topic."""
+        self.node.get_logger().info("Starting Localization Interface Node...")
 
-        self._node.create_subscription(Odometry, self._odom_top, self._odom_cb, qos_profile)
+        time.sleep(10)  # Allow time for the node to initialize
 
-        if wait:
-            self.wait()
-
-        self._node.get_logger().info("Localization Interface is ready.")
+        self.node.get_logger().info("Localization Interface is ready.")
         return self
-
-    def wait(self, timeout: Optional[float] = None) -> Odometry:
-        """Wait for a message on the interface topic.
-
-        Args:
-            timeout: The time to wait for a message in seconds.
-        """
-        return wait_for_message(self._node, self._odom_top, Odometry, timeout=timeout)
-
-    def _odom_cb(self, msg: Odometry) -> None:
-        self._odom_msg = msg
-        for cb in self._odom_callbacks:
-            try:
-                cb(msg)
-            except Exception as e:
-                self._node.get_logger().error(f"Error in callback: {e}")
+        
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -463,11 +444,14 @@ class LocalizationInterface:
             odom = self._odom_msg
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         return odom.twist.twist.linear.x
 =======
         return odom.twist.twist.linear.x
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 =======
+=======
+>>>>>>> 0ff0a7d (added mpc control and example, but still in working progress)
         return odom.twist.twist.linear.x
 =======
         while cb in self.callbacks:
@@ -649,4 +633,10 @@ class LocalizationInterface:
 =======
 =======
 >>>>>>> d574325 (try (unsuccessfully, but without crash) to run pure_pursuit in simulation.)
+<<<<<<< HEAD
 >>>>>>> 2af5048 (try (unsuccessfully, but without crash) to run pure_pursuit in simulation.)
+=======
+=======
+        return odom.twist.twist.linear.x
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
+>>>>>>> 0ff0a7d (added mpc control and example, but still in working progress)

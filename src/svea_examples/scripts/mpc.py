@@ -9,6 +9,7 @@ try:
     from svea_mocap.mocap import MotionCaptureInterface
 except ImportError:
     pass
+<<<<<<< HEAD
 from svea_core.controllers.mpc import MPC
 from std_msgs.msg import Float32
 from geometry_msgs.msg import PoseArray, PoseStamped
@@ -27,6 +28,14 @@ qos_pubber = QoSProfile(
     depth=1,
 )
 
+=======
+from svea_core.controllers.mpc import MPC_casadi
+from std_msgs.msg import Float32
+from geometry_msgs.msg import PoseArray, PoseStamped
+
+from svea_core import rosonic as rx
+
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
 class mpc(rx.Node):
     is_sim = rx.Parameter(True)
     state = rx.Parameter([-3.0, 0.0, 0.0, 0.0])  # x, y, yaw, velocity
@@ -34,11 +43,17 @@ class mpc(rx.Node):
     delta_s = rx.Parameter(5)  # m
     mpc_config_ns = rx.Parameter('/mpc')
     target_speed = rx.Parameter(0.5)  # m/s
+<<<<<<< HEAD
     prediction_horizon = rx.Parameter(5)
     final_state_weight_matrix = rx.Parameter(None)  # Weight matrix for the final state in MPC
 
     actuation = ActuationInterface()
     localizer = LocalizationInterface()
+=======
+    prediction_horizon = rx.Parameter(10)
+    final_state_weight_matrix = rx.Parameter(None)  # Weight matrix for the final state in MPC
+
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
 
     ## MPC parameters 
     GOAL_REACHED_DIST = 0.2   # The distance threshold (in meters) within which the goal is considered reached.
@@ -46,6 +61,10 @@ class mpc(rx.Node):
     UPDATE_MPC_PARAM = True   # A flag indicating if the MPC parameters can be updated when the system is approaching the target.
     RESET_MPC_PARAM = False   # A flag indicating if the MPC parameters should be reset when the system is moving away from the target.
     predicted_state = None
+<<<<<<< HEAD
+=======
+    current_horizon = prediction_horizon
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
 
     ## Static Planner parameters
     APPROACH_TARGET_THR = 5   # The distance threshold (in meters) to define when the system is "approaching" the target.
@@ -62,6 +81,7 @@ class mpc(rx.Node):
 
     dt =0.01
 
+<<<<<<< HEAD
     steering_pub = rx.Publisher(Float32, '/target_steering_angle', qos_profile=qos_subber)
     velocity_pub = rx.Publisher(Float32, '/target_speed', qos_profile=qos_subber)
     velocity_measured_pub = rx.Publisher(Float32, '/measured_speed', qos_profile=qos_subber)
@@ -81,6 +101,8 @@ class mpc(rx.Node):
         self.compute_trajectory()
     
 
+=======
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
     def on_startup(self):
 
         ## Define the unitless steering biases for each SVEA.
@@ -90,6 +112,7 @@ class mpc(rx.Node):
             "svea7": 7
         }
 
+<<<<<<< HEAD
         self.controller = MPC(self)
         self.DELTA_TIME = 1.0/self.mpc_freq
         self.initial_horizon = self.prediction_horizon
@@ -283,6 +306,50 @@ class mpc(rx.Node):
         else:
             return False
     
+=======
+        self.mpc = MPC_casadi
+        self.get_logger().info(f"Using MPC frequency: {self.final_state_weight_matrix} Hz")
+        self.DELTA_TIME = 1.0/self.mpc_freq
+        print(self.DELTA_TIME)
+
+        self.create_timer(self.DELTA_TIME, self.loop)
+
+        # if not self.is_sim:
+        #     svea_name = self.SVEA_MOCAP_NAME.lower()  # Ensure case-insensitivity  
+        #     unitless_steering = self.unitless_steering_map.get(svea_name, 0)  # Default to 0 if not found
+        #     PERC_TO_LLI_COEFF = 1.27
+        #     MAX_STEERING_ANGLE = 40 * math.pi / 180
+        #     steer_percent = unitless_steering / PERC_TO_LLI_COEFF
+        #     self.steering_bias = (steer_percent / 100.0) * MAX_STEERING_ANGLE
+        # else:
+        #     self.steering_bias = 0
+
+    def loop(self):
+        self.get_logger().info(f"Using MPC frequency: {self.final_state_weight_matrix} Hz")
+
+    def load_param(self, name, value=None):
+        self.declare_parameter(name, value)
+        if value is None:
+            assert self.has_parameter(name), f'Missing parameter "{name}"'
+        return self.get_parameter(name).value
+        
+    def create_simulator_and_SVEAmanager(self):
+        # Create simulators, models, managers, etc.
+        if self.IS_SIM:
+
+            # simulator need a model to simulate
+            self.sim_model = Bicycle4DWithESC()
+
+        # start the SVEA manager (needed for both sim and real world)
+        if not self.IS_SIM:
+            self.svea.localizer.update_name(self.SVEA_MOCAP_NAME)
+
+        self.svea.start(wait=True)
+
+        # everything ready to go -> unpause simulator
+        if self.IS_SIM:
+            self.simulator.toggle_pause_simulation()
+>>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
 
 if __name__ == '__main__':
     mpc.main()
