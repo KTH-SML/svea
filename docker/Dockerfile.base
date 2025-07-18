@@ -28,9 +28,8 @@ RUN apt-get update -y && \
         python3-pip \
         python3-numpy \
         python3-matplotlib \
-        python3-catkin-tools \
+        python3-colcon-common-extensions \
         && \
-    python3 -m pip install -U pip && \
     rm -rf /var/lib/apt/lists/*
 
 ## Create svea workspace

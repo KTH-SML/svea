@@ -1,4 +1,4 @@
-FROM ros:jazzy AS micro-ros-agent-builder
+FROM ros:jazzy-ros-base AS micro-ros-agent-builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 WORKDIR /svea_ws
@@ -9,7 +9,7 @@ RUN . /opt/ros/$ROS_DISTRO/setup.sh \
 &&  rm -rf log/ build/ src/
 
 # Use the official ROS 2 Jazzy image as the base image
-FROM ros:jazzy-ros-base-noble
+FROM ros:jazzy-ros-base
 
 # Set the ROS distribution as a build argument
 ARG ROSDISTRO="jazzy"

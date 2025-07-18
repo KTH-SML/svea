@@ -6,8 +6,13 @@
 # Author: Kaj Munhoz Arfvidsson
 
 ## Uncomment to build base image for amd64 (x86)/arm64.
-# CONFIG="base-amd64"
-# CONFIG="base-arm64"
+# BUILD_CONFIG="base-amd64"
+# BUILD_CONFIG="base-arm64"
+
+## Auto-detect platform for macOS with Apple Silicon
+if [ "$(uname -s)" = "Darwin" ]; then
+    BUILD_CONFIG="arm64"
+fi
 
 main() {
 
@@ -31,7 +36,7 @@ main() {
         # building for host platform
         withdefault BUILD_PLATFORM  "$(uname -m)"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
@@ -39,7 +44,7 @@ main() {
         # building for x86_64
         withdefault BUILD_PLATFORM  "linux/amd64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
@@ -47,7 +52,7 @@ main() {
         # building for arm64/aarch64/jetson
         withdefault BUILD_PLATFORM  "linux/arm64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
@@ -55,7 +60,7 @@ main() {
         # building for both amd64 and arm64
         withdefault BUILD_PLATFORM  "linux/arm64,linux/amd64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "1"
