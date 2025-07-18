@@ -71,8 +71,11 @@ WORKDIR /svea_ws
 COPY src ./src
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 28d5445 (ooops)
+=======
+>>>>>>> d0ce68c (Added mocap4ros2_qualisys dep import to build process)
 COPY requirements.txt ./
 RUN rosdep install \
         --rosdistro $ROSDISTRO \
@@ -93,7 +96,29 @@ COPY util ./util
 COPY entrypoint requirements.txt ./
 =======
     pip install -r requirements.txt
+<<<<<<< HEAD
 >>>>>>> 28d5445 (ooops)
+=======
+=======
+COPY util ./util
+COPY entrypoint requirements.txt ./
+
+# Automatically import extra dependencies if dependency_repos.repos exists
+RUN if [ -f src/mocap4ros2_qualisys/dependency_repos.repos ]; then \
+      vcs import src < src/mocap4ros2_qualisys/dependency_repos.repos; \
+    fi
+    
+# Update rosdep and install dependencies for the ROS 2 workspace
+RUN apt-get update -y && \
+    rosdep update --rosdistro $ROSDISTRO && \
+    rosdep install --rosdistro $ROSDISTRO --from-paths src --ignore-src -y && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies in the virtual environment
+# RUN pip install --break-system-packages --upgrade pip && \
+RUN pip install --break-system-packages -r requirements.txt
+>>>>>>> 739744d (Added mocap4ros2_qualisys dep import to build process)
+>>>>>>> d0ce68c (Added mocap4ros2_qualisys dep import to build process)
 
 # Ensure proper environment setup before build
 ENV CMAKE_PREFIX_PATH="/opt/ros/$ROSDISTRO"
