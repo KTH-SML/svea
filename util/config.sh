@@ -56,6 +56,14 @@ main() {
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
+    elif [ "$BUILD_CONFIG" = "arm64" ]; then
+        # building for arm64 (macOS Apple Silicon)
+        withdefault BUILD_PLATFORM  "linux/arm64"
+        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+        withdefault BUILD_FILE      "docker/Dockerfile"
+        withdefault BUILD_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_TAG       "$REPOSITORY_NAME"
+        withdefault IMAGE_PUSH      "0"
     elif [ "$BUILD_CONFIG" = "ghcr" ]; then
         # building for both amd64 and arm64
         withdefault BUILD_PLATFORM  "linux/arm64,linux/amd64"
