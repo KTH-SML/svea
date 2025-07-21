@@ -152,15 +152,22 @@ jetson_release() {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Auto-detect platform for macOS
 =======
 ## Auto-detect platform for macOS with Apple Silicon
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+## Auto-detect platform for macOS with Apple Silicon
+=======
+>>>>>>> 3fd88dc (added missing is_darwin check for mac causing redundant error)
+>>>>>>> ea5b49f (added missing is_darwin check for mac causing redundant error)
 # Check if running on macOS (Darwin)
 is_darwin() {
     [ "$(uname -s)" = "Darwin" ]
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 ## Detect arm64 architecture
 is_arm64() {
@@ -170,7 +177,11 @@ is_arm64() {
 
 =======
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+>>>>>>> ea5b49f (added missing is_darwin check for mac causing redundant error)
 
+=======
+>>>>>>> 3fd88dc (added missing is_darwin check for mac causing redundant error)
 ################################################################################
 ################################################################################
 
