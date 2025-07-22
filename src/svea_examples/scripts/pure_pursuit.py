@@ -14,7 +14,7 @@ from svea_core import rosonic as rx
 class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
     DELTA_TIME = 0.1
-    TRAJ_LEN = 50
+    TRAJ_LEN = 20
 
     points = rx.Parameter(['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]'])
     is_sim = rx.Parameter(True)
@@ -47,11 +47,11 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         if self.controller.is_finished:
             self.update_goal()
             self.update_traj(x, y)
-            self.get_logger().info(f"Location: {x}, {y}")
-            self.get_logger().info(f"looking ahead: {self.controller.k * vel + self.controller.Lfc}")
+            # self.get_logger().info(f"Location: {x}, {y}")
+            # self.get_logger().info(f"looking ahead: {self.controller.k * vel + self.controller.Lfc}")
 
         steering, velocity = self.controller.compute_control(state)
-        # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
+        self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
         self.actuation.send_control(steering, velocity)
 
     def update_goal(self):
@@ -59,7 +59,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         self.curr %= len(self._points)
         self.goal = self._points[self.curr]
         self.controller.is_finished = False
-        self.get_logger().info(f"Goal: {self.goal}")
+        # self.get_logger().info(f"Goal: {self.goal}")
 
     def update_traj(self, x, y):
         xs = np.linspace(x, self.goal[0], self.TRAJ_LEN)

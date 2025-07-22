@@ -90,7 +90,7 @@ class sim_svea(rx.Node):
 
     @rx.Subscriber(Int8, steering_request_top, qos_subber)
     def steering_request_cb(self, steering_request_msg):
-        self.steering_req = steering_request_msg.data
+        self.steering_req = steering_request_msg.data * -1
         self.last_ctrl_time = self.clock.now().to_msg()
     
     @rx.Subscriber(Int8, throttle_request_top, qos_subber)

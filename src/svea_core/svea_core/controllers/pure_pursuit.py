@@ -11,9 +11,9 @@ class PurePursuitController:
         - Separate trajectory-related parts into inherited controller
     """
 
-    k = 0.3  # look forward gain
+    k = 0.1  # look forward gain
     Lfc = 0.6  # look-ahead distance
-    K_p = 0.2  # speed control propotional gain
+    K_p = 0.15  # speed control propotional gain
     K_i = 0.01  # speed control integral gain
 
 
@@ -85,8 +85,8 @@ class PurePursuitController:
         d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
         ind = d.index(min(d))
         dist = 0.0
-        dynamic_lfc =  min(max(0.5, vel * 0.6), 1.1)
-        Lf = max(self.k * vel + dynamic_lfc, 1.05)
+        dynamic_lfc =  min(max(0.8, vel * 0.5), 1.5)
+        Lf = max(self.k * vel + dynamic_lfc, 1.2)
 
         # search look ahead target point index
         while Lf > dist and (ind + 1) < len(self.traj_x):
