@@ -10,6 +10,9 @@
   
   <!-- Conditional lidar transform (ROS2 doesn't have <group> but supports if/unless on nodes) -->
   <node pkg="tf2_ros" exec="static_transform_publisher" name="lidarlink_broadcaster" 
-        args="0.284 0 0.2 0 0 0 1 base_link laser"
+        args="0.385 0 0.15 0 0 0 1 base_link laser"
         if="$(var is_indoors)"/>
+
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="wheelencoderlink_broadcaster" 
+        args="0.0 0 0.0 0 0 0 1 base_link wheel_encoder"/>
 </launch>

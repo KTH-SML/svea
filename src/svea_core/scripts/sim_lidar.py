@@ -100,7 +100,7 @@ class sim_lidar(rx.Node):
 
         self._lidar_position = np.append(lidar_xy, yaw)
 
-        self.publish_tf(odmetry_msg)
+        # self.publish_tf(odmetry_msg)
         self._scan_msg.header.stamp = odmetry_msg.header.stamp
         self.sim_loop()
 

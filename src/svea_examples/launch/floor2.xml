@@ -26,6 +26,13 @@
         <param name="autostart" value="true" />
     </node>
 
+    <group if="$(var is_sim)">
+        <!-- Start transforms -->
+        <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
+            <arg name="is_indoors" value="$(var is_sim)"/>
+        </include>
+    </group>
+
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(var is_sim)">
         <!-- Start low-level interface -->
@@ -53,6 +60,7 @@
         <param name="state" value="$(var state)" />
         <param name="points" value="$(var points)" />
     </node>
+    
 
     <!-- Start simulation -->
     <include file="$(find-pkg-share svea_core)/launch/simulation.xml">
