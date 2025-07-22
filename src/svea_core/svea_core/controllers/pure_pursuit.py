@@ -11,14 +11,15 @@ class PurePursuitController:
         - Separate trajectory-related parts into inherited controller
     """
 
-    k = 0.6  # look forward gain
-    Lfc = 0.2  # look-ahead distance
-    K_p = 1.0  # speed control propotional gain
-    K_i = 0.2  # speed control integral gain
+    k = 0.3  # look forward gain
+    Lfc = 0.6  # look-ahead distance
+    K_p = 0.2  # speed control propotional gain
+    K_i = 0.01  # speed control integral gain
+
+
     L = 0.324  # [m] wheel base of vehicle
 
-    def __init__(self, vehicle_name='', dt=0.01):
-        self.vehicle_name = vehicle_name
+    def __init__(self, dt=0.01):
         self.dt = dt
 
         self.traj_x = []
@@ -84,7 +85,8 @@ class PurePursuitController:
         d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
         ind = d.index(min(d))
         dist = 0.0
-        Lf = self.k * vel + self.Lfc
+        dynamic_lfc =  min(max(0.5, vel * 0.6), 1.1)
+        Lf = max(self.k * vel + dynamic_lfc, 1.05)
 
         # search look ahead target point index
         while Lf > dist and (ind + 1) < len(self.traj_x):
@@ -94,7 +96,7 @@ class PurePursuitController:
             ind += 1
 
         # terminating condition
-        if dist < 0.1:
+        if dist < 1.0:
             self.is_finished = True
             pass
 

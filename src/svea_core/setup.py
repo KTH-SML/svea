@@ -18,6 +18,7 @@ setup(
         (f'lib/{package_name}', glob('scripts/*.py')),
         (os.path.join('share', package_name), glob('urdf/*')),
         (os.path.join('share', package_name, 'meshes'), glob('meshes/*')),
+        (os.path.join('share', package_name, 'util'), glob('util/*.sh')),
     ],
     install_requires=['setuptools','pyyaml'],
     zip_safe=True,
