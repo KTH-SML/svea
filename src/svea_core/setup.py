@@ -32,7 +32,11 @@ setup(
 =======
         (os.path.join('share', package_name), glob('urdf/*')),
         (os.path.join('share', package_name, 'meshes'), glob('meshes/*')),
+<<<<<<< HEAD
 >>>>>>> 710b561 (Teleop control in simulation with teleop_twist_keyboard added)
+=======
+        (os.path.join('share', package_name, 'util'), glob('util/*.sh')),
+>>>>>>> f6b073e (test version 1.0 update)
     ],
     install_requires=['setuptools','pyyaml'],
     zip_safe=True,

@@ -183,9 +183,6 @@
             </include>
         </group>
 
-        <!-- Start controller -->
-        <node pkg="svea_localization" exec="actuation_to_twist.py" name="actuation_to_twist" output="screen"/>
-
         <!-- Static transforms for sensors -->
         <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
             <arg name="is_indoors"  value="$(var is_indoors)"/>
@@ -221,8 +218,8 @@
 =======
     <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
         <param from="$(find-pkg-share svea_localization)/config/local_ekf.yaml" />
-        <param name="imu0"                  value="imu/data"/>
-        <param name="twist0"                value="actuation_twist"/>
+        <param name="imu0"                  value="/lli/sensor/imu"/>
+        <param name="twist0"                value="/lli/sensor/encoders"/>
         <remap from="/odometry/filtered"    to="/odometry/filtered/local"/>
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> --> 
 >>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)

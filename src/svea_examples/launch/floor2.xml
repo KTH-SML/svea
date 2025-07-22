@@ -26,6 +26,7 @@
     <arg name="initial_pose_a"  default="1.57" /> <!-- wrt to map-->
     <arg name="map_path" default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
     <arg name="points" default="['[-2.3, -7.1]', '[3.51, 1.95]', '[10.5, 11.7]', '[5.7, 15.0]', '[-1.18, 4.69]', '[-7.0, -4.0]']" />
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
@@ -46,6 +47,10 @@
         <arg name="map" value="$(var map)" />
     </include>   
 =======
+=======
+    <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
+    <arg name="points" default="['[-2.3, -7.1]', '[10.5, 11.7]', '[5.6, 14.7]', '[-7.0, -4.0]']" />
+>>>>>>> 3f76096 (test version 1.0 update)
 
     <!-- Start map server -->
     <!-- more info about nav2_map_server:https://answers.ros.org/question/398095/-->
@@ -63,13 +68,10 @@
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(var is_sim)">
         <!-- Start low-level interface -->
-        <node name="serial_node" pkg="rosserial_python" exec="serial_node">
-            <param name="port" value="/dev/ttyACM0"/>
-            <param name="baud" value="250000"/>
-        </node>
+        <executable cmd="$(find-pkg-share svea_core)/util/start_micro_ros.sh" output="screen"/>
 
         <!-- Start localization -->
-        <include file="$(find-pkg-share svea_sensors)/launch/localize.launch">
+        <include file="$(find-pkg-share svea_localization)/launch/localize.xml">
             <arg name="initial_pose_x" value="$(var initial_pose_x)" />
             <arg name="initial_pose_y" value="$(var initial_pose_y)" />
             <arg name="initial_pose_a" value="$(var initial_pose_a)" />
@@ -89,6 +91,7 @@
         <param name="use_rviz" value="$(var use_foxglove)"/>
         <param name="is_sim" value="$(var is_sim)"/>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <param name="state" value="$(var state)" />
         <param name="points" value="$(var points)" />
     </node>
@@ -101,4 +104,15 @@
     <!-- Start simulation -->
     <include file="$(find-pkg-share svea_core)/launch/simulation.xml"/>
 >>>>>>> 914c44e (update on 05/12/2025)
+=======
+        <param name="state" value="$(var state)" />
+        <param name="points" value="$(var points)" />
+    </node>
+
+    <!-- Start simulation -->
+    <include file="$(find-pkg-share svea_core)/launch/simulation.xml">
+        <arg name="state" value="$(var state)" />
+        <arg name="points" value="$(var points)" />
+    </include>
+>>>>>>> 3f76096 (test version 1.0 update)
 </launch>
