@@ -141,8 +141,8 @@
                                      0.0, 0.0, 0.0,
                                      0.0, 0.0, 0.0]"/>
         <param name="odom0"                 value="odometry/gps"/>
-        <param name="imu0"                  value="imu/data"/>
-        <param name="twist0"                value="actuation_twist"/>
+        <param name="imu0"                  value="/lli/sensor/imu"/>
+        <param name="twist0"                value="/lli/sensor/encoders"/>
         <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> -->
     </node>

@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
   
-    frequency: 30.0
+    frequency: 50.0
 
     sensor_timeout: 0.1
 
@@ -33,8 +33,8 @@
 
 
     ##########################################
-    # BNO055 IMU #############################
-    imu0: /imu/data
+    # IMU ####################################
+    imu0: /lli/sensor/imu
     imu0_config: [false, false, false,
                   true,  true,  true,
                   false, false, false,
@@ -53,8 +53,8 @@
 
 
     ##########################################
-    # Twist based on actuation ###############
-    twist0: /actuation_twist
+    # Wheel encoder #############c#############
+    twist0: /lli/sensor/encoders
     twist0_config: [false, false, false,
                     false, false, false,
                     true,  true,  false,
