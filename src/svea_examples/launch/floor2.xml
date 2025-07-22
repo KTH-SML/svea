@@ -69,6 +69,22 @@
         <param name="autostart" value="true" />
     </node>
 
+<<<<<<< HEAD
+=======
+    <group if="$(var is_sim)">
+        <!-- Start transforms -->
+        <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
+            <arg name="is_indoors" value="$(var is_sim)"/>
+        </include>
+        
+        <!-- Start simulation -->
+        <include file="$(find-pkg-share svea_core)/launch/simulation.xml">
+            <arg name="state" value="$(var state)" />
+            <arg name="points" value="$(var points)" />
+        </include>
+    </group>
+
+>>>>>>> 976ac63 (update)
     <!-- If is_sim equal to false, then include all these tags-->
     <group unless="$(var is_sim)">
         <!-- Start low-level interface -->
@@ -113,10 +129,13 @@
         <param name="points" value="$(var points)" />
     </node>
 
+<<<<<<< HEAD
     <!-- Start simulation -->
     <include file="$(find-pkg-share svea_core)/launch/simulation.xml">
         <arg name="state" value="$(var state)" />
         <arg name="points" value="$(var points)" />
     </include>
 >>>>>>> 3f76096 (test version 1.0 update)
+=======
+>>>>>>> ed429ad (update)
 </launch>

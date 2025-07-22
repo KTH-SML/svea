@@ -220,7 +220,7 @@
         <param from="$(find-pkg-share svea_localization)/config/local_ekf.yaml" />
         <param name="imu0"                  value="/lli/sensor/imu"/>
         <param name="twist0"                value="/lli/sensor/encoders"/>
-        <remap from="/odometry/filtered"    to="/odometry/filtered/local"/>
+        <remap from="/odometry/filtered"    to="/odometry/local"/>
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> --> 
 >>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
     </node>
@@ -241,7 +241,7 @@
         <param name="odom0"                 value="odometry/gps"/>
         <param name="imu0"                  value="/lli/sensor/imu"/>
         <param name="twist0"                value="/lli/sensor/encoders"/>
-        <remap from="/odometry/filtered"    to="/odometry/filtered/global"/>
+        <remap from="/odometry/filtered"    to="/odometry/global"/>
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> -->
     </node>
 </launch>
