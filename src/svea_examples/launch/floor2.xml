@@ -31,6 +31,12 @@
         <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
             <arg name="is_indoors" value="$(var is_sim)"/>
         </include>
+        
+        <!-- Start simulation -->
+        <include file="$(find-pkg-share svea_core)/launch/simulation.xml">
+            <arg name="state" value="$(var state)" />
+            <arg name="points" value="$(var points)" />
+        </include>
     </group>
 
     <!-- If is_sim equal to false, then include all these tags-->
@@ -60,11 +66,5 @@
         <param name="state" value="$(var state)" />
         <param name="points" value="$(var points)" />
     </node>
-    
 
-    <!-- Start simulation -->
-    <include file="$(find-pkg-share svea_core)/launch/simulation.xml">
-        <arg name="state" value="$(var state)" />
-        <arg name="points" value="$(var points)" />
-    </include>
 </launch>
