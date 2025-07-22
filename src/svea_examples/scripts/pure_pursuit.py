@@ -97,7 +97,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         """
 =======
     DELTA_TIME = 0.1
-    TRAJ_LEN = 50
+    TRAJ_LEN = 20
 
     points = rx.Parameter(['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]'])
     is_sim = rx.Parameter(True)
@@ -154,10 +154,11 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         if self.controller.is_finished:
             self.update_goal()
             self.update_traj(x, y)
-            self.get_logger().info(f"Location: {x}, {y}")
-            self.get_logger().info(f"looking ahead: {self.controller.k * vel + self.controller.Lfc}")
+            # self.get_logger().info(f"Location: {x}, {y}")
+            # self.get_logger().info(f"looking ahead: {self.controller.k * vel + self.controller.Lfc}")
 
         steering, velocity = self.controller.compute_control(state)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -171,6 +172,8 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 =======
 =======
 >>>>>>> f6b073e (test version 1.0 update)
+=======
+>>>>>>> c488e16 (tuning pure pursuit)
         # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
 =======
         self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
@@ -181,7 +184,13 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 =======
         # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
 >>>>>>> 3f76096 (test version 1.0 update)
+<<<<<<< HEAD
 >>>>>>> f6b073e (test version 1.0 update)
+=======
+=======
+        self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
+>>>>>>> 1775e8c (tuning pure pursuit)
+>>>>>>> c488e16 (tuning pure pursuit)
         self.actuation.send_control(steering, velocity)
 
     def update_goal(self):
@@ -201,11 +210,15 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         self.controller.is_finished = False
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         # Mark the goal
         self.mark.marker('goal','blue',self.goal)
 =======
         self.get_logger().info(f"Goal: {self.goal}")
 >>>>>>> 3f76096 (test version 1.0 update)
+=======
+        # self.get_logger().info(f"Goal: {self.goal}")
+>>>>>>> 1775e8c (tuning pure pursuit)
 
     def update_traj(self, x, y):
         """

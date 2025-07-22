@@ -284,7 +284,7 @@ class ActuationInterface:
 
     def loop(self):
         """Main loop to publish control messages."""
-        self.steering_msg.data = int(self.latest_controls[Controls.STEERING] * 1.27)  # 1.27 is a factor to convert from percent to the range of -127 to 127
+        self.steering_msg.data = int(self.latest_controls[Controls.STEERING] * - 1.27)  # 1.27 is a factor to convert from percent to the range of -127 to 127
         self.velocity_msg.data = int(self.latest_controls[Controls.VELOCITY] * 1.27) # 1.27 is a factor to convert from percent to the range of -127 to 127
         self.steering_pub.publish(self.steering_msg)
         self.throttle_pub.publish(self.velocity_msg)

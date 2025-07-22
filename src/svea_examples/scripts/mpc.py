@@ -32,7 +32,8 @@ qos_pubber = QoSProfile(
 from svea_core.controllers.mpc import MPC_casadi
 from std_msgs.msg import Float32
 from geometry_msgs.msg import PoseArray, PoseStamped
-from rclpy.qos import QoSProfile
+from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
+
 
 from svea_core import rosonic as rx
 
@@ -42,7 +43,17 @@ from svea_core import rosonic as rx
 qos_subber = QoSProfile(depth=10 # Size of the queue 
                         )
 
+<<<<<<< HEAD
 >>>>>>> 25280bf (add mpc (in progress), clean up)
+=======
+qos_pubber = QoSProfile(
+    reliability=QoSReliabilityPolicy.RELIABLE,
+    durability=QoSDurabilityPolicy.VOLATILE,
+    history=QoSHistoryPolicy.KEEP_LAST,
+    depth=1,
+)
+
+>>>>>>> 1775e8c (tuning pure pursuit)
 class mpc(rx.Node):
     is_sim = rx.Parameter(True)
     state = rx.Parameter([-3.0, 0.0, 0.0, 0.0])  # x, y, yaw, velocity
@@ -101,6 +112,7 @@ class mpc(rx.Node):
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     steering_pub = rx.Publisher(Float32, '/target_steering_angle', qos_profile=qos_subber)
     velocity_pub = rx.Publisher(Float32, '/target_speed', qos_profile=qos_subber)
     velocity_measured_pub = rx.Publisher(Float32, '/measured_speed', qos_profile=qos_subber)
@@ -111,6 +123,15 @@ class mpc(rx.Node):
 =======
     @rx.Subscriber(PoseStamped, 'mpc_target', qos_subber)
 >>>>>>> 25280bf (add mpc (in progress), clean up)
+=======
+    steering_pub = rx.Publisher(Float32, 'target_steering_angle', qos_profile=qos_subber)
+    velocity_pub = rx.Publisher(Float32, 'target_speed', qos_profile=qos_subber)
+    velocity_measured_pub = rx.Publisher(Float32, 'measured_speed', qos_profile=qos_subber)
+    predicted_trajectory_pub = rx.Publisher(PoseArray, 'predicted_path', qos_profile=qos_pubber)
+    static_trajectory_pub = rx.Publisher(PoseArray, 'static_path', qos_profile=qos_pubber)
+
+    @rx.Subscriber(PoseStamped, 'target_steering_angle', qos_pubber)
+>>>>>>> 1775e8c (tuning pure pursuit)
     def mpc_target_callback(self, msg):
         """
         Callback function that sets a new goal position and calculates a trajectory.
@@ -339,7 +360,6 @@ class mpc(rx.Node):
         self.controller = MPC_casadi(self)
 >>>>>>> 25280bf (add mpc (in progress), clean up)
         self.DELTA_TIME = 1.0/self.mpc_freq
-        print(self.DELTA_TIME)
 
         self.create_timer(self.DELTA_TIME, self.loop)
 
