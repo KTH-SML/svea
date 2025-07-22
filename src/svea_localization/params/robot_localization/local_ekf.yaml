@@ -6,8 +6,11 @@
   ros__parameters:
   
 <<<<<<< HEAD
+<<<<<<< HEAD
     frequency: 20.0
 =======
+=======
+>>>>>>> a034a0d (minor update on localization parameters)
     frequency: 30.0
 <<<<<<< HEAD
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
@@ -195,6 +198,9 @@
 frequency: 30
 =======
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+    frequency: 50.0
+>>>>>>> 5731903 (minor update on localization parameters)
 
     sensor_timeout: 0.1
 
@@ -226,8 +232,8 @@ frequency: 30
 
 
     ##########################################
-    # BNO055 IMU #############################
-    imu0: /imu/data
+    # IMU ####################################
+    imu0: /lli/sensor/imu
     imu0_config: [false, false, false,
                   true,  true,  true,
                   false, false, false,
@@ -246,8 +252,8 @@ frequency: 30
 
 
     ##########################################
-    # Twist based on actuation ###############
-    twist0: /actuation_twist
+    # Wheel encoder #############c#############
+    twist0: /lli/sensor/encoders
     twist0_config: [false, false, false,
                     false, false, false,
                     true,  true,  false,

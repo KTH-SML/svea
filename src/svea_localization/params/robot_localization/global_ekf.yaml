@@ -54,8 +54,8 @@
     odom0_pose_rejection_threshold: 5
 
     ##########################################
-    # BNO055 IMU #############################
-    imu0: /imu/data
+    # IMU ####################################
+    imu0: /lli/sensor/imu
     imu0_config: [false, false, false,
                   true,  true,  true,
                   false, false, false,
@@ -74,8 +74,8 @@
 
 
     ##########################################
-    # Twist based on actuation ###############
-    twist0: /actuation_twist
+    # Wheel encoder #############c#############
+    twist0: /lli/sensor/encoders
     twist0_config: [false, false, false,
                     false, false, false,
                     true,  true,  false,
