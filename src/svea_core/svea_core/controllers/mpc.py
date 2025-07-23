@@ -49,11 +49,11 @@ class MPC_casadi:
         self._node = node
 
         # The prediction horizon steps for the mpc optimization problem.
-        self.N = self.load_param('prediction_horizon')
+        self.N = self.load_param('prediction_horizon', 10)
         self.current_horizon = self.N # Initially set to max horizon
 
         # The time step in which the optimization problem is divided (unit [s]).
-        self.dt = ca.DM(self.load_param('time_step'))
+        self.dt = ca.DM(self.load_param('time_step', 0.4))
         
         ## Load weight matrices 
         # Note: we convert to dense matrix to allow symbolic operations.
@@ -70,25 +70,25 @@ class MPC_casadi:
         self.Qf_list = self.load_param('final_state_weight_matrix')
         self.Qf = ca.DM(np.array(self.Qf_list).reshape((4, 4)))
 
-        self.Qv_num  = self.load_param('forward_speed_weight')
+        self.Qv_num  = self.load_param('forward_speed_weight', 0)
         self.Qv = ca.DM(self.Qv_num)
         
         ## Model Parameters
 
-        self.min_steering = np.radians(self.load_param('steering_min'))
-        self.max_steering = np.radians(self.load_param('steering_max'))
+        self.min_steering = np.radians(self.load_param('steering_min', -40.0))
+        self.max_steering = np.radians(self.load_param('steering_max', 40.0))
 
-        self.min_steering_rate = np.radians(self.load_param('steering_rate_min'))
-        self.max_steering_rate = np.radians(self.load_param('steering_rate_max'))
+        self.min_steering_rate = np.radians(self.load_param('steering_rate_min', -35.0))
+        self.max_steering_rate = np.radians(self.load_param('steering_rate_max', 35.0))
 
-        self.min_velocity = self.load_param('velocity_min')
-        self.max_velocity = self.load_param('velocity_max')
+        self.min_velocity = self.load_param('velocity_min', -0.4)
+        self.max_velocity = self.load_param('velocity_max', 0.4)
 
-        self.min_acceleration = self.load_param('acceleration_min')
-        self.max_acceleration = self.load_param('acceleration_max')
+        self.min_acceleration = self.load_param('acceleration_min', -0.2)
+        self.max_acceleration = self.load_param('acceleration_max', 0.4)
 
         # Wheelbase of the vehicle (unit [m]).
-        self.L = ca.DM(self.load_param('wheelbase'))
+        self.L = ca.DM(self.load_param('wheelbase', 0.32))
         
         ## Setup CasADi
 
