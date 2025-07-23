@@ -71,12 +71,12 @@
     ## Model Parameters
 
     # The min/max steering angle allowed for SVEA (unit [degrees])
-    steering_min: -40
-    steering_max: 40
+    steering_min: -40.0
+    steering_max: 40.0
 
     # The min/max steering rate allowed for SVEA (unit [degrees/s])
-    steering_rate_min: -35 
-    steering_rate_max: 35 
+    steering_rate_min: -35.0 
+    steering_rate_max: 35.0
 
     # The min/max velocity allowed for SVEA (unit [m/s^2])
     velocity_min: -0.4

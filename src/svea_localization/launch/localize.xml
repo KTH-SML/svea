@@ -22,7 +22,7 @@
     <arg name="lli_port"                default="/dev/ttyACM0"/>
 
     <!-- map server -->
-    <arg name="map_file"                default=""/>
+    <arg name="map_file"                default="/svea_ws/src/svea_core/maps/sml.yaml"/>
 
     <!-- Lidar  -->
 <<<<<<< HEAD
@@ -80,11 +80,25 @@
     </group> -->
 
     <!-- Start map server -->
+<<<<<<< HEAD
     <node if="$(eval '\'$(var map_file)\' != \'\'')" pkg="nav2_map_server" exec="map_server" name="map_server" output="screen" args="$(var map_file)"/>
 
 <<<<<<< HEAD
         <!-- start all sensors if this is not a simulation -->
 <<<<<<< HEAD
+=======
+    <node name="map_server" pkg="nav2_map_server" exec="map_server" output="screen">
+        <param name="yaml_filename" value="$(var map_file)" />
+        <param name="use_sim_time" value="false" />
+        <param name="topic_name" value="map" />
+    </node>
+    
+    <node name="lifecycle_manager" pkg="nav2_lifecycle_manager" exec="lifecycle_manager" output="screen">
+        <param name="node_names" value="['map_server']" />
+        <param name="autostart" value="true" />
+    </node>
+    <!-- start all sensors if this is not a simulation -->
+>>>>>>> cb4be18 (update localiztion params, and launch file)
     <group unless="$(var is_sim)">
         <let name="use_sim_time" value="false"/>
         <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
@@ -156,8 +170,8 @@
 =======
             <!-- Start AMCL -->
             <node pkg="nav2_amcl" exec="amcl" name="amcl_localization" output="screen">
-                <param from="$(find-pkg-share svea_localization)/config/localize.yaml"/>
-                <param name="scan"              value="scan"/>
+                <param from="$(find-pkg-share svea_localization)/params/localize.yaml"/>
+                <param name="scan"              value="/scan"/>
                 <param name="initial_pose_x"    value="$(var initial_pose_x)" />
                 <param name="initial_pose_y"    value="$(var initial_pose_y)" />
                 <param name="initial_pose_a"    value="$(var initial_pose_a)" />
@@ -217,8 +231,8 @@
 >>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
 =======
     <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
-        <param from="$(find-pkg-share svea_localization)/config/local_ekf.yaml" />
-        <param name="imu0"                  value="/lli/sensor/imu"/>
+        <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
+        <!-- <param name="imu0"                  value="/lli/sensor/imu"/> -->
         <param name="twist0"                value="/lli/sensor/encoders"/>
         <remap from="/odometry/filtered"    to="/odometry/local"/>
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> --> 
@@ -227,7 +241,7 @@
 
     <!-- Global EKF -->
     <node unless="$(var is_indoors)" pkg="robot_localization" exec="ekf_node" name="ekf_global" output="screen">
-        <param from="$(find-pkg-share svea_localization)/config/global_ekf.yaml"/>
+        <param from="$(find-pkg-share svea_localization)/params/global_ekf.yaml"/>
         <!-- initial_state: [x,          y,          z, 
                              roll,       pitch,      yaw, 
                              x_dot,      y_dot,      z_dot, 

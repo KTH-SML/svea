@@ -117,11 +117,15 @@ class mpc(rx.Node):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 4ed06c8 (update localiztion params, and launch file)
     steering_pub = rx.Publisher(Float32, '/target_steering_angle', qos_profile=qos_subber)
     velocity_pub = rx.Publisher(Float32, '/target_speed', qos_profile=qos_subber)
     velocity_measured_pub = rx.Publisher(Float32, '/measured_speed', qos_profile=qos_subber)
     predicted_trajectory_pub = rx.Publisher(PoseArray, '/predicted_path', qos_profile=qos_pubber)
     static_trajectory_pub = rx.Publisher(PoseArray, '/static_path', qos_profile=qos_pubber)
+<<<<<<< HEAD
 
     @rx.Subscriber(PoseStamped, '/mpc_target', qos_pubber)
 =======
@@ -136,6 +140,10 @@ class mpc(rx.Node):
 
     @rx.Subscriber(PoseStamped, 'target_steering_angle', qos_pubber)
 >>>>>>> 1775e8c (tuning pure pursuit)
+=======
+
+    @rx.Subscriber(PoseStamped, '/mpc_target', qos_pubber)
+>>>>>>> 4ed06c8 (update localiztion params, and launch file)
     def mpc_target_callback(self, msg):
         """
         Callback function that sets a new goal position and calculates a trajectory.
@@ -418,10 +426,10 @@ class mpc(rx.Node):
                 self.mpc_last_time = current_time
             
         # Publish the latest control target and the estimated speed( from mocap or indoors loc. or outdoors loc.).
-        self.publish_to_foxglove(self.steering, self.velocity, self.state[3])
+        # self.publish_to_foxglove(self.steering, self.velocity, self.state[3])
         # Visualization data and send control
-        self.svea.send_control(self.steering + self.steering_bias, self.velocity) 
-        self.svea.visualize_data()
+        self.actuation.send_control(self.steering + self.steering_bias, self.velocity) 
+        # self.svea.visualize_data()
         
 
     def publish_to_foxglove(self,target_steering,target_speed,measured_speed):

@@ -8,9 +8,10 @@ from launch.substitutions import EqualsSubstitution
 
 def generate_launch_description():
     # Launch arguments
+    map_ar = 'sml'
     map_arg = DeclareLaunchArgument(
         'map',
-        default_value='sml',
+        default_value=map_ar,
         description='Map name'
     )
     is_sim_arg = DeclareLaunchArgument(
@@ -38,7 +39,7 @@ def generate_launch_description():
     map_path = PathJoinSubstitution([
         FindPackageShare('svea_core'),
         'maps',
-        [LaunchConfiguration('map'), '.yaml']
+        [map_ar+'.yaml']
     ])
 
     # Map server
@@ -50,13 +51,13 @@ def generate_launch_description():
         parameters=[{
             'yaml_filename': map_path,
             'use_sim_time': False,
-            'topic_name': 'map'
+            'topic_name': '/map'
         }]
     )
 
     lifecycle_manager = Node(
-        package='lifecycle_manager',
-        executable='nav2_lifecycle_manager',
+        package='nav2_lifecycle_manager',
+        executable='lifecycle_manager',
         name='lifecycle_manager',
         parameters=[{
             'node_names': ['map_server'],
@@ -107,7 +108,6 @@ def generate_launch_description():
         package='foxglove_bridge',
         executable='foxglove_bridge',
         name='foxglove_bridge',
-        output='screen',
         condition=IfCondition(LaunchConfiguration('use_foxglove')),
         parameters=[{
             'port': 8765,
@@ -183,12 +183,12 @@ def generate_launch_description():
         use_foxglove_arg,
         mpc_mode_arg,
         svea_mocap_name_arg,
-        # map_server,
-        # lifecycle_manager,
+        map_server,
+        lifecycle_manager,
         # hardware_interface,
         # simulation,
-        # foxglove_bridge,
+        foxglove_bridge,
         # visualization,
-        mpc_goal,
-        mpc_path_tracking,
+        # mpc_goal,
+        # mpc_path_tracking,
     ])
