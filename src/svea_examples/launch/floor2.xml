@@ -57,6 +57,7 @@
         <arg name="port" value="8765" />
     </include>
 
+    <!-- Start loading svea model -->
     <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py"/>
 
     <!-- Start pure_pursuit -->

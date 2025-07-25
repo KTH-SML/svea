@@ -21,4 +21,4 @@ catkin_pkg
 plotly
 scipy
 # This is for NMPC
-casadi==3.6.0
+casadi==3.6.7

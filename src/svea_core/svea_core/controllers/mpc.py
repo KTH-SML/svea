@@ -4,7 +4,7 @@ import casadi as ca
 import numpy as np
 from rclpy.node import Node
 
-class MPC_casadi:
+class MPC:
 
     def __init__(self, node: Node, config_ns='/mpc') -> None:
         """

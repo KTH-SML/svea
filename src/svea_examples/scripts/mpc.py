@@ -9,11 +9,11 @@ try:
     from svea_mocap.mocap import MotionCaptureInterface
 except ImportError:
     pass
-from svea_core.controllers.mpc import MPC_casadi
+from svea_core.controllers.mpc import MPC
 from std_msgs.msg import Float32
 from geometry_msgs.msg import PoseArray, PoseStamped
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
-import rclpy
+from rclpy.clock import Clock
 
 from svea_core import rosonic as rx
 
@@ -90,8 +90,10 @@ class mpc(rx.Node):
             "svea7": 7
         }
 
-        self.controller = MPC_casadi(self)
+        self.controller = MPC(self)
         self.DELTA_TIME = 1.0/self.mpc_freq
+        self.initial_horizon = self.prediction_horizon
+        self.initial_Qf = self.final_state_weight_matrix
 
         self.create_timer(self.DELTA_TIME, self.loop)
 
@@ -111,8 +113,11 @@ class mpc(rx.Node):
         # If a static path plan has been computed, run the mpc.
         if self.static_path_plan.size > 0 :
             # If enough time has passed, run the MPC computation
-            current_time = rclpy.clock.Clock().now().to_msg()
-            measured_dt = current_time - self.mpc_last_time
+            current_time = Clock().now().to_msg()
+            time_diff_sec = (current_time.sec - self.mpc_last_time.sec) + \
+                (current_time.nanosec - self.mpc_last_time.nanosec) / 1e9
+            measured_dt = time_diff_sec
+                        # current_time - self.mpc_last_time
             if measured_dt >= self.DELTA_TIME:
                 reference_trajectory, distance_to_next_point = self.get_mpc_current_reference()
                 if self.is_last_point and distance_to_next_point <= self.APPROACH_TARGET_THR and self.UPDATE_MPC_PARAM:
@@ -176,7 +181,7 @@ class mpc(rx.Node):
                 self.current_index_static_plan += 1  
             reference_state = self.static_path_plan[:,self.current_index_static_plan]
             x_ref = np.tile(reference_state, (self.initial_horizon+1, 1)).T 
-            target_speed_row = np.full((1, x_ref.shape[1]), self.TARGET_SPEED)                
+            target_speed_row = np.full((1, x_ref.shape[1]), self.target_speed)                
             x_ref = np.concatenate((x_ref, target_speed_row), axis=0)
             return x_ref, distance_to_next_point
 
@@ -184,13 +189,13 @@ class mpc(rx.Node):
             distance_to_last_point = self.compute_distance(self.state,self.static_path_plan[:,-1])
             reference_state = self.static_path_plan[:,-1]
             x_ref = np.tile(reference_state, (self.initial_horizon+1, 1)).T
-            target_speed_row = np.full((1, x_ref.shape[1]), self.TARGET_SPEED)
+            target_speed_row = np.full((1, x_ref.shape[1]), self.target_speed)
             x_ref = np.concatenate((x_ref, target_speed_row), axis=0)
             return x_ref, distance_to_last_point
 
     def compute_trajectory(self):
         """
-        Compute a straight-line trajectory from the current position to the goal using DELTA_S,
+        Compute a straight-line trajectory from the current position to the goal using delta_s,
         including the heading for each point, and publish the path.
         """
         if not self.goal_pose or not self.state:
@@ -206,7 +211,7 @@ class mpc(rx.Node):
         # reset mpc parameters
         self.UPDATE_MPC_PARAM = True  
         self.RESET_MPC_PARAM = False
-        self.mpc_last_time = self.clock.Clock().now().to_msg()
+        self.mpc_last_time = Clock().now().to_msg()
         self.controller.reset_parameters()
 
         # Calculate the straight-line trajectory between current state and goal position
@@ -215,7 +220,7 @@ class mpc(rx.Node):
         distance = self.compute_distance([start_x, start_y], [goal_x, goal_y])
         goal_yaw = self.get_yaw_from_pose(self.goal_pose)
 
-        # Compute intermediate points at intervals of DELTA_S
+        # Compute intermediate points at intervals of delta_s
         num_points = int(distance // self.delta_s)
 
         for i in range(num_points):
@@ -237,7 +242,7 @@ class mpc(rx.Node):
             distance = self.compute_distance([last_appended_x, last_appended_y], [goal_x, goal_y])
 
             # If the distance to the goal is too small, replace the last point with the goal directly.
-            if distance < self.DELTA_S / 2:
+            if distance < self.delta_s / 2:
                 # Replace the last appended point with the goal point
                 self.static_path_plan[:, -1] = np.array([goal_x, goal_y, goal_yaw])
             else:
@@ -265,6 +270,18 @@ class mpc(rx.Node):
         
         # Return the yaw
         return euler[2]  
+    
+    def is_goal_reached(self,distance):
+        if  not self.is_last_point:
+            return False        
+        elif distance < self.GOAL_REACHED_DIST:
+            yaw_error = self.state[2] - self.static_path_plan[2,-1]
+            if  abs(yaw_error) < self.GOAL_REACHED_YAW:
+                return True
+            else:
+                return False
+        else:
+            return False
     
 
 if __name__ == '__main__':
