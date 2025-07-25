@@ -30,4 +30,4 @@ catkin_pkg
 plotly
 
 # This is for NMPC
-casadi==3.6.0
+casadi==3.6.7

@@ -8,6 +8,7 @@
     -->
 
     <!-- Launch file arguments -->
+<<<<<<< HEAD
     <arg name="map"             default="sml"/>  
     <arg name="use_foxglove"    default="true"/>
     <arg name="svea_mocap_name" default="svea7"/>      <!-- name of SVEA -->    
@@ -26,6 +27,56 @@
         <arg name="is_sim" value="$(var is_sim)" />
         <arg name="state" value="$(var state)" />
     </include>     
+=======
+    <arg name="map"             default="/svea_ws/src/svea_core/maps/sml.yaml"/>  
+    <arg name="use_foxglove"    default="true"/>
+    <let name="use_foxglove" value="$(eval '\'$(var use_foxglove)\' == \'true\'')"/>
+    <arg name="svea_mocap_name" default="svea7"/>      <!-- name of SVEA -->    
+    <arg name="is_sim"          default="true"/>
+    <let name="is_sim" value="$(eval '\'$(var is_sim)\' == \'true\'')"/>
+    <arg name="state" default="[0.0, 0.0, 0.9, 0.0]" />
+    <arg name="mpc_mode"        default="goal_position"/> <!-- Options: goal_position, path_tracking -->
+
+    <!-- Start map server -->
+    <!-- more info about nav2_map_server:https://answers.ros.org/question/398095/-->
+    <node name="map_server" pkg="nav2_map_server" exec="map_server" output="screen">
+        <param name="yaml_filename" value="$(var map)" />
+        <param name="use_sim_time" value="false" />
+        <param name="topic_name" value="map" />
+    </node>
+    
+    <node name="lifecycle_manager" pkg="nav2_lifecycle_manager" exec="lifecycle_manager" output="screen">
+        <param name="node_names" value="['map_server']" />
+        <param name="autostart" value="true" />
+    </node>
+
+    <!-- If is_sim true, start transforms and simulation -->
+    <group if="$(var is_sim)">
+        <!-- Start transforms -->
+        <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
+            <arg name="is_indoors" value="$(var is_sim)"/>
+        </include>
+        
+        <!-- Start simulation -->
+        <include file="$(find-pkg-share svea_core)/launch/simulation.xml">
+            <arg name="state" value="$(var state)" />
+        </include>
+    </group>
+
+    <!-- If is_sim equal to false, then start micro-Ros-agent -->
+    <group unless="$(var is_sim)">
+        <!-- Start low-level interface -->
+        <executable cmd="$(find-pkg-share svea_core)/util/start_micro_ros.sh" output="screen"/>
+    </group>
+
+    <!-- Start Foxglove -->
+    <include if="$(var use_foxglove)" file="$(find-pkg-share foxglove_bridge)/launch/foxglove_bridge_launch.xml">
+        <arg name="port" value="8765" />
+    </include>
+
+    <!-- Start loading svea model -->
+    <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py"/>
+>>>>>>> bc2b7b5 (mpc goal position complete)
     
     <!-- Start main node based on MPC mode -->
     <group if="$(eval '\'$(var mpc_mode)\' == \'goal_position\'')">
@@ -46,10 +97,17 @@
             <param name="use_rviz" value="$(var use_foxglove)"/>
             <param name="is_sim" value="$(var is_sim)"/>
             <param name="mpc_freq" value="10"/> 
+<<<<<<< HEAD
             <param name="target_speed" value="1.0"/>
             <param name="circle_radius" value="1.5"/>
             <param name="circle_center_x" value="0.0"/>
             <param name="circle_center_y" value="0.0"/>
+=======
+            <param name="target_speed" value="1"/>
+            <param name="circle_radius" value="1.5"/>
+            <param name="circle_center_x" value="0"/>
+            <param name="circle_center_y" value="0"/>
+>>>>>>> bc2b7b5 (mpc goal position complete)
             <param name="svea_mocap_name" value="$(var svea_mocap_name)"/>
             <param name="mpc_config_ns" value="~mpc"/>
             <param from="$(find-pkg-share svea_core)/params/mpc_default_path_tracking.yaml" />
