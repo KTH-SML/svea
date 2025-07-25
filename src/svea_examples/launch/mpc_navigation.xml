@@ -98,6 +98,7 @@
             <param name="is_sim" value="$(var is_sim)"/>
             <param name="mpc_freq" value="10"/> 
 <<<<<<< HEAD
+<<<<<<< HEAD
             <param name="target_speed" value="1.0"/>
             <param name="circle_radius" value="1.5"/>
             <param name="circle_center_x" value="0.0"/>
@@ -108,6 +109,12 @@
             <param name="circle_center_x" value="0"/>
             <param name="circle_center_y" value="0"/>
 >>>>>>> bc2b7b5 (mpc goal position complete)
+=======
+            <param name="target_speed" value="1.0"/>
+            <param name="circle_radius" value="1.5"/>
+            <param name="circle_center_x" value="0.0"/>
+            <param name="circle_center_y" value="0.0"/>
+>>>>>>> 9579d95 (mpc path tracking complete)
             <param name="svea_mocap_name" value="$(var svea_mocap_name)"/>
             <param name="mpc_config_ns" value="~mpc"/>
             <param from="$(find-pkg-share svea_core)/params/mpc_default_path_tracking.yaml" />

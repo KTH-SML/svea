@@ -42,6 +42,9 @@ class mpc_path_tracking(rx.Node):
     prediction_horizon = rx.Parameter(5)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9579d95 (mpc path tracking complete)
     actuation = ActuationInterface()
     localizer = LocalizationInterface()
 
@@ -210,7 +213,11 @@ class mpc_path_tracking(rx.Node):
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     mpc_path_tracking.main()
 =======
     
 >>>>>>> bc2b7b5 (mpc goal position complete)
+=======
+    mpc_path_tracking.main()
+>>>>>>> 9579d95 (mpc path tracking complete)
