@@ -90,7 +90,7 @@ qos_profile = QoSProfile(
 
 
 
-class LocalizationInterface(rx.Resource):
+class LocalizationInterface(rx.Field):
     """Interface handling the reception of state information from the
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
     localization stack.

@@ -61,7 +61,7 @@ class Controls(IntEnum):
     VELOCITY = 1
 
 
-class ActuationInterface(rx.Resource):
+class ActuationInterface(rx.Field):
 
 <<<<<<< HEAD
 
@@ -525,6 +525,7 @@ class ActuationInterface:
         """
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         return self.MAX_SPEED_1 if self.highgear_msg.data else self.MAX_SPEED_0
 =======
         return self.MAX_SPEED_1 if self.gear else self.MAX_SPEED_0
@@ -656,3 +657,6 @@ class _ControlRequest(object):
 =======
         return self.MAX_SPEED_1 if self.highgear_msg.data else self.MAX_SPEED_0
 >>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
+=======
+        return self.MAX_SPEED_1 if self.highgear_msg.data else self.MAX_SPEED_0
+>>>>>>> f6498d4 (update rosonic)
