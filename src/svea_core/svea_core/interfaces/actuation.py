@@ -26,7 +26,7 @@ class Controls(IntEnum):
     VELOCITY = 1
 
 
-class ActuationInterface(rx.Resource):
+class ActuationInterface(rx.Field):
 
     # saturation input limits to keep hardware healthy
     MAX_STEER_PERCENT = 90          # [%]

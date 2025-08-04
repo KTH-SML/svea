@@ -22,7 +22,7 @@ qos_profile = QoSProfile(
 
 
 
-class LocalizationInterface(rx.Resource):
+class LocalizationInterface(rx.Field):
     """Interface handling the reception of state information from the
     localization stack.
 
