@@ -9,6 +9,7 @@ from svea_core.interfaces import LocalizationInterface
 from svea_core.controllers.pure_pursuit import PurePursuitController
 from svea_core.interfaces import ActuationInterface
 from svea_core import rosonic as rx
+from svea_core.utils import PlaceMarker
 
 
 class pure_pursuit(rx.Node):  # Inherit from rx.Node
@@ -22,6 +23,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
     actuation = ActuationInterface()
     localizer = LocalizationInterface()
+    mark = PlaceMarker()
 
     def on_startup(self):
         # Convert POINTS to numerical lists if loaded as strings
@@ -58,6 +60,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         self.curr += 1
         self.curr %= len(self._points)
         self.goal = self._points[self.curr]
+        self.mark.marker('goal','blue',self.goal)
         self.controller.is_finished = False
         # self.get_logger().info(f"Goal: {self.goal}")
 
