@@ -9,6 +9,7 @@
 
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
+  <depend>visualization_msgs</depend>
   <depend>robot_localization</depend>
   <depend>rclpy</depend>
   <!-- <depend>rosserial_msgs</depend> -->

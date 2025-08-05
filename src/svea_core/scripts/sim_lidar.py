@@ -24,6 +24,7 @@ from tf2_ros import TransformBroadcaster
 from geometry_msgs.msg import TransformStamped
 
 from svea_core import rosonic as rx
+from svea_core.utils.viz_util import publish_lidar_points, publish_lidar_rays, publish_edges
 import ast
 
 
@@ -75,9 +76,15 @@ class sim_lidar(rx.Node):
 
     ## Parameters ##
     odometry_top = rx.Parameter('odometry/local')
+    _viz_points_topic = 'viz_lidar_points'
+    _viz_rays_topic = 'viz_lidar_rays'
+    _viz_edges_topic = 'viz_edges'
 
     ## Publishers ##
     _scan_pub = rx.Publisher(LaserScan, '/scan', qos_pubber)
+    _viz_points_pub = rx.Publisher(PointCloud, _viz_points_topic, qos_pubber)
+    _viz_rays_pub = rx.Publisher(Marker, _viz_rays_topic, qos_pubber)
+    _viz_edges_pub = rx.Publisher(Marker, _viz_edges_topic, qos_pubber)
     
     ## Subscribers ##
     @rx.Subscriber(Odometry, odometry_top, qos_subber)
@@ -100,7 +107,10 @@ class sim_lidar(rx.Node):
 
         self._lidar_position = np.append(lidar_xy, yaw)
 
+<<<<<<< HEAD
         self.publish_tf(odmetry_msg)
+=======
+>>>>>>> 6567c2c (marker placer complete)
         self._scan_msg.header.stamp = odmetry_msg.header.stamp
         self.sim_loop()
 
@@ -137,10 +147,13 @@ class sim_lidar(rx.Node):
 
         self.tf_broadcaster = TransformBroadcaster(self)
 
-        # self.create_timer(self.SCAN_TIME, self.sim_loop)
+        self.create_timer(self.SCAN_TIME, self.sim_loop)
 
     def load_param(self, name, value=None):
-        self.declare_parameter(name, value)
+        try:
+            self.declare_parameter(name, value)
+        except Exception as e:
+            None
         if value is None:
             assert self.has_parameter(name), f'Missing parameter "{name}"'
         return self.get_parameter(name).value
@@ -152,6 +165,8 @@ class sim_lidar(rx.Node):
             self._update_visible_edges()
             self._update_scan()
             self.publish_scan()
+            self.publish_viz_points()
+            self.publish_viz_rays()
 
     @property
     def obstacles(self):
@@ -220,17 +235,12 @@ class sim_lidar(rx.Node):
 
     def publish_scan(self):
         self._scan_pub.publish(self._scan_msg)
+    
+    def publish_viz_points(self):
+        publish_lidar_points(self._viz_points_pub, self.viz_points)
 
-    def publish_tf(self, odom_msg):
-        t = TransformStamped()
-        t.header.stamp = odom_msg.header.stamp
-        t.header.frame_id = 'base_link'
-        t.child_frame_id = 'laser'
-        t.transform.translation.x = 0.18
-        t.transform.translation.y = -0.05
-        t.transform.translation.z = 0.0
-        t.transform.rotation.w = 1.0
-        self.tf_broadcaster.sendTransform(t)
+    def publish_viz_rays(self):
+        publish_lidar_rays(self._viz_rays_pub, self._lidar_position, self.viz_points)
 
 
 def beam_intersection(beam_and_edges):

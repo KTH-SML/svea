@@ -28,6 +28,11 @@ numpy
 lark --prefer-binary
 catkin_pkg
 plotly
+<<<<<<< HEAD
 
+=======
+scipy
+matplotlib
+>>>>>>> 6567c2c (marker placer complete)
 # This is for NMPC
 casadi==3.6.7

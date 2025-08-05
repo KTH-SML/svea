@@ -88,5 +88,12 @@
 
     <!-- Start simulation -->
     <include file="$(find-pkg-share svea_core)/launch/simulation.xml"/>
+<<<<<<< HEAD
 >>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
+=======
+
+    <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
+        <arg name="is_indoors" value="$(var is_sim)"/>
+    </include>
+>>>>>>> 146db9c (marker placer complete)
 </launch>

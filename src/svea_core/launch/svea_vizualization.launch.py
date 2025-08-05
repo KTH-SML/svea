@@ -65,8 +65,13 @@ def generate_launch_description():
             arguments=[urdf]),
         Node(
             package='svea_core',
+<<<<<<< HEAD
             executable='viz_util.py',
             name='viz_util',
 >>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
+=======
+            executable='model_viz.py',
+            name='svea_model',
+>>>>>>> 146db9c (marker placer complete)
             output='screen'),
     ])
