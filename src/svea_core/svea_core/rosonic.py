@@ -271,6 +271,7 @@ class Resource:
 
         if name is not None:
             if self.__rosonic_name__ is None:
+<<<<<<< HEAD
                 self.__rosonic_name__ = name
             else:
                 raise Exception(f"Resource '{self}' already has a name, '{self.__rosonic_name__}'")
@@ -632,19 +633,26 @@ class Resource:
             case (  None,   None):
                 raise Exception(f"Resource '{self}' doesn't have a name.")
             case (  None, str(_)):
+=======
+>>>>>>> 1c56426 (fix rosonic bug with nameless resources)
                 self.__rosonic_name__ = name
-            case (str(_),   None): pass
-            case (str(_), str(_)):
+            else:
                 raise Exception(f"Resource '{self}' already has a name, '{self.__rosonic_name__}'")
 
-        self.__rosonic_owner__ = owner
-        fullname = self.__rosonic_fullname__
-        assert fullname not in self.__rosonic_lookup__, \
-            f"Resource '{fullname}' already registered"
-
-        if owner is not self:
+        if owner is self:
+            assert self.__rosonic_name__ is not None, f"Root resource '{self}' must have a name"
+        else:
             assert _is_registered(owner), f"Resource '{owner}' owning '{self}' is not registered"
+
+            # The following check only makes sense for non-root, named resources
+            if self.__rosonic_name__ is not None:
+                fullname = f"{owner.__rosonic_fullname__}/{self.__rosonic_name__}"
+                assert fullname not in self.__rosonic_lookup__, \
+                    f"Resource '{fullname}' already registered"
+
             owner.__rosonic_resources__ += (self,)
+
+        self.__rosonic_owner__ = owner # From this point, the resource (self) is registered
         
         for resource in self.__rosonic_preregistered__:
             resource.__rosonic_register__(self)
@@ -653,6 +661,8 @@ class Resource:
     def __rosonic_fullname__(self) -> str:
         """
         Computes the fully qualified graph name of this resource.
+
+        Note: Takes on the parent's name if itself does not have a name.
 
         Returns:
             str: The fully qualified name for this resource.
@@ -663,21 +673,22 @@ class Resource:
         assert _is_registered(self), f"Resource '{self}' is not started"
 
         name = self.__rosonic_name__
-        if _is_absolute_name(name):
-            return name
-
         owner = self.__rosonic_owner__
-        root = (None if _is_root(self) else
-                owner.__rosonic_fullname__)
 
-        return (name if root is None else
-                f"{root}/{name}")
+        if name is None:
+            return owner.__rosonic_fullname__
+        elif _is_root(self) or _is_absolute_name(name):
+            return name
+        else:
+            return f"{owner.__rosonic_fullname__}/{name}"
 
     @property
     def __rosonic_relname__(self) -> str:
         """
         Computes the relative name of this resource with respect to the root
         resource.
+
+        Note: Takes on the parent's name if itself does not have a name.
 
         Returns:
             str: The relative name of this resource.
@@ -690,13 +701,14 @@ class Resource:
         name = self.__rosonic_name__
         owner = self.__rosonic_owner__
 
-        if _is_absolute_name(name):
-            return name
-        if _is_root(self):
+        if name is None:
+            return owner.__rosonic_relname__
+        elif _is_root(self):
             return ''
-
-        return (name if _is_root(owner) else
-                f"{owner.__rosonic_relname__}/{name}")
+        elif _is_absolute_name(name) or _is_root(owner):
+            return name
+        else:
+            return f"{owner.__rosonic_relname__}/{name}"
 
     @property
     def __rosonic_lookup__(self) -> dict[str, 'Resource']:
@@ -710,7 +722,8 @@ class Resource:
         """
         lookup: dict[str, 'Resource'] = {}
         for resource in self.__rosonic_resources__:
-            lookup |= {resource.__rosonic_fullname__: resource}
+            if resource.__rosonic_name__ is not None:
+                lookup |= {resource.__rosonic_fullname__: resource}
             lookup |= resource.__rosonic_lookup__
         return lookup
 
@@ -958,7 +971,6 @@ class Node(Member, Node):
 # Only for typing
 class _RegisteredResource(Resource):
 
-    __rosonic_name__: str           # pyright: ignore[reportIncompatibleVariableOverride]
     __rosonic_owner__: Resource     # pyright: ignore[reportIncompatibleVariableOverride]
 
 
