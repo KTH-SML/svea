@@ -51,4 +51,4 @@ class state_publisher(rx.Node):
 
 
 if __name__ == '__main__':
-    StatePublisher.main()
+    state_publisher.main()

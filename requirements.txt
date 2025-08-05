@@ -20,5 +20,6 @@ lark --prefer-binary
 catkin_pkg
 plotly
 scipy
+matplotlib
 # This is for NMPC
 casadi==3.6.7

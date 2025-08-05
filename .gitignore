@@ -4,3 +4,7 @@ __pycache__/
 *$py.class
 log/
 **/teleopsvea/
+test.ipynb
+**/motion_capture_system/
+.vscode/
+el2425/

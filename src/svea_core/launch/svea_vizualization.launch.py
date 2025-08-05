@@ -30,7 +30,7 @@ def generate_launch_description():
             arguments=[urdf]),
         Node(
             package='svea_core',
-            executable='viz_util.py',
-            name='viz_util',
+            executable='model_viz.py',
+            name='svea_model',
             output='screen'),
     ])

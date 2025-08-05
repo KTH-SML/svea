@@ -50,4 +50,8 @@
 
     <!-- Start simulation -->
     <include file="$(find-pkg-share svea_core)/launch/simulation.xml"/>
+
+    <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
+        <arg name="is_indoors" value="$(var is_sim)"/>
+    </include>
 </launch>
