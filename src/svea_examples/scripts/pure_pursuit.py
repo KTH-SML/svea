@@ -17,9 +17,13 @@ from svea_core.controllers.pure_pursuit import PurePursuitController
 from svea_core.interfaces import ActuationInterface
 from svea_core import rosonic as rx
 <<<<<<< HEAD
+<<<<<<< HEAD
 from svea_core.utils import PlaceMarker, ShowPath
 =======
 >>>>>>> 914c44e (update on 05/12/2025)
+=======
+from svea_core.utils import PlaceMarker
+>>>>>>> b1bf097 (pure_pursuit goal display update)
 
 
 class pure_pursuit(rx.Node):  # Inherit from rx.Node
@@ -105,6 +109,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
     actuation = ActuationInterface()
     localizer = LocalizationInterface()
+    mark = PlaceMarker()
 
     def on_startup(self):
 >>>>>>> 914c44e (update on 05/12/2025)
@@ -207,6 +212,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         self.curr += 1
         self.curr %= len(self._points)
         self.goal = self._points[self.curr]
+        self.mark.marker('goal','blue',self.goal)
         self.controller.is_finished = False
 <<<<<<< HEAD
 <<<<<<< HEAD
