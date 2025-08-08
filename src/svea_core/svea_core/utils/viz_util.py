@@ -22,15 +22,19 @@ from sensor_msgs.msg import PointCloud
 from std_msgs.msg import ColorRGBA
 from visualization_msgs.msg import Marker
 <<<<<<< HEAD
+<<<<<<< HEAD
 from svea_core import rosonic as rx
 
 top_height = 0.22 # [m] approx.
 
 =======
+=======
+from svea_core import rosonic as rx
+>>>>>>> 9278f8e (Planned Path and Past Path can be displayed with ShowPath in util, example in pure pursuit)
 
-chassis_height = 0.06 # [m] approx.
 top_height = 0.22 # [m] approx.
 
+<<<<<<< HEAD
 ###############################
 ## TRAJECTORY VISUALIZATIONS ##
 ###############################
@@ -142,6 +146,8 @@ def publish_pose_array(poses_publisher, x_list, y_list, yaw_list):
 
 
 >>>>>>> 146db9c (marker placer complete)
+=======
+>>>>>>> 9278f8e (Planned Path and Past Path can be displayed with ShowPath in util, example in pure pursuit)
 ##########################
 ## LIDAR VIZUALIZATIONS ##
 ##########################

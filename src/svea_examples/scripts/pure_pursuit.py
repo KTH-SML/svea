@@ -18,12 +18,16 @@ from svea_core.interfaces import ActuationInterface
 from svea_core import rosonic as rx
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from svea_core.utils import PlaceMarker, ShowPath
 =======
 >>>>>>> 914c44e (update on 05/12/2025)
 =======
 from svea_core.utils import PlaceMarker
 >>>>>>> b1bf097 (pure_pursuit goal display update)
+=======
+from svea_core.utils import PlaceMarker, ShowPath
+>>>>>>> 9278f8e (Planned Path and Past Path can be displayed with ShowPath in util, example in pure pursuit)
 
 
 class pure_pursuit(rx.Node):  # Inherit from rx.Node
@@ -109,7 +113,10 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
     actuation = ActuationInterface()
     localizer = LocalizationInterface()
+    # Goal Visualization
     mark = PlaceMarker()
+    # Path Visualization
+    path = ShowPath()
 
     def on_startup(self):
 >>>>>>> 914c44e (update on 05/12/2025)
@@ -134,9 +141,13 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         self.curr = 0
         self.goal = self._points[self.curr]
 <<<<<<< HEAD
+<<<<<<< HEAD
         self.mark.marker('goal','blue',self.goal)
 =======
 >>>>>>> 914c44e (update on 05/12/2025)
+=======
+        self.mark.marker('goal','blue',self.goal)
+>>>>>>> 9278f8e (Planned Path and Past Path can be displayed with ShowPath in util, example in pure pursuit)
         self.update_traj(x, y)
 
         self.create_timer(self.DELTA_TIME, self.loop)
@@ -159,8 +170,6 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         if self.controller.is_finished:
             self.update_goal()
             self.update_traj(x, y)
-            # self.get_logger().info(f"Location: {x}, {y}")
-            # self.get_logger().info(f"looking ahead: {self.controller.k * vel + self.controller.Lfc}")
 
         steering, velocity = self.controller.compute_control(state)
 <<<<<<< HEAD
@@ -212,8 +221,8 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         self.curr += 1
         self.curr %= len(self._points)
         self.goal = self._points[self.curr]
-        self.mark.marker('goal','blue',self.goal)
         self.controller.is_finished = False
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -225,6 +234,10 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 =======
         # self.get_logger().info(f"Goal: {self.goal}")
 >>>>>>> 1775e8c (tuning pure pursuit)
+=======
+        # Mark the goal
+        self.mark.marker('goal','blue',self.goal)
+>>>>>>> 9278f8e (Planned Path and Past Path can be displayed with ShowPath in util, example in pure pursuit)
 
     def update_traj(self, x, y):
         """
@@ -243,6 +256,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         self.controller.traj_y = ys
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         #self.path.publish_path(xs,ys)
 
 if __name__ == '__main__':
@@ -250,6 +264,10 @@ if __name__ == '__main__':
 =======
 =======
 >>>>>>> f567493 (update on 05/12/2025)
+=======
+=======
+>>>>>>> 9278f8e (Planned Path and Past Path can be displayed with ShowPath in util, example in pure pursuit)
+>>>>>>> fd5cfb1 (Planned Path and Past Path can be displayed with ShowPath in util, example in pure pursuit)
         self.path.publish_path(xs,ys)
 
 if __name__ == '__main__':
