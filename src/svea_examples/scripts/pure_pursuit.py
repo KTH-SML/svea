@@ -9,7 +9,7 @@ from svea_core.interfaces import LocalizationInterface
 from svea_core.controllers.pure_pursuit import PurePursuitController
 from svea_core.interfaces import ActuationInterface
 from svea_core import rosonic as rx
-from svea_core.utils import PlaceMarker
+from svea_core.utils import PlaceMarker, ShowPath
 
 
 class pure_pursuit(rx.Node):  # Inherit from rx.Node
@@ -23,7 +23,10 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
     actuation = ActuationInterface()
     localizer = LocalizationInterface()
+    # Goal Visualization
     mark = PlaceMarker()
+    # Path Visualization
+    path = ShowPath()
 
     def on_startup(self):
         # Convert POINTS to numerical lists if loaded as strings
@@ -38,6 +41,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
         self.curr = 0
         self.goal = self._points[self.curr]
+        self.mark.marker('goal','blue',self.goal)
         self.update_traj(x, y)
 
         self.create_timer(self.DELTA_TIME, self.loop)
@@ -49,8 +53,6 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         if self.controller.is_finished:
             self.update_goal()
             self.update_traj(x, y)
-            # self.get_logger().info(f"Location: {x}, {y}")
-            # self.get_logger().info(f"looking ahead: {self.controller.k * vel + self.controller.Lfc}")
 
         steering, velocity = self.controller.compute_control(state)
         self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
@@ -60,15 +62,16 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         self.curr += 1
         self.curr %= len(self._points)
         self.goal = self._points[self.curr]
-        self.mark.marker('goal','blue',self.goal)
         self.controller.is_finished = False
-        # self.get_logger().info(f"Goal: {self.goal}")
+        # Mark the goal
+        self.mark.marker('goal','blue',self.goal)
 
     def update_traj(self, x, y):
         xs = np.linspace(x, self.goal[0], self.TRAJ_LEN)
         ys = np.linspace(y, self.goal[1], self.TRAJ_LEN)
         self.controller.traj_x = xs
         self.controller.traj_y = ys
+        self.path.publish_path(xs,ys)
 
 if __name__ == '__main__':
     pure_pursuit.main()
