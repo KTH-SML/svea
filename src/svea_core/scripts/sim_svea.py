@@ -262,6 +262,10 @@ class sim_svea(rx.Node):
         self.highgear = False
         self.diff = False
 
+        namespace = self.get_namespace()
+        self.odom_frame = namespace + '/' + self.odom_frame if namespace != '/' else self.odom_frame
+        self.self_frame = namespace + '/' + self.self_frame if namespace != '/' else self.self_frame
+
         if self.publish_tf:
             # for broadcasting fake tf tree
             self.tf_br = tf2_ros.TransformBroadcaster(self)

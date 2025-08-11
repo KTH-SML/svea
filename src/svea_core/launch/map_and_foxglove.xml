@@ -2,7 +2,10 @@
 <launch>
     <!-- Launch file arguments -->
     <arg name="map"             default="floor2"/>
+<<<<<<< HEAD
     <arg name="map_path" default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
+=======
+>>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
     <arg name="use_foxglove"    default="true"/>
     <let name="use_foxglove" value="$(eval '\'$(var use_foxglove)\' == \'true\'')"/>
 

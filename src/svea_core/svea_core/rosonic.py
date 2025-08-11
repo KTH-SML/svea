@@ -1513,6 +1513,20 @@ class Publisher(NamedField):
 
     ### Example Usage:
     ```python
+
+
+
+    class App(rx.Node):
+    
+        # Topic: /app/cmd_vel
+        cmd_vel = rx.Publisher(Twist) 
+
+        @rx.Timer(0.1)
+        def loop(self):
+            msg = Twist()
+            msg.linear.x = 1.0
+            self.cmd_vel.publish(msg)
+
     class MyNode(rx.Node):
         chat_pub = rx.Publisher(String, 'chat_topic')
 
