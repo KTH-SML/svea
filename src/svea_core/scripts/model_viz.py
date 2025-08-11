@@ -30,9 +30,12 @@ class Publish3Dcar(Node):
         hinc = 0.005
 
         # message declarations
+        namespace = self.get_namespace()
+        frame_id = namespace + '/odom' if namespace != '/' else 'odom'
+        child_id = namespace + '/axis' if namespace != '/' else 'base_link'
         odom_trans = TransformStamped()
-        odom_trans.header.frame_id = 'odom'
-        odom_trans.child_frame_id = 'axis'
+        odom_trans.header.frame_id = frame_id
+        odom_trans.child_frame_id = child_id
 
         try:
             while rclpy.ok():

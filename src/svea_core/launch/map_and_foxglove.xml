@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Launch file arguments -->
+    <arg name="map"             default="floor2"/>
+    <arg name="use_foxglove"    default="true"/>
+    <let name="use_foxglove" value="$(eval '\'$(var use_foxglove)\' == \'true\'')"/>
+
+    <!-- Start map server -->
+    <!-- more info about nav2_map_server:https://answers.ros.org/question/398095/-->
+    <node name="map_server" pkg="nav2_map_server" exec="map_server" output="screen">
+        <param name="yaml_filename" value="$(var map_path)" />
+        <param name="use_sim_time" value="false" />
+        <param name="topic_name" value="map" />
+    </node>
+    
+    <node name="lifecycle_manager" pkg="nav2_lifecycle_manager" exec="lifecycle_manager" output="screen">
+        <param name="node_names" value="['map_server']" />
+        <param name="autostart" value="true" />
+    </node>
+
+    <!-- Start Foxglove -->
+    <include if="$(var use_foxglove)" file="$(find-pkg-share foxglove_bridge)/launch/foxglove_bridge_launch.xml">
+        <arg name="port" value="8765" />
+    </include>
+
+</launch>

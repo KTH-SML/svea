@@ -1,18 +1,19 @@
 <launch>
   <!-- Launch file arguments -->
   <arg name="is_indoors" default="true" description="Whether the robot is operating indoors"/>
+  <arg name="vehicle_name" default=""/>
   
   <!-- Static transforms -->
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster" args="0 0 0 0 0 0 map odom"/>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster" args="0 0 0 0 0 0 odom base_link"/>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="imulink_broadcaster" args="0.07 0 0.11 0 0 0 base_link imu"/>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="gpslink_broadcaster" args="0.04 0.103 0.140 0 0 0 base_link gps"/>
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster" args="0 0 0 0 0 0 map $(var vehicle_name)/odom"/>
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster" args="0 0 0 0 0 0 $(var vehicle_name)/odom $(var vehicle_name)/base_link"/>
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="imulink_broadcaster" args="0.07 0 0.11 0 0 0 $(var vehicle_name)/base_link $(var vehicle_name)/imu"/>
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="gpslink_broadcaster" args="0.04 0.103 0.140 0 0 0 $(var vehicle_name)/base_link $(var vehicle_name)/gps"/>
   
   <!-- Conditional lidar transform (ROS2 doesn't have <group> but supports if/unless on nodes) -->
   <node pkg="tf2_ros" exec="static_transform_publisher" name="lidarlink_broadcaster" 
-        args="0.385 0 0.15 0 0 0 1 base_link laser"
+        args="0.385 0 0.15 0 0 0 1 $(var vehicle_name)/base_link $(var vehicle_name)/laser"
         if="$(var is_indoors)"/>
 
   <node pkg="tf2_ros" exec="static_transform_publisher" name="wheelencoderlink_broadcaster" 
-        args="0.0 0 0.0 0 0 0 1 base_link wheel_encoder"/>
+        args="0.0 0 0.0 0 0 0 1 $(var vehicle_name)/base_link $(var vehicle_name)/wheel_encoder"/>
 </launch>
