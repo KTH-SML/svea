@@ -2,6 +2,7 @@
 <launch>
     <!-- Launch file arguments -->
     <arg name="map"             default="floor2"/>
+    <arg name="map_path" default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
     <arg name="use_foxglove"    default="true"/>
     <let name="use_foxglove" value="$(eval '\'$(var use_foxglove)\' == \'true\'')"/>
 
