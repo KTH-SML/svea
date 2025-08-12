@@ -24,11 +24,7 @@
     <!-- Start Svea Core -->
     <include file="$(find-pkg-share svea_core)/launch/svea_launch.xml">
         <arg name="is_sim" value="$(var is_sim)" />
-        <arg name="initial_pose_x" value="$(var initial_pose_x)" />
-        <arg name="initial_pose_y" value="$(var initial_pose_y)" />
-        <arg name="initial_pose_a" value="$(var initial_pose_a)" />
         <arg name="state" value="$(var state)" />
-        <arg name="points" value="$(var points)" />
     </include>     
     
     <!-- Start main node based on MPC mode -->
