@@ -18,10 +18,17 @@ features with object-oriented interfaces.
 
 ## Useful to know before starting
 Before continuing to the next sections, consider taking some time to read up on
+<<<<<<< HEAD
 two important concepts for this code base: the **Robotic Operating System (ROS 2)**
 and **Object Oriented Programming (OOP)**.
 
 To read up on ROS 2, check out the
+=======
+two important concepts for this code base: the **Robotic Operating System (ROS2)**
+and **Object Oriented Programming (OOP)**.
+
+To read up on ROS2, check out the
+>>>>>>> 5db0cd0 (update readme)
 [ROS Start Guide](https://docs.ros.org/en/jazzy/index.html#getting-started). However, do not spend
 too much time diving into the guide. The structure and tutorials are not very
 intuitive, but glossing over them will give a sense of what ROS is and how you
@@ -41,7 +48,11 @@ instructions.
 ## Install Docker Engine
 For the instructions below to work, you need to first install Docker Engine.
 
+<<<<<<< HEAD
 For Windows users, you will need to install WSL 2 and set it's distribution to
+=======
+For Windows users, you will need to first install WSL 2 and set it's distribution to
+>>>>>>> 5db0cd0 (update readme)
 Ubuntu (20 or higher recommended). Use the commands listed [here](https://learn.microsoft.com/en-us/windows/wsl/basic-commands)
 to "Install", "List available Linux distributions", and "Set default WSL Version" to
 Ubuntu 20 or higher.
@@ -55,14 +66,18 @@ For example, choose the home directory or a directory for keeping projects in.
 Once you are in the chosen directory, use the command:
 
 ```bash
+<<<<<<< HEAD
 git clone https://github.com/KTH-SML/svea.git
+=======
+git clone https://github.com/KTH-SML/svea_jazzy.git
+>>>>>>> 5db0cd0 (update readme)
 ```
 
 to download the library. Then, a new directory will appear called
-`./svea`. Go into the directory with command:
+`./svea_jazzy`. Go into the directory with command:
 
 ```bash
-cd svea
+cd svea_jazzy
 ```
 
 To install the Docker image containing the entire codebase run:
@@ -113,7 +128,11 @@ ros2 launch svea_examples floor2.launch
 Then, open Foxglove Studio natively or in the browser, and on the first prompt
 click "Open connection", then click "Open" with the default settings. Next,
 click on the "Layout" dropdown menu and select "Import from file...". Finally,
+<<<<<<< HEAD
 navigate to `./foxglove` and select `Floor2 Pure Pursuit.json`. After it
+=======
+navigate to `svea_jazzy/foxglove` and select `Floor2 Pure Pursuit.json`. After it
+>>>>>>> 5db0cd0 (update readme)
 finishes loading, you should see something that looks like this:
 
 ![purepursuit_foxglove](docs/media/foxglove_pure_pursuit.png)
