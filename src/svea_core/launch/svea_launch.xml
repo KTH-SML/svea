@@ -43,6 +43,8 @@
 
 
     <!-- Start loading svea model -->
-    <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py"/>
+    <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py">
+        <arg name="vehicle_name" value="$(var vehicle_name)"/>
+    </include>
 
 </launch>

@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
-<robot name="svea">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="svea">
+  
+  <!-- 定义namespace参数，默认为空 -->
+  <xacro:arg name="namespace" default="" />
+  <xacro:property name="ns" value="$(arg namespace)" />
 
- <material name="black">
+  <material name="black">
     <color rgba="0 0 0 1"/>
   </material>
   <material name="white">
@@ -14,8 +18,7 @@
     <color rgba="1 0.5 0 1"/>
   </material>
 
-
-  <link name="base_link">
+  <link name="${ns}base_link">
     <visual>
       <geometry>
         <mesh filename="package://svea_core/meshes/body.stl" scale="0.001 0.001 0.001"/>
@@ -25,7 +28,7 @@
     </visual>
   </link>
 
-  <link name="tire1">
+  <link name="${ns}tire1">
     <visual>
       <geometry>
         <mesh filename="package://svea_core/meshes/tire.stl" scale="0.001 0.001 0.001"/>
@@ -35,13 +38,13 @@
     </visual>
   </link>
 
-  <joint name="base_to_tire1_front_left" type="fixed">
-    <parent link="base_link"/>
-    <child link="tire1"/>
+  <joint name="${ns}base_to_tire1_front_left" type="fixed">
+    <parent link="${ns}base_link"/>
+    <child link="${ns}tire1"/>
     <origin xyz="0.19 0.06 0"/>
   </joint>
 
-  <link name="tire2">
+  <link name="${ns}tire2">
     <visual>
       <geometry>
         <mesh filename="package://svea_core/meshes/tire.stl" scale="0.001 0.001 0.001"/>
@@ -51,13 +54,13 @@
     </visual>
   </link>
 
-  <joint name="base_to_tire2_front_right" type="fixed">
-    <parent link="base_link"/>
-    <child link="tire2"/>
+  <joint name="${ns}base_to_tire2_front_right" type="fixed">
+    <parent link="${ns}base_link"/>
+    <child link="${ns}tire2"/>
     <origin xyz="0.19 -0.06 0"/>
   </joint>
 
-  <link name="tire3">
+  <link name="${ns}tire3">
     <visual>
       <geometry>
         <mesh filename="package://svea_core/meshes/tire.stl" scale="0.001 0.001 0.001"/>
@@ -67,13 +70,13 @@
     </visual>
   </link>
 
-  <joint name="base_to_tire3_back_left" type="fixed">
-    <parent link="base_link"/>
-    <child link="tire3"/>
+  <joint name="${ns}base_to_tire3_back_left" type="fixed">
+    <parent link="${ns}base_link"/>
+    <child link="${ns}tire3"/>
     <origin xyz="-0.15 0.06 0"/>
   </joint>
 
-  <link name="tire4">
+  <link name="${ns}tire4">
     <visual>
       <geometry>
         <mesh filename="package://svea_core/meshes/tire.stl" scale="0.001 0.001 0.001"/>
@@ -83,13 +86,13 @@
     </visual>
   </link>
 
-  <joint name="base_to_tire4_back_right" type="fixed">
-    <parent link="base_link"/>
-    <child link="tire4"/>
+  <joint name="${ns}base_to_tire4_back_right" type="fixed">
+    <parent link="${ns}base_link"/>
+    <child link="${ns}tire4"/>
     <origin xyz="-0.15 -0.06 0"/>
   </joint>
 
-  <link name="mount_body">
+  <link name="${ns}mount_body">
     <visual>
       <geometry>
         <mesh filename="package://svea_core/meshes/body166.stl" scale="0.001 0.001 0.001"/>
@@ -99,13 +102,13 @@
     </visual>
   </link>
   
-  <joint name="base_to_mount_body" type="fixed">
-    <parent link="base_link"/>
-    <child link="mount_body"/>
+  <joint name="${ns}base_to_mount_body" type="fixed">
+    <parent link="${ns}base_link"/>
+    <child link="${ns}mount_body"/>
     <origin xyz="-0.01 0.015 0.085"/>
   </joint>
 
-  <link name="lidar_base">
+  <link name="${ns}lidar_base">
     <visual>
       <geometry>
         <mesh filename="package://svea_core/meshes/lidar_base.stl" scale="0.001 0.001 0.001"/>
@@ -115,13 +118,13 @@
     </visual>
   </link>
 
-  <joint name="mount_body_to_lidar_base" type="fixed">
-    <parent link="mount_body"/>
-    <child link="lidar_base"/>
+  <joint name="${ns}mount_body_to_lidar_base" type="fixed">
+    <parent link="${ns}mount_body"/>
+    <child link="${ns}lidar_base"/>
     <origin xyz="0.37 0 0"/>
   </joint>
 
-  <link name="lidar_top">
+  <link name="${ns}lidar_top">
     <visual>
       <geometry>
         <mesh filename="package://svea_core/meshes/lidar_top.stl" scale="0.001 0.001 0.001"/>
@@ -131,13 +134,13 @@
     </visual>
   </link>
 
-  <joint name="lidar_base_to_lidar_top" type="fixed">
-    <parent link="lidar_base"/>
-    <child link="lidar_top"/>
+  <joint name="${ns}lidar_base_to_lidar_top" type="fixed">
+    <parent link="${ns}lidar_base"/>
+    <child link="${ns}lidar_top"/>
     <origin xyz="0 0 0.03"/>
   </joint>
 
-  <link name="lidar_cap">
+  <link name="${ns}lidar_cap">
     <visual>
       <geometry>
         <mesh filename="package://svea_core/meshes/lidar_cap.stl" scale="0.001 0.001 0.001"/>
@@ -147,13 +150,13 @@
     </visual>
   </link>
 
-  <joint name="lidar_top_to_lidar_cap" type="fixed">
-    <parent link="lidar_top"/>
-    <child link="lidar_cap"/>
+  <joint name="${ns}lidar_top_to_lidar_cap" type="fixed">
+    <parent link="${ns}lidar_top"/>
+    <child link="${ns}lidar_cap"/>
     <origin xyz="0 0 0.03"/>
   </joint>
 
-  <link name="zed_box">
+  <link name="${ns}zed_box">
     <visual>
       <geometry>
         <mesh filename="package://svea_core/meshes/ZED_Box.stl" scale="0.001 0.001 0.001"/>
@@ -163,9 +166,9 @@
     </visual>
   </link>
 
-  <joint name="mount_body_to_zed_box" type="fixed">
-    <parent link="mount_body"/>
-    <child link="zed_box"/>
+  <joint name="${ns}mount_body_to_zed_box" type="fixed">
+    <parent link="${ns}mount_body"/>
+    <child link="${ns}zed_box"/>
     <origin xyz="0.22 0.01 0.037"/>
   </joint>
   

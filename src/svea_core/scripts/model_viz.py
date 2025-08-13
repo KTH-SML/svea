@@ -31,8 +31,9 @@ class Publish3Dcar(Node):
 
         # message declarations
         namespace = self.get_namespace()
+        self.get_logger().info("Namespace: {0}".format(namespace))
         frame_id = namespace + '/odom' if namespace != '/' else 'odom'
-        child_id = namespace + '/axis' if namespace != '/' else 'base_link'
+        child_id = namespace + '/axis' if namespace != '/' else 'axis'
         odom_trans = TransformStamped()
         odom_trans.header.frame_id = frame_id
         odom_trans.child_frame_id = child_id
