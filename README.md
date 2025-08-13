@@ -20,11 +20,11 @@ features with object-oriented interfaces.
 
 ## Useful to know before starting
 Before continuing to the next sections, consider taking some time to read up on
-two important concepts for this code base: the **Robotic Operating System (ROS)**
+two important concepts for this code base: the **Robotic Operating System (ROS2)**
 and **Object Oriented Programming (OOP)**.
 
-To read up on ROS, check out the
-[ROS Start Guide](http://wiki.ros.org/ROS/StartGuide). However, do not spend
+To read up on ROS2, check out the
+[ROS Start Guide](https://docs.ros.org/en/jazzy/index.html#getting-started). However, do not spend
 too much time diving into the guide. The structure and tutorials are not very
 intuitive, but glossing over them will give a sense of what ROS is and how you
 are meant to use it. The rest of the learning curve is overcome by trying it out
@@ -44,9 +44,9 @@ instructions.
 For the instructions below to work, you need to first install Docker Engine.
 
 For Windows users, you will need to first install WSL 2 and set it's distribution to
-Ubuntu (either 18 or 20). Use the commands listed [here](https://learn.microsoft.com/en-us/windows/wsl/basic-commands)
+Ubuntu (20 or higher recommended). Use the commands listed [here](https://learn.microsoft.com/en-us/windows/wsl/basic-commands)
 to "Install", "List available Linux distributions", and "Set default WSL Version" to
-Ubuntu 18 or 20.
+Ubuntu 20 or higher.
 
 To install Docker Engine, follow the instructions for your operating system
 [here](https://docs.docker.com/engine/).
@@ -57,14 +57,14 @@ For example, choose the home directory or a directory for keeping projects in.
 Once you are in the chosen directory, use the command:
 
 ```bash
-git clone https://github.com/KTH-SML/svea
+git clone https://github.com/KTH-SML/svea_jazzy.git
 ```
 
 to download the library. Then, a new directory will appear called
-`./svea`. Go into the directory with command:
+`./svea_jazzy`. Go into the directory with command:
 
 ```bash
-cd svea
+cd svea_jazzy
 ```
 
 To install the Docker image containing the entire codebase run:
@@ -110,13 +110,13 @@ util/run-dev
 Then, for a simulated, pure pursuit example, call:
 
 ```bash
-roslaunch svea_examples floor2.launch
+ros2 launch svea_examples floor2.launch
 ```
 
 Then, open Foxglove Studio natively or in the browser, and on the first prompt
 click "Open connection", then click "Open" with the default settings. Next,
 click on the "Layout" dropdown menu and select "Import from file...". Finally,
-navigate to `svea/foxglove` and select `Floor2 Pure Pursuit.json`. After it
+navigate to `svea_jazzy/foxglove` and select `Floor2 Pure Pursuit.json`. After it
 finishes loading, you should see something that looks like this:
 
 ![purepursuit_foxglove](docs/media/foxglove_pure_pursuit.png)
@@ -134,10 +134,7 @@ To your roslaunch file, add
 
 ```xml
 <!--open serial connection for controlling SVEA-->
-<node pkg="rosserial_python" type="serial_node.py" name="serial_node">
-    <param name="port" value="/dev/ttyACM0"/>
-    <param name="baud" value="250000"/>
-</node>
+<executable cmd="$(find-pkg-share svea_core)/util/start_micro_ros.sh" output="screen"/>
 ```
 
 ### Running localization on the real SVEA
@@ -145,7 +142,7 @@ To your roslaunch file, add
 Running the localization amounts to adding `localize.launch` to your project launch:
 
 ```xml
-<include file="$(find svea_sensors)/launch/localize.launch"/>
+<include file="$(find svea_localization)/launch/localize.launch"/>
 ```
 
 ### Using priviliged run script
