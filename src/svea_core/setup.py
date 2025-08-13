@@ -28,9 +28,13 @@ setup(
         (f'share/{package_name}/maps', glob('maps/*')),
         (f'lib/{package_name}', glob('scripts/*.py')),
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 48e60ec (Confirmed that symlink works)
 =======
         (os.path.join('share', package_name), glob('urdf/*')),
+=======
+        (f'share/{package_name}/urdf', glob('urdf/*')),
+>>>>>>> 579c547 (multi model displacement with namespace in foxglove fixed)
         (os.path.join('share', package_name, 'meshes'), glob('meshes/*')),
 <<<<<<< HEAD
 >>>>>>> 710b561 (Teleop control in simulation with teleop_twist_keyboard added)

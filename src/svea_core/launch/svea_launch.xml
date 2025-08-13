@@ -64,11 +64,17 @@
 
     <!-- Start loading svea model -->
 <<<<<<< HEAD
+<<<<<<< HEAD
     <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py">
         <arg name="vehicle_name" value="$(var vehicle_name)"/>
     </include>
 =======
     <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py"/>
 >>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
+=======
+    <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py">
+        <arg name="vehicle_name" value="$(var vehicle_name)"/>
+    </include>
+>>>>>>> 392cd10 (multi model displacement with namespace in foxglove fixed)
 
 </launch>
