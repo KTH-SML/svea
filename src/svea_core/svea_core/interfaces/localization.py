@@ -23,7 +23,7 @@ qos_profile = QoSProfile(
 
 
 class LocalizationInterface(rx.Field):
-    """Interface handling the reception of state information from the
+    r"""Interface handling the reception of state information from the
     localization stack.
 
     This object can take on several callback functions and execute them as soon

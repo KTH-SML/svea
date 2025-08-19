@@ -6,9 +6,24 @@ import math
 
 class PurePursuitController:
     """
+    Pure Pursuit controller for following a path.
 
-    TODO:
-        - Separate trajectory-related parts into inherited controller
+    This controller computes steering and velocity commands based on the current
+    state of the vehicle and a predefined trajectory. It uses a look-ahead distance
+    to determine the target point on the trajectory and calculates the necessary
+    steering angle and velocity to follow that point.
+
+    Attributes:
+        dt: Time step for control updates.
+        traj_x: X coordinates of the trajectory points.
+        traj_y: Y coordinates of the trajectory points.
+        target: Current target point on the trajectory.
+        target_velocity: Desired velocity to maintain while following the path.
+        error_sum: Integral of velocity error for speed control.
+        last_index: Last index used in trajectory calculations.
+        is_finished: Flag indicating if the path has been completed.
+    Args:
+        dt: Time step for control updates, default is 0.01 seconds.
     """
 
     k = 0.1  # look forward gain

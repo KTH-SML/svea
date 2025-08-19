@@ -27,7 +27,33 @@ class Controls(IntEnum):
 
 
 class ActuationInterface(rx.Field):
+    r"""Interface object for sending actuation commands to the SVEA car's low-level
+    controller.
 
+    We implement the interface for two reasons:
+
+    1. Our models typically expect steering angle `[rad]` and velocity `[m/s]`.
+    2. We would like to add some features on top of just sending the control
+       inputs.
+
+    The low-level controller expects unit-less steering and velocity values between
+    `[-127, 127]` that correspond to the minimum and maximum steering angles and
+    velocities.
+
+    This interface makes it easy to input steering angles in `[rad]` and
+    velocities in `[m/s]`. Assumes very simplistic models of the low-level
+    actuation. It assumes a linear steering model and a linear velocity model.
+    The control interface assumes that the ESC is in the default Sports mode.
+
+    Args:
+        vehicle_name: Name of vehicle being controlled; The name will be
+            effectively be added as a namespace to the topics used by the
+            corresponding low lever interface i.e
+            `namespace/vehicle_name/lli/topic`.
+        log_length: Number of messages from control requests, control actuated
+            and the remote that should be stored in the internal log. Set to
+            `None` for unlimited logging.
+    """
     # saturation input limits to keep hardware healthy
     MAX_STEER_PERCENT = 90          # [%]
     MAX_SPEED_PERCENT = 90          # [%]

@@ -1,5 +1,5 @@
 """
-# rosonic: Declarative ROS 2 Nodes in Python
+# Declarative ROS 2 Nodes in Python
 
 **Note:** This started as a fun project in ROS 1 to make nodes easier to write.
 With ROS 2, I thought rosonic wouldn't be necessary. However, unsurprisingly,

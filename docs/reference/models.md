@@ -1,5 +1,5 @@
 # Models
 
-::: svea.models.bicycle
+::: svea_core.svea_core.models.bicycle
 
-::: svea.models.cooperative
+::: svea_core.svea_core.models.platooning
