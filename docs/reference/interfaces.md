@@ -1,5 +1,5 @@
 # Interfaces
 
-::: svea.ActuationInterface
+::: svea_core.svea_core.interfaces.ActuationInterface
 
-::: svea.LocalizationInterface
+::: svea_core.svea_core.interfaces.LocalizationInterface

@@ -62,7 +62,10 @@ class Controls(IntEnum):
 
 
 class ActuationInterface(rx.Field):
+    r"""Interface object for sending actuation commands to the SVEA car's low-level
+    controller.
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 class ActuationInterface:
@@ -70,6 +73,8 @@ class ActuationInterface:
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
     controller.
 
+=======
+>>>>>>> 689cbbe (added tutorials doc)
     We implement the interface for two reasons:
 
     1. Our models typically expect steering angle `[rad]` and velocity `[m/s]`.
@@ -85,8 +90,11 @@ class ActuationInterface:
     actuation. It assumes a linear steering model and a linear velocity model.
     The control interface assumes that the ESC is in the default Sports mode.
 <<<<<<< HEAD
+<<<<<<< HEAD
     """
 =======
+=======
+>>>>>>> 689cbbe (added tutorials doc)
 
     Args:
         vehicle_name: Name of vehicle being controlled; The name will be
@@ -97,12 +105,15 @@ class ActuationInterface:
             and the remote that should be stored in the internal log. Set to
             `None` for unlimited logging.
     """
+<<<<<<< HEAD
 
     # arduino's expected input frequency
     OPERATING_FREQ = 50             # [Hz]
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
 =======
 >>>>>>> 8b92c94 (added mpc control and example, but still in working progress)
+=======
+>>>>>>> 689cbbe (added tutorials doc)
     # saturation input limits to keep hardware healthy
     MAX_STEER_PERCENT = 90          # [%]
     MAX_SPEED_PERCENT = 90          # [%]

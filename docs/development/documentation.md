@@ -91,10 +91,14 @@ docstrings using `mkdocstrings`. This is what should be done:
 1. Adding reference section containing one page per module.
 ```text
 <<<<<<< HEAD
+<<<<<<< HEAD
 svea_jazzy/docs/
 =======
 svea/docs/
 >>>>>>> 3afea11 (add docs)
+=======
+svea_jazzy/docs/
+>>>>>>> 689cbbe (added tutorials doc)
     instructions/
     tutorials/
     reference/
@@ -104,6 +108,7 @@ svea/docs/
 
 2. Each page should contain:
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 ```text
@@ -111,6 +116,9 @@ svea/docs/
     <options>
 ```
 >>>>>>> 3afea11 (add docs)
+=======
+
+>>>>>>> 689cbbe (added tutorials doc)
 
 See more [here](https://mkdocstrings.github.io/).
 

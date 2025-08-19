@@ -13,14 +13,16 @@
 =======
     <arg name="obstacle_map"    default="obstacles"/>
     <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
-    <arg name="points" default="['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]']" />
     <arg name="is_sim" default="true"/>
 
 
     <node name="sim_svea" pkg="svea_core" exec="sim_svea.py" output="screen">
         <param name="state" value="$(var state)" />
+<<<<<<< HEAD
         <param name="points" value="$(var points)" />
 >>>>>>> 3f76096 (test version 1.0 update)
+=======
+>>>>>>> 689cbbe (added tutorials doc)
     </node>
 
     <node name="sim_lidar" pkg="svea_core" exec="sim_lidar.py" output="screen">

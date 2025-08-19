@@ -123,7 +123,6 @@
         <arg name="initial_pose_y" value="$(var initial_pose_y)" />
         <arg name="initial_pose_a" value="$(var initial_pose_a)" />
         <arg name="state" value="$(var state)" />
-        <arg name="points" value="$(var points)" />
     </include>   
 >>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
 

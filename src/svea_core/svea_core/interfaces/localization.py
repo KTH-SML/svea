@@ -91,8 +91,12 @@ qos_profile = QoSProfile(
 
 
 class LocalizationInterface(rx.Field):
+<<<<<<< HEAD
     """Interface handling the reception of state information from the
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+    r"""Interface handling the reception of state information from the
+>>>>>>> 689cbbe (added tutorials doc)
     localization stack.
 
     This object can take on several callback functions and execute them as soon

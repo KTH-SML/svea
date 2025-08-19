@@ -33,6 +33,9 @@ from svea_core.utils import PlaceMarker, ShowPath
 class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 689cbbe (added tutorials doc)
     r"""Pure Pursuit example script for SVEA.
 
     #**Background**
@@ -56,10 +59,15 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
     ```
     This launch file includes the following components, with example parameters:
 
+<<<<<<< HEAD
         # Initial state of the robot (x, y, yaw, velocity)
         state:=[-7.4, -15.3, 0.9, 0.0] 
         # Points defining the path to follow. Each point is a string representation of a list.
         points:=['[-2.3,-7.1]','[10.5,11.7]','[5.7,15.0]','[-7.0,-4.0]'] 
+=======
+        state:=[-7.4, -15.3, 0.9, 0.0] #Initial state of the robot (x, y, yaw, velocity).
+        points:=['[-2.3,-7.1]','[10.5,11.7]','[5.7,15.0]','[-7.0,-4.0]'] #Points defining the path to follow. Each point is a string representation of a list.
+>>>>>>> 689cbbe (added tutorials doc)
 
     Attributes:
         points: List of points defining the path to follow.
@@ -69,6 +77,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         path: ShowPath for visualizing the path.
     """
 
+<<<<<<< HEAD
     DELTA_TIME = 0.1
     TRAJ_LEN = 20
 
@@ -104,13 +113,15 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         to call the loop method at regular intervals.
         """
 =======
+=======
+>>>>>>> 689cbbe (added tutorials doc)
     DELTA_TIME = 0.1
     TRAJ_LEN = 20
 
     points = rx.Parameter(['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]'])
-    is_sim = rx.Parameter(True)
     target_velocity = rx.Parameter(1.0)
-
+    
+    # Interfaces
     actuation = ActuationInterface()
     localizer = LocalizationInterface()
     # Goal Visualization
@@ -119,7 +130,20 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
     path = ShowPath()
 
     def on_startup(self):
+<<<<<<< HEAD
 >>>>>>> 914c44e (update on 05/12/2025)
+=======
+        """
+        Initialize the Pure Pursuit controller and set up the path and goal.
+        Controller is initialized with the target velocity and the points
+        provided in the parameters. The current state is obtained from the
+        localization interface, and the goal is set to the first point in the
+        path.
+        The trajectory is updated based on the current state and the goal.
+        The controller is set to not finished initially, and a timer is created
+        to call the loop method at regular intervals.
+        """
+>>>>>>> 689cbbe (added tutorials doc)
         # Convert POINTS to numerical lists if loaded as strings
         if isinstance(self.points[0], str):
             self._points = [eval(point) for point in self.points]
@@ -154,6 +178,9 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
     def loop(self):
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 689cbbe (added tutorials doc)
         """
         Main loop of the Pure Pursuit controller. It retrieves the current state
         from the localization interface, computes the steering and velocity
@@ -162,8 +189,11 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         If the controller has finished following the path, it updates the goal
         and trajectory based on the next point in the path.
         """
+<<<<<<< HEAD
 =======
 >>>>>>> 914c44e (update on 05/12/2025)
+=======
+>>>>>>> 689cbbe (added tutorials doc)
         state = self.localizer.get_state()
         x, y, yaw, vel = state
 
@@ -222,11 +252,14 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         is reached, it wraps around to the beginning. The current index is
         incremented, and the goal marker is updated.
         """
+<<<<<<< HEAD
 =======
         self.actuation.send_control(steering, velocity)
 
     def update_goal(self):
 >>>>>>> 914c44e (update on 05/12/2025)
+=======
+>>>>>>> 689cbbe (added tutorials doc)
         self.curr += 1
         self.curr %= len(self._points)
         self.goal = self._points[self.curr]
@@ -255,10 +288,13 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         position, and updates the controller's trajectory points.
         The trajectory is visualized using the ShowPath interface.
         """
+<<<<<<< HEAD
 =======
 
     def update_traj(self, x, y):
 >>>>>>> 914c44e (update on 05/12/2025)
+=======
+>>>>>>> 689cbbe (added tutorials doc)
         xs = np.linspace(x, self.goal[0], self.TRAJ_LEN)
         ys = np.linspace(y, self.goal[1], self.TRAJ_LEN)
         self.controller.traj_x = xs
