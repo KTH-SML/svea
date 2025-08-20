@@ -60,14 +60,20 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
     This launch file includes the following components, with example parameters:
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ae8b5a0 (docs updated)
         # Initial state of the robot (x, y, yaw, velocity)
         state:=[-7.4, -15.3, 0.9, 0.0] 
         # Points defining the path to follow. Each point is a string representation of a list.
         points:=['[-2.3,-7.1]','[10.5,11.7]','[5.7,15.0]','[-7.0,-4.0]'] 
+<<<<<<< HEAD
 =======
         state:=[-7.4, -15.3, 0.9, 0.0] #Initial state of the robot (x, y, yaw, velocity).
         points:=['[-2.3,-7.1]','[10.5,11.7]','[5.7,15.0]','[-7.0,-4.0]'] #Points defining the path to follow. Each point is a string representation of a list.
 >>>>>>> 689cbbe (added tutorials doc)
+=======
+>>>>>>> ae8b5a0 (docs updated)
 
     Attributes:
         points: List of points defining the path to follow.

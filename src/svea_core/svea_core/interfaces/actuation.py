@@ -91,6 +91,7 @@ class ActuationInterface:
     The control interface assumes that the ESC is in the default Sports mode.
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     """
 =======
 =======
@@ -104,6 +105,8 @@ class ActuationInterface:
         log_length: Number of messages from control requests, control actuated
             and the remote that should be stored in the internal log. Set to
             `None` for unlimited logging.
+=======
+>>>>>>> ae8b5a0 (docs updated)
     """
 <<<<<<< HEAD
 

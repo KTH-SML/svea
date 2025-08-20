@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <launch>
     <!-- Launch file arguments -->
-    <arg name="map"             default="floor2"/>
     <arg name="is_sim"          default="true"/>
     <let name="is_sim" value="$(eval '\'$(var is_sim)\' == \'true\'')"/>
     <arg name="use_foxglove"    default="true"/>
