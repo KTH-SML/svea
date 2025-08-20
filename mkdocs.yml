@@ -6,27 +6,27 @@
 # To build the documentation:
 # > mkdocs build
 
-site_name: svea_jazzy
-site_description: 'Starter ROS workspace for working with the [s]mall [ve]hicles for [a]utonomy platform '
+site_name: svea
+site_description: 'Starter ROS2 workspace for working with the [s]mall [ve]hicles for [a]utonomy platform '
 site_author: Smart Mobility Lab
 # site_url: https://svea.eecs.kth.se
 
 repo_url: https://github.com/KTH-SML/svea_jazzy.git
-copyright: "2020, Smart Mobility Lab"
+copyright: "2025, Smart Mobility Lab"
 
 theme: material
 
 nav:
   - Home: index.md
+  - Installation & Setup:
+    - Docker: setup/docker.md
+    - More Docker: setup/more_docker.md
+    - Lidar: setup/lidar_setup.md
   - Tutorial:
     - 0. Introduction: tutorials/0_intro.md
     - 1. Floor 2 and Pure-Pursuit: tutorials/1_floor2.md
     - 2. Lidar Simulation: tutorials/2_lidar_sim.md
     - 3. The SVEA: tutorials/3_svea_operation.md
-    - 4. Docker: tutorials/4_docker.md
-    - 5. Advanced Docker Workflows: tutorials/5_more_docker.md
-  - Setup:
-    - Lidar: setup/lidar_setup.md
   - Examples:
     - Teleop: examples/teleop.md
     - Pure Pursuit: examples/pure_pursuit.md
@@ -47,6 +47,7 @@ markdown_extensions:
       permalink: True
   - pymdownx.arithmatex:
       generic: true
+  - pymdownx.details
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid

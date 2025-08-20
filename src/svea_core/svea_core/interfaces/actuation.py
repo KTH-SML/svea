@@ -44,15 +44,6 @@ class ActuationInterface(rx.Field):
     velocities in `[m/s]`. Assumes very simplistic models of the low-level
     actuation. It assumes a linear steering model and a linear velocity model.
     The control interface assumes that the ESC is in the default Sports mode.
-
-    Args:
-        vehicle_name: Name of vehicle being controlled; The name will be
-            effectively be added as a namespace to the topics used by the
-            corresponding low lever interface i.e
-            `namespace/vehicle_name/lli/topic`.
-        log_length: Number of messages from control requests, control actuated
-            and the remote that should be stored in the internal log. Set to
-            `None` for unlimited logging.
     """
     # saturation input limits to keep hardware healthy
     MAX_STEER_PERCENT = 90          # [%]
