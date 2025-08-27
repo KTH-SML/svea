@@ -84,10 +84,12 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
     def on_startup(self):
         self.velocity = 0.0
         self.steering = 0.0
+        self.localizer.init_odom(*self.state)
         self.create_timer(self.DELTA_TIME, self.loop)
 
     def loop(self):
         self.actuation.send_control(self.steering, self.velocity)
+        self.localizer.get_state()
 
 if __name__ == '__main__':
     teleop_control.main()

@@ -54,6 +54,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
     TRAJ_LEN = 20
 
     points = rx.Parameter(['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]'])
+    state = rx.Parameter([-7.4, -15.3, 0.9, 0.0])  # x, y, yaw, vel
     target_velocity = rx.Parameter(1.0)
     
     # Interfaces
@@ -81,6 +82,8 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 
         self.controller = PurePursuitController()
         self.controller.target_velocity = self.target_velocity
+
+        self.localizer.init_odom(*self.state)
 
         state = self.localizer.get_state()
         x, y, yaw, vel = state
