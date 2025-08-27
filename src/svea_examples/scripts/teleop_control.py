@@ -122,7 +122,7 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
     @rx.Subscriber(Twist, 'cmd_vel', qos_subber)
     def ctrl_request_twist(self, twist_msg):
         self.velocity = twist_msg.linear.x
-        self.steering = -twist_msg.angular.z
+        self.steering = twist_msg.angular.z
 
     def on_startup(self):
 <<<<<<< HEAD
