@@ -165,6 +165,8 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         self.controller = PurePursuitController()
         self.controller.target_velocity = self.target_velocity
 
+        self.localizer.init_odom(*self.state)
+
         state = self.localizer.get_state()
         x, y, yaw, vel = state
 
