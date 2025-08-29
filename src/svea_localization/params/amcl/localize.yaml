@@ -155,9 +155,9 @@ selective_resampling: true
     transform_tolerance: 0.01
     recovery_alpha_slow: 0.001 #0.005
     recovery_alpha_fast: 0.1 #0.005
-    initial_pose_x: 0.0
-    initial_pose_y: 0.0
-    initial_pose_a: 0.0
+    # initial_pose_x: 0.0
+    # initial_pose_y: 0.0
+    # initial_pose_a: 0.0
     initial_cov_xx: 0.5
     initial_cov_yy: 0.5
     initial_cov_aa: 0.25
@@ -180,6 +180,12 @@ selective_resampling: true
     laser_lambda_short: 0.2
     laser_likelihood_max_dist: 2.0
     laser_model_type: likelihood_field
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
 
 <<<<<<< HEAD
 #Odometry model parameters
@@ -206,5 +212,16 @@ odom_alpha4: 0.8  # Trans from rot
     # odom_frame_id
     # global_frame_id
     # tf_broadcast
+<<<<<<< HEAD
 >>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
+<<<<<<< HEAD
 >>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+=======
+
+    base_frame_id: "base_link"
+    odom_frame_id: "odom"
+    global_frame_id: "map"
+    scan_topic: /scan
+>>>>>>> a0fa786 (udpate lidar.xml and amcl localize.xml to fix AMCL)
+>>>>>>> 8177d8a (udpate lidar.xml and amcl localize.xml to fix AMCL)
