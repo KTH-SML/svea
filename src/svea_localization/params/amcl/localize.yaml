@@ -11,9 +11,9 @@
     transform_tolerance: 0.01
     recovery_alpha_slow: 0.001 #0.005
     recovery_alpha_fast: 0.1 #0.005
-    initial_pose_x: 0.0
-    initial_pose_y: 0.0
-    initial_pose_a: 0.0
+    # initial_pose_x: 0.0
+    # initial_pose_y: 0.0
+    # initial_pose_a: 0.0
     initial_cov_xx: 0.5
     initial_cov_yy: 0.5
     initial_cov_aa: 0.25
@@ -35,6 +35,12 @@
     laser_lambda_short: 0.2
     laser_likelihood_max_dist: 2.0
     laser_model_type: likelihood_field
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
 
     #Odometry model parameters
     odom_model_type: diff-corrected
@@ -46,3 +52,8 @@
     # odom_frame_id
     # global_frame_id
     # tf_broadcast
+
+    base_frame_id: "base_link"
+    odom_frame_id: "odom"
+    global_frame_id: "map"
+    scan_topic: /scan
