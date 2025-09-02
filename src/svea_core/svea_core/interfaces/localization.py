@@ -42,8 +42,6 @@ class LocalizationInterface(rx.Field):
             except Exception as e:
                 self.node.get_logger().error(f"Error in callback: {e}")
 
-    init_pub = rx.Publisher(Odometry, _odom_top, qos_profile=qos_profile)
-
 
     def __init__(self, *, init_odom=None, **kwds) -> None:
         
@@ -72,26 +70,6 @@ class LocalizationInterface(rx.Field):
 
         self.node.get_logger().info("Localization Interface is ready.")
         return self
-
-    def init_odom(self, x, y, yaw, v) -> None:
-        """Initialize the odometry message with a given state.
-
-        Args:
-            x: The x position.
-            y: The y position.
-            yaw: The yaw angle in radians.
-            v: The velocity in m/s.
-        """
-        self._odom_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
-        self._odom_msg.pose.pose.position.x = x
-        self._odom_msg.pose.pose.position.y = y
-        quat = quaternion_from_euler(0, 0, yaw)
-        self._odom_msg.pose.pose.orientation.x = quat[0]
-        self._odom_msg.pose.pose.orientation.y = quat[1]
-        self._odom_msg.pose.pose.orientation.z = quat[2]
-        self._odom_msg.pose.pose.orientation.w = quat[3]
-        self._odom_msg.twist.twist.linear.x = v
-        self.init_pub.publish(self._odom_msg)   
         
 
     def add_callback(self, cb, as_state=False) -> None:
