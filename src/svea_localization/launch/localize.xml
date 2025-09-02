@@ -53,49 +53,66 @@
 
     <!-- Nodes -->
 
-    <!-- start all sensors if this is not a simulation -->
+    <!-- Static transforms for sensors -->
+    <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
+        <arg name="is_indoors"  value="$(var is_indoors)"/>
+    </include>
+
+    <!-- <node pkg="nav2_map_server" exec="map_server" name="map_server" output="screen">
+        <param name="yaml_filename" value="/svea_ws/src/svea_core/maps/sml.yaml"/>
+    </node> -->
+
+        <!-- start all sensors if this is not a simulation -->
     <group unless="$(eval '\'$(var is_sim)\' == \'true\'')">
         <let name="use_sim_time" value="false"/>
-        <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/>
+        <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
         <group if="$(eval '\'$(var is_indoors)\' == \'true\'')">
             <!-- Start Lidar -->
             <include file="$(find-pkg-share svea_localization)/launch/lidar.xml">
                 <arg name="lidar_ip"                    value="$(var lidar_ip)"/>
             </include>
 
+            <!-- Lifecycle Manager for Map Server -->
+            <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
+                <param name="autostart" value="true"/>
+                <param name="node_names" value="['map_server']"/>
+            </node> -->
+
             <!-- Start AMCL -->
-            <node pkg="nav2_amcl" exec="amcl" name="amcl_localization" output="screen">
+            <!-- <node pkg="nav2_amcl" exec="amcl" name="amcl_localization" output="screen">
                 <param from="$(find-pkg-share svea_localization)/params/localize.yaml"/>
                 <param name="scan"              value="/scan"/>
                 <param name="initial_pose_x"    value="$(var initial_pose_x)" />
                 <param name="initial_pose_y"    value="$(var initial_pose_y)" />
                 <param name="initial_pose_a"    value="$(var initial_pose_a)" />
-            </node>
+            </node> -->
+
+            <!-- Lifecycle Manager for AMCL -->
+           <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
+                <param name="autostart" value="true"/>
+                <param name="node_names" value="['amcl_localization']"/>
+            </node> -->
         </group>
 
         <!-- TODO: Start GPS if outdoor localization -->
-        <group unless="$(eval '\'$(var is_indoors)\' == \'true\'')">
-            <group if="$(var start_rtk)">
-                <include file="$(find-pkg-share svea_localization)/launch/rtk.xml">
-                    <arg name="gps_device"      value="$(var gps_device)" />
-                    <arg name="baud"            value="$(var gps_baud)" />
-                </include>
-            </group>
-            <include file="$(find-pkg-share svea_localization)/launch/navsat.xml">
-                <arg name="delay"           value="$(var delay)"/>
-                <arg name="yaw_offset"      value="$(var initial_pose_a)"/>
-                <arg name="use_datum"       value="$(var use_datum)" />
-                <arg name="datum_service"   value="$(var datum_service)" />
-                <arg name="datum_file"      value="$(var datum_file)" />
-                <arg name="datum_data"      value="$(var datum_data)" />
-            </include>
-        </group>
+        <!-- <group unless="$(eval '\'$(var is_indoors)\' == \'true\'')"> -->
+            <!-- <group if="$(var start_rtk)"> -->
+                <!-- <include file="$(find-pkg-share svea_localization)/launch/rtk.xml"> -->
+                    <!-- <arg name="gps_device"      value="$(var gps_device)" /> -->
+                    <!-- <arg name="baud"            value="$(var gps_baud)" /> -->
+                <!-- </include> -->
+            <!-- </group> -->
+            <!-- <include file="$(find-pkg-share svea_localization)/launch/navsat.xml"> -->
+                <!-- <arg name="delay"           value="$(var delay)"/> -->
+                <!-- <arg name="yaw_offset"      value="$(var initial_pose_a)"/> -->
+                <!-- <arg name="use_datum"       value="$(var use_datum)" /> -->
+                <!-- <arg name="datum_service"   value="$(var datum_service)" /> -->
+                <!-- <arg name="datum_file"      value="$(var datum_file)" /> -->
+                <!-- <arg name="datum_data"      value="$(var datum_data)" /> -->
+            <!-- </include> -->
+        <!-- </group> -->
     </group>
 
-    <!-- Static transforms for sensors -->
-    <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
-        <arg name="is_indoors"  value="$(var is_indoors)"/>
-    </include>
 
 
     <!-- Do not start the sensors, useful when running from a bag file -->
@@ -104,10 +121,10 @@
     <!-- Robot localization (Local EKF)-->
     <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
         <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
-        <!-- <param name="imu0"                  value="/lli/sensor/imu"/> -->
+        <param name="imu0"                  value="/lli/sensor/imu"/>
         <param name="twist0"                value="/lli/sensor/encoders"/>
         <remap from="/odometry/filtered"    to="/odometry/local"/>
-        <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> --> 
+        <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/>  -->
     </node>
 
     <!-- Global EKF -->
