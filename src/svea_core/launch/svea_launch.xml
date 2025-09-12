@@ -36,12 +36,16 @@
             <arg name="state" value="$(var state)" />
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             <arg name="map" value="$(var map)" />
 =======
             <arg name="points" value="$(var points)" />
 >>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
 =======
 >>>>>>> 689cbbe (added tutorials doc)
+=======
+            <arg name="map" value="$(var map)" />
+>>>>>>> a1bdba7 (psl map update)
         </include>
     </group>
 
