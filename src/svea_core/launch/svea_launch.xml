@@ -22,6 +22,7 @@
         <!-- Start simulation -->
         <include file="$(find-pkg-share svea_core)/launch/simulation.xml">
             <arg name="state" value="$(var state)" />
+            <arg name="map" value="$(var map)" />
         </include>
     </group>
 

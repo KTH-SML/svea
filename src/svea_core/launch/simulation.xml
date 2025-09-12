@@ -1,6 +1,6 @@
 <launch>
-
-    <arg name="obstacle_map"    default="obstacles"/>
+    <arg name="map" default="floor2">
+    <arg name="obstacle_map"    default="$(var map)_obstacles"/>
     <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
     <arg name="is_sim" default="true"/>
 
