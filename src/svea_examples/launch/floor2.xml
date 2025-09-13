@@ -24,6 +24,7 @@
         <arg name="initial_pose_y" value="$(var initial_pose_y)" />
         <arg name="initial_pose_a" value="$(var initial_pose_a)" />
         <arg name="state" value="$(var state)" />
+        <arg name="map" value="$(var map)" />
     </include>   
 
     <!-- Start pure_pursuit -->
