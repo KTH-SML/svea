@@ -149,6 +149,7 @@ amcl:
 >>>>>>> 2fb2b0b (localization update still have issues)
   ros__parameters:
 <<<<<<< HEAD
+<<<<<<< HEAD
     #Overall filter parameters
     min_particles: 100 
     max_particles: 800
@@ -226,6 +227,8 @@ odom_alpha4: 0.8  # Trans from rot
 
 =======
     use_sim_time: True
+=======
+>>>>>>> 94397f1 (AMCL fixed)
     alpha1: 0.2
     alpha2: 0.2
     alpha3: 0.2
@@ -233,6 +236,7 @@ odom_alpha4: 0.8  # Trans from rot
     alpha5: 0.2
 >>>>>>> 199c690 (localization update still have issues)
     base_frame_id: "base_link"
+    introspection_mode: "disabled"
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9
     beam_skip_threshold: 0.3
@@ -246,7 +250,6 @@ odom_alpha4: 0.8  # Trans from rot
 =======
 =======
     lambda_short: 0.1
-    laser_frame_id: "laser"
     laser_likelihood_max_dist: 2.0
     laser_max_range: 100.0
     laser_min_range: -1.0
@@ -272,6 +275,7 @@ odom_alpha4: 0.8  # Trans from rot
     z_rand: 0.5
     z_short: 0.05
     scan_topic: scan
+<<<<<<< HEAD
 
 amcl_map_client:
   ros__parameters:
@@ -290,4 +294,18 @@ robot_state_publisher:
   ros__parameters:
     use_sim_time: True
 >>>>>>> 199c690 (localization update still have issues)
+<<<<<<< HEAD
 >>>>>>> 2fb2b0b (localization update still have issues)
+=======
+=======
+    map_topic: map
+    set_initial_pose: true
+    always_reset_initial_pose: false
+    first_map_only: false
+    initial_pose:
+      x: -7.3699
+      y: -15.383940368977647
+      z: 0.0
+      yaw: 1.57
+>>>>>>> 94397f1 (AMCL fixed)
+>>>>>>> 5eef1eb (AMCL fixed)

@@ -34,11 +34,16 @@ def generate_launch_description():
     autostart = LaunchConfiguration('autostart')
     params_file = LaunchConfiguration('params_file')
 <<<<<<< HEAD
+<<<<<<< HEAD
     # lifecycle_nodes = ['map_server', 'amcl']
     lifecycle_nodes = ['amcl']
 =======
     lifecycle_nodes = ['map_server', 'amcl']
 >>>>>>> 199c690 (localization update still have issues)
+=======
+    # lifecycle_nodes = ['map_server', 'amcl']
+    lifecycle_nodes = ['amcl']
+>>>>>>> 94397f1 (AMCL fixed)
     initial_pose_a = LaunchConfiguration('initial_pose_a')
     initial_pose_x = LaunchConfiguration('initial_pose_x')
     initial_pose_y = LaunchConfiguration('initial_pose_y')
@@ -103,6 +108,9 @@ def generate_launch_description():
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 94397f1 (AMCL fixed)
         # Node(
         #     package='nav2_map_server',
         #     executable='map_server',
@@ -110,6 +118,7 @@ def generate_launch_description():
         #     output='screen',
         #     parameters=[configured_params],
         #     remappings=remappings),
+<<<<<<< HEAD
 =======
         Node(
             package='nav2_map_server',
@@ -119,6 +128,8 @@ def generate_launch_description():
             parameters=[configured_params],
             remappings=remappings),
 >>>>>>> 199c690 (localization update still have issues)
+=======
+>>>>>>> 94397f1 (AMCL fixed)
 
         Node(
             package='nav2_amcl',

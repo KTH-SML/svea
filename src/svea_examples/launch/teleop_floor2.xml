@@ -53,6 +53,7 @@
         <arg name="initial_pose_a" value="$(var initial_pose_a)" />
         <arg name="state" value="$(var state)" />
         <arg name="map" value="$(var map)" />
+<<<<<<< HEAD
     </include>
 
     <node name="teleop_control" pkg="svea_examples" exec="teleop_control.py" output="screen"/>
@@ -74,6 +75,8 @@
         <arg name="initial_pose_y" value="$(var initial_pose_y)" />
         <arg name="initial_pose_a" value="$(var initial_pose_a)" />
         <arg name="state" value="$(var state)" />
+=======
+>>>>>>> 94397f1 (AMCL fixed)
     </include>
 
 <<<<<<< HEAD
