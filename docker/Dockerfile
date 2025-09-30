@@ -140,6 +140,7 @@ RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 COPY firmware/disable_fastdds_shm.xml \
      firmware/disable_fastdds_shm_localhost_only.xml \
      /tmp/
@@ -157,6 +158,11 @@ RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \
 >>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
 =======
 COPY disable_fastdds_shm.xml disable_fastdds_shm_localhost_only.xml /tmp/
+=======
+COPY firmware/disable_fastdds_shm.xml \
+     firmware/disable_fastdds_shm_localhost_only.xml \
+     /tmp/
+>>>>>>> 8d5fdd9 (Add configuration files to disable Fast-DDS SHM transport for UDPv4)
 ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 ENV MICROROS_DISABLE_SHM=1
 
