@@ -79,7 +79,9 @@ ENV CMAKE_PREFIX_PATH="/opt/ros/$ROSDISTRO"
 RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
     colcon build --symlink-install"
 
-COPY disable_fastdds_shm.xml disable_fastdds_shm_localhost_only.xml /tmp/
+COPY firmware/disable_fastdds_shm.xml \
+     firmware/disable_fastdds_shm_localhost_only.xml \
+     /tmp/
 ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 ENV MICROROS_DISABLE_SHM=1
 
