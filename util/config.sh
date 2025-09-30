@@ -9,18 +9,13 @@
 # BUILD_CONFIG="base-amd64"
 # BUILD_CONFIG="base-arm64"
 
-## Auto-detect platform for macOS with Apple Silicon
-# Check if running on macOS (Darwin)
-is_darwin() {
-    [ "$(uname -s)" = "Darwin" ]
-}
-
-if is_darwin; then
-    BUILD_CONFIG="arm64"
-fi
-
 
 main() {
+
+    if isempty BUILD_CONFIG && is_darwin; then
+        BUILD_CONFIG="arm64"
+    fi
+
 
     withdefault DEBUG "0"
 
@@ -118,6 +113,11 @@ jetson_release() {
     fi
 }
 
+## Auto-detect platform for macOS with Apple Silicon
+# Check if running on macOS (Darwin)
+is_darwin() {
+    [ "$(uname -s)" = "Darwin" ]
+}
 
 
 ################################################################################
