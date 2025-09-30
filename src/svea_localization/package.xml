@@ -17,7 +17,6 @@
   <depend>tf2_ros</depend>
   <depend>tf_transformations</depend>
   <depend>ntrip_client</depend>
-  <depend>svea_core</depend>
 
   <exec_depend>nav2_amcl</exec_depend>
   <exec_depend>nav2_map_server</exec_depend>
