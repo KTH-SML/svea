@@ -146,8 +146,11 @@ Developed for ROS 2 Jazzy Jalisco.
 Kaj Munhoz Arfvidsson
 """
 
+<<<<<<< HEAD
 from __future__ import annotations
 
+=======
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 from typing import TypeGuard
 
 import rclpy                            # pyright: ignore[reportMissingImports]
@@ -211,7 +214,10 @@ class Resource:
     __rosonic_node__: 'NodeBase | None'             = None
     __rosonic_owner__: 'Resource | None'            = None
     __rosonic_resources__: tuple['Resource', ...]   = ()
+<<<<<<< HEAD
     __rosonic_started__: bool                       = False
+=======
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
     # Class property. For Field resources
     __rosonic_preregistered__: tuple['Resource', ...] = ()
@@ -253,7 +259,11 @@ class Resource:
         if owner is self:
             assert self.__rosonic_name__ is not None, f"Root resource '{self}' must have a name"
         else:
+<<<<<<< HEAD
             assert owner._is_registered(), f"Resource '{owner}' owning '{self}' is not registered"
+=======
+            assert _is_registered(owner), f"Resource '{owner}' owning '{self}' is not registered"
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
             # The following check only makes sense for non-root, named resources
             if self.__rosonic_name__ is not None:
@@ -281,14 +291,22 @@ class Resource:
         Raises:
             AssertionError: If the resource is not registered yet.
         """
+<<<<<<< HEAD
         assert self._is_registered(), f"Resource '{self}' is not started"
+=======
+        assert _is_registered(self), f"Resource '{self}' is not started"
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
         name = self.__rosonic_name__
         owner = self.__rosonic_owner__
 
         if name is None:
             return owner.__rosonic_fullname__
+<<<<<<< HEAD
         elif self._is_root() or self._is_absolute_name(name):
+=======
+        elif _is_root(self) or _is_absolute_name(name):
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
             return name
         else:
             return f"{owner.__rosonic_fullname__}/{name}"
@@ -307,13 +325,18 @@ class Resource:
         Raises:
             AssertionError: If the resource is not registered yet.
         """
+<<<<<<< HEAD
         assert self._is_registered(), f"Resource '{self}' is not started"
+=======
+        assert _is_registered(self), f"Resource '{self}' is not started"
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
         
         name = self.__rosonic_name__
         owner = self.__rosonic_owner__
 
         if name is None:
             return owner.__rosonic_relname__
+<<<<<<< HEAD
         elif self._is_root():
             return ''
         elif self._is_absolute_name(name) or owner._is_root():
@@ -322,6 +345,15 @@ class Resource:
             parent = owner.__rosonic_relname__
             return name if parent == '' else f"{parent}/{name}"
     
+=======
+        elif _is_root(self):
+            return ''
+        elif _is_absolute_name(name) or _is_root(owner):
+            return name
+        else:
+            return f"{owner.__rosonic_relname__}/{name}"
+
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
     @property
     def __rosonic_lookup__(self) -> dict[str, 'Resource']:
         """
@@ -355,7 +387,11 @@ class Resource:
             AssertionError: If the resource is not properly registered before
             startup.
         """
+<<<<<<< HEAD
         assert self._is_registered(), f"Resource '{self}' is not registered"
+=======
+        assert _is_registered(self), f"Resource '{self}' is not registered"
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
         for resource in self.__rosonic_resources__:
             resource.__rosonic_startup__(node)
@@ -363,8 +399,11 @@ class Resource:
         self.__rosonic_node__ = node
 
         self.on_startup()
+<<<<<<< HEAD
 
         self.__rosonic_started__ = True
+=======
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
         
     def __rosonic_shutdown__(self, node: NodeBase) -> None:
         """
@@ -381,7 +420,11 @@ class Resource:
         Raises:
             AssertionError: If the resource is not started yet.
         """
+<<<<<<< HEAD
         assert self._is_started(), f"Resource '{self}' is not started"
+=======
+        assert _is_started(self), f"Resource '{self}' is not started"
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
         self.on_shutdown()
 
@@ -411,6 +454,7 @@ class Resource:
         """
         pass
 
+<<<<<<< HEAD
     def _is_absolute_name(self, name: str | None = None) -> bool:
         if name is None:
             name = self.__rosonic_name__
@@ -430,6 +474,8 @@ class Resource:
         return (self if self._is_root() else
                 self._get_root())
 
+=======
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
 # Only for typing
 class _RegisteredResource(Resource):
@@ -443,6 +489,26 @@ class _StartedResource(_RegisteredResource):
     __rosonic_node__: NodeBase
 
 
+<<<<<<< HEAD
+=======
+def _is_absolute_name(name: str) -> bool:
+    return name.startswith('/') or name.startswith('~')
+
+def _is_registered(resource: Resource) -> TypeGuard[_RegisteredResource]:
+    return resource.__rosonic_owner__ is not None
+
+def _is_started(resource: Resource) -> TypeGuard[_StartedResource]:
+    return resource.__rosonic_node__ is not None
+
+def _is_root(resource: Resource) -> bool:
+    return resource.__rosonic_owner__ is resource
+
+def _get_root(resource: Resource) -> Resource:
+    assert _is_registered(resource), f"Resource '{resource}' is not registered"
+    return (resource if _is_root(resource) else
+            _get_root(resource))
+
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 class Node(Resource, NodeBase):
     """
     Base class for all SVEA nodes.
@@ -631,7 +697,11 @@ class Parameter(NamedField):
         if instance is None:
             return self
 
+<<<<<<< HEAD
         if not self._is_started():
+=======
+        if not _is_started(self):
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
             return self
 
         return self.value
@@ -709,7 +779,11 @@ class Publisher(NamedField):
         Publish a message to the topic.
         Raise an exception if the publisher is not started.
         """
+<<<<<<< HEAD
         assert self._is_started(), f"Publisher for topic '{self.topic}' is not started yet."
+=======
+        assert _is_started(self), f"Publisher for topic '{self.topic}' is not started yet."
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
         self.publisher.publish(msg)
 
     def on_startup(self):
@@ -724,7 +798,11 @@ class Publisher(NamedField):
         qos_profile = self.qos_profile or rclpy.qos.qos_profile_default
 
         if isinstance(topic, Parameter):
+<<<<<<< HEAD
             assert topic._is_started(), f"Resource '{self}' depend on '{topic}' which has not started yet"
+=======
+            assert _is_started(topic), f"Resource '{self}' depend on '{topic}' which has not started yet"
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
             topic = topic.value
 
         if not isinstance(msg_type, type):
@@ -817,7 +895,11 @@ class Subscriber(NamedField):
         qos_profile = self.qos_profile or rclpy.qos.qos_profile_default
 
         if isinstance(topic, Parameter):
+<<<<<<< HEAD
             assert topic._is_started(), f"Resource '{self}' depend on '{topic}' which has not started yet"
+=======
+            assert _is_started(topic), f"Resource '{self}' depend on '{topic}' which has not started yet"
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
             topic = topic.value
 
         if not isinstance(msg_type, type):

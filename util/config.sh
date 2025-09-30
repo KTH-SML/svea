@@ -12,6 +12,11 @@
 
 main() {
 
+    if isempty BUILD_CONFIG && is_darwin; then
+        BUILD_CONFIG="arm64"
+    fi
+
+
     withdefault DEBUG "0"
 
     withdefault ROSDISTRO       "jazzy"
@@ -44,25 +49,48 @@ main() {
         # building for host platform
         withdefault BUILD_PLATFORM  "$(uname -m)"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+<<<<<<< HEAD
         withdefault BUILD_FILE      "docker/Dockerfile.base"
         withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
+=======
+        withdefault BUILD_FILE      "docker/Dockerfile"
+        withdefault BUILD_TAG       "ros:$ROSDISTRO"
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
     elif [ "$BUILD_CONFIG" = "base-amd64" ]; then
         # building for x86_64
         withdefault BUILD_PLATFORM  "linux/amd64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+<<<<<<< HEAD
         withdefault BUILD_FILE      "docker/Dockerfile.base"
         withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
+=======
+        withdefault BUILD_FILE      "docker/Dockerfile"
+        withdefault BUILD_TAG       "ros:$ROSDISTRO"
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
     elif [ "$BUILD_CONFIG" = "base-arm64" ]; then
         # building for arm64/aarch64/jetson
         withdefault BUILD_PLATFORM  "linux/arm64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+<<<<<<< HEAD
         withdefault BUILD_FILE      "docker/Dockerfile.base"
         withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
+=======
+        withdefault BUILD_FILE      "docker/Dockerfile"
+        withdefault BUILD_TAG       "ros:$ROSDISTRO"
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH      "0"
+    elif [ "$BUILD_CONFIG" = "arm64" ]; then
+        # building for arm64 (macOS Apple Silicon)
+        withdefault BUILD_PLATFORM  "linux/arm64"
+        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+        withdefault BUILD_FILE      "docker/Dockerfile"
+        withdefault BUILD_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_TAG       "$REPOSITORY_NAME"
         withdefault IMAGE_PUSH      "0"
     elif [ "$BUILD_CONFIG" = "ghcr" ]; then
         # building for both amd64 and arm64
@@ -115,18 +143,25 @@ jetson_release() {
     fi
 }
 
+<<<<<<< HEAD
 ## Auto-detect platform for macOS
+=======
+## Auto-detect platform for macOS with Apple Silicon
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 # Check if running on macOS (Darwin)
 is_darwin() {
     [ "$(uname -s)" = "Darwin" ]
 }
 
+<<<<<<< HEAD
 ## Detect arm64 architecture
 is_arm64() {
     ARCH="$(uname -m)"
     [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]
 }
 
+=======
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
 ################################################################################
 ################################################################################

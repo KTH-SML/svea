@@ -92,7 +92,11 @@ def generate_launch_description():
 
         DeclareLaunchArgument("initial_pose_y", default_value="0.0" ),
 
+<<<<<<< HEAD
         DeclareLaunchArgument("initial_pose_a", default_value="1.52" ),
+=======
+        DeclareLaunchArgument("initial_pose_a", default_value="0.0" ),
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
         # Node(
         #     package='nav2_map_server',
@@ -107,10 +111,14 @@ def generate_launch_description():
             executable='amcl',
             name='amcl',
             output='screen',
+<<<<<<< HEAD
             parameters=[configured_params,
                         {'initial_pose.x': initial_pose_x},
                         {'initial_pose.y': initial_pose_y},
                         {'initial_pose.yaw': initial_pose_a}],
+=======
+            parameters=[configured_params],
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
             remappings=remappings),
 
         Node(
@@ -121,4 +129,8 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time},
                         {'autostart': autostart},
                         {'node_names': lifecycle_nodes}])
+<<<<<<< HEAD
     ])
+=======
+    ])
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))

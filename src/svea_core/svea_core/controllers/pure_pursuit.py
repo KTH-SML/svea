@@ -30,11 +30,15 @@ class PurePursuitController:
     Lfc = 0.6  # look-ahead distance
     K_p = 0.15  # speed control propotional gain
     K_i = 0.01  # speed control integral gain
+<<<<<<< HEAD
     
     # Anti-windup parameters
     max_velocity = 1.0  # [m/s] maximum velocity output
     min_velocity = -1.0  # [m/s] minimum velocity output (for reverse)
     integral_limit = 10.0  # maximum integral error accumulation
+=======
+
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
     L = 0.324  # [m] wheel base of vehicle
 
@@ -80,6 +84,7 @@ class PurePursuitController:
 
         x, y, yaw, vel = state
 
+<<<<<<< HEAD
         # speed control with anti-windup
         error = self.target_velocity - vel
         
@@ -102,6 +107,15 @@ class PurePursuitController:
             self.error_sum = max(-self.integral_limit, min(self.integral_limit, self.error_sum))
         
         return saturated_velocity
+=======
+        # speed control
+        error = self.target_velocity - vel
+        self.error_sum += error * self.dt
+        P = error * self.K_p
+        I = self.error_sum * self.K_i
+        correction = P + I
+        return self.target_velocity + correction
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
     def find_target(self, state):
         ind = self._calc_target_index(state)

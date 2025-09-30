@@ -54,9 +54,12 @@ class ActuationInterface(rx.Field):
     # The max velocity in Gear 2 is around 3.6 m/s.
     MAX_SPEED_0 = 1.7               # [m/s]
     MAX_SPEED_1 = 3.6               # [m/s]
+<<<<<<< HEAD
     BIAS_STEERING = -9
 
     is_sim = rx.Parameter(False)
+=======
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
     steering_pub = rx.Publisher(Int8, 'lli/ctrl/steering', qos_profile=QoS_DEFAULT)
     throttle_pub = rx.Publisher(Int8, 'lli/ctrl/throttle', qos_profile=QoS_DEFAULT)
@@ -82,12 +85,19 @@ class ActuationInterface(rx.Field):
         self.highgear_pub.publish(self.highgear_msg)
         self.diff_pub.publish(self.diff_msg)
         self.node.get_logger().info("Actuation Interface is ready.")
+<<<<<<< HEAD
         if self.is_sim:
             self.BIAS_STEERING = 0
 
     def loop(self):
         """Main loop to publish control messages."""
         self.steering_msg.data = int(self.latest_controls[Controls.STEERING] * - 1.27 - self.BIAS_STEERING)  # 1.27 is a factor to convert from percent to the range of -127 to 127
+=======
+
+    def loop(self):
+        """Main loop to publish control messages."""
+        self.steering_msg.data = int(self.latest_controls[Controls.STEERING] * - 1.27)  # 1.27 is a factor to convert from percent to the range of -127 to 127
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
         self.velocity_msg.data = int(self.latest_controls[Controls.VELOCITY] * 1.27) # 1.27 is a factor to convert from percent to the range of -127 to 127
         self.steering_pub.publish(self.steering_msg)
         self.throttle_pub.publish(self.velocity_msg)

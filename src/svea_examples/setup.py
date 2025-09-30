@@ -1,6 +1,10 @@
 import os
 from glob import glob
+<<<<<<< HEAD
 import xml.etree.ElementTree as ET
+=======
+from xml.etree.ElementTree import ET
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 from setuptools import find_packages, setup
 
 package = ET.parse('package.xml').getroot()

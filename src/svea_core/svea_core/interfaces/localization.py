@@ -6,6 +6,7 @@ from typing import Self, Optional
 
 import rclpy
 from rclpy.node import Node
+<<<<<<< HEAD
 from rclpy.time import Time
 from rclpy.clock import Clock
 from rclpy.duration import Duration
@@ -20,6 +21,15 @@ from tf2_geometry_msgs import do_transform_pose
 
 from .. import rosonic as rx
 
+=======
+import rclpy.clock
+from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
+
+from tf_transformations import quaternion_from_euler, euler_from_quaternion
+from nav_msgs.msg import Odometry
+from .. import rosonic as rx
+import time
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
 qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.RELIABLE,
@@ -28,12 +38,17 @@ qos_profile = QoSProfile(
             depth=1)
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 class LocalizationInterface(rx.Field):
     r"""Interface handling the reception of state information from the
     localization stack.
 
     This object can take on several callback functions and execute them as soon
     as state information is available.
+<<<<<<< HEAD
     """
 
     class _InterfaceParameters(rx.NamedField):
@@ -141,6 +156,51 @@ class LocalizationInterface(rx.Field):
 
         return out
 
+=======
+
+    """
+
+    _odom_top = 'odometry/local'
+
+    @rx.Subscriber(Odometry, _odom_top, qos_profile=qos_profile)
+    def _odom_cb(self, msg: Odometry) -> None:
+        self._odom_msg = msg
+        for cb in self._odom_callbacks:
+            try:
+                cb(msg)
+            except Exception as e:
+                self.node.get_logger().error(f"Error in callback: {e}")
+
+
+    def __init__(self, *, init_odom=None, **kwds) -> None:
+        
+        ## Odometry ##
+        # Create a new odometry message with default values
+        if odom := kwds.get('init_odom', None):
+            self._odom_msg = init_odom
+        else:
+            self._odom_msg = Odometry()
+            self._odom_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
+            self._odom_msg.header.frame_id = 'map'
+            self._odom_msg.child_frame_id = 'base_link'
+        
+        if odom_top := kwds.get('odom_top', None):
+            self._odom_top = odom_top
+        
+        # list of functions to call whenever a new state comes in
+        self._odom_callbacks = []
+
+
+    def on_startup(self):
+        """Start the localization interface by subscribing to the odometry topic."""
+        self.node.get_logger().info("Starting Localization Interface Node...")
+
+        time.sleep(10)  # Allow time for the node to initialize
+
+        self.node.get_logger().info("Localization Interface is ready.")
+        return self
+        
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
     def add_callback(self, cb, as_state=False) -> None:
         """Add state callback.
@@ -238,4 +298,8 @@ class LocalizationInterface(rx.Field):
         """
         if odom is None:
             odom = self._odom_msg
+<<<<<<< HEAD
         return odom.twist.twist.linear.x
+=======
+        return odom.twist.twist.linear.x
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))

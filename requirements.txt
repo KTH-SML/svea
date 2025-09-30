@@ -8,7 +8,10 @@
 # You can read more here: https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format
 
 numpy
+<<<<<<< HEAD
 matplotlib
+=======
+>>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
 # This is for MPC
 casadi==3.6.7
