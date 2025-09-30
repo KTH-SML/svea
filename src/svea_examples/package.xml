@@ -4,17 +4,23 @@
   <name>svea_examples</name>
   <version>0.0.0</version>
 <<<<<<< HEAD
+<<<<<<< HEAD
   <description>Examples for SVEA</description>
   <maintainer email="kajarf@kth.se">Kaj Munhoz Arfvidsson</maintainer>
 =======
   <description>TODO: Package description</description>
   <maintainer email="lic2@kth.se">rosuser</maintainer>
 >>>>>>> 914c44e (update on 05/12/2025)
+=======
+  <description>Examples for SVEA</description>
+  <maintainer email="kajarf@kth.se">Kaj Munhoz Arfvidsson</maintainer>
+>>>>>>> 1ea11f8 (Update package.xml and setup.py files for svea_core, svea_examples, and svea_localization to improve descriptions and maintainers' information)
   <license>TODO: License declaration</license>
 
   <depend>svea_core</depend>
   <depend>rclpy</depend>
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
   <test_depend>ament_copyright</test_depend>
@@ -23,6 +29,8 @@
   <test_depend>python3-pytest</test_depend>
 
 >>>>>>> 914c44e (update on 05/12/2025)
+=======
+>>>>>>> 1ea11f8 (Update package.xml and setup.py files for svea_core, svea_examples, and svea_localization to improve descriptions and maintainers' information)
   <export>
     <build_type>ament_python</build_type>
   </export>

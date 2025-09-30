@@ -1,14 +1,17 @@
-from setuptools import find_packages, setup
 import os
 from glob import glob
+import xml.etree.ElementTree as ET
+from setuptools import find_packages, setup
 
-package_name = 'svea_core'
+package = ET.parse('package.xml').getroot()
+name = package.find('name').text
 
 setup(
-    name=package_name,
+    name=name,
     version='0.0.0',
-    packages=find_packages(include=[package_name, f"{package_name}.*"]),
+    packages=find_packages(include=[name, f"{name}.*"]),
     data_files=[
+<<<<<<< HEAD
         ('share/ament_index/resource_index/packages',
             [f'resource/{package_name}']),
         (f'share/{package_name}', ['package.xml']),
@@ -41,12 +44,23 @@ setup(
 =======
         (os.path.join('share', package_name, 'util'), glob('util/*.sh')),
 >>>>>>> f6b073e (test version 1.0 update)
+=======
+        ('share/ament_index/resource_index/packages', [f'resource/{name}']),
+        (f'share/{name}', ['package.xml']),
+        (f'share/{name}/launch', glob('launch/*.xml')),
+        (os.path.join('share', name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
+        (f'share/{name}/params', glob('params/*.yaml')),
+        (f'share/{name}/maps', glob('maps/*')),
+        (f'lib/{name}', glob('scripts/*.py')),
+        (f'share/{name}/urdf', glob('urdf/*')),
+        (os.path.join('share', name, 'meshes'), glob('meshes/*')),
+        (os.path.join('share', name, 'util'), glob('util/*.sh')),
+>>>>>>> 10ada71 (Update package.xml and setup.py files for svea_core, svea_examples, and svea_localization to improve descriptions and maintainers' information)
     ],
-    install_requires=['setuptools','pyyaml'],
+    install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='rosuser',
-    maintainer_email='lic2@kth.se',
-    description='TODO: Package description',
-    license='TODO: License declaration',
-    tests_require=['pytest'],
+    maintainer=package.find('maintainer').text,
+    maintainer_email=package.find('maintainer').get('email'),
+    description=package.find('description').text,
+    license=package.find('license').text,
 )
