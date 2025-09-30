@@ -22,6 +22,7 @@ pyubx2
 geopy
 utm
 nats-py
+<<<<<<< HEAD
 
 empy
 numpy
@@ -36,3 +37,5 @@ matplotlib
 >>>>>>> 6567c2c (marker placer complete)
 # This is for NMPC
 casadi==3.6.7
+=======
+>>>>>>> 2aad9f5 (Clean up requirements.txt by removing unused packages and ensuring necessary dependencies are listed.)
