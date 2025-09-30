@@ -13,16 +13,6 @@
 =======
 >>>>>>> 7f3be22 (fixed typo in config)
 
-## Auto-detect platform for macOS with Apple Silicon
-# Check if running on macOS (Darwin)
-is_darwin() {
-    [ "$(uname -s)" = "Darwin" ]
-}
-
-if is_darwin; then
-    BUILD_CONFIG="arm64"
-fi
-
 
 main() {
 
@@ -160,6 +150,7 @@ jetson_release() {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Auto-detect platform for macOS
 =======
 ## Auto-detect platform for macOS with Apple Silicon
@@ -171,11 +162,22 @@ jetson_release() {
 =======
 >>>>>>> 3fd88dc (added missing is_darwin check for mac causing redundant error)
 >>>>>>> ea5b49f (added missing is_darwin check for mac causing redundant error)
+=======
+## Auto-detect platform for macOS with Apple Silicon
+=======
+>>>>>>> 3fd88dc (added missing is_darwin check for mac causing redundant error)
+=======
+## Auto-detect platform for macOS with Apple Silicon
+>>>>>>> 3b4ac0a (Refactor is_darwin function and its usage for clarity in main function)
+>>>>>>> 1651d8d (Refactor is_darwin function and its usage for clarity in main function)
 # Check if running on macOS (Darwin)
 is_darwin() {
     [ "$(uname -s)" = "Darwin" ]
 }
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 3b4ac0a (Refactor is_darwin function and its usage for clarity in main function)
 
 >>>>>>> 2cf1997 (moved reused function to top)
 
