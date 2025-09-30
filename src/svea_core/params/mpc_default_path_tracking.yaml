@@ -1,59 +1,90 @@
 ##
 ## Configuration file for MPC Controller
 ##
+/**:
+  ros__parameters:
+    ## Core Parameters
+    # The time step in which the optimization problem is divided (unit [s])
+    time_step: 0.2
 
-mpc:
-  ## Core Parameters
-  # The time step in which the optimization problem is divided (unit [s])
-  time_step: 0.2
+    # The prediction horizon steps for the mpc optimization problem
+    prediction_horizon: 10
 
-  # The prediction horizon steps for the mpc optimization problem
-  prediction_horizon: 10
+    ## Objective Function J
 
-  ## Objective Function J
+    # Q1
+    # Note: The state weight matrix is a 4x4 matrix, but the values are flattened into a list.
+    # [100.0, 0.0, 0.0, 0.0,
+    #  0.0, 100.0, 0.0, 0.0,
+    #  0.0, 0.0, 100.0, 0.0,
+    #  0.0, 0.0, 0.0, 70.0]
+    state_weight_matrix:
+      - 100.0
+      - 0.0
+      - 0.0
+      - 0.0
+      - 0.0
+      - 100.0
+      - 0.0
+      - 0.0
+      - 0.0
+      - 0.0
+      - 100.0
+      - 0.0
+      - 0.0
+      - 0.0
+      - 0.0
+      - 70.0
+      
+    # Q2
+    # Note: The control rate weight matrix is a 2x2 matrix, but the values are flattened into a list.
+    # [0.0, 0.0,
+    #  0.0, 0.0]
+    control_rate_weight_matrix: 
+      - 0.0
+      - 0.0
+      - 0.0
+      - 0.0
+    
+    # Q3
+    # Note: The control weight matrix is a 2x2 matrix, but the values are flattened into a list.
+    # [10.0, 0.0,
+    #  0.0, 10.0]
+    control_weight_matrix:
+      - 10.0
+      - 0.0
+      - 0.0
+      - 10.0
+    
+    # Qf
+    final_state_weight_matrix:
+      [100.0, 0.0, 0.0, 0.0,
+       0.0, 100.0, 0.0, 0.0,
+       0.0, 0.0, 100.0, 0.0,
+       0.0, 0.0,  0.0, 70.0]
+  
+    # Qv
+    # Note: A big value encourage forward movements rather than backwards.
+    #       FEATURE DOES NOT WORK SO FAR.
+    forward_speed_weight: 0
 
-  # Q1
-  state_weight_matrix: [100,  0, 0, 0,
-                        0, 100, 0, 0,
-                        0,  0, 100, 0,
-                        0,  0, 0, 70]
+    ## Model Parameters
 
-  # Q2
-  control_rate_weight_matrix: [0, 0,
-                              0, 0]
+    # The min/max steering angle allowed for SVEA (unit [degrees])
+    steering_min: -40.0
+    steering_max: 40.0
 
-  # Q3
-  control_weight_matrix: [10, 0,
-                          0, 10]
+    # The min/max steering rate allowed for SVEA (unit [degrees/s])
+    steering_rate_min: -20.0
+    steering_rate_max: 20.0
 
-  # Qf
-  final_state_weight_matrix: [100,  0, 0, 0,
-                              0,  100, 0, 0,
-                              0,  0, 100, 0,
-                              0,  0, 0, 70]
+    # The min/max velocity allowed for SVEA (unit [m/s^2])
+    velocity_min: -0.4
+    velocity_max: 1.5
 
-  # Qv
-  # Note: A big value encourage forward movements rather than backwards.
-  #       FEATURE DOES NOT WORK SO FAR.
-  forward_speed_weight: 0
-
-  ## Model Parameters
-
-  # The min/max steering angle allowed for SVEA (unit [degrees])
-  steering_min: -40
-  steering_max: 40
-
-  # The min/max steering rate allowed for SVEA (unit [degrees/s])
-  steering_rate_min: -20
-  steering_rate_max: 20
-
-  # The min/max velocity allowed for SVEA (unit [m/s^2])
-  velocity_min: -0.4
-  velocity_max: 1.5
-
-  # The min/max acceleration allowed for SVEA (unit [m/s^2])
-  acceleration_min: -0.2
-  acceleration_max: 0.4
-
-  # The wheelbase of the vehicle (unit [m]). 
-  wheelbase: 0.32
+    # The min/max acceleration allowed for SVEA (unit [m/s^2])
+    acceleration_min: -0.2
+    acceleration_max: 0.4
+    
+    # The wheelbase of the vehicle (unit [m]). 
+    wheelbase: 0.32

@@ -1,0 +1,16 @@
+<launch>
+    <arg name="map"             default="floor2"/>
+    <arg name="obstacle_map"    default="$(var map)_obstacles"/>
+    <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
+    <arg name="is_sim" default="true"/>
+
+
+    <node name="sim_svea" pkg="svea_core" exec="sim_svea.py" output="screen">
+        <param name="state" value="$(var state)" />
+    </node>
+
+    <node name="sim_lidar" pkg="svea_core" exec="sim_lidar.py" output="screen">
+        <param from="$(find-pkg-share svea_core)/params/$(var obstacle_map).yaml"/>
+    </node>
+    
+</launch>

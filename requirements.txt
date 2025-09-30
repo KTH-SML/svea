@@ -7,10 +7,14 @@
 #
 # You can read more here: https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format
 
+numpy
+
+# This is for MPC
+casadi==3.6.7
+
 # These are for RTK-GPS
 pyserial
 pyubx2
 geopy
 utm
-# This is for NMPC
-casadi==3.5.5
+nats-py

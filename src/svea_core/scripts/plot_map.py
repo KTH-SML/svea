@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 
-import rospy
+import rclpy
+from rclpy.node import Node
 import numpy as np
 import matplotlib.pyplot as plt
 from nav_msgs.msg import OccupancyGrid
 
 
-class plot_map:
+class PlotMap(Node):
 
     map = None
 
     def __init__(self):
 
-        rospy.init_node('plot_map')
+        super().__init__('plot_map')
 
-        self.rate = rospy.Rate(2)
-
-        self.map_cb(rospy.wait_for_message("/map", OccupancyGrid))
-        self.sub_map = rospy.Subscriber("/map", OccupancyGrid, self.map_cb)
-
-    def run(self):
-        while not rospy.is_shutdown():
-            self.spin()
-            self.rate.sleep()
+        
+        
+        self.sub_map = self.create_subscription(
+            OccupancyGrid,
+            "/map",
+            self.map_cb,
+            10
+        )
 
     def spin(self):
         if not self.map is None:
@@ -35,6 +35,20 @@ class plot_map:
         data = msg.data
         self.map = np.array(data).reshape(height, width)
 
+def main(args=None):
+    rclpy.init(args=args)
+    plot_map = PlotMap()
+    rate = plot_map.create_rate(2)
+    try:
+        while rclpy.ok():
+            rclpy.spin_once(plot_map, timeout_sec=0.1)
+            rate.sleep()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # 清理资源
+        plot_map.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
-    plot_map().run()
+    main()

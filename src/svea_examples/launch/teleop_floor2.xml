@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Launch file arguments -->
+    <arg name="map"             default="penn_state_lab"/>
+    <arg name="is_sim"          default="true"/>
+    <arg name="use_foxglove"    default="true"/>
+    <arg name="initial_pose_x"  default="-2.65488696"/>
+    <arg name="initial_pose_y"  default="-1.64422277"/>
+    <arg name="initial_pose_a"  default="1.57" /> <!-- wrt to map-->
+    <arg name="map_path" default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
+    <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
+
+    <!-- Start Map Server and Foxglove -->
+    <include file="$(find-pkg-share svea_core)/launch/map_and_foxglove.xml">
+        <arg name="map" value="$(var map)" />
+        <arg name="use_foxglove" value="$(var use_foxglove)" />
+    </include>   
+    
+    <!-- Start Svea Core -->
+    <include file="$(find-pkg-share svea_core)/launch/svea_launch.xml">
+        <arg name="is_sim" value="$(var is_sim)" />
+        <arg name="initial_pose_x" value="$(var initial_pose_x)" />
+        <arg name="initial_pose_y" value="$(var initial_pose_y)" />
+        <arg name="initial_pose_a" value="$(var initial_pose_a)" />
+        <arg name="state" value="$(var state)" />
+        <arg name="map" value="$(var map)" />
+    </include>
+
+    <node name="teleop_control" pkg="svea_examples" exec="teleop_control.py" output="screen"/>
+</launch>

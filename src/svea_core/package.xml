@@ -1,42 +1,27 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>svea_core</name>
   <version>0.0.0</version>
-  <description>The svea_core package</description>
-
-  <!-- One maintainer tag required, multiple allowed, one person per tag -->
-  <maintainer email="frankji@kth.se">Frank Jiang</maintainer>
+  <description>SVEA Core Package</description>
   <maintainer email="kajarf@kth.se">Kaj Munhoz Arfvidsson</maintainer>
+  <license>TODO: License declaration</license>
 
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <license>MIT</license>
-
-  <!-- Url tags are optional, but multiple are allowed, one per tag -->
-  <url type="website">https://github.com/KTH-SML/svea</url>
-
-  <!-- Author tags are optional, multiple are allowed, one per tag -->
-  <author email="tbolin@kth.se">Tobias Bolin</author>
-  <author email="frankji@kth.se">Frank Jiang</author>
-
-
-  <!-- The *depend tags are used to specify dependencies -->
-  <!-- Dependencies can be catkin packages or system dependencies -->
-  <buildtool_depend>catkin</buildtool_depend>
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
-  <depend>python3-yaml</depend>
+  <depend>visualization_msgs</depend>
   <depend>robot_localization</depend>
-  <depend>rospy</depend>
-  <depend>rosserial_msgs</depend>
-  <depend>rosserial_python</depend>
+  <depend>rclpy</depend>
+  <!-- <depend>rosserial_msgs</depend> -->
+  <!-- <depend>rosserial_python</depend> -->
+  <depend>python3-yaml</depend>
   <depend>std_msgs</depend>
-  <depend>svea_msgs</depend>
   <depend>foxglove_bridge</depend>
-  <test_depend>rosunit</test_depend>
+  <depend>tf_transformations</depend>
 
-  <!-- The export tag contains other, unspecified, tags -->
+  <depend>svea_localization</depend>
+
   <export>
-    <!-- Other tools can request additional information be placed here -->
-
+    <build_type>ament_python</build_type>
   </export>
 </package>

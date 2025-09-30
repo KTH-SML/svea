@@ -1,0 +1,47 @@
+<!--TODO-->
+
+<launch>
+
+    <!-- Launch file arguments -->
+    <arg name="use_sim_time"  default="True"/>
+
+    <!-- Launch Low-Level Micro-Ros -->
+    <executable cmd="$(find-pkg-share svea_core)/util/start_micro_ros.sh" output="screen"/>
+
+    <!-- Lidar  -->
+    <arg name="lidar_ip"                default="192.168.3.11" />
+    <include file="$(find-pkg-share svea_localization)/launch/lidar.xml">
+        <arg name="lidar_ip"                    value="$(var lidar_ip)"/>
+    </include>
+
+    <!-- Static transforms -->
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster" args="0 0 0 0 0 0 odom base_link"/>
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="lidarlink_broadcaster" 
+        args="0.385 0 0.15 0 0 0 1 base_link laser"/>
+
+    <!-- Robot localization (Local EKF)-->
+    <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
+        <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
+        <param name="imu0"                  value="/lli/sensor/imu"/>
+        <param name="twist0"                value="/lli/sensor/encoders"/>
+        <remap from="/odometry/filtered"    to="/odometry/local"/>
+        <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/>  -->
+    </node>
+
+    <!-- Start Foxglove -->
+    <include file="$(find-pkg-share foxglove_bridge)/launch/foxglove_bridge_launch.xml">
+        <arg name="port" value="8765" />
+    </include>
+
+    <include file="$(find-pkg-share nav2_bringup)/launch/bringup_launch.py">
+        <arg name="use_sim_time" value="$(var use_sim_time)"/>
+    </include>
+
+    <!-- Start SLAM -->
+    <include file="$(find-pkg-share slam_toolbox)/launch/online_async_launch.py">
+        <arg name="use_sim_time" value="$(var use_sim_time)"/>
+        <arg name="slam_params_file" value="$(find-pkg-share svea_localization)/params/slam_sync.yaml"/>
+    </include>
+    
+
+</launch>

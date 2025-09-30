@@ -9,11 +9,17 @@
 # BUILD_CONFIG="base-amd64"
 # BUILD_CONFIG="base-arm64"
 
+
 main() {
+
+    if isempty BUILD_CONFIG && is_darwin; then
+        BUILD_CONFIG="arm64"
+    fi
+
 
     withdefault DEBUG "0"
 
-    withdefault ROSDISTRO       "noetic"
+    withdefault ROSDISTRO       "jazzy"
     withdefault WORKSPACE       "/svea_ws"
     withdefault REPOSITORY_PATH "$(climb entrypoint)"
     withdefault REPOSITORY_NAME "$(basename "$REPOSITORY_PATH")"
@@ -31,7 +37,7 @@ main() {
         # building for host platform
         withdefault BUILD_PLATFORM  "$(uname -m)"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
@@ -39,7 +45,7 @@ main() {
         # building for x86_64
         withdefault BUILD_PLATFORM  "linux/amd64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
@@ -47,15 +53,23 @@ main() {
         # building for arm64/aarch64/jetson
         withdefault BUILD_PLATFORM  "linux/arm64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH      "0"
+    elif [ "$BUILD_CONFIG" = "arm64" ]; then
+        # building for arm64 (macOS Apple Silicon)
+        withdefault BUILD_PLATFORM  "linux/arm64"
+        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+        withdefault BUILD_FILE      "docker/Dockerfile"
+        withdefault BUILD_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_TAG       "$REPOSITORY_NAME"
         withdefault IMAGE_PUSH      "0"
     elif [ "$BUILD_CONFIG" = "ghcr" ]; then
         # building for both amd64 and arm64
         withdefault BUILD_PLATFORM  "linux/arm64,linux/amd64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
+        withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ros:$ROSDISTRO"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "1"
@@ -98,6 +112,13 @@ jetson_release() {
         echo "$(index 2 $(cat "$file"))"
     fi
 }
+
+## Auto-detect platform for macOS with Apple Silicon
+# Check if running on macOS (Darwin)
+is_darwin() {
+    [ "$(uname -s)" = "Darwin" ]
+}
+
 
 ################################################################################
 ################################################################################
@@ -201,6 +222,14 @@ append() {
 istrue() {
     VALUE="$(eval echo "\$$1")"
     test "${VALUE:-0}" -eq 1
+    return $?
+}
+
+# Assert shell variable with name NAME is empty
+# > isempty NAME
+isempty() {
+    VALUE="$(eval echo "\$$1")"
+    test -z "$VALUE"
     return $?
 }
 

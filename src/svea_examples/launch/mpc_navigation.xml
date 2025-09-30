@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 
+        This launch file enables navigation through Model Predictive Control (MPC) 
+        with selectable modes: goal position setting or path tracking.
+        It is compatible with both simulation and real SVEA vehicles when the Motion Capture 
+        system is enabled, and the necessary ROS packages (motion_capture_system, svea_mocap) are included in the repository.
+    -->
+
+    <!-- Launch file arguments -->
+    <arg name="map"             default="sml"/>  
+    <arg name="use_foxglove"    default="true"/>
+    <arg name="svea_mocap_name" default="svea7"/>      <!-- name of SVEA -->    
+    <arg name="is_sim"          default="true"/>
+    <arg name="state" default="[0.0, 0.0, 0.9, 0.0]" />
+    <arg name="mpc_mode"        default="goal_position"/> <!-- Options: goal_position, path_tracking -->
+
+    <!-- Start Map Server and Foxglove -->
+    <include file="$(find-pkg-share svea_core)/launch/map_and_foxglove.xml">
+        <arg name="map" value="$(var map)" />
+        <arg name="use_foxglove" value="$(var use_foxglove)" />
+    </include>   
+    
+    <!-- Start Svea Core -->
+    <include file="$(find-pkg-share svea_core)/launch/svea_launch.xml">
+        <arg name="is_sim" value="$(var is_sim)" />
+        <arg name="state" value="$(var state)" />
+    </include>     
+    
+    <!-- Start main node based on MPC mode -->
+    <group if="$(eval '\'$(var mpc_mode)\' == \'goal_position\'')">
+        <node name="mpc" pkg="svea_examples" exec="mpc.py" output="screen">
+            <param name="use_rviz" value="$(var use_foxglove)"/>
+            <param name="is_sim" value="$(var is_sim)"/>
+            <param name="mpc_freq" value="10"/> 
+            <param name="target_speed" value="0.3"/>
+            <param name="delta_s"  value="5"/>
+            <param name="svea_mocap_name" value="$(var svea_mocap_name)"/>
+            <param name="mpc_config_ns" value="~mpc"/>
+            <param from="$(find-pkg-share svea_core)/params/mpc_default.yaml" />
+        </node>
+    </group>
+
+    <group if="$(eval '\'$(var mpc_mode)\' == \'path_tracking\'')">
+        <node name="mpc" pkg="svea_examples" exec="mpc_path_tracking.py" output="screen">
+            <param name="use_rviz" value="$(var use_foxglove)"/>
+            <param name="is_sim" value="$(var is_sim)"/>
+            <param name="mpc_freq" value="10"/> 
+            <param name="target_speed" value="1.0"/>
+            <param name="circle_radius" value="1.5"/>
+            <param name="circle_center_x" value="0.0"/>
+            <param name="circle_center_y" value="0.0"/>
+            <param name="svea_mocap_name" value="$(var svea_mocap_name)"/>
+            <param name="mpc_config_ns" value="~mpc"/>
+            <param from="$(find-pkg-share svea_core)/params/mpc_default_path_tracking.yaml" />
+        </node>
+    </group>
+    
+</launch>

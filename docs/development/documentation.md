@@ -90,7 +90,7 @@ docstrings using `mkdocstrings`. This is what should be done:
 
 1. Adding reference section containing one page per module.
 ```text
-svea/docs/
+svea_jazzy/docs/
     instructions/
     tutorials/
     reference/
@@ -99,10 +99,7 @@ svea/docs/
 ```
 
 2. Each page should contain:
-```text
-::: svea.actuation
-    <options>
-```
+
 
 See more [here](https://mkdocstrings.github.io/).
 

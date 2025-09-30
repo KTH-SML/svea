@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--TODO: Confirm migration to ROS2-->
+
+<!--
+    Launch RTK Localization using Ublox F9P reciever and SWEPOS Network-RTK Service
+-->
+
+<launch>
+    <!-- RTK RECEIVER ARGUMENTS -->
+    <arg name="gps_device"          default="/dev/ttyACM0"/> 
+    <!-- dev/ttyS0 if connected via UART -->
+    <arg name="baud"            default="250000" />
+    <!-- 38400 if connected via UART -->
+    <arg name="gps_frame"       default="gps"/>
+    <arg name="dynamic_model"   default="portable"/> <!-- Allowed values are "portable", "stationary", "pedestrian","automotive","sea","airborne_1g","airborne_2g", "airborne_4g","wrist_watch", and "bike" -->
+
+    <!-- NTRIP CLIENT ARGUMENTS -->
+    <!-- for swepos network rtk -->
+    <arg name="host"            default="nrtk-swepos.lm.se"/>
+    <arg name="port"            default="80"/>  <!-- PORT 8500 is also valid -->
+    <arg name="authenticate"    default="true"/>
+    <arg name="mountpoint"      default="MSM_GNSS"/>
+    <arg name="username"        default=""/>
+    <arg name="password"        default=""/>
+    <!-- for rtk2go -->
+    <!-- <arg name="host"            default="rtk2go.com"/> -->
+    <!-- <arg name="port"            default="2101"/> -->
+    <!-- <arg name="authenticate"    default="true"/> -->
+    <!-- <arg name="mountpoint"      default="SweArbGotHag"/> -->
+    <!-- <arg name="username"        default=""/> -->
+    <!-- <arg name="password"        default=""/> -->
+    
+
+    <!-- START UBLOX ZED-F9P RTK MANAGER NODE -->
+    <node pkg="svea_localization" exec="rtk_manager.py" name="rtk_manager" output="screen" namespace="gps">
+        <param name="device"        value="$(var gps_device)"/>
+        <param name="baud"          value="$(var baud)" />
+        <param name="gps_frame"     value="$(var gps_frame)" />
+        <param name="dynamic_model" value="$(var dynamic_model)"/>
+    </node>
+
+    <!-- START NTRIP CLIENT -->
+    <include file="$(find-pkg-share ntrip_client)/ntrip_client_launch.py">
+        <arg name="host"            value="$(var host)" />
+        <arg name="port"            value="$(var port)" /> 
+        <arg name="mountpoint"      value="$(var mountpoint)" />
+        <arg name="authenticate"    value="$(var authenticate)" />
+        <arg name="username"        value="$(var username)" />
+        <arg name="password"        value="$(var password)" />
+    </include>
+
+</launch>

@@ -1,0 +1,40 @@
+<!--TODO-->
+
+<launch>
+
+    <!-- Launch file arguments -->
+    <arg name="xavier"      default="false"/>
+    <arg name="camera"      default="rs"/>
+    <arg name="slam_delay"  default="5"/>
+    <arg name="output_dir"  default="$(env HOME)"/>
+    <arg name="topics" default="
+        /rs/t265_camera/odom/sample
+        /zed/zed_node/odom
+        /scan
+        /rosout
+        /laser_status
+        /imu/data
+        /imu/raw
+        /imu/status
+        /imu/temp
+        /Hokyoulidar/parameter_descriptions
+        /Hokyoulidar/parameter_updates
+        /lli/ctrl_actuated
+    " description="List of topic need to be recorded"/>
+
+    <!-- Start default odometry and SLAM -->
+    <include file="$(find-pkg-share svea_localization)/launch/slam.py">
+        <arg name="xavier"      value="$(var xavier)"/>
+        <arg name="camera"      value="$(var camera)"/>
+        <arg name="slam_delay"  value="$(var slam_delay)"/>
+    </include>
+
+    <!-- ROS bag -->
+    <executable 
+        cmd="ros2 bag record -o $(var output_dir) $(var topics)"
+        output="screen"
+        name="rosbag2_recorder"
+    />
+
+</launch>
+

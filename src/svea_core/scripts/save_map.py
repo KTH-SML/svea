@@ -4,38 +4,42 @@ import pickle
 from pathlib import Path
 from datetime import datetime
 import numpy as np
-import rospy
+import rclpy
+from rclpy.node import Node
 from nav_msgs.msg import OccupancyGrid
+import time
 
 
-class save_map:
+class SaveMap(Node):
 
     def __init__(self):
+        super().__init__('save_map')
 
-        rospy.init_node('save_map')
+        # declare parameters
+        self.declare_parameter('save_dir', str(Path.home()/'maps'))
+        self.declare_parameter('file_name', '%Y%m%d-%H%m')
+        self.declare_parameter('save_method', 'numpy')
 
         # load parameters
-        self.save_dir = rospy.get_param('~save_dir', None)
-        self.file_name = rospy.get_param('~file_name', None)
-        self.save_method = rospy.get_param('~save_method', None)
+        self.save_dir = self.get_parameter('save_dir').value
+        self.file_name = self.get_parameter('file_name').value
+        self.save_method = self.get_parameter('save_method').value
+
+        self.get_logger().info(f'My svae directory is {self.save_dir}', once=True)
 
         # make sure save directory exist
         self.save_dir = Path(self.save_dir)
         self.save_dir.mkdir(parents=True, exist_ok=True)
 
-    def run(self):
-        self.map_cb(rospy.wait_for_message('/map', OccupancyGrid))
-
     def map_cb(self, msg: OccupancyGrid):
         """
         Callback for when message is received on the /map topic.
-
         Using save_method we can choose how to save the map. The save method
         is determined by the method defined in this class.
         """
 
         path = self.save_dir
-        path /= datetime.now().strftime(self.file_name)
+        path /= datetime.now().strftime('{self.file_name}')
 
         save_fn = getattr(self, f'save_{self.save_method}', None)
 
@@ -91,6 +95,30 @@ class save_map:
         with open(path, 'wb') as f:
             msg.serialize(f)
 
+def wait_for_message(node ,topic_type, topic): 
+    class _vfm(object):
+        def __init__(self) -> None:
+            self.msg = None
+            
+        def cb(self, msg):
+            self.msg = msg
+
+    vfm = _vfm()
+    subscription = node.create_subscription(topic_type,topic,vfm.cb,1)
+    while rclpy.ok():
+        if vfm.msg != None: return vfm.msg
+        rclpy.spin_once(node)
+        time.sleep(0.001)
+    # unsubcription
+    subscription.destroy()
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = SaveMap()
+    msg = wait_for_message(node, OccupancyGrid, "/map")
+    node.map_cb(msg)
+    rclpy.spin(node)
+    rclpy.shutdown()
 
 if __name__ == '__main__':
-    save_map().run()
+    main()

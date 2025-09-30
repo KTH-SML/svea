@@ -1,26 +1,10 @@
-build/*
-devel/*
-logs/*
-.catkin_tools/*
-.catkin_workspace
-src/CMakeLists.txt
-
 __pycache__/
-*.pyc
-
+**/__pycache__/
+*.py[cod]
+*$py.class
+log/
+**/teleopsvea/
+test.ipynb
+**/motion_capture_system/
 .vscode/
-src/.vscode/
-
-venv/
-site/
-
-# macOS
-.DS_Store
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Linux
-*~
+el2425/

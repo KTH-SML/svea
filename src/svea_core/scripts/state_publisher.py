@@ -1,14 +1,15 @@
 #! /usr/bin/env python3
 
-import rospy
+import rclpy
 from geometry_msgs.msg import PointStamped
+from nav_msgs.msg import Odometry
+from tf_transformations import euler_from_quaternion
 
-from svea_msgs.msg import VehicleState as VehicleStateMsg
-from svea.states import VehicleState
-from svea.data import RVIZPathHandler
+from svea_core import rosonic as rx
+from svea_core import LocalizationInterface
 
 
-class state_publisher:
+class state_publisher(rx.Node):
     """
     A quick and easy way to get vehicle states.
 
@@ -17,56 +18,37 @@ class state_publisher:
     map.
     """
 
-    SPIN_RATE = 10
+    rate = rx.Parameter(10)
 
-    def __init__(self):
+    def on_startup(self):
 
-        ## Initialize node
+        self.odometry = Odometry()
+        
+        self.rate = self.create_rate(self.rate)
 
-        rospy.init_node('state_publisher')
+        self.localization = LocalizationInterface(self).start()
 
-        ## Create node resources
-
-        # spin rate
-        self.rate = rospy.Rate(self.SPIN_RATE)
-
-        # Visualization tool
-        self.rviz = RVIZPathHandler()
-
-        # Vehicle state
-        self.state = VehicleState()
-        self.state.state_msg = rospy.wait_for_message('state', VehicleStateMsg)
-        rospy.Subscriber(
-            "state",
-            VehicleStateMsg,
-            lambda msg: setattr(self.state, 'state_msg', msg)
-        )
-
-        # Clicked point listener
-        self.sub_clicked_point = rospy.Subscriber(
-            '/clicked_point',
+        self.create_subscription(
             PointStamped,
-            lambda msg: rospy.loginfo('Clikcked point: [%f, %f]', msg.x, msg.y)
+            '/clicked_point',
+            lambda msg: self.get_logger().info('Clicked point: [%f, %f]' % (msg.point.x, msg.point.y)),
+            10
         )
 
-        rospy.loginfo("init done")
+        self.create_timer(1/self.rate, self.loop)
 
-    def run(self):
-        while self.keep_alive():
-            self.spin()
+    def loop(self):
+        """Main loop for the state publisher."""
+        
+        while rclpy.ok():
+
+            state = self.localization.get_state()
+            self.get_logger().info(
+                "(" + ", ".join(f'{val:.02f}' for val in state) + ")"
+            )
+
             self.rate.sleep()
-
-    def keep_alive(self):
-        return not rospy.is_shutdown()
-
-    def spin(self):
-        rospy.loginfo('[%f, %f, %f]', self.state.x, self.state.y, self.state.yaw)
-        self.rviz.log_state(self.state)
-        self.rviz.visualize_data()
 
 
 if __name__ == '__main__':
-
-    ## Start node ##
-
-    state_publisher().run()
+    state_publisher.main()
