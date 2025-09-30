@@ -12,6 +12,7 @@ service ssh start
 # Get project information
 source util/config.sh
 
+<<<<<<< HEAD
 source "/opt/ros/$ROS_DISTRO/setup.bash" --
 
 # Micro-ROS Agent environment variables
@@ -23,6 +24,8 @@ if [ "$MICROROS_DISABLE_SHM" = "1" ] ; then
     fi
 fi
 
+=======
+>>>>>>> 26b80c5 (Remove remote_ros function and associated script to simplify entrypoint)
 source "/opt/ros/$ROS_DISTRO/setup.bash" --
 
 # Micro-ROS Agent environment variables
