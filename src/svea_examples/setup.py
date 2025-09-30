@@ -3,10 +3,14 @@
 import os
 from glob import glob
 <<<<<<< HEAD
+<<<<<<< HEAD
 import xml.etree.ElementTree as ET
 =======
 from xml.etree.ElementTree import ET
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+import xml.etree.ElementTree as ET
+>>>>>>> e42804d (svea_example setup.py typo fixed)
 from setuptools import find_packages, setup
 
 package = ET.parse('package.xml').getroot()
