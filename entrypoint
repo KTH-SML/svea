@@ -9,10 +9,6 @@ set -e
 # Get project information
 source util/config.sh
 
-# Set ROS_IP etc. for e.g. rviz remote connection
-# https://stackoverflow.com/a/65912397
-remote_ros() { source util/remote_ros.sh; }; remote_ros
-
 source "/opt/ros/$ROS_DISTRO/setup.bash" --
 
 # Micro-ROS Agent environment variables
