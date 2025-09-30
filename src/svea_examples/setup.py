@@ -1,6 +1,6 @@
 import os
 from glob import glob
-from xml.etree.ElementTree import ET
+import xml.etree.ElementTree as ET
 from setuptools import find_packages, setup
 
 package = ET.parse('package.xml').getroot()
