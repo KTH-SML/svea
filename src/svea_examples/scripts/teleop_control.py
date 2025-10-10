@@ -90,9 +90,12 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
 
     actuation = ActuationInterface()
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     localizer = LocalizationInterface()
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
 
     # Path Visualization
     path = ShowPath()
@@ -149,7 +152,6 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
 
     def loop(self):
         self.actuation.send_control(self.steering, self.velocity)
-        self.localizer.get_state()
 
 <<<<<<< HEAD
 

@@ -151,6 +151,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	    <include file="$(find-pkg-share svea_localization)/launch/localization.py">
 		    <arg name="intial_pose_x" value="$(var initial_pose_x)"/>
 		    <arg name="intial_pose_y" value="$(var initial_pose_y)"/>
@@ -161,6 +162,10 @@
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 =======
 >>>>>>> 2fb2b0b (localization update still have issues)
+=======
+            <include file="$(find-pkg-share svea_localization)/launch/localization.py"/>
+
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
             <!-- Lifecycle Manager for Map Server -->
             <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
                 <param name="autostart" value="true"/>
@@ -263,7 +268,7 @@
 =======
     <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
         <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
-        <param name="imu0"                  value="/lli/sensor/imu"/>
+        <!-- <param name="imu0"                  value="/lli/sensor/imu"/> -->
         <param name="twist0"                value="/lli/sensor/encoders"/>
         <remap from="/odometry/filtered"    to="/odometry/local"/>
 <<<<<<< HEAD

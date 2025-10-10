@@ -6,7 +6,11 @@ from sensor_msgs.msg import Imu
 from svea_core import rosonic as rx
 
 qos_pubber = QoSProfile(
+<<<<<<< HEAD
     reliability=QoSReliabilityPolicy.BEST_EFFORT,
+=======
+    reliability=QoSReliabilityPolicy.RELIABLE,
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
     durability=QoSDurabilityPolicy.VOLATILE,
     history=QoSHistoryPolicy.KEEP_LAST,
     depth=1,
@@ -14,7 +18,11 @@ qos_pubber = QoSProfile(
 
 
 qos_subber = QoSProfile(
+<<<<<<< HEAD
     reliability=QoSReliabilityPolicy.BEST_EFFORT,  # BEST_EFFORT
+=======
+    reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
     history=QoSHistoryPolicy.KEEP_LAST,         # Keep the last N messages
     durability=QoSDurabilityPolicy.VOLATILE,    # Volatile
     depth=10,                                   # Size of the queue
@@ -27,7 +35,11 @@ class imu_bias_remove(rx.Node):
     """
 
     bias_sampled = False
+<<<<<<< HEAD
     sample_count = 100
+=======
+    sample_count = 5000
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
     sample_counter = 0
 
     ## Publishers ##
@@ -54,6 +66,7 @@ class imu_bias_remove(rx.Node):
         
         else:
             imu_msg.angular_velocity.z -= self.bias_angular_z
+<<<<<<< HEAD
             imu_msg.angular_velocity.z = imu_msg.angular_velocity.z / 4.0
             imu_msg.linear_acceleration.x -= self.bias_linear_x
             imu_msg.linear_acceleration.y -= self.bias_linear_y
@@ -73,6 +86,11 @@ class imu_bias_remove(rx.Node):
             if abs(imu_msg.angular_velocity.z) < 0.03:
                 imu_msg.angular_velocity.z = 0.0
 
+=======
+            imu_msg.linear_acceleration.x -= self.bias_linear_x
+            imu_msg.linear_acceleration.y -= self.bias_linear_y
+
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
             self.imu_re_pub.publish(imu_msg)
 
     def on_startup(self):
@@ -80,4 +98,8 @@ class imu_bias_remove(rx.Node):
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     imu_bias_remove.main()
+=======
+    state_publisher.main()
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)

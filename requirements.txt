@@ -9,9 +9,13 @@
 
 numpy
 <<<<<<< HEAD
+<<<<<<< HEAD
 matplotlib
 =======
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+matplotlib
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
 
 # This is for MPC
 casadi==3.6.7

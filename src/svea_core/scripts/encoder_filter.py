@@ -7,7 +7,11 @@ from std_msgs.msg import Bool, Int8
 from svea_core import rosonic as rx
 
 qos_pubber = QoSProfile(
+<<<<<<< HEAD
     reliability=QoSReliabilityPolicy.BEST_EFFORT,
+=======
+    reliability=QoSReliabilityPolicy.RELIABLE,
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
     durability=QoSDurabilityPolicy.VOLATILE,
     history=QoSHistoryPolicy.KEEP_LAST,
     depth=1,
@@ -15,7 +19,11 @@ qos_pubber = QoSProfile(
 
 
 qos_subber = QoSProfile(
+<<<<<<< HEAD
     reliability=QoSReliabilityPolicy.BEST_EFFORT,  # BEST_EFFORT
+=======
+    reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
     history=QoSHistoryPolicy.KEEP_LAST,         # Keep the last N messages
     durability=QoSDurabilityPolicy.VOLATILE,    # Volatile
     depth=10,                                   # Size of the queue
@@ -29,6 +37,7 @@ class encoder_filter(rx.Node):
 
     rm_throttle = 1 
     ctrl_throttle = 1
+<<<<<<< HEAD
     override = None
     encoder_time = None
 
@@ -37,11 +46,20 @@ class encoder_filter(rx.Node):
 
     ## Subscribers ##
     @rx.Subscriber(Bool, '/lli/remote/override', qos_subber)
+=======
+
+    ## Publishers ##
+    encoder_re_pub = rx.Publisher(TwistWithCovarianceStamped, '/encoder/sfiltered', qos_pubber)
+
+    ## Subscribers ##
+    @rx.Subsciber(Bool, '/lli/remote/override', qos_subber)
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
     def override_sub(self, override_msg):
         self.override = override_msg.data
 
     @rx.Subscriber(Int8, '/lli/remote/throttle', qos_subber)
     def throttle_sub(self, rm_throttle_msg):
+<<<<<<< HEAD
         if rm_throttle_msg.data >= 15:
             self.rm_throttle = 1
         elif rm_throttle_msg.data <= -15:
@@ -95,10 +113,33 @@ class encoder_filter(rx.Node):
                 encoder_msg.twist.twist.angular.z *= self.ctrl_throttle
         
         self.encoder_re_pub.publish(encoder_msg)
+=======
+        if rm_throttle_msg.data >= 0:
+            self.rm_throttle = 1
+        else:
+            self.rm_throttle = -1
+
+    @rx.Subscriber(Int8, '/lli/ctrl/throttle', qos_subber)
+    def ctrl_throttle_sub(self, throttle_msg):
+        if ctrl_throttle_msg.data >= 0:
+            self.ctrl_throttle = 1
+        else:
+            self.ctrl_throttle = -1
+
+    @rx.Subscriber(TwistWithCovarianceStamped, '/lli/sensor/encoder', qos_subber)
+    def imu_sub(self, imu_msg):
+        if self.override:
+            imu_msg.twist.twist.linear.x = abs(imu_msg.twist.twist.linear.x) * self.rm_throttle
+        else:
+            imu_msg.twist.twist.linear.x = abs(imu_msg.twist.twist.linear.x) * self.ctrl_throttle
+        
+        self.encoder_re_pub.publish(imu_msg)
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
 
     def on_startup(self):
         pass
 
+<<<<<<< HEAD
     def ticks_to_twist(self, ticks_L, ticks_R, dt):
         r = 0.055   # wheel radius [m]
         N = 40      # ticks per revolution
@@ -114,3 +155,8 @@ class encoder_filter(rx.Node):
 
 if __name__ == '__main__':
     encoder_filter.main()
+=======
+
+if __name__ == '__main__':
+    state_publisher.main()
+>>>>>>> 28b1ce8 (encoder and imu high level calibrater)
