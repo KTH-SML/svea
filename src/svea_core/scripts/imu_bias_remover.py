@@ -64,4 +64,4 @@ class imu_bias_remove(rx.Node):
 
 
 if __name__ == '__main__':
-    state_publisher.main()
+    imu_bias_remove.main()

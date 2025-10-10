@@ -34,7 +34,7 @@ class encoder_filter(rx.Node):
     encoder_re_pub = rx.Publisher(TwistWithCovarianceStamped, '/encoder/sfiltered', qos_pubber)
 
     ## Subscribers ##
-    @rx.Subsciber(Bool, '/lli/remote/override', qos_subber)
+    @rx.Subscriber(Bool, '/lli/remote/override', qos_subber)
     def override_sub(self, override_msg):
         self.override = override_msg.data
 
@@ -66,4 +66,4 @@ class encoder_filter(rx.Node):
 
 
 if __name__ == '__main__':
-    state_publisher.main()
+    encoder_filter.main()
