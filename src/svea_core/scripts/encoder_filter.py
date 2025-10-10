@@ -31,7 +31,7 @@ class encoder_filter(rx.Node):
     ctrl_throttle = 1
 
     ## Publishers ##
-    encoder_re_pub = rx.Publisher(TwistWithCovarianceStamped, '/encoder/sfiltered', qos_pubber)
+    encoder_re_pub = rx.Publisher(TwistWithCovarianceStamped, '/encoder/filtered', qos_pubber)
 
     ## Subscribers ##
     @rx.Subscriber(Bool, '/lli/remote/override', qos_subber)
