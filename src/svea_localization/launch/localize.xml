@@ -72,6 +72,8 @@
                 <arg name="lidar_ip"                    value="$(var lidar_ip)"/>
             </include>
 
+            <include file="$(find-pkg-share svea_localization)/launch/localization.py"/>
+
             <!-- Lifecycle Manager for Map Server -->
             <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
                 <param name="autostart" value="true"/>
@@ -121,7 +123,7 @@
     <!-- Robot localization (Local EKF)-->
     <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
         <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
-        <param name="imu0"                  value="/lli/sensor/imu"/>
+        <!-- <param name="imu0"                  value="/lli/sensor/imu"/> -->
         <param name="twist0"                value="/lli/sensor/encoders"/>
         <remap from="/odometry/filtered"    to="/odometry/local"/>
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/>  -->

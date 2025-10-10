@@ -70,7 +70,6 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
     target_velocity = rx.Parameter(1.0)
 
     actuation = ActuationInterface()
-    localizer = LocalizationInterface()
 
     # Path Visualization
     path = ShowPath()
@@ -88,7 +87,6 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
 
     def loop(self):
         self.actuation.send_control(self.steering, self.velocity)
-        self.localizer.get_state()
 
 if __name__ == '__main__':
     teleop_control.main()
