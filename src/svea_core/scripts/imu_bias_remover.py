@@ -6,7 +6,7 @@ from sensor_msgs.msg import Imu
 from svea_core import rosonic as rx
 
 qos_pubber = QoSProfile(
-    reliability=QoSReliabilityPolicy.RELIABLE,
+    reliability=QoSReliabilityPolicy.BEST_EFFORT,
     durability=QoSDurabilityPolicy.VOLATILE,
     history=QoSHistoryPolicy.KEEP_LAST,
     depth=1,
@@ -14,7 +14,7 @@ qos_pubber = QoSProfile(
 
 
 qos_subber = QoSProfile(
-    reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
+    reliability=QoSReliabilityPolicy.BEST_EFFORT,  # BEST_EFFORT
     history=QoSHistoryPolicy.KEEP_LAST,         # Keep the last N messages
     durability=QoSDurabilityPolicy.VOLATILE,    # Volatile
     depth=10,                                   # Size of the queue
@@ -27,7 +27,7 @@ class imu_bias_remove(rx.Node):
     """
 
     bias_sampled = False
-    sample_count = 5000
+    sample_count = 1000
     sample_counter = 0
 
     ## Publishers ##

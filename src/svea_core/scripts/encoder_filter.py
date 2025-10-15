@@ -7,7 +7,7 @@ from std_msgs.msg import Bool, Int8
 from svea_core import rosonic as rx
 
 qos_pubber = QoSProfile(
-    reliability=QoSReliabilityPolicy.RELIABLE,
+    reliability=QoSReliabilityPolicy.BEST_EFFORT,
     durability=QoSDurabilityPolicy.VOLATILE,
     history=QoSHistoryPolicy.KEEP_LAST,
     depth=1,
@@ -15,7 +15,7 @@ qos_pubber = QoSProfile(
 
 
 qos_subber = QoSProfile(
-    reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
+    reliability=QoSReliabilityPolicy.BEST_EFFORT,  # BEST_EFFORT
     history=QoSHistoryPolicy.KEEP_LAST,         # Keep the last N messages
     durability=QoSDurabilityPolicy.VOLATILE,    # Volatile
     depth=10,                                   # Size of the queue
@@ -46,13 +46,13 @@ class encoder_filter(rx.Node):
             self.rm_throttle = -1
 
     @rx.Subscriber(Int8, '/lli/ctrl/throttle', qos_subber)
-    def ctrl_throttle_sub(self, throttle_msg):
+    def ctrl_throttle_sub(self, ctrl_throttle_msg):
         if ctrl_throttle_msg.data >= 0:
             self.ctrl_throttle = 1
         else:
             self.ctrl_throttle = -1
 
-    @rx.Subscriber(TwistWithCovarianceStamped, '/lli/sensor/encoder', qos_subber)
+    @rx.Subscriber(TwistWithCovarianceStamped, '/lli/sensor/encoders', qos_subber)
     def imu_sub(self, imu_msg):
         if self.override:
             imu_msg.twist.twist.linear.x = abs(imu_msg.twist.twist.linear.x) * self.rm_throttle
