@@ -306,6 +306,13 @@ robot_state_publisher:
       x: -7.3699
       y: -15.383940368977647
       z: 0.0
+<<<<<<< HEAD
       yaw: 1.57
 >>>>>>> 94397f1 (AMCL fixed)
+<<<<<<< HEAD
 >>>>>>> 5eef1eb (AMCL fixed)
+=======
+=======
+      yaw: 1.0116
+>>>>>>> 46832dd (minor fixs)
+>>>>>>> 2c22348 (minor fixs)
