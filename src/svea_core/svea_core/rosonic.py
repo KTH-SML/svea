@@ -316,8 +316,9 @@ class Resource:
         elif _is_absolute_name(name) or _is_root(owner):
             return name
         else:
-            return f"{owner.__rosonic_relname__}/{name}"
-
+            parent = owner.__rosonic_relname__
+            return name if parent == '' else f"{parent}/{name}"
+    
     @property
     def __rosonic_lookup__(self) -> dict[str, 'Resource']:
         """
