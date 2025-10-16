@@ -27,7 +27,7 @@ class imu_bias_remove(rx.Node):
     """
 
     bias_sampled = False
-    sample_count = 1000
+    sample_count = 200
     sample_counter = 0
 
     ## Publishers ##
@@ -54,6 +54,7 @@ class imu_bias_remove(rx.Node):
         
         else:
             imu_msg.angular_velocity.z -= self.bias_angular_z
+            imu_msg.angular_velocity.z = imu_msg.angular_velocity.z / 4.0
             imu_msg.linear_acceleration.x -= self.bias_linear_x
             imu_msg.linear_acceleration.y -= self.bias_linear_y
 
