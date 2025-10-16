@@ -90,10 +90,14 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
     points = rx.Parameter(['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]'])
     state = rx.Parameter([-7.4, -15.3, 0.9, 0.0])  # x, y, yaw, vel
 <<<<<<< HEAD
+<<<<<<< HEAD
     target_velocity = rx.Parameter(0.6)
 =======
     target_velocity = rx.Parameter(1.0)
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+    target_velocity = rx.Parameter(0.6)
+>>>>>>> 6151141 (update)
     
     # Interfaces
     actuation = ActuationInterface()

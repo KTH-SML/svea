@@ -46,6 +46,9 @@ class encoder_filter(rx.Node):
     rm_throttle = 1 
     ctrl_throttle = 1
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6151141 (update)
     override = None
     encoder_time = None
 
@@ -67,6 +70,7 @@ class encoder_filter(rx.Node):
 
     @rx.Subscriber(Int8, '/lli/remote/throttle', qos_subber)
     def throttle_sub(self, rm_throttle_msg):
+<<<<<<< HEAD
 <<<<<<< HEAD
         if rm_throttle_msg.data >= 15:
             self.rm_throttle = 1
@@ -123,31 +127,70 @@ class encoder_filter(rx.Node):
         self.encoder_re_pub.publish(encoder_msg)
 =======
         if rm_throttle_msg.data >= 0:
+=======
+        if rm_throttle_msg.data >= 15:
+>>>>>>> 6151141 (update)
             self.rm_throttle = 1
-        else:
+        elif rm_throttle_msg.data <= -15:
             self.rm_throttle = -1
 
     @rx.Subscriber(Int8, '/lli/ctrl/throttle', qos_subber)
     def ctrl_throttle_sub(self, ctrl_throttle_msg):
-        if ctrl_throttle_msg.data >= 0:
+        if ctrl_throttle_msg.data >= 15:
             self.ctrl_throttle = 1
-        else:
+        elif ctrl_throttle_msg.data <= -15:
             self.ctrl_throttle = -1
 
     @rx.Subscriber(TwistWithCovarianceStamped, '/lli/sensor/encoders', qos_subber)
-    def imu_sub(self, imu_msg):
-        if self.override:
-            imu_msg.twist.twist.linear.x = abs(imu_msg.twist.twist.linear.x) * self.rm_throttle
+    def encoder_sub(self, encoder_msg):
+        current_time = encoder_msg.header.stamp.sec + encoder_msg.header.stamp.nanosec * 1e-9
+
+        # 如果是第一次回调，直接记录时间，不计算dt
+        if getattr(self, "encoder_time", None) is None:
+            self.encoder_time = current_time
+            self.get_logger().info("First encoder message received, initializing timestamp")
+            return
+
+        # 计算时间差
+        T = current_time - self.encoder_time
+        self.encoder_time = current_time
+
+        # 从消息中读取左右轮ticks（假设linear.y是左，linear.z是右）
+        L = encoder_msg.twist.twist.linear.y
+        R = encoder_msg.twist.twist.linear.z
+
+        # 检查T是否有效
+        if T <= 0:
+            self.get_logger().warn(f"Invalid dt={T:.6f}, skipping")
+            return
+ 
+        # 调用转换函数
+        v, w = self.ticks_to_twist(L, R, T)
+
+        encoder_msg.twist.twist.angular.z = w
+ 
+        if self.override is None:
+            pass
         else:
-            imu_msg.twist.twist.linear.x = abs(imu_msg.twist.twist.linear.x) * self.ctrl_throttle
+            if self.override:
+                encoder_msg.twist.twist.linear.x = abs(encoder_msg.twist.twist.linear.x) * self.rm_throttle
+            else:
+                encoder_msg.twist.twist.linear.x = abs(encoder_msg.twist.twist.linear.x) * self.ctrl_throttle
         
+<<<<<<< HEAD
         self.encoder_re_pub.publish(imu_msg)
 >>>>>>> 28b1ce8 (encoder and imu high level calibrater)
+=======
+        self.encoder_re_pub.publish(encoder_msg)
+>>>>>>> 6151141 (update)
 
     def on_startup(self):
         pass
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6151141 (update)
     def ticks_to_twist(self, ticks_L, ticks_R, dt):
         r = 0.055   # wheel radius [m]
         N = 40      # ticks per revolution

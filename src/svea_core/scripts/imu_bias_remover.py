@@ -45,6 +45,7 @@ class imu_bias_remove(rx.Node):
     bias_sampled = False
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     sample_count = 100
 =======
     sample_count = 5000
@@ -52,6 +53,9 @@ class imu_bias_remove(rx.Node):
 =======
     sample_count = 1000
 >>>>>>> 2c22348 (minor fixs)
+=======
+    sample_count = 200
+>>>>>>> 6151141 (update)
     sample_counter = 0
 
     ## Publishers ##
@@ -79,6 +83,9 @@ class imu_bias_remove(rx.Node):
         else:
             imu_msg.angular_velocity.z -= self.bias_angular_z
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6151141 (update)
             imu_msg.angular_velocity.z = imu_msg.angular_velocity.z / 4.0
             imu_msg.linear_acceleration.x -= self.bias_linear_x
             imu_msg.linear_acceleration.y -= self.bias_linear_y
@@ -111,7 +118,11 @@ class imu_bias_remove(rx.Node):
 
 if __name__ == '__main__':
 <<<<<<< HEAD
+<<<<<<< HEAD
     imu_bias_remove.main()
 =======
     state_publisher.main()
 >>>>>>> 28b1ce8 (encoder and imu high level calibrater)
+=======
+    imu_bias_remove.main()
+>>>>>>> 6151141 (update)
