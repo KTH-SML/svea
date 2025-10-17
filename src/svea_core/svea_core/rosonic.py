@@ -238,9 +238,13 @@ class Resource:
     __rosonic_owner__: 'Resource | None'            = None
     __rosonic_resources__: tuple['Resource', ...]   = ()
 <<<<<<< HEAD
+<<<<<<< HEAD
     __rosonic_started__: bool                       = False
 =======
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+    __rosonic_started__: bool                       = False
+>>>>>>> 7499a4c (Add __rosonic_started__ attribute and related methods for resource state management)
 
     # Class property. For Field resources
     __rosonic_preregistered__: tuple['Resource', ...] = ()
@@ -424,10 +428,15 @@ class Resource:
 
         self.on_startup()
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         self.__rosonic_started__ = True
 =======
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+
+        self.__rosonic_started__ = True
+>>>>>>> 7499a4c (Add __rosonic_started__ attribute and related methods for resource state management)
         
     def __rosonic_shutdown__(self, node: NodeBase) -> None:
         """
@@ -479,11 +488,16 @@ class Resource:
         pass
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     def _is_absolute_name(self, name: str | None = None) -> bool:
+=======
+    def _is_absolute_name(name: str | None = None) -> bool:
+>>>>>>> 7499a4c (Add __rosonic_started__ attribute and related methods for resource state management)
         if name is None:
             name = self.__rosonic_name__
         return name.startswith('/') or name.startswith('~')
 
+<<<<<<< HEAD
     def _is_registered(self) -> TypeGuard['_RegisteredResource']:
         return self.__rosonic_owner__ is not None
 
@@ -500,6 +514,22 @@ class Resource:
 
 =======
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+    def _is_registered(self) -> TypeGuard[_RegisteredResource]:
+        return resource.__rosonic_owner__ is not None
+
+    def _is_started(resource) -> TypeGuard[_StartedResource]:
+        return resource.__rosonic_started__
+
+    def _is_root(resource) -> bool:
+        return resource.__rosonic_owner__ is resource
+
+    def _get_root(resource) -> Resource:
+        assert _is_registered(resource), f"Resource '{resource}' is not registered"
+        return (resource if _is_root(resource) else
+                _get_root(resource))
+
+>>>>>>> 7499a4c (Add __rosonic_started__ attribute and related methods for resource state management)
 
 # Only for typing
 class _RegisteredResource(Resource):
@@ -513,6 +543,7 @@ class _StartedResource(_RegisteredResource):
     __rosonic_node__: NodeBase
 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 def _is_absolute_name(name: str) -> bool:
@@ -533,6 +564,8 @@ def _get_root(resource: Resource) -> Resource:
             _get_root(resource))
 
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+>>>>>>> 7499a4c (Add __rosonic_started__ attribute and related methods for resource state management)
 class Node(Resource, NodeBase):
 =======
 from typing import Optional
