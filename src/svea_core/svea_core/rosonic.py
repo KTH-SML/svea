@@ -209,6 +209,7 @@ class Resource:
     __rosonic_node__: 'NodeBase | None'             = None
     __rosonic_owner__: 'Resource | None'            = None
     __rosonic_resources__: tuple['Resource', ...]   = ()
+    __rosonic_started__: bool                       = False
 
     # Class property. For Field resources
     __rosonic_preregistered__: tuple['Resource', ...] = ()
@@ -360,6 +361,8 @@ class Resource:
         self.__rosonic_node__ = node
 
         self.on_startup()
+
+        self.__rosonic_started__ = True
         
     def __rosonic_shutdown__(self, node: NodeBase) -> None:
         """
@@ -406,6 +409,25 @@ class Resource:
         """
         pass
 
+    def _is_absolute_name(name: str | None = None) -> bool:
+        if name is None:
+            name = self.__rosonic_name__
+        return name.startswith('/') or name.startswith('~')
+
+    def _is_registered(self) -> TypeGuard[_RegisteredResource]:
+        return resource.__rosonic_owner__ is not None
+
+    def _is_started(resource) -> TypeGuard[_StartedResource]:
+        return resource.__rosonic_started__
+
+    def _is_root(resource) -> bool:
+        return resource.__rosonic_owner__ is resource
+
+    def _get_root(resource) -> Resource:
+        assert _is_registered(resource), f"Resource '{resource}' is not registered"
+        return (resource if _is_root(resource) else
+                _get_root(resource))
+
 
 # Only for typing
 class _RegisteredResource(Resource):
@@ -418,23 +440,6 @@ class _StartedResource(_RegisteredResource):
 
     __rosonic_node__: NodeBase
 
-
-def _is_absolute_name(name: str) -> bool:
-    return name.startswith('/') or name.startswith('~')
-
-def _is_registered(resource: Resource) -> TypeGuard[_RegisteredResource]:
-    return resource.__rosonic_owner__ is not None
-
-def _is_started(resource: Resource) -> TypeGuard[_StartedResource]:
-    return resource.__rosonic_node__ is not None
-
-def _is_root(resource: Resource) -> bool:
-    return resource.__rosonic_owner__ is resource
-
-def _get_root(resource: Resource) -> Resource:
-    assert _is_registered(resource), f"Resource '{resource}' is not registered"
-    return (resource if _is_root(resource) else
-            _get_root(resource))
 
 class Node(Resource, NodeBase):
     """
