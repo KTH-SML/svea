@@ -253,7 +253,7 @@ class Resource:
         if owner is self:
             assert self.__rosonic_name__ is not None, f"Root resource '{self}' must have a name"
         else:
-            assert _is_registered(owner), f"Resource '{owner}' owning '{self}' is not registered"
+            assert owner._is_registered(), f"Resource '{owner}' owning '{self}' is not registered"
 
             # The following check only makes sense for non-root, named resources
             if self.__rosonic_name__ is not None:
@@ -288,7 +288,7 @@ class Resource:
 
         if name is None:
             return owner.__rosonic_fullname__
-        elif self._is_root() or _is_absolute_name(name):
+        elif self._is_root() or self._is_absolute_name(name):
             return name
         else:
             return f"{owner.__rosonic_fullname__}/{name}"
@@ -316,7 +316,7 @@ class Resource:
             return owner.__rosonic_relname__
         elif self._is_root():
             return ''
-        elif _is_absolute_name(name) or _is_root(owner):
+        elif self._is_absolute_name(name) or owner._is_root():
             return name
         else:
             parent = owner.__rosonic_relname__
