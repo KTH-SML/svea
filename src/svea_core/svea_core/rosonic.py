@@ -1908,10 +1908,14 @@ class Subscriber(NamedField):
 
         if isinstance(topic, Parameter):
 <<<<<<< HEAD
+<<<<<<< HEAD
             assert topic._is_started(), f"Resource '{self}' depend on '{topic}' which has not started yet"
 =======
             assert _is_started(topic), f"Resource '{self}' depend on '{topic}' which has not started yet"
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+            assert topic._is_started(), f"Resource '{self}' depend on '{topic}' which has not started yet"
+>>>>>>> 1b813ca (Fix assertion call for topic startup check)
             topic = topic.value
 =======
         topic = self.topic
