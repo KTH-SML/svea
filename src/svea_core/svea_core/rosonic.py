@@ -146,6 +146,8 @@ Developed for ROS 2 Jazzy Jalisco.
 Kaj Munhoz Arfvidsson
 """
 
+from __future__ import annotations
+
 from typing import TypeGuard
 
 import rclpy                            # pyright: ignore[reportMissingImports]
