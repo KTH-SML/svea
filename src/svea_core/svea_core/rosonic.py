@@ -417,7 +417,7 @@ class Resource:
         return name.startswith('/') or name.startswith('~')
 
     def _is_registered(self) -> TypeGuard['_RegisteredResource']:
-        return resource.__rosonic_owner__ is not None
+        return self.__rosonic_owner__ is not None
 
     def _is_started(self) -> TypeGuard['_StartedResource']:
         return self.__rosonic_started__
