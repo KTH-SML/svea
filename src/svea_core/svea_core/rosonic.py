@@ -817,7 +817,7 @@ class Subscriber(NamedField):
         qos_profile = self.qos_profile or rclpy.qos.qos_profile_default
 
         if isinstance(topic, Parameter):
-            assert _is_started(topic), f"Resource '{self}' depend on '{topic}' which has not started yet"
+            assert topic._is_started(), f"Resource '{self}' depend on '{topic}' which has not started yet"
             topic = topic.value
 
         if not isinstance(msg_type, type):
