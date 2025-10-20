@@ -327,10 +327,14 @@ class Resource:
             AssertionError: If the resource is not registered yet.
         """
 <<<<<<< HEAD
+<<<<<<< HEAD
         assert self._is_registered(), f"Resource '{self}' is not started"
 =======
         assert _is_registered(self), f"Resource '{self}' is not started"
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+        assert self._is_registered(), f"Resource '{self}' is not started"
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
 
         name = self.__rosonic_name__
         owner = self.__rosonic_owner__
@@ -338,10 +342,14 @@ class Resource:
         if name is None:
             return owner.__rosonic_fullname__
 <<<<<<< HEAD
+<<<<<<< HEAD
         elif self._is_root() or self._is_absolute_name(name):
 =======
         elif _is_root(self) or _is_absolute_name(name):
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+        elif self._is_root() or _is_absolute_name(name):
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
             return name
         else:
             return f"{owner.__rosonic_fullname__}/{name}"
@@ -361,10 +369,14 @@ class Resource:
             AssertionError: If the resource is not registered yet.
         """
 <<<<<<< HEAD
+<<<<<<< HEAD
         assert self._is_registered(), f"Resource '{self}' is not started"
 =======
         assert _is_registered(self), f"Resource '{self}' is not started"
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+        assert self._is_registered(), f"Resource '{self}' is not started"
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
         
         name = self.__rosonic_name__
         owner = self.__rosonic_owner__
@@ -372,6 +384,9 @@ class Resource:
         if name is None:
             return owner.__rosonic_relname__
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
         elif self._is_root():
             return ''
         elif self._is_absolute_name(name) or owner._is_root():
@@ -423,10 +438,14 @@ class Resource:
             startup.
         """
 <<<<<<< HEAD
+<<<<<<< HEAD
         assert self._is_registered(), f"Resource '{self}' is not registered"
 =======
         assert _is_registered(self), f"Resource '{self}' is not registered"
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+        assert self._is_registered(), f"Resource '{self}' is not registered"
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
 
         for resource in self.__rosonic_resources__:
             resource.__rosonic_startup__(node)
@@ -461,10 +480,14 @@ class Resource:
             AssertionError: If the resource is not started yet.
         """
 <<<<<<< HEAD
+<<<<<<< HEAD
         assert self._is_started(), f"Resource '{self}' is not started"
 =======
         assert _is_started(self), f"Resource '{self}' is not started"
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+        assert self._is_started(), f"Resource '{self}' is not started"
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
 
         self.on_shutdown()
 
@@ -496,10 +519,14 @@ class Resource:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     def _is_absolute_name(self, name: str | None = None) -> bool:
 =======
     def _is_absolute_name(name: str | None = None) -> bool:
 >>>>>>> 7499a4c (Add __rosonic_started__ attribute and related methods for resource state management)
+=======
+    def _is_absolute_name(self, name: str | None = None) -> bool:
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
         if name is None:
             name = self.__rosonic_name__
         return name.startswith('/') or name.startswith('~')
@@ -525,16 +552,21 @@ class Resource:
     def _is_registered(self) -> TypeGuard[_RegisteredResource]:
         return resource.__rosonic_owner__ is not None
 
+<<<<<<< HEAD
     def _is_started(resource) -> TypeGuard[_StartedResource]:
         return resource.__rosonic_started__
+=======
+    def _is_started(self) -> TypeGuard['_StartedResource']:
+        return self.__rosonic_started__
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
 
-    def _is_root(resource) -> bool:
-        return resource.__rosonic_owner__ is resource
+    def _is_root(self) -> bool:
+        return self.__rosonic_owner__ is self
 
-    def _get_root(resource) -> Resource:
-        assert _is_registered(resource), f"Resource '{resource}' is not registered"
-        return (resource if _is_root(resource) else
-                _get_root(resource))
+    def _get_root(self) -> Resource:
+        assert self._is_registered(), f"Resource '{self}' is not registered"
+        return (self if self._is_root() else
+                self._get_root())
 
 >>>>>>> 7499a4c (Add __rosonic_started__ attribute and related methods for resource state management)
 
@@ -1323,10 +1355,14 @@ class Parameter(NamedField):
             return self
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         if not self._is_started():
 =======
         if not _is_started(self):
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+        if not self._is_started():
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
             return self
 
         return self.value
@@ -1629,6 +1665,7 @@ class Publisher(NamedField):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         assert self._is_started(), f"Publisher for topic '{self.topic}' is not started yet."
 =======
         assert _is_started(self), f"Publisher for topic '{self.topic}' is not started yet."
@@ -1636,6 +1673,8 @@ class Publisher(NamedField):
 =======
 =======
 >>>>>>> e1d0aaa (update rosonic)
+=======
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
         assert _is_started(self), f"Publisher for topic '{self.topic}' is not started yet."
 =======
         if self.publisher is None:
@@ -1647,7 +1686,13 @@ class Publisher(NamedField):
 =======
         assert _is_started(self), f"Publisher for topic '{self.topic}' is not started yet."
 >>>>>>> f6498d4 (update rosonic)
+<<<<<<< HEAD
 >>>>>>> e1d0aaa (update rosonic)
+=======
+=======
+        assert self._is_started(), f"Publisher for topic '{self.topic}' is not started yet."
+>>>>>>> 2b928b6 (Refactor assertion methods to use self)
+>>>>>>> 9967d48 (Refactor assertion methods to use self)
         self.publisher.publish(msg)
 
     def on_startup(self):
