@@ -166,6 +166,7 @@ Kaj Munhoz Arfvidsson
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from __future__ import annotations
 
 =======
@@ -174,6 +175,12 @@ from __future__ import annotations
 >>>>>>> 17e7e32 (Fundamental changes.)
 =======
 >>>>>>> e1d0aaa (update rosonic)
+=======
+=======
+from __future__ import annotations
+
+>>>>>>> 8ba6a0b (Add future annotations import to rosonic.py)
+>>>>>>> 8a97de1 (Add future annotations import to rosonic.py)
 from typing import TypeGuard
 
 import rclpy                            # pyright: ignore[reportMissingImports]
