@@ -38,7 +38,7 @@
     imu0_config: [false, false, false,
                   false, false, false,
                   false, false, false,
-                  false, false,  true,
+                  false, false, true,
                   true, false, false]
     imu0_nodelay: true #default false
     imu0_differential: true

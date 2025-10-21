@@ -110,7 +110,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
             self.update_traj(x, y)
 
         steering, velocity = self.controller.compute_control(state)
-        # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
+        self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
         self.actuation.send_control(steering, velocity)
 
     def update_goal(self):
