@@ -58,6 +58,21 @@ class imu_bias_remove(rx.Node):
             imu_msg.linear_acceleration.x -= self.bias_linear_x
             imu_msg.linear_acceleration.y -= self.bias_linear_y
 
+            x = imu_msg.linear_acceleration.y * -1
+            y = imu_msg.linear_acceleration.x
+            z = imu_msg.linear_acceleration.z * -1
+
+            imu_msg.linear_acceleration.x = x
+            imu_msg.linear_acceleration.y = y
+            imu_msg.linear_acceleration.z = z
+
+            
+            if abs(imu_msg.linear_acceleration.x) < 0.05:
+                imu_msg.linear_acceleration.x = 0.0
+
+            if abs(imu_msg.angular_velocity.z) < 0.03:
+                imu_msg.angular_velocity.z = 0.0
+
             self.imu_re_pub.publish(imu_msg)
 
     def on_startup(self):

@@ -3,11 +3,12 @@
   <arg name="is_indoors" default="true" description="Whether the robot is operating indoors"/>
   
   <!-- Static transforms -->
-  <!-- <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster" args="0 0 0 0 0 0 map odom"/> -->
+  <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster"
+      args="--x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id map --child-frame-id odom"/>
   <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster"
       args="--x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id odom --child-frame-id base_link" />
   <node pkg="tf2_ros" exec="static_transform_publisher" name="imulink_broadcaster" 
-      args="--x 0.10 --y 0.047 --z 0.17 --yaw 1.5708 --pitch 0 --roll 0 --frame-id base_link --child-frame-id imu"/>
+      args="--x 0.10 --y -0.047 --z 0.17 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id imu"/>
   <node pkg="tf2_ros" exec="static_transform_publisher" name="gpslink_broadcaster" 
       args="--x 0.04 --y 0.103 --z 0.140 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id gps"/>
   
