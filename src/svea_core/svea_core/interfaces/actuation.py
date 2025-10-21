@@ -129,6 +129,7 @@ class ActuationInterface:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     BIAS_STEERING = -9
 
     is_sim = rx.Parameter(False)
@@ -138,6 +139,13 @@ class ActuationInterface:
 >>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
 =======
 >>>>>>> 0ff0a7d (added mpc control and example, but still in working progress)
+=======
+=======
+    BIAS_STEERING = 0
+
+    is_sim = rx.Parameter(False)
+>>>>>>> 2e6d21f (Pure Pursuit works)
+>>>>>>> e593937 (Pure Pursuit works)
 
     steering_pub = rx.Publisher(Int8, 'lli/ctrl/steering', qos_profile=QoS_DEFAULT)
     throttle_pub = rx.Publisher(Int8, 'lli/ctrl/throttle', qos_profile=QoS_DEFAULT)
@@ -164,6 +172,7 @@ class ActuationInterface:
         self.diff_pub.publish(self.diff_msg)
         self.node.get_logger().info("Actuation Interface is ready.")
 <<<<<<< HEAD
+<<<<<<< HEAD
         if self.is_sim:
             self.BIAS_STEERING = 0
 
@@ -176,6 +185,14 @@ class ActuationInterface:
         """Main loop to publish control messages."""
         self.steering_msg.data = int(self.latest_controls[Controls.STEERING] * - 1.27)  # 1.27 is a factor to convert from percent to the range of -127 to 127
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+        if self.is_sim:
+            self.BIAS_STEERING = 0
+
+    def loop(self):
+        """Main loop to publish control messages."""
+        self.steering_msg.data = int(self.latest_controls[Controls.STEERING] * - 1.27 - self.BIAS_STEERING)  # 1.27 is a factor to convert from percent to the range of -127 to 127
+>>>>>>> e593937 (Pure Pursuit works)
         self.velocity_msg.data = int(self.latest_controls[Controls.VELOCITY] * 1.27) # 1.27 is a factor to convert from percent to the range of -127 to 127
         self.steering_pub.publish(self.steering_msg)
         self.throttle_pub.publish(self.velocity_msg)

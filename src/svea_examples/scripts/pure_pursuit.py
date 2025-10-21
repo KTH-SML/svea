@@ -218,6 +218,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
 =======
 =======
@@ -231,6 +232,8 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 >>>>>>> c488e16 (tuning pure pursuit)
 =======
 >>>>>>> 946d7d3 (Multi example in progress, unified svea core launch file in progress)
+=======
+>>>>>>> e593937 (Pure Pursuit works)
         # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
 =======
         self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
@@ -253,7 +256,13 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 =======
         # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
 >>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
+<<<<<<< HEAD
 >>>>>>> 946d7d3 (Multi example in progress, unified svea core launch file in progress)
+=======
+=======
+        self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
+>>>>>>> 2e6d21f (Pure Pursuit works)
+>>>>>>> e593937 (Pure Pursuit works)
         self.actuation.send_control(steering, velocity)
 
     def update_goal(self):

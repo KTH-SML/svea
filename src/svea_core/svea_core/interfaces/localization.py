@@ -64,6 +64,8 @@ from tf_transformations import quaternion_from_euler, euler_from_quaternion
 from geometry_msgs.msg import PoseStamped, TwistStamped
 from nav_msgs.msg import Odometry
 
+from tf2_geometry_msgs import do_transform_pose
+
 from .. import rosonic as rx
 <<<<<<< HEAD
 import time
@@ -297,12 +299,13 @@ class LocalizationInterface(rx.Field):
         pose_source  = odom.header.frame_id or ""
         twist_source = odom.child_frame_id or pose_source or ""
 
-        stamp = Time.from_msg(odom.header.stamp)
+        stamp = Time()
         timeout = Duration(seconds=timeout_s)
 
         # ---- Transform Pose -> pose_target ----
         ps = PoseStamped()
         ps.header = odom.header
+        ps.header.stamp = stamp.to_msg()
         ps.pose   = odom.pose.pose
 
         if pose_source != pose_target:
@@ -317,7 +320,7 @@ class LocalizationInterface(rx.Field):
 
         # ---- Transform Twist -> twist_target ----
         ts = TwistStamped()
-        ts.header.stamp = odom.header.stamp
+        ts.header.stamp = stamp.to_msg()
         ts.header.frame_id = twist_source if twist_source else pose_source
         ts.twist = odom.twist.twist
 
