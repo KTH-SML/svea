@@ -105,11 +105,14 @@ class imu_bias_remove(rx.Node):
             if abs(imu_msg.angular_velocity.z) < 0.03:
                 imu_msg.angular_velocity.z = 0.0
 
+<<<<<<< HEAD
 =======
             imu_msg.linear_acceleration.x -= self.bias_linear_x
             imu_msg.linear_acceleration.y -= self.bias_linear_y
 
 >>>>>>> 28b1ce8 (encoder and imu high level calibrater)
+=======
+>>>>>>> 12cb3f4 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
             self.imu_re_pub.publish(imu_msg)
 
     def on_startup(self):

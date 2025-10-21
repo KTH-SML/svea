@@ -8,6 +8,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     frequency: 20.0
 =======
 =======
@@ -20,6 +21,13 @@
 =======
 <<<<<<< HEAD
 >>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
+=======
+    frequency: 30.0
+<<<<<<< HEAD
+=======
+    frequency: 10.0
+>>>>>>> 8e67980 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
+>>>>>>> 12cb3f4 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
 
     sensor_timeout: 0.1
 
@@ -78,6 +86,7 @@
 <<<<<<< HEAD
     #imu0_pose_rejection_threshold: 0.8                 # Note the difference in parameter names
     #imu0_twist_rejection_threshold: 0.08                #
+<<<<<<< HEAD
 =======
     # imu0: /lli/sensor/imu
     # imu0_config: [false, false, false,
@@ -98,6 +107,8 @@
 =======
     imu0_twist_rejection_threshold: 0.08                #
 >>>>>>> 6151141 (update)
+=======
+>>>>>>> 12cb3f4 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
     #imu0_linear_acceleration_rejection_threshold: 1.0  #
 
     # imu0_remove_gravitational_acceleration: false #default true
@@ -111,6 +122,7 @@
                     false, false, false,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                     true,  false, false,
                     false, false, false,
                     false, false, false]
@@ -122,6 +134,9 @@
 =======
                     true,  false,  false,
 >>>>>>> 6151141 (update)
+=======
+                    true,  false, false,
+>>>>>>> 12cb3f4 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
                     false, false, true ,
                     false, false, false]
     twist0_nodelay: true

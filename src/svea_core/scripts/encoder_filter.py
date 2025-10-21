@@ -112,6 +112,7 @@ class encoder_filter(rx.Node):
 
         encoder_msg.twist.twist.angular.y = w
         encoder_msg.twist.twist.angular.z *= -1
+<<<<<<< HEAD
         #encoder_msg.twist.twist.angular.z = w
  
         if self.override is None:
@@ -168,14 +169,19 @@ class encoder_filter(rx.Node):
         v, w = self.ticks_to_twist(L, R, T)
 
         encoder_msg.twist.twist.angular.z = w
+=======
+        # encoder_msg.twist.twist.angular.z = w
+>>>>>>> 12cb3f4 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
  
         if self.override is None:
             pass
         else:
             if self.override:
                 encoder_msg.twist.twist.linear.x = abs(encoder_msg.twist.twist.linear.x) * self.rm_throttle
+                encoder_msg.twist.twist.angular.z *= self.rm_throttle
             else:
                 encoder_msg.twist.twist.linear.x = abs(encoder_msg.twist.twist.linear.x) * self.ctrl_throttle
+                encoder_msg.twist.twist.angular.z *= self.ctrl_throttle
         
 <<<<<<< HEAD
         self.encoder_re_pub.publish(imu_msg)

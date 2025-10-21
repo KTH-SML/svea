@@ -268,8 +268,8 @@
 =======
     <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
         <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
-        <!-- <param name="imu0"                  value="/lli/sensor/imu"/> -->
-        <param name="twist0"                value="/lli/sensor/encoders"/>
+        <param name="imu0"                  value="/imu/filtered"/>
+        <param name="twist0"                value="/encoder/filtered"/>
         <remap from="/odometry/filtered"    to="/odometry/local"/>
 <<<<<<< HEAD
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> --> 
