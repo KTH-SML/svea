@@ -2,6 +2,7 @@
 
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 from sensor_msgs.msg import LaserScan
+from builtin_interfaces.msg import Time
 
 from svea_core import rosonic as rx
 
