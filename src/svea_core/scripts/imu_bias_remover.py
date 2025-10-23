@@ -46,6 +46,7 @@ class imu_bias_remove(rx.Node):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     sample_count = 100
 =======
     sample_count = 5000
@@ -56,6 +57,9 @@ class imu_bias_remove(rx.Node):
 =======
     sample_count = 200
 >>>>>>> 6151141 (update)
+=======
+    sample_count = 100
+>>>>>>> b5e4617 (vscode ssh update)
     sample_counter = 0
 
     ## Publishers ##
@@ -84,9 +88,14 @@ class imu_bias_remove(rx.Node):
             imu_msg.angular_velocity.z -= self.bias_angular_z
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 6151141 (update)
             imu_msg.angular_velocity.z = imu_msg.angular_velocity.z / 4.0
+=======
+            imu_msg.angular_velocity.z = imu_msg.angular_velocity.z
+            imu_msg.linear_acceleration.x = imu_msg.linear_acceleration.x / 4.0
+>>>>>>> b5e4617 (vscode ssh update)
             imu_msg.linear_acceleration.x -= self.bias_linear_x
             imu_msg.linear_acceleration.y -= self.bias_linear_y
 
@@ -122,6 +131,7 @@ class imu_bias_remove(rx.Node):
 if __name__ == '__main__':
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     imu_bias_remove.main()
 =======
     state_publisher.main()
@@ -129,3 +139,6 @@ if __name__ == '__main__':
 =======
     imu_bias_remove.main()
 >>>>>>> 6151141 (update)
+=======
+    imu_bias_remove.main()
+>>>>>>> b5e4617 (vscode ssh update)

@@ -151,6 +151,7 @@ amcl:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     #Overall filter parameters
     min_particles: 100 
     max_particles: 800
@@ -244,11 +245,47 @@ odom_alpha4: 0.8  # Trans from rot
 >>>>>>> 199c690 (localization update still have issues)
     base_frame_id: "base_link"
     introspection_mode: "disabled"
+=======
+
+    # --- Timing & TF ---
+    transform_tolerance: 0.2
+
+    # --- Motion update thresholds (reduce CPU → reduce lag) ---
+    update_min_a: 0.05
+    update_min_d: 0.05
+
+    # --- Adaptive sampling (KLD) ---
+    min_particles: 500
+    max_particles: 2000
+    pf_err: 0.02
+    pf_z: 0.99
+
+    # --- Beam skipping for dynamics/glass --
+    do_beamskip: true
+>>>>>>> cd45094 (vscode ssh update)
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9
     beam_skip_threshold: 0.3
-    do_beamskip: false
+
+    # --- Noise / odom model ---
+    alpha1: 0.2                 # rot noise on rot
+    alpha2: 0.2                 # rot noise on trans
+    alpha3: 0.2                 # trans noise on trans (was 1.6, very high)
+    alpha4: 0.2                 # trans noise on rot
+    alpha5: 0.05                # (keep low unless you have strafe)
+
+    # --- Measurement mixture weights ---
+    z_hit: 0.90
+    z_rand: 0.08                # was 0.15
+    z_short: 0.02               # was 0.05
+    z_max: 0.00                 # was 0.05; often unnecessary with real max range
+    sigma_hit: 0.15             # was 0.1; slightly wider for real sensors
+
+
+    # -- Rest --
+    base_frame_id: "base_link"
     global_frame_id: "map"
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     scan_topic: /scan
@@ -259,23 +296,35 @@ odom_alpha4: 0.8  # Trans from rot
 =======
     lambda_short: 0.1
 =======
+=======
+    odom_frame_id: "odom"
+    robot_model_type: "nav2_amcl::DifferentialMotionModel"
+    resample_interval: 1
+    tf_broadcast: true
+    map_topic: map
+    scan_topic: scan
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
+    always_reset_initial_pose: false
+    first_map_only: false
+
+    introspection_mode: "disabled"
+>>>>>>> cd45094 (vscode ssh update)
     lambda_short: 0.2
 >>>>>>> 10cbd8c (update)
     laser_likelihood_max_dist: 2.0
-    laser_max_range: 100.0
+    laser_max_range: 20.0
     laser_min_range: -1.0
     laser_model_type: "likelihood_field"
     max_beams: 50
-    max_particles: 800
-    min_particles: 100
-    odom_frame_id: "odom"
-    pf_err: 0.01
-    pf_z: 0.99
     recovery_alpha_fast: 0.005
     recovery_alpha_slow: 0.005
-    resample_interval: 1
-    robot_model_type: "nav2_amcl::DifferentialMotionModel"
     save_pose_rate: 0.5
+<<<<<<< HEAD
     sigma_hit: 0.1
     tf_broadcast: true
     transform_tolerance: 0.01
@@ -326,4 +375,9 @@ robot_state_publisher:
 =======
       yaw: 1.0116
 >>>>>>> 46832dd (minor fixs)
+<<<<<<< HEAD
 >>>>>>> 2c22348 (minor fixs)
+=======
+=======
+>>>>>>> cd45094 (vscode ssh update)
+>>>>>>> b5e4617 (vscode ssh update)

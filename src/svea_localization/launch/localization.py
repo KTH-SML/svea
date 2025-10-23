@@ -102,10 +102,14 @@ def generate_launch_description():
         DeclareLaunchArgument("initial_pose_y", default_value="0.0" ),
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         DeclareLaunchArgument("initial_pose_a", default_value="1.52" ),
 =======
         DeclareLaunchArgument("initial_pose_a", default_value="0.0" ),
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+        DeclareLaunchArgument("initial_pose_a", default_value="1.52" ),
+>>>>>>> b5e4617 (vscode ssh update)
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -137,13 +141,19 @@ def generate_launch_description():
             name='amcl',
             output='screen',
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b5e4617 (vscode ssh update)
             parameters=[configured_params,
                         {'initial_pose.x': initial_pose_x},
                         {'initial_pose.y': initial_pose_y},
                         {'initial_pose.yaw': initial_pose_a}],
+<<<<<<< HEAD
 =======
             parameters=[configured_params],
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+>>>>>>> b5e4617 (vscode ssh update)
             remappings=remappings),
 
         Node(
@@ -155,7 +165,11 @@ def generate_launch_description():
                         {'autostart': autostart},
                         {'node_names': lifecycle_nodes}])
 <<<<<<< HEAD
+<<<<<<< HEAD
     ])
 =======
     ])
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+    ])
+>>>>>>> b5e4617 (vscode ssh update)

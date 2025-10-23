@@ -8,6 +8,7 @@
     <arg name="use_foxglove"    default="true"/>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     <arg name="initial_pose_x"  default="-7.3699"/>
     <arg name="initial_pose_y"  default="-15.383940368977647"/>
     <arg name="initial_pose_a"  default="1.0116" /> <!-- wrt to map-->
@@ -16,6 +17,8 @@
     <arg name="points" default="['[-2.3, -7.1]', '[10.5, 11.7]', '[5.7, 15.0]', '[-7.0, -4.0]']" />
 =======
 =======
+=======
+>>>>>>> b5e4617 (vscode ssh update)
 =======
     <let name="is_sim" value="$(eval '\'$(var is_sim)\' == \'true\'')"/>
     <arg name="use_foxglove"    default="true"/>
@@ -31,6 +34,11 @@
     <arg name="initial_pose_x"  default="-2.65488696"/>
     <arg name="initial_pose_y"  default="-1.64422277"/>
     <arg name="initial_pose_a"  default="1.57" /> <!-- wrt to map-->
+=======
+    <arg name="initial_pose_x"  default="-7.3699"/>
+    <arg name="initial_pose_y"  default="-15.383940368977647"/>
+    <arg name="initial_pose_a"  default="1.0116" /> <!-- wrt to map-->
+>>>>>>> cd45094 (vscode ssh update)
     <arg name="map_path" default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
 <<<<<<< HEAD
 <<<<<<< HEAD

@@ -113,6 +113,9 @@ class encoder_filter(rx.Node):
         encoder_msg.twist.twist.angular.y = w
         encoder_msg.twist.twist.angular.z *= -1
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b5e4617 (vscode ssh update)
         #encoder_msg.twist.twist.angular.z = w
  
         if self.override is None:

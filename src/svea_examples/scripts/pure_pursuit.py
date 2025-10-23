@@ -106,10 +106,14 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
     mark = PlaceMarker()
     # Path Visualization
 <<<<<<< HEAD
+<<<<<<< HEAD
     #path = ShowPath()
 =======
     path = ShowPath()
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+    #path = ShowPath()
+>>>>>>> b5e4617 (vscode ssh update)
 
     def on_startup(self):
         """
@@ -321,6 +325,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         #self.path.publish_path(xs,ys)
 
 if __name__ == '__main__':
@@ -329,6 +334,8 @@ if __name__ == '__main__':
 =======
 >>>>>>> f567493 (update on 05/12/2025)
 =======
+=======
+>>>>>>> b5e4617 (vscode ssh update)
 =======
 >>>>>>> 9278f8e (Planned Path and Past Path can be displayed with ShowPath in util, example in pure pursuit)
 >>>>>>> fd5cfb1 (Planned Path and Past Path can be displayed with ShowPath in util, example in pure pursuit)
@@ -351,4 +358,13 @@ if __name__ == '__main__':
 =======
     pure_pursuit.main()
 >>>>>>> 5a67854 (Confirmed that symlink works)
+<<<<<<< HEAD
 >>>>>>> 48e60ec (Confirmed that symlink works)
+=======
+=======
+        #self.path.publish_path(xs,ys)
+
+if __name__ == '__main__':
+    pure_pursuit.main()
+>>>>>>> cd45094 (vscode ssh update)
+>>>>>>> b5e4617 (vscode ssh update)

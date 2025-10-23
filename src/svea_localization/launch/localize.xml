@@ -23,6 +23,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     <arg name="lidar_ip"                default="192.168.0.10" />
 =======
     <arg name="lidar_ip"                default="192.168.3.11" />
@@ -37,6 +38,9 @@
 >>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
 =======
 >>>>>>> ff325d4 (localization test)
+=======
+    <arg name="lidar_ip"                default="192.168.0.10" />
+>>>>>>> b5e4617 (vscode ssh update)
 
     <!-- GPS -->
     <arg name="start_rtk"               default="false"/>
@@ -137,12 +141,19 @@
     </node> -->
 
         <!-- start all sensors if this is not a simulation -->
+<<<<<<< HEAD
 >>>>>>> 2fb2b0b (localization update still have issues)
     <group unless="$(eval '\'$(var is_sim)\' == \'true\'')">
         <let name="use_sim_time" value="false"/>
         <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
         <group if="$(eval '\'$(var is_indoors)\' == \'true\'')">
 >>>>>>> ff325d4 (localization test)
+=======
+    <group unless="$(var is_sim)">
+        <let name="use_sim_time" value="false"/>
+        <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
+        <group if="$(var is_indoors)">
+>>>>>>> b5e4617 (vscode ssh update)
             <!-- Start Lidar -->
             <include file="$(find-pkg-share svea_localization)/launch/lidar.xml">
                 <arg name="lidar_ip"                    value="$(var lidar_ip)"/>
@@ -152,11 +163,15 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b5e4617 (vscode ssh update)
 	    <include file="$(find-pkg-share svea_localization)/launch/localization.py">
 		    <arg name="intial_pose_x" value="$(var initial_pose_x)"/>
 		    <arg name="intial_pose_y" value="$(var initial_pose_y)"/>
 		    <arg name="intial_pose_a" value="$(var initial_pose_a)"/>
 	    </include>
+<<<<<<< HEAD
 
 =======
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
@@ -164,6 +179,8 @@
 >>>>>>> 2fb2b0b (localization update still have issues)
 =======
             <include file="$(find-pkg-share svea_localization)/launch/localization.py"/>
+=======
+>>>>>>> b5e4617 (vscode ssh update)
 
 >>>>>>> 28b1ce8 (encoder and imu high level calibrater)
             <!-- Lifecycle Manager for Map Server -->

@@ -9,6 +9,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     frequency: 20.0
 =======
 =======
@@ -22,12 +23,20 @@
 <<<<<<< HEAD
 >>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
 =======
+=======
+>>>>>>> b5e4617 (vscode ssh update)
     frequency: 30.0
 <<<<<<< HEAD
 =======
     frequency: 10.0
 >>>>>>> 8e67980 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
+<<<<<<< HEAD
 >>>>>>> 12cb3f4 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
+=======
+=======
+    frequency: 20.0
+>>>>>>> cd45094 (vscode ssh update)
+>>>>>>> b5e4617 (vscode ssh update)
 
     sensor_timeout: 0.1
 
@@ -128,6 +137,7 @@
 <<<<<<< HEAD
                     true,  false, false,
                     false, false, false,
+<<<<<<< HEAD
                     false, false, false]
     twist0_nodelay: true
     twist0_queue_size: 8
@@ -141,6 +151,8 @@
                     true,  false, false,
 >>>>>>> 12cb3f4 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
                     false, false, true ,
+=======
+>>>>>>> b5e4617 (vscode ssh update)
                     false, false, false]
     twist0_nodelay: true
     twist0_queue_size: 8

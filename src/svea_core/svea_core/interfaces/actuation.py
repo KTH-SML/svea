@@ -130,6 +130,7 @@ class ActuationInterface:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     BIAS_STEERING = -9
 
     is_sim = rx.Parameter(False)
@@ -141,7 +142,12 @@ class ActuationInterface:
 >>>>>>> 0ff0a7d (added mpc control and example, but still in working progress)
 =======
 =======
+>>>>>>> b5e4617 (vscode ssh update)
+=======
     BIAS_STEERING = 0
+=======
+    BIAS_STEERING = -9
+>>>>>>> cd45094 (vscode ssh update)
 
     is_sim = rx.Parameter(False)
 >>>>>>> 2e6d21f (Pure Pursuit works)
