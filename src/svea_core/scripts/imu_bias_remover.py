@@ -89,6 +89,7 @@ class imu_bias_remove(rx.Node):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 6151141 (update)
             imu_msg.angular_velocity.z = imu_msg.angular_velocity.z / 4.0
@@ -96,6 +97,9 @@ class imu_bias_remove(rx.Node):
             imu_msg.angular_velocity.z = imu_msg.angular_velocity.z
             imu_msg.linear_acceleration.x = imu_msg.linear_acceleration.x / 4.0
 >>>>>>> b5e4617 (vscode ssh update)
+=======
+            imu_msg.angular_velocity.z = imu_msg.angular_velocity.z / 4.0
+>>>>>>> 9fd9045 (filter fixed)
             imu_msg.linear_acceleration.x -= self.bias_linear_x
             imu_msg.linear_acceleration.y -= self.bias_linear_y
 

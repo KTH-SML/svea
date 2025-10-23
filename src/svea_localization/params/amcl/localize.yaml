@@ -248,15 +248,15 @@ odom_alpha4: 0.8  # Trans from rot
 =======
 
     # --- Timing & TF ---
-    transform_tolerance: 0.2
+    transform_tolerance: 0.1
 
     # --- Motion update thresholds (reduce CPU → reduce lag) ---
-    update_min_a: 0.05
-    update_min_d: 0.05
+    update_min_a: 0.01
+    update_min_d: 0.02
 
     # --- Adaptive sampling (KLD) ---
-    min_particles: 500
-    max_particles: 2000
+    min_particles: 800
+    max_particles: 2500
     pf_err: 0.02
     pf_z: 0.99
 
@@ -268,18 +268,18 @@ odom_alpha4: 0.8  # Trans from rot
     beam_skip_threshold: 0.3
 
     # --- Noise / odom model ---
-    alpha1: 0.2                 # rot noise on rot
-    alpha2: 0.2                 # rot noise on trans
+    alpha1: 0.1                 # rot noise on rot
+    alpha2: 0.1                 # rot noise on trans
     alpha3: 0.2                 # trans noise on trans (was 1.6, very high)
-    alpha4: 0.2                 # trans noise on rot
+    alpha4: 0.1                 # trans noise on rot
     alpha5: 0.05                # (keep low unless you have strafe)
 
     # --- Measurement mixture weights ---
     z_hit: 0.90
-    z_rand: 0.08                # was 0.15
+    z_rand: 0.07                # was 0.15
     z_short: 0.02               # was 0.05
-    z_max: 0.00                 # was 0.05; often unnecessary with real max range
-    sigma_hit: 0.15             # was 0.1; slightly wider for real sensors
+    z_max: 0.01                # was 0.05; often unnecessary with real max range
+    sigma_hit: 0.12             # was 0.1; slightly wider for real sensors
 
 
     # -- Rest --
