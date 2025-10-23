@@ -2,7 +2,7 @@ amcl:
   ros__parameters:
 
     # --- Timing & TF ---
-    transform_tolerance: 0.01
+    transform_tolerance: 0.1
 
     # --- Motion update thresholds (reduce CPU → reduce lag) ---
     update_min_a: 0.01
