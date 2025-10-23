@@ -34,6 +34,7 @@ class lidar_filter(rx.Node):
     @rx.Subscriber(LaserScan, '/scan', qos_subber)
     def laser_callback(self, laser_msg):
 <<<<<<< HEAD
+<<<<<<< HEAD
         now = self.get_clock().now()
         adjusted_time = now - Duration(seconds=0.01)
         laser_msg.header.stamp = adjusted_time.to_msg()
@@ -42,6 +43,11 @@ class lidar_filter(rx.Node):
         delay_ns = int(10e6) # 10 ms
         laser_msg.header.stamp = Time(sec=now.sec, nanosec=now.nanosec - delay_ns if now.nanosec > delay_ns else 0)
 >>>>>>> fad5c54 (minor fix)
+=======
+        now = self.get_clock().now()
+        adjusted_time = now - Duration(seconds=1.5)
+        laser_msg.header.stamp = adjusted_time.to_msg()
+>>>>>>> f34faa4 (tx2 floor2 works)
         self.encoder_re_pub.publish(laser_msg)
 
     def on_startup(self):

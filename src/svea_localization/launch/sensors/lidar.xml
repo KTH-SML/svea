@@ -32,6 +32,7 @@
         <param name="skip"              value="1"/>
 =======
         <param name="default_user_latency"         value="-1.6543"/>
+<<<<<<< HEAD
 >>>>>>> 8177d8a (udpate lidar.xml and amcl localize.xml to fix AMCL)
     </node>
 </launch>
@@ -52,3 +53,8 @@
     </node>
 </launch>
 >>>>>>> ecc9d3f (Migration to ROS 2 (#55))
+=======
+        <param name="skip"              value="1"/>
+    </node>
+</launch>
+>>>>>>> f34faa4 (tx2 floor2 works)
