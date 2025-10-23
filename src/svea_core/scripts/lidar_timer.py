@@ -40,4 +40,4 @@ class lidar_filter(rx.Node):
 
 
 if __name__ == '__main__':
-    encoder_filter.main()
+    lidar_filter.main()
