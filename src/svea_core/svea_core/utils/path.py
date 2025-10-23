@@ -27,7 +27,7 @@ qos_pubber = QoSProfile(
 class ShowPath(rx.Field):
     
     TRAVEL_DIST_THRESH = 0.1
-    PATH_MAX_LEN = 1000
+    PATH_MAX_LEN = 100
     chassis_height=0.06
 
     odometry_top = rx.Parameter('odometry/local')
