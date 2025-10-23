@@ -85,13 +85,13 @@
             </node> -->
 
             <!-- Start AMCL -->
-            <!-- <node pkg="nav2_amcl" exec="amcl" name="amcl_localization" output="screen">
+            <node pkg="nav2_amcl" exec="amcl" name="amcl_localization" output="screen">
                 <param from="$(find-pkg-share svea_localization)/params/localize.yaml"/>
-                <param name="scan"              value="/scan"/>
+                <param name="scan"              value="/scan/filtered"/>
                 <param name="initial_pose_x"    value="$(var initial_pose_x)" />
                 <param name="initial_pose_y"    value="$(var initial_pose_y)" />
                 <param name="initial_pose_a"    value="$(var initial_pose_a)" />
-            </node> -->
+            </node>
 
             <!-- Lifecycle Manager for AMCL -->
            <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
