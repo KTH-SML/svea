@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     <!-- Launch file arguments -->
-    <arg name="map"             default="penn_state_lab"/>
+    <arg name="map"             default="floor2"/>
     <arg name="is_sim"          default="true"/>
     <arg name="use_foxglove"    default="true"/>
     <arg name="initial_pose_x"  default="-2.65488696"/>

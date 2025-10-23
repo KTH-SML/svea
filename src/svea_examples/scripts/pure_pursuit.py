@@ -63,7 +63,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
     # Goal Visualization
     mark = PlaceMarker()
     # Path Visualization
-    path = ShowPath()
+    #path = ShowPath()
 
     def on_startup(self):
         """
@@ -137,7 +137,7 @@ class pure_pursuit(rx.Node):  # Inherit from rx.Node
         ys = np.linspace(y, self.goal[1], self.TRAJ_LEN)
         self.controller.traj_x = xs
         self.controller.traj_y = ys
-        self.path.publish_path(xs,ys)
+        #self.path.publish_path(xs,ys)
 
 if __name__ == '__main__':
     pure_pursuit.main()

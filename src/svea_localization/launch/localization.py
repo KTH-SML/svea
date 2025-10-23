@@ -92,7 +92,7 @@ def generate_launch_description():
 
         DeclareLaunchArgument("initial_pose_y", default_value="0.0" ),
 
-        DeclareLaunchArgument("initial_pose_a", default_value="0.0" ),
+        DeclareLaunchArgument("initial_pose_a", default_value="1.52" ),
 
         # Node(
         #     package='nav2_map_server',
@@ -107,7 +107,10 @@ def generate_launch_description():
             executable='amcl',
             name='amcl',
             output='screen',
-            parameters=[configured_params],
+            parameters=[configured_params,
+                        {'initial_pose.x': initial_pose_x},
+                        {'initial_pose.y': initial_pose_y},
+                        {'initial_pose.yaw': initial_pose_a}],
             remappings=remappings),
 
         Node(

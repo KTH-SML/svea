@@ -24,6 +24,8 @@ RUN apt-get update  -y && \
     build-essential \
     apt-utils lsb-release \
     cmake \
+    openssh-server \
+    ca-certificates \
     git vim nano curl iputils-ping \
     python3-colcon-common-extensions \
     python3-rosdep \
@@ -36,8 +38,23 @@ RUN apt-get update  -y && \
     ros-$ROSDISTRO-nav2-* \
     && rm -rf /var/lib/apt/lists/*
 
-# ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
+# sshd needs this
+RUN mkdir -p /var/run/sshd
 
+# --- Root password login (default: admin) ---
+ARG ROOT_PASSWORD=admin
+RUN echo "root:${ROOT_PASSWORD}" | chpasswd
+
+# SSH config: allow root + password login (keep pubkey auth on too)
+RUN sed -ri 's/^#?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -ri 's/^#?PubkeyAuthentication .*/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -ri 's/^#?UsePAM .*/UsePAM yes/' /etc/ssh/sshd_config
+
+# Expose SSH
+EXPOSE 22
+
+# ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
 
 # Bootstrap rosdep and setup colcon mixin and metadata
 # RUN rosdep init && \

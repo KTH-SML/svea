@@ -19,6 +19,8 @@ fi
 # Other docker arguments
 append ARGS \
     -it \
+    -p 2222:22 \
+    -p "8765:8765" \
     -v "$SHARED_VOLUME" \
     -e "TERM=xterm-256color" \
     --rm \
@@ -30,12 +32,10 @@ else
     # On macOS, reduce privileges to avoid Docker Desktop issues
     if is_darwin; then
         append ARGS \
-            --privileged \
-            --network host
+            --privileged
     else
         append ARGS \
             -v "/dev:/dev" \
-            --network host \
             --privileged
     fi
 fi

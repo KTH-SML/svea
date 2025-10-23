@@ -54,7 +54,7 @@ class ActuationInterface(rx.Field):
     # The max velocity in Gear 2 is around 3.6 m/s.
     MAX_SPEED_0 = 1.7               # [m/s]
     MAX_SPEED_1 = 3.6               # [m/s]
-    BIAS_STEERING = 0
+    BIAS_STEERING = -9
 
     is_sim = rx.Parameter(False)
 

@@ -20,7 +20,7 @@
     <arg name="map_file"                default="/svea_ws/src/svea_core/maps/sml.yaml"/>
 
     <!-- Lidar  -->
-    <arg name="lidar_ip"                default="192.168.3.11" />
+    <arg name="lidar_ip"                default="192.168.0.10" />
 
     <!-- GPS -->
     <arg name="start_rtk"               default="false"/>
@@ -63,16 +63,20 @@
     </node> -->
 
         <!-- start all sensors if this is not a simulation -->
-    <group unless="$(eval '\'$(var is_sim)\' == \'true\'')">
+    <group unless="$(var is_sim)">
         <let name="use_sim_time" value="false"/>
         <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
-        <group if="$(eval '\'$(var is_indoors)\' == \'true\'')">
+        <group if="$(var is_indoors)">
             <!-- Start Lidar -->
             <include file="$(find-pkg-share svea_localization)/launch/lidar.xml">
                 <arg name="lidar_ip"                    value="$(var lidar_ip)"/>
             </include>
 
-            <include file="$(find-pkg-share svea_localization)/launch/localization.py"/>
+	    <include file="$(find-pkg-share svea_localization)/launch/localization.py">
+		    <arg name="intial_pose_x" value="$(var initial_pose_x)"/>
+		    <arg name="intial_pose_y" value="$(var initial_pose_y)"/>
+		    <arg name="intial_pose_a" value="$(var initial_pose_a)"/>
+	    </include>
 
             <!-- Lifecycle Manager for Map Server -->
             <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
