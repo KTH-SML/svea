@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Dockerfile for SVEA images
 #
 # Author: Kaj Munhoz Arfvidsson
@@ -10,15 +11,21 @@ FROM ros:jazzy-ros-base AS micro-ros-agent-builder
 =======
 FROM ros:jazzy AS micro-ros-agent-builder
 >>>>>>> c1156cb (add micro-ros agent in docker)
+=======
+# Dockerfile for SVEA images
+#
+# Author: Kaj Munhoz Arfvidsson
+>>>>>>> 25eba17 (update docker build)
 
+ARG BUILD_TAG
+ARG ROSDISTRO
+
+FROM ${BUILD_TAG:-ghcr.io/kth-sml/svea:latest}
+
+ARG ROSDISTRO
 ARG DEBIAN_FRONTEND=noninteractive
-WORKDIR /svea_ws
-RUN . /opt/ros/$ROS_DISTRO/setup.sh \
-&&  git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro_ros_msgs src/micro_ros_msgs \
-&&  git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro-ROS-Agent src/micro-ROS-Agent \
-&&  colcon build \
-&&  rm -rf log/ build/ src/
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 28d5445 (ooops)
@@ -26,66 +33,19 @@ RUN . /opt/ros/$ROS_DISTRO/setup.sh \
 >>>>>>> c1156cb (add micro-ros agent in docker)
 # Use the official ROS 2 Jazzy image as the base image
 FROM ros:jazzy-ros-base-noble
+=======
+## Install dependencies using apt-get
+>>>>>>> 25eba17 (update docker build)
 
-# Set the ROS distribution as a build argument
-ARG ROSDISTRO="jazzy"
-ENV ROSDISTRO=$ROSDISTRO
+RUN apt-get update -y
 
-COPY --from=micro-ros-agent-builder /svea_ws /svea_ws
+# # You can add apt dependencies like this...
+# RUN apt-get install --no-install-recommends -y \
+#         git curl
 
-# Install bootstrap tools and ROS 2 packages
-RUN apt-get update  -y && \
-    apt-get upgrade -y && \
-    apt-get install --no-install-recommends -y \
-    build-essential \
-    apt-utils lsb-release \
-    cmake \
-    openssh-server \
-    ca-certificates \
-    git vim nano curl iputils-ping \
-    python3-colcon-common-extensions \
-    python3-rosdep \
-    python3-vcstool \
-    python3-pip \
-    ros-$ROSDISTRO-ament-cmake-python \
-    ros-$ROSDISTRO-ros-base=0.11.0-1* \
-    # ros-$ROSDISTRO-rmw-zenoh-cpp \
-    ros-$ROSDISTRO-teleop-twist-keyboard \
-    ros-$ROSDISTRO-nav2-* \
-    && rm -rf /var/lib/apt/lists/*
-
-# sshd needs this
-RUN mkdir -p /var/run/sshd
-
-# --- Root password login (default: admin) ---
-ARG ROOT_PASSWORD=admin
-RUN echo "root:${ROOT_PASSWORD}" | chpasswd
-
-# SSH config: allow root + password login (keep pubkey auth on too)
-RUN sed -ri 's/^#?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-    sed -ri 's/^#?PubkeyAuthentication .*/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -ri 's/^#?UsePAM .*/UsePAM yes/' /etc/ssh/sshd_config
-
-# Expose SSH
-EXPOSE 22
-
-# ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
-
-# Bootstrap rosdep and setup colcon mixin and metadata
-# RUN rosdep init && \
-RUN rosdep update --rosdistro $ROSDISTRO
-
-# Create a Python virtual environment
-# ENV VIRTUAL_ENV=/opt/venv
-# RUN python3 -m venv $VIRTUAL_ENV
-# ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-# Set up the working directory
-WORKDIR /svea_ws
-
-# Copy the ROS 2 workspace and utility files into the container
+# This is for any added ROS packages
 COPY src ./src
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -93,6 +53,10 @@ COPY src ./src
 >>>>>>> 28d5445 (ooops)
 =======
 >>>>>>> d0ce68c (Added mocap4ros2_qualisys dep import to build process)
+=======
+=======
+>>>>>>> 68e62af (update docker build)
+>>>>>>> 25eba17 (update docker build)
 COPY requirements.txt ./
 RUN rosdep install \
         --rosdistro $ROSDISTRO \
@@ -100,6 +64,7 @@ RUN rosdep install \
         --ignore-src \
         -qry \
         && \
+<<<<<<< HEAD
 <<<<<<< HEAD
     pip install \
         --break-system-packages \
@@ -112,6 +77,8 @@ RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
 COPY util ./util
 COPY entrypoint requirements.txt ./
 =======
+=======
+>>>>>>> 25eba17 (update docker build)
     pip install -r requirements.txt
 <<<<<<< HEAD
 >>>>>>> 28d5445 (ooops)
@@ -152,8 +119,16 @@ ENV CMAKE_PREFIX_PATH="/opt/ros/$ROSDISTRO"
 =======
 >>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
 # Build the ROS 2 workspace
+=======
+    pip install \
+        --break-system-packages \
+        -r requirements.txt
+
+# Build the ROS 2 workspace (improves build speeds later on).
+>>>>>>> 68e62af (update docker build)
 RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
     colcon build --symlink-install"
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -203,3 +178,5 @@ CMD ["bash"]
 >>>>>>> 28d5445 (ooops)
 =======
 >>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
+=======
+>>>>>>> 25eba17 (update docker build)
