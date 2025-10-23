@@ -248,7 +248,7 @@ odom_alpha4: 0.8  # Trans from rot
 =======
 
     # --- Timing & TF ---
-    transform_tolerance: 0.01
+    transform_tolerance: 0.1
 
     # --- Motion update thresholds (reduce CPU → reduce lag) ---
     update_min_a: 0.01

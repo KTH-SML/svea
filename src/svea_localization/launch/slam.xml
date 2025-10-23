@@ -6,6 +6,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     <arg name="use_sim_time"  default="true"/>
 =======
     <arg name="use_sim_time"  default="True"/>
@@ -18,6 +19,9 @@
 =======
     <arg name="use_sim_time"  default="True"/>
 >>>>>>> 5eef1eb (AMCL fixed)
+=======
+    <arg name="use_sim_time"  default="true"/>
+>>>>>>> fad5c54 (minor fix)
 
     <!-- Launch Low-Level Micro-Ros -->
     <executable cmd="$(find-pkg-share svea_core)/util/start_micro_ros.sh" output="screen"/>
