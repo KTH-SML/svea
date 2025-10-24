@@ -44,7 +44,7 @@ amcl:
     resample_interval: 1
     tf_broadcast: true
     map_topic: map
-    scan_topic: /scan/filtered
+    scan_topic: /scan
     set_initial_pose: true
     initial_pose:
       x: 0.0

@@ -21,7 +21,7 @@
         <param name="publish_multiecho" value="$(var lidar_publish_multiecho)"/>
         <param name="angle_min"         value="$(var lidar_angle_min)"/>
         <param name="angle_max"         value="$(var lidar_angle_max)"/>
-        <param name="default_user_latency"         value="-1.6543"/>
+        <param name="default_user_latency"         value="0.01"/>
         <param name="skip"              value="1"/>
     </node>
 </launch>

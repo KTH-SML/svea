@@ -34,7 +34,7 @@ class lidar_filter(rx.Node):
     @rx.Subscriber(LaserScan, '/scan', qos_subber)
     def laser_callback(self, laser_msg):
         now = self.get_clock().now()
-        adjusted_time = now - Duration(seconds=1.5)
+        adjusted_time = now - Duration(seconds=0.01)
         laser_msg.header.stamp = adjusted_time.to_msg()
         self.encoder_re_pub.publish(laser_msg)
 

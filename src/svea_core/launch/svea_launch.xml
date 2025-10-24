@@ -42,7 +42,7 @@
         <!--LLI fixers-->
         <node pkg="svea_core" exec="encoder_filter.py" name="encoder_filter" output="screen"/>
         <node pkg="svea_core" exec="imu_bias_remover.py" name="imu_bias_remover" output="screen"/>
-        <node pkg="svea_core" exec="lidar_timer.py" name="lidar_timer" output="screen"/>
+        <!-- <node pkg="svea_core" exec="lidar_timer.py" name="lidar_timer" output="screen"/> -->
     </group>
 
 
