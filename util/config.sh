@@ -12,6 +12,11 @@
 
 main() {
 
+    if isempty BUILD_CONFIG && is_darwin; then
+        BUILD_CONFIG="arm64"
+    fi
+
+
     withdefault DEBUG "0"
 
     withdefault ROSDISTRO       "jazzy"
@@ -63,6 +68,14 @@ main() {
         withdefault BUILD_FILE      "docker/Dockerfile.base"
         withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_PUSH      "0"
+    elif [ "$BUILD_CONFIG" = "arm64" ]; then
+        # building for arm64 (macOS Apple Silicon)
+        withdefault BUILD_PLATFORM  "linux/arm64"
+        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
+        withdefault BUILD_FILE      "docker/Dockerfile"
+        withdefault BUILD_TAG       "ghcr.io/kth-sml/svea:latest"
+        withdefault IMAGE_TAG       "$REPOSITORY_NAME"
         withdefault IMAGE_PUSH      "0"
     elif [ "$BUILD_CONFIG" = "ghcr" ]; then
         # building for both amd64 and arm64
