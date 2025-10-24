@@ -1,12 +1,8 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 <launch>
   <!-- Launch file arguments -->
   <arg name="is_indoors" default="true" description="Whether the robot is operating indoors"/>
   
   <!-- Static transforms -->
-<<<<<<< HEAD
-<<<<<<< HEAD
   <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster"
       args="--x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id map --child-frame-id odom"/>
   <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster"
@@ -23,76 +19,4 @@
 
   <node pkg="tf2_ros" exec="static_transform_publisher" name="wheelencoderlink_broadcaster" 
         args="--x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id wheel_encoder"/>
-=======
-  <!-- <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster" args="0 0 0 0 0 0 map odom"/> -->
-=======
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster"
-      args="--x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id map --child-frame-id odom"/>
->>>>>>> 12cb3f4 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster"
-      args="--x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id odom --child-frame-id base_link" />
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="imulink_broadcaster" 
-      args="--x 0.10 --y -0.047 --z 0.17 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id imu"/>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="gpslink_broadcaster" 
-      args="--x 0.04 --y 0.103 --z 0.140 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id gps"/>
-  
-  <!-- Conditional lidar transform (ROS2 doesn't have <group> but supports if/unless on nodes) -->
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="lidarlink_broadcaster" 
-        args="--x 0.385 --y 0 --z 0.15 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id laser"
-        if="$(var is_indoors)"/>
-
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="wheelencoderlink_broadcaster" 
-<<<<<<< HEAD
-        args="0.0 0 0.0 0 0 0 1 base_link wheel_encoder"/>
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-
-<launch>
-    <!-- Launch file arguments -->
-    <arg name="is_indoors"      default="true" />
-
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster"        args="0 0 0 0 0 0 map odom" />
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster"   args="0 0 0 0 0 0 odom base_link" />
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="imulink_broadcaster"        args="0 0 0.1 0 0 0 base_link imu" />
-    <node pkg="tf2_ros" exec="static_transform_publisher" name="gpslink_broadcaster"        args="0.04 0.103  0.140 0 0 0 base_link gps" />
-    
-    <group if="$(arg is_indoors)">
-        <node pkg="tf2_ros" exec="static_transform_publisher" name="lidarlink_broadcaster"  args="0.284 0 0.2 0 0 0 1 base_link laser" />
-    </group>
->>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
-=======
-<launch>
-  <!-- Launch file arguments -->
-  <arg name="is_indoors" default="true" description="Whether the robot is operating indoors"/>
-  
-  <!-- Static transforms -->
-  <!-- <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster" args="0 0 0 0 0 0 map odom"/> -->
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster" args="0 0 0 0 0 0 odom base_link"/>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="imulink_broadcaster" args="0.07 0 0.11 0 0 0 base_link imu"/>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="gpslink_broadcaster" args="0.04 0.103 0.140 0 0 0 base_link gps"/>
-  
-  <!-- Conditional lidar transform (ROS2 doesn't have <group> but supports if/unless on nodes) -->
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="lidarlink_broadcaster" 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        args="0.284 0 0.2 0 0 0 1 base_link laser"
-        if="$(var is_indoors)"/>
->>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
-=======
-        args="0.385 0 0.15 0 0 0 1 $(var vehicle_name)/base_link $(var vehicle_name)/laser"
-        if="$(var is_indoors)"/>
-
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="wheelencoderlink_broadcaster" 
-        args="0.0 0 0.0 0 0 0 1 $(var vehicle_name)/base_link $(var vehicle_name)/wheel_encoder"/>
->>>>>>> 946d7d3 (Multi example in progress, unified svea core launch file in progress)
-=======
-        args="0.385 0 0.15 0 0 0 1 base_link laser"
-        if="$(var is_indoors)"/>
-
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="wheelencoderlink_broadcaster" 
-        args="0.0 0 0.0 0 0 0 1 base_link wheel_encoder"/>
->>>>>>> 2fb2b0b (localization update still have issues)
-=======
-        args="--x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id wheel_encoder"/>
->>>>>>> 2c22348 (minor fixs)
 </launch>

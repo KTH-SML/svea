@@ -14,7 +14,8 @@ from geometry_msgs.msg import PoseStamped
 
         
 
-class PlannerInterface[N:Node]:
+class PlannerInterface:
+
     _path_interface = None
     _gridmap_msg = None
     _gridmap_sub = None
@@ -24,15 +25,17 @@ class PlannerInterface[N:Node]:
     _path_topic = None
     _points_path = None
 
-    def __init__(self,node:N) -> None:
-        self.node = node
+    def __init__(self, node: Node) -> None:
+        
+        self._node = node
+
         # Map interface
         self._map_topic = self.load_param('~map_topic', '/map')
         self.init_gridmap_subscribers()
 
         # Path interface
         self._path_topic = self.load_param('~path_topic', '/path')
-        self._path_pub = self.node.create_publisher(Path, self._path_topic, 1)
+        self._path_pub = self._node.create_publisher(Path, self._path_topic, 1)
         # self._path_pub = rclpy.Publisher(self._path_topic, Path, latch=True, queue_size=1)
         self._pose_path = list()
         self._rviz_path = Path()
@@ -40,14 +43,14 @@ class PlannerInterface[N:Node]:
         self.ndoe.get_logger().info("PlannerInterface initialized")
     
     def load_param(self, name, value=None):
-        self.node.declare_parameter(name, value)
+        self._node.declare_parameter(name, value)
         if value is None:
-            assert self.node.has_parameter(name), f'Missing parameter "{name}"'
-        return self.node.get_parameter(name).value
+            assert self._node.has_parameter(name), f'Missing parameter "{name}"'
+        return self._node.get_parameter(name).value
     
     ## GRIDMAP INTERFACE ##
     def init_gridmap_subscribers(self):
-        self._gridmap_sub = self.node.create_subscription(OccupancyGrid, self._map_topic, self._gridmap_cb, 1)
+        self._gridmap_sub = self._node.create_subscription(OccupancyGrid, self._map_topic, self._gridmap_cb, 1)
         
     def _gridmap_cb(self, msg):
         self._gridmap_msg = OccupancyGrid(msg.header, msg.info, msg.data)
@@ -87,7 +90,7 @@ class PlannerInterface[N:Node]:
         obs_np = np.asarray(obstacles)
         data[obs_np[:, 0], obs_np[:, 1]] = 100  
 
-        map_pub = self.node.create_publisher(OccupancyGrid, self._map_topic, 1)
+        map_pub = self._node.create_publisher(OccupancyGrid, self._map_topic, 1)
         # map_pub = rclpy.Publisher('/map_from_grid', OccupancyGrid, latch=True, queue_size=1)
         map_msg = OccupancyGrid()
         map_msg.data = [item for sublist in np.array(data, dtype=int).tolist() for item in sublist]
@@ -111,7 +114,7 @@ class PlannerInterface[N:Node]:
         self._path_topic = self.load_param('~path_topic', '/path')
         self.latch_qos = QoSProfile(depth=1,
                                durability=DurabilityPolicy.TRANSIENT_LOCAL)
-        self._path_pub = self.node.create_publisher(Path, self._path_topic, self.latch_qos, 1)
+        self._path_pub = self._node.create_publisher(Path, self._path_topic, self.latch_qos, 1)
 
     def create_pose_path(self):
         for point in self._points_path:
@@ -147,7 +150,7 @@ class PlannerInterface[N:Node]:
     #     return path
     
     def get_path_from_topic(self):
-        path_msg = self.node.create_subscription(
+        path_msg = self._node.create_subscription(
             Path,
             '/smooth_path',
             lambda msg: setattr(self, '_temp_path_msg', msg),
@@ -165,7 +168,7 @@ class PlannerInterface[N:Node]:
         
         # Clean up
         del self._temp_path_msg
-        self.node.destroy_subscription(path_msg)
+        self._node.destroy_subscription(path_msg)
         
         return path
         

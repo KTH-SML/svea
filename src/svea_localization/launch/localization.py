@@ -33,17 +33,8 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
     autostart = LaunchConfiguration('autostart')
     params_file = LaunchConfiguration('params_file')
-<<<<<<< HEAD
-<<<<<<< HEAD
     # lifecycle_nodes = ['map_server', 'amcl']
     lifecycle_nodes = ['amcl']
-=======
-    lifecycle_nodes = ['map_server', 'amcl']
->>>>>>> 199c690 (localization update still have issues)
-=======
-    # lifecycle_nodes = ['map_server', 'amcl']
-    lifecycle_nodes = ['amcl']
->>>>>>> 94397f1 (AMCL fixed)
     initial_pose_a = LaunchConfiguration('initial_pose_a')
     initial_pose_x = LaunchConfiguration('initial_pose_x')
     initial_pose_y = LaunchConfiguration('initial_pose_y')
@@ -101,20 +92,8 @@ def generate_launch_description():
 
         DeclareLaunchArgument("initial_pose_y", default_value="0.0" ),
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         DeclareLaunchArgument("initial_pose_a", default_value="1.52" ),
-=======
-        DeclareLaunchArgument("initial_pose_a", default_value="0.0" ),
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-        DeclareLaunchArgument("initial_pose_a", default_value="1.52" ),
->>>>>>> b5e4617 (vscode ssh update)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 94397f1 (AMCL fixed)
         # Node(
         #     package='nav2_map_server',
         #     executable='map_server',
@@ -122,38 +101,16 @@ def generate_launch_description():
         #     output='screen',
         #     parameters=[configured_params],
         #     remappings=remappings),
-<<<<<<< HEAD
-=======
-        Node(
-            package='nav2_map_server',
-            executable='map_server',
-            name='map_server',
-            output='screen',
-            parameters=[configured_params],
-            remappings=remappings),
->>>>>>> 199c690 (localization update still have issues)
-=======
->>>>>>> 94397f1 (AMCL fixed)
 
         Node(
             package='nav2_amcl',
             executable='amcl',
             name='amcl',
             output='screen',
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b5e4617 (vscode ssh update)
             parameters=[configured_params,
                         {'initial_pose.x': initial_pose_x},
                         {'initial_pose.y': initial_pose_y},
                         {'initial_pose.yaw': initial_pose_a}],
-<<<<<<< HEAD
-=======
-            parameters=[configured_params],
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
->>>>>>> b5e4617 (vscode ssh update)
             remappings=remappings),
 
         Node(
@@ -164,12 +121,4 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time},
                         {'autostart': autostart},
                         {'node_names': lifecycle_nodes}])
-<<<<<<< HEAD
-<<<<<<< HEAD
     ])
-=======
-    ])
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-    ])
->>>>>>> b5e4617 (vscode ssh update)

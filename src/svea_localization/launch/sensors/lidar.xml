@@ -13,10 +13,6 @@
     <arg name="lidar_angle_min"             default="-2.355"/>
     <arg name="lidar_angle_max"             default="2.355"/>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 7b91b85 (2025/03/24 Meeting update)
     <node pkg="urg_node" exec="urg_node_driver" name="Hokyoulidar">
         <param name="ip_address"        value="$(var lidar_ip)" />
         <param name="frame_id"          value="$(var lidar_frame_id)"/>
@@ -25,36 +21,7 @@
         <param name="publish_multiecho" value="$(var lidar_publish_multiecho)"/>
         <param name="angle_min"         value="$(var lidar_angle_min)"/>
         <param name="angle_max"         value="$(var lidar_angle_max)"/>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         <param name="default_user_latency"         value="0.01"/>
         <param name="skip"              value="1"/>
-=======
-        <param name="default_user_latency"         value="-1.6543"/>
-<<<<<<< HEAD
->>>>>>> 8177d8a (udpate lidar.xml and amcl localize.xml to fix AMCL)
     </node>
 </launch>
-=======
-        <param name="default_user_latency"         value="-1.6543"/>
-=======
-    <node pkg="urg_node" type="urg_node" name="Hokyoulidar">
-        <param name="ip_address"        value="$(arg lidar_ip)" />
-        <param name="frame_id"          value="$(arg lidar_frame_id)"/>
-        <param name="calibrate_time"    value="$(arg lidar_calibrate_time)"/>
-        <param name="publish_intensity" value="$(arg lidar_publish_intensity)"/>
-        <param name="publish_multiecho" value="$(arg lidar_publish_multiecho)"/>
-        <param name="angle_min"         value="$(arg lidar_angle_min)"/>
-        <param name="angle_max"         value="$(arg lidar_angle_max)"/>
->>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
-=======
->>>>>>> 7b91b85 (2025/03/24 Meeting update)
-    </node>
-</launch>
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-        <param name="skip"              value="1"/>
-    </node>
-</launch>
->>>>>>> f34faa4 (tx2 floor2 works)

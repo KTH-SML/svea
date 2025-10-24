@@ -27,11 +27,7 @@ qos_pubber = QoSProfile(
 class ShowPath(rx.Field):
     
     TRAVEL_DIST_THRESH = 0.1
-<<<<<<< HEAD
     PATH_MAX_LEN = 100
-=======
-    PATH_MAX_LEN = 1000
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
     chassis_height=0.06
 
     odometry_top = rx.Parameter('odometry/local')

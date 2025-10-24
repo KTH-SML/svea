@@ -119,7 +119,7 @@ class PurePursuitController:
         d = [abs(math.sqrt(idx ** 2 + idy ** 2)) for (idx, idy) in zip(dx, dy)]
         ind = d.index(min(d))
         dist = 0.0
-        dynamic_lfc =  min(max(0.8, vel * 0.5), 1.5)
+        dynamic_lfc =  min(max(0.8, vel * 0.5), 1.7)
         Lf = max(self.k * vel + dynamic_lfc, 1.2)
 
         # search look ahead target point index

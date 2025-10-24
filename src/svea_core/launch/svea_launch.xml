@@ -9,19 +9,7 @@
     <arg name="initial_pose_x"  default="-2.65488696"/>
     <arg name="initial_pose_y"  default="-1.64422277"/>
     <arg name="initial_pose_a"  default="1.57" /> <!-- wrt to map-->
-<<<<<<< HEAD
-<<<<<<< HEAD
     <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
-=======
-    <arg name="map_path" default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
-=======
->>>>>>> 3475a3d (map server launch file add missing map_path)
-    <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
-<<<<<<< HEAD
-    <arg name="points" default="['[-2.3, -7.1]', '[3.51, 1.95]', '[10.5, 11.7]', '[5.7, 15.0]', '[-1.18, 4.69]', '[-7.0, -4.0]']" />
->>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
-=======
->>>>>>> 689cbbe (added tutorials doc)
     <arg name="vehicle_name" default=""/>
 
 
@@ -35,18 +23,7 @@
         <!-- Start simulation -->
         <include file="$(find-pkg-share svea_core)/launch/simulation.xml">
             <arg name="state" value="$(var state)" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
             <arg name="map" value="$(var map)" />
-=======
-            <arg name="points" value="$(var points)" />
->>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
-=======
->>>>>>> 689cbbe (added tutorials doc)
-=======
-            <arg name="map" value="$(var map)" />
->>>>>>> a1bdba7 (psl map update)
         </include>
     </group>
 
@@ -61,30 +38,17 @@
             <arg name="initial_pose_y" value="$(var initial_pose_y)" />
             <arg name="initial_pose_a" value="$(var initial_pose_a)" />
         </include>
-<<<<<<< HEAD
 
         <!--LLI fixers-->
         <node pkg="svea_core" exec="encoder_filter.py" name="encoder_filter" output="screen"/>
         <node pkg="svea_core" exec="imu_bias_remover.py" name="imu_bias_remover" output="screen"/>
         <!-- <node pkg="svea_core" exec="lidar_timer.py" name="lidar_timer" output="screen"/> -->
-=======
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
     </group>
 
 
     <!-- Start loading svea model -->
-<<<<<<< HEAD
-<<<<<<< HEAD
     <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py">
         <arg name="vehicle_name" value="$(var vehicle_name)"/>
     </include>
-=======
-    <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py"/>
->>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
-=======
-    <include file="$(find-pkg-share svea_core)/launch/svea_vizualization.launch.py">
-        <arg name="vehicle_name" value="$(var vehicle_name)"/>
-    </include>
->>>>>>> 392cd10 (multi model displacement with namespace in foxglove fixed)
 
 </launch>

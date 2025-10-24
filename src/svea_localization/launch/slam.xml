@@ -3,25 +3,7 @@
 <launch>
 
     <!-- Launch file arguments -->
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     <arg name="use_sim_time"  default="true"/>
-=======
-    <arg name="use_sim_time"  default="True"/>
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-    <arg name="xavier"      default="false"/>
-    <arg name="camera"      default="rs"/>
-    <arg name="slam_delay"  default="5"/>
->>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
-=======
-    <arg name="use_sim_time"  default="True"/>
->>>>>>> 5eef1eb (AMCL fixed)
-=======
-    <arg name="use_sim_time"  default="true"/>
->>>>>>> fad5c54 (minor fix)
 
     <!-- Launch Low-Level Micro-Ros -->
     <executable cmd="$(find-pkg-share svea_core)/util/start_micro_ros.sh" output="screen"/>

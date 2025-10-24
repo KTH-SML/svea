@@ -32,15 +32,7 @@
     
 
     <!-- START UBLOX ZED-F9P RTK MANAGER NODE -->
-<<<<<<< HEAD
-<<<<<<< HEAD
     <node pkg="svea_localization" exec="rtk_manager.py" name="rtk_manager" output="screen" namespace="gps">
-=======
-    <node pkg="svea_localization" exec="rtk_manager" name="rtk_manager" output="screen" namespace="gps">
->>>>>>> cf824d9 (2025/03/24 Meeting update)
-=======
-    <node pkg="svea_localization" exec="rtk_manager.py" name="rtk_manager" output="screen" namespace="gps">
->>>>>>> 217dc92 (05/12/2025 meeting update)
         <param name="device"        value="$(var gps_device)"/>
         <param name="baud"          value="$(var baud)" />
         <param name="gps_frame"     value="$(var gps_frame)" />

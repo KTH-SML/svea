@@ -75,15 +75,6 @@ class PlaceMarker(rx.Field):
         marker.color.b = b
         marker.color.a = a
         
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        # 设置生命周期（0 表示永久）
-        marker.lifetime = Duration(sec=1, nanosec=0)  # 1 秒后消失
-        
->>>>>>> 146db9c (marker placer complete)
-=======
->>>>>>> b1bf097 (pure_pursuit goal display update)
         # 发布 Marker
         mark_pub.publish(marker)
 

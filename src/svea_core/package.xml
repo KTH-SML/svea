@@ -19,6 +19,8 @@
   <depend>foxglove_bridge</depend>
   <depend>tf_transformations</depend>
 
+  <depend>svea_localization</depend>
+
   <export>
     <build_type>ament_python</build_type>
   </export>

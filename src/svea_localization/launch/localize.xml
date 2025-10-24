@@ -20,27 +20,7 @@
     <arg name="map_file"                default="/svea_ws/src/svea_core/maps/sml.yaml"/>
 
     <!-- Lidar  -->
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     <arg name="lidar_ip"                default="192.168.0.10" />
-=======
-    <arg name="lidar_ip"                default="192.168.3.11" />
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-    <arg name="lidar_ip"                default="" />
->>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
-=======
-    <arg name="lidar_ip"                default="192.168.3.11" />
-<<<<<<< HEAD
-    <let name="lidar_ip_bool" value="$(eval '\'$(var lidar_ip)\' != \'\'')"/>
->>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
-=======
->>>>>>> ff325d4 (localization test)
-=======
-    <arg name="lidar_ip"                default="192.168.0.10" />
->>>>>>> b5e4617 (vscode ssh update)
 
     <!-- GPS -->
     <arg name="start_rtk"               default="false"/>
@@ -73,64 +53,6 @@
 
     <!-- Nodes -->
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <!-- TODO: Start low-level interface -->
-    <!-- <group if="$(arg start_serial)">
-        <node pkg="rosserial_python" exec="serial_node.py" name="serial_node">
-            <param name="port" value="$(arg lli_port)"/>
-            <param name="baud" value="250000"/>
-        </node>
-    </group> -->
-
-    <!-- Start map server -->
-<<<<<<< HEAD
-    <node if="$(eval '\'$(var map_file)\' != \'\'')" pkg="nav2_map_server" exec="map_server" name="map_server" output="screen" args="$(var map_file)"/>
-
-<<<<<<< HEAD
-        <!-- start all sensors if this is not a simulation -->
-<<<<<<< HEAD
-=======
-    <node name="map_server" pkg="nav2_map_server" exec="map_server" output="screen">
-        <param name="yaml_filename" value="$(var map_file)" />
-        <param name="use_sim_time" value="false" />
-        <param name="topic_name" value="map" />
-    </node>
-    
-    <node name="lifecycle_manager" pkg="nav2_lifecycle_manager" exec="lifecycle_manager" output="screen">
-        <param name="node_names" value="['map_server']" />
-        <param name="autostart" value="true" />
-    </node>
-    <!-- start all sensors if this is not a simulation -->
->>>>>>> cb4be18 (update localiztion params, and launch file)
-    <group unless="$(var is_sim)">
-        <let name="use_sim_time" value="false"/>
-        <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
-        <group if="$(var is_indoors)">
-=======
-    <group unless="$(eval '\'$(var is_sim)\' == \'true\'')">
-        <let name="use_sim_time" value="false"/>
-        <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
-        <group if="$(eval '\'$(var is_indoors)\' == \'true\'')">
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-    <!-- start all sensors if this is not a simulation -->
-    <group unless="$(var is_sim)">
-<<<<<<< HEAD
-        <!-- TODO: <param name="use_sim_time" value="false"/> -->
-<<<<<<< HEAD
-        <group if="$(arg is_indoors)">
->>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
-=======
-=======
-        <let name="use_sim_time" value="false"/>
-        <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/>
->>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
-        <group if="$(var is_indoors)">
->>>>>>> 7b91b85 (2025/03/24 Meeting update)
-=======
-    <!-- start all sensors if this is not a simulation -->
-=======
     <!-- Static transforms for sensors -->
     <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
         <arg name="is_indoors"  value="$(var is_indoors)"/>
@@ -141,99 +63,41 @@
     </node> -->
 
         <!-- start all sensors if this is not a simulation -->
-<<<<<<< HEAD
->>>>>>> 2fb2b0b (localization update still have issues)
-    <group unless="$(eval '\'$(var is_sim)\' == \'true\'')">
-        <let name="use_sim_time" value="false"/>
-        <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
-        <group if="$(eval '\'$(var is_indoors)\' == \'true\'')">
->>>>>>> ff325d4 (localization test)
-=======
     <group unless="$(var is_sim)">
         <let name="use_sim_time" value="false"/>
         <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
         <group if="$(var is_indoors)">
->>>>>>> b5e4617 (vscode ssh update)
             <!-- Start Lidar -->
             <include file="$(find-pkg-share svea_localization)/launch/lidar.xml">
                 <arg name="lidar_ip"                    value="$(var lidar_ip)"/>
             </include>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b5e4617 (vscode ssh update)
 	    <include file="$(find-pkg-share svea_localization)/launch/localization.py">
 		    <arg name="intial_pose_x" value="$(var initial_pose_x)"/>
 		    <arg name="intial_pose_y" value="$(var initial_pose_y)"/>
 		    <arg name="intial_pose_a" value="$(var initial_pose_a)"/>
 	    </include>
-<<<<<<< HEAD
 
-=======
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
->>>>>>> 2fb2b0b (localization update still have issues)
-=======
-            <include file="$(find-pkg-share svea_localization)/launch/localization.py"/>
-=======
->>>>>>> b5e4617 (vscode ssh update)
-
->>>>>>> 28b1ce8 (encoder and imu high level calibrater)
             <!-- Lifecycle Manager for Map Server -->
             <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
                 <param name="autostart" value="true"/>
                 <param name="node_names" value="['map_server']"/>
             </node> -->
 
-<<<<<<< HEAD
             <!-- Start AMCL -->
-<<<<<<< HEAD
             <node pkg="nav2_amcl" exec="amcl" name="amcl_localization" output="screen">
-=======
-            <!-- <node pkg="nav2_amcl" exec="amcl" name="amcl_localization" output="screen">
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
                 <param from="$(find-pkg-share svea_localization)/params/localize.yaml"/>
                 <param name="scan"              value="/scan"/>
                 <param name="initial_pose_x"    value="$(var initial_pose_x)" />
                 <param name="initial_pose_y"    value="$(var initial_pose_y)" />
                 <param name="initial_pose_a"    value="$(var initial_pose_a)" />
-<<<<<<< HEAD
             </node>
-=======
-            </node> -->
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
 
             <!-- Lifecycle Manager for AMCL -->
            <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
                 <param name="autostart" value="true"/>
                 <param name="node_names" value="['amcl_localization']"/>
             </node> -->
-=======
-=======
->>>>>>> 2fb2b0b (localization update still have issues)
-            <!-- Start AMCL -->
-            <!-- <node pkg="nav2_amcl" exec="amcl" name="amcl_localization" output="screen">
-                <param from="$(find-pkg-share svea_localization)/params/localize.yaml"/>
-                <param name="scan"              value="/scan"/>
-                <param name="initial_pose_x"    value="$(var initial_pose_x)" />
-                <param name="initial_pose_y"    value="$(var initial_pose_y)" />
-                <param name="initial_pose_a"    value="$(var initial_pose_a)" />
-<<<<<<< HEAD
-            </node>
->>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
-=======
-            </node> -->
-
-            <!-- Lifecycle Manager for AMCL -->
-           <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
-                <param name="autostart" value="true"/>
-                <param name="node_names" value="['amcl_localization']"/>
-            </node> -->
->>>>>>> 2fb2b0b (localization update still have issues)
         </group>
 
         <!-- TODO: Start GPS if outdoor localization -->
@@ -261,39 +125,12 @@
     <let name="use_sim_time" value="$(var is_sim)" if="$(eval '\'$(var is_sim)\' == \'true\'')"/>
 
     <!-- Robot localization (Local EKF)-->
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
-        <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
-<<<<<<< HEAD
-        <param name="imu0"                  value="/imu/filtered"/>
-        <param name="twist0"                value="/encoder/filtered"/>
-=======
-        <param name="imu0"                  value="/lli/sensor/imu"/>
-        <param name="twist0"                value="/lli/sensor/encoders"/>
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-        <remap from="/odometry/filtered"    to="/odometry/local"/>
-        <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/>  -->
-=======
-    <node pkg="robot_localization" exec="ekf_localization_node" name="ekf_local" clear_params="true" output="screen">
-        <rosparam command="load" file="$(find-pkg-share svea_localization)/params/robot_localization/local_ekf.yaml" />
-        <param name="imu0"                  value="imu/data"/>
-        <param name="twist0"                value="actuation_twist"/>
-        <remap from="/odometry/filtered"    to="/odometry/filtered/local"/>
-        <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> -->
->>>>>>> a6d4456 (add svea_localization,modifying to ros2 in progress)
-=======
     <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
         <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
         <param name="imu0"                  value="/imu/filtered"/>
         <param name="twist0"                value="/encoder/filtered"/>
         <remap from="/odometry/filtered"    to="/odometry/local"/>
-<<<<<<< HEAD
-        <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/> --> 
->>>>>>> b921c25 (Added rmw-zenoh in dockerfile, added svea_example)
-=======
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/>  -->
->>>>>>> 2fb2b0b (localization update still have issues)
     </node>
 
     <!-- Global EKF -->

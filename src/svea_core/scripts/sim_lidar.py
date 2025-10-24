@@ -107,10 +107,6 @@ class sim_lidar(rx.Node):
 
         self._lidar_position = np.append(lidar_xy, yaw)
 
-<<<<<<< HEAD
-        self.publish_tf(odmetry_msg)
-=======
->>>>>>> 6567c2c (marker placer complete)
         self._scan_msg.header.stamp = odmetry_msg.header.stamp
         self.sim_loop()
 

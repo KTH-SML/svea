@@ -30,8 +30,6 @@ class Publish3Dcar(Node):
         hinc = 0.005
 
         # message declarations
-<<<<<<< HEAD
-<<<<<<< HEAD
         namespace = self.get_namespace()
         self.get_logger().info("Namespace: {0}".format(namespace))
         frame_id = namespace + '/odom' if namespace != '/' else 'odom'
@@ -39,20 +37,6 @@ class Publish3Dcar(Node):
         odom_trans = TransformStamped()
         odom_trans.header.frame_id = frame_id
         odom_trans.child_frame_id = child_id
-=======
-        odom_trans = TransformStamped()
-        odom_trans.header.frame_id = 'odom'
-        odom_trans.child_frame_id = 'axis'
->>>>>>> 146db9c (marker placer complete)
-=======
-        namespace = self.get_namespace()
-        self.get_logger().info("Namespace: {0}".format(namespace))
-        frame_id = namespace + '/odom' if namespace != '/' else 'odom'
-        child_id = namespace + '/axis' if namespace != '/' else 'axis'
-        odom_trans = TransformStamped()
-        odom_trans.header.frame_id = frame_id
-        odom_trans.child_frame_id = child_id
->>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
 
         try:
             while rclpy.ok():

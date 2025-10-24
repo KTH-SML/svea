@@ -1,57 +1,13 @@
 <?xml version="1.0"?>
 <launch>
     <!-- Launch file arguments -->
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     <arg name="map"             default="floor2"/>
     <arg name="is_sim"          default="true"/>
     <arg name="use_foxglove"    default="true"/>
     <arg name="initial_pose_x"  default="-7.3699"/>
     <arg name="initial_pose_y"  default="-15.383940368977647"/>
     <arg name="initial_pose_a"  default="1.0116" /> <!-- wrt to map-->
-=======
-=======
->>>>>>> 710b561 (Teleop control in simulation with teleop_twist_keyboard added)
-=======
->>>>>>> 012cdaf (psl map update)
-=======
->>>>>>> b5e4617 (vscode ssh update)
-    <arg name="map"             default="penn_state_lab"/>
-=======
-    <arg name="map"             default="floor2"/>
->>>>>>> cd45094 (vscode ssh update)
-    <arg name="is_sim"          default="true"/>
-    <arg name="use_foxglove"    default="true"/>
-<<<<<<< HEAD
-=======
-    <arg name="map"             default="floor2"/>
-=======
-    <arg name="map"             default="penn_state_lab"/>
->>>>>>> a1bdba7 (psl map update)
-    <arg name="is_sim"          default="true"/>
-    <arg name="use_foxglove"    default="true"/>
-<<<<<<< HEAD
-    <let name="use_foxglove" value="$(eval '\'$(var use_foxglove)\' == \'true\'')"/>
->>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
-=======
->>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
-    <arg name="initial_pose_x"  default="-2.65488696"/>
-    <arg name="initial_pose_y"  default="-1.64422277"/>
-    <arg name="initial_pose_a"  default="1.57" /> <!-- wrt to map-->
-<<<<<<< HEAD
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-=======
-    <arg name="initial_pose_x"  default="-7.3699"/>
-    <arg name="initial_pose_y"  default="-15.383940368977647"/>
-    <arg name="initial_pose_a"  default="1.0116" /> <!-- wrt to map-->
->>>>>>> 4b698a4 (filter fixed)
->>>>>>> 9fd9045 (filter fixed)
     <arg name="map_path" default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
-<<<<<<< HEAD
-<<<<<<< HEAD
     <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
 
     <!-- Start Map Server and Foxglove -->
@@ -68,49 +24,7 @@
         <arg name="initial_pose_a" value="$(var initial_pose_a)" />
         <arg name="state" value="$(var state)" />
         <arg name="map" value="$(var map)" />
-<<<<<<< HEAD
     </include>
 
     <node name="teleop_control" pkg="svea_examples" exec="teleop_control.py" output="screen"/>
-=======
-=======
-    <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
->>>>>>> 689cbbe (added tutorials doc)
-
-    <!-- Start Map Server and Foxglove -->
-    <include file="$(find-pkg-share svea_core)/launch/map_and_foxglove.xml">
-        <arg name="map" value="$(var map)" />
-        <arg name="use_foxglove" value="$(var use_foxglove)" />
-    </include>   
-    
-    <!-- Start Svea Core -->
-    <include file="$(find-pkg-share svea_core)/launch/svea_launch.xml">
-        <arg name="is_sim" value="$(var is_sim)" />
-        <arg name="initial_pose_x" value="$(var initial_pose_x)" />
-        <arg name="initial_pose_y" value="$(var initial_pose_y)" />
-        <arg name="initial_pose_a" value="$(var initial_pose_a)" />
-        <arg name="state" value="$(var state)" />
-=======
->>>>>>> 94397f1 (AMCL fixed)
-    </include>
-
-<<<<<<< HEAD
-    <node name="teleop_control" pkg="svea_examples" exec="teleop_control" output="screen"/>
-=======
-    <node name="teleop_control" pkg="svea_examples" exec="teleop_control.py" output="screen"/>
-<<<<<<< HEAD
->>>>>>> 946d7d3 (Multi example in progress, unified svea core launch file in progress)
-
-    <!-- Start simulation -->
-    <include file="$(find-pkg-share svea_core)/launch/simulation.xml"/>
-<<<<<<< HEAD
->>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
-=======
-
-    <include file="$(find-pkg-share svea_localization)/launch/transforms.xml">
-        <arg name="is_indoors" value="$(var is_sim)"/>
-    </include>
->>>>>>> 146db9c (marker placer complete)
-=======
->>>>>>> b7aa899 (Multi example in progress, unified svea core launch file in progress)
 </launch>

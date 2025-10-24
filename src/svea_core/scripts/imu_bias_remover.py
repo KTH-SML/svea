@@ -6,15 +6,7 @@ from sensor_msgs.msg import Imu
 from svea_core import rosonic as rx
 
 qos_pubber = QoSProfile(
-<<<<<<< HEAD
-<<<<<<< HEAD
     reliability=QoSReliabilityPolicy.BEST_EFFORT,
-=======
-    reliability=QoSReliabilityPolicy.RELIABLE,
->>>>>>> 28b1ce8 (encoder and imu high level calibrater)
-=======
-    reliability=QoSReliabilityPolicy.BEST_EFFORT,
->>>>>>> 2c22348 (minor fixs)
     durability=QoSDurabilityPolicy.VOLATILE,
     history=QoSHistoryPolicy.KEEP_LAST,
     depth=1,
@@ -22,15 +14,7 @@ qos_pubber = QoSProfile(
 
 
 qos_subber = QoSProfile(
-<<<<<<< HEAD
-<<<<<<< HEAD
     reliability=QoSReliabilityPolicy.BEST_EFFORT,  # BEST_EFFORT
-=======
-    reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
->>>>>>> 28b1ce8 (encoder and imu high level calibrater)
-=======
-    reliability=QoSReliabilityPolicy.BEST_EFFORT,  # BEST_EFFORT
->>>>>>> 2c22348 (minor fixs)
     history=QoSHistoryPolicy.KEEP_LAST,         # Keep the last N messages
     durability=QoSDurabilityPolicy.VOLATILE,    # Volatile
     depth=10,                                   # Size of the queue
@@ -43,23 +27,7 @@ class imu_bias_remove(rx.Node):
     """
 
     bias_sampled = False
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     sample_count = 100
-=======
-    sample_count = 5000
->>>>>>> 28b1ce8 (encoder and imu high level calibrater)
-=======
-    sample_count = 1000
->>>>>>> 2c22348 (minor fixs)
-=======
-    sample_count = 200
->>>>>>> 6151141 (update)
-=======
-    sample_count = 100
->>>>>>> b5e4617 (vscode ssh update)
     sample_counter = 0
 
     ## Publishers ##
@@ -86,20 +54,7 @@ class imu_bias_remove(rx.Node):
         
         else:
             imu_msg.angular_velocity.z -= self.bias_angular_z
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 6151141 (update)
             imu_msg.angular_velocity.z = imu_msg.angular_velocity.z / 4.0
-=======
-            imu_msg.angular_velocity.z = imu_msg.angular_velocity.z
-            imu_msg.linear_acceleration.x = imu_msg.linear_acceleration.x / 4.0
->>>>>>> b5e4617 (vscode ssh update)
-=======
-            imu_msg.angular_velocity.z = imu_msg.angular_velocity.z / 4.0
->>>>>>> 9fd9045 (filter fixed)
             imu_msg.linear_acceleration.x -= self.bias_linear_x
             imu_msg.linear_acceleration.y -= self.bias_linear_y
 
@@ -118,14 +73,6 @@ class imu_bias_remove(rx.Node):
             if abs(imu_msg.angular_velocity.z) < 0.03:
                 imu_msg.angular_velocity.z = 0.0
 
-<<<<<<< HEAD
-=======
-            imu_msg.linear_acceleration.x -= self.bias_linear_x
-            imu_msg.linear_acceleration.y -= self.bias_linear_y
-
->>>>>>> 28b1ce8 (encoder and imu high level calibrater)
-=======
->>>>>>> 12cb3f4 (Turning updategit statusgit status Something THAT WORKSgit statusgit status!)
             self.imu_re_pub.publish(imu_msg)
 
     def on_startup(self):
@@ -133,16 +80,4 @@ class imu_bias_remove(rx.Node):
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     imu_bias_remove.main()
-=======
-    state_publisher.main()
->>>>>>> 28b1ce8 (encoder and imu high level calibrater)
-=======
-    imu_bias_remove.main()
->>>>>>> 6151141 (update)
-=======
-    imu_bias_remove.main()
->>>>>>> b5e4617 (vscode ssh update)

@@ -14,15 +14,7 @@
         <param name="publish_filtered_gps"                              value="true"/>
         <param name="wait_for_datum"                                    value="$(var use_datum)"/>
         <param name="delay"                                             value="$(var delay)" />
-<<<<<<< HEAD
-<<<<<<< HEAD
         <param name="magnetic_declination_radians"                      value='0.0'/>
-=======
-        <param name="magnetic_declination_radians"                      value="0"/>
->>>>>>> cf824d9 (2025/03/24 Meeting update)
-=======
-        <param name="magnetic_declination_radians"                      value='0.0'/>
->>>>>>> e76035e (Added rmw-zenoh in dockerfile, added svea_example)
         <param name="yaw_offset"                                        value="$(var yaw_offset)"/>
         <param name="zero_altitude"                                     value="true" />
         <param name="broadcast_cartesian_transform_as_parent_frame"     value="true"/>
@@ -33,15 +25,7 @@
     </node> 
 
     <!-- Atleast one of the datum_file or datum_data must be set, if both are set, datum_file will be used -->
-<<<<<<< HEAD
-<<<<<<< HEAD
     <node if="$(var use_datum)" pkg="svea_localization" exec="set_datum_node.py" name="set_datum_node" output="screen">
-=======
-    <node if="$(var use_datum)" pkg="svea_localization" exec="set_datum_node" name="set_datum_node" output="screen">
->>>>>>> cf824d9 (2025/03/24 Meeting update)
-=======
-    <node if="$(var use_datum)" pkg="svea_localization" exec="set_datum_node.py" name="set_datum_node" output="screen">
->>>>>>> 217dc92 (05/12/2025 meeting update)
         <param name="datum_service"     value="$(var datum_service)" />
         <param name="service_timeout"   value="60.0" />
         <param name="datum_file"        value="$(var datum_file)" />

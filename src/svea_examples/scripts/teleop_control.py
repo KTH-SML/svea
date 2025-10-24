@@ -4,34 +4,16 @@ from tf_transformations import quaternion_from_euler
 
 from svea_core.interfaces import LocalizationInterface
 from svea_core.interfaces import ActuationInterface
-<<<<<<< HEAD
-<<<<<<< HEAD
 from svea_core.utils import ShowPath
-=======
->>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
-=======
-from svea_core.utils import ShowPath
->>>>>>> 689cbbe (added tutorials doc)
 from svea_core import rosonic as rx
 from geometry_msgs.msg import Twist
 from rclpy.qos import QoSProfile
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
->>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
-=======
-
->>>>>>> 689cbbe (added tutorials doc)
 qos_subber = QoSProfile(depth=10 # Size of the queue 
                         )
 
 class teleop_control(rx.Node):  # Inherit from rx.Node
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 689cbbe (added tutorials doc)
     """ Teleoperation control node for Svea.
 
     #**Background**
@@ -82,45 +64,16 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
         localizer (LocalizationInterface): Interface for localization and state retrieval.
         path (ShowPath): Interface for visualizing the path.
     """
-<<<<<<< HEAD
 
     DELTA_TIME = 0.1
 
     target_velocity = rx.Parameter(1.0)
 
     actuation = ActuationInterface()
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    localizer = LocalizationInterface()
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
->>>>>>> 28b1ce8 (encoder and imu high level calibrater)
 
     # Path Visualization
     path = ShowPath()
 
-=======
-=======
->>>>>>> 689cbbe (added tutorials doc)
-
-    DELTA_TIME = 0.1
-
-    target_velocity = rx.Parameter(1.0)
-
-<<<<<<< HEAD
->>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
-=======
-    actuation = ActuationInterface()
-    localizer = LocalizationInterface()
-
-<<<<<<< HEAD
->>>>>>> 01b7a7d (teleop example bug fixed)
-=======
-    # Path Visualization
-    path = ShowPath()
-
->>>>>>> 689cbbe (added tutorials doc)
     ## Subscribers ##
     @rx.Subscriber(Twist, 'cmd_vel', qos_subber)
     def ctrl_request_twist(self, twist_msg):
@@ -128,24 +81,6 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
         self.steering = twist_msg.angular.z
 
     def on_startup(self):
-<<<<<<< HEAD
-<<<<<<< HEAD
-        self.velocity = 0.0
-        self.steering = 0.0
-        self.create_timer(self.DELTA_TIME, self.loop)
-
-    def loop(self):
-        self.actuation.send_control(self.steering, self.velocity)
-<<<<<<< HEAD
-=======
-        self.localizer.get_state()
-<<<<<<< HEAD
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-=======
-
-=======
->>>>>>> 689cbbe (added tutorials doc)
         self.velocity = 0.0
         self.steering = 0.0
         self.create_timer(self.DELTA_TIME, self.loop)
@@ -153,12 +88,5 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
     def loop(self):
         self.actuation.send_control(self.steering, self.velocity)
 
-<<<<<<< HEAD
-
->>>>>>> 9585fc8 (Teleop control in simulation with teleop_twist_keyboard added)
->>>>>>> 710b561 (Teleop control in simulation with teleop_twist_keyboard added)
-
-=======
->>>>>>> 689cbbe (added tutorials doc)
 if __name__ == '__main__':
     teleop_control.main()

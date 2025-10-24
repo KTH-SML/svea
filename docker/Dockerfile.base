@@ -47,8 +47,6 @@ RUN apt-get update -y && \
         openssh-server ca-certificates \
         git vim nano curl iputils-ping \
         python3-pip \
-<<<<<<< HEAD
-<<<<<<< HEAD
         python3-rosdep \
         python3-vcstool \
         python3-colcon-common-extensions \
@@ -58,22 +56,6 @@ RUN apt-get update -y && \
         # ros-$ROSDISTRO-rmw-zenoh-cpp \
         ros-$ROSDISTRO-teleop-twist-keyboard \
         ros-$ROSDISTRO-nav2-* \
-=======
-        python3-numpy \
-        python3-matplotlib \
-        python3-colcon-common-extensions \
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-        python3-rosdep \
-        python3-vcstool \
-        python3-colcon-common-extensions \
-        ## Move these to rosdep?
-        ros-$ROSDISTRO-ament-cmake-python \
-        ros-$ROSDISTRO-ros-base=0.11.0-1* \
-        # ros-$ROSDISTRO-rmw-zenoh-cpp \
-        ros-$ROSDISTRO-teleop-twist-keyboard \
-        ros-$ROSDISTRO-nav2-* \
->>>>>>> 25eba17 (update docker build)
         && \
     rm -rf /var/lib/apt/lists/*
 

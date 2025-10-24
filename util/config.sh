@@ -8,10 +8,6 @@
 ## Uncomment to build base image for amd64 (x86) or arm64.
 # BUILD_CONFIG="base-amd64"
 # BUILD_CONFIG="base-arm64"
-<<<<<<< HEAD
-
-=======
->>>>>>> 7f3be22 (fixed typo in config)
 
 
 main() {
@@ -48,54 +44,24 @@ main() {
         # building for host platform
         withdefault BUILD_PLATFORM  "$(uname -m)"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-<<<<<<< HEAD
-<<<<<<< HEAD
         withdefault BUILD_FILE      "docker/Dockerfile.base"
         withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
-=======
-        withdefault BUILD_FILE      "docker/Dockerfile"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO"
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
->>>>>>> 25eba17 (update docker build)
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
     elif [ "$BUILD_CONFIG" = "base-amd64" ]; then
         # building for x86_64
         withdefault BUILD_PLATFORM  "linux/amd64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-<<<<<<< HEAD
-<<<<<<< HEAD
         withdefault BUILD_FILE      "docker/Dockerfile.base"
         withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
-=======
-        withdefault BUILD_FILE      "docker/Dockerfile"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO"
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
->>>>>>> 25eba17 (update docker build)
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
     elif [ "$BUILD_CONFIG" = "base-arm64" ]; then
         # building for arm64/aarch64/jetson
         withdefault BUILD_PLATFORM  "linux/arm64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-<<<<<<< HEAD
-<<<<<<< HEAD
         withdefault BUILD_FILE      "docker/Dockerfile.base"
         withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
-=======
-        withdefault BUILD_FILE      "docker/Dockerfile"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO"
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
->>>>>>> 25eba17 (update docker build)
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
     elif [ "$BUILD_CONFIG" = "ghcr" ]; then
@@ -149,73 +115,19 @@ jetson_release() {
     fi
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 ## Auto-detect platform for macOS
-=======
-## Auto-detect platform for macOS with Apple Silicon
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-=======
->>>>>>> c5c0898 (moved reused function to top)
-## Auto-detect platform for macOS with Apple Silicon
-=======
->>>>>>> 3fd88dc (added missing is_darwin check for mac causing redundant error)
->>>>>>> ea5b49f (added missing is_darwin check for mac causing redundant error)
-=======
-=======
->>>>>>> 25eba17 (update docker build)
-## Auto-detect platform for macOS with Apple Silicon
-=======
->>>>>>> 3fd88dc (added missing is_darwin check for mac causing redundant error)
-=======
-## Auto-detect platform for macOS with Apple Silicon
->>>>>>> 3b4ac0a (Refactor is_darwin function and its usage for clarity in main function)
-<<<<<<< HEAD
->>>>>>> 1651d8d (Refactor is_darwin function and its usage for clarity in main function)
-=======
-=======
-## Auto-detect platform for macOS
->>>>>>> 68e62af (update docker build)
->>>>>>> 25eba17 (update docker build)
 # Check if running on macOS (Darwin)
 is_darwin() {
     [ "$(uname -s)" = "Darwin" ]
 }
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 3b4ac0a (Refactor is_darwin function and its usage for clarity in main function)
 
-<<<<<<< HEAD
->>>>>>> 2cf1997 (moved reused function to top)
-=======
 ## Detect arm64 architecture
 is_arm64() {
     ARCH="$(uname -m)"
     [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]
 }
 
->>>>>>> 68e62af (update docker build)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-## Detect arm64 architecture
-is_arm64() {
-    ARCH="$(uname -m)"
-    [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]
-}
-
-=======
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
->>>>>>> ea5b49f (added missing is_darwin check for mac causing redundant error)
-
-=======
->>>>>>> 3fd88dc (added missing is_darwin check for mac causing redundant error)
 ################################################################################
 ################################################################################
 

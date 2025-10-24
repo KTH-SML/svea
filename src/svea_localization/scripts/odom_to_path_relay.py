@@ -3,16 +3,6 @@
 Author: Sulthan Suresh Fazeela
 """
 
-<<<<<<< HEAD
-<<<<<<<< HEAD:src/svea_localization/scripts/odom_to_path_relay.py
-========
-__author__ = "Sulthan Suresh Fazeela"
-__email__ = "sultha@kth.se"
-__license__ = "MIT"
-
->>>>>>>> 360ef06 (add svea_localization,modifying to ros2 in progress):src/svea_localization/script/odom_to_path_relay.py
-=======
->>>>>>> 914c44e (update on 05/12/2025)
 import rclpy
 import rclpy.exceptions
 from rclpy.node import Node
@@ -24,17 +14,6 @@ from geometry_msgs.msg import PoseStamped
 import math
 
 
-<<<<<<< HEAD
-<<<<<<<< HEAD:src/svea_localization/scripts/odom_to_path_relay.py
-========
-def load_param(self, name, value=None):
-    self.declare_parameter(name, value)
-    if value is None:
-        assert self.has_parameter(name), f'Missing parameter "{name}"'
-    return self.get_parameter(name).value
->>>>>>>> 360ef06 (add svea_localization,modifying to ros2 in progress):src/svea_localization/script/odom_to_path_relay.py
-=======
->>>>>>> 914c44e (update on 05/12/2025)
 
 def replace_base(old, new) -> str:
     split_last = lambda xs: (xs[:-1], xs[-1])
@@ -54,25 +33,11 @@ class OdomToPathRelay(Node):
             super().__init__('odom_to_path_relay')
             
             # Topic Parameters
-<<<<<<< HEAD
-<<<<<<<< HEAD:src/svea_localization/scripts/odom_to_path_relay.py
-=======
->>>>>>> 914c44e (update on 05/12/2025)
             self.odom_topic = self.load_param('~odom_topic', 'odom')
             
             # Other parameters
             self.base_frame_id = self.load_param('~base_frame_id', 'base_link')
             self.initial_yaw_offset = self.load_param('~initial_yaw_offset', 0.0)
-<<<<<<< HEAD
-========
-            self.odom_topic = load_param(self, '~odom_topic', 'odom')
-            
-            # Other parameters
-            self.base_frame_id = load_param(self, '~base_frame_id', 'base_link')
-            self.initial_yaw_offset = load_param(self, '~initial_yaw_offset', 0.0)
->>>>>>>> 360ef06 (add svea_localization,modifying to ros2 in progress):src/svea_localization/script/odom_to_path_relay.py
-=======
->>>>>>> 914c44e (update on 05/12/2025)
             
             # TF2
             self.tf_buf = tf2_ros.Buffer()
@@ -98,10 +63,6 @@ class OdomToPathRelay(Node):
             
             # Log status
             self.get_logger().info('{} node initialized.'.format(self.get_name()))
-<<<<<<< HEAD
-<<<<<<<< HEAD:src/svea_localization/scripts/odom_to_path_relay.py
-=======
->>>>>>> 914c44e (update on 05/12/2025)
     
     def load_param(self, name, value=None):
         self.declare_parameter(name, value)
@@ -109,12 +70,6 @@ class OdomToPathRelay(Node):
             assert self.has_parameter(name), f'Missing parameter "{name}"'
         return self.get_parameter(name).value
     
-<<<<<<< HEAD
-========
-            
->>>>>>>> 360ef06 (add svea_localization,modifying to ros2 in progress):src/svea_localization/script/odom_to_path_relay.py
-=======
->>>>>>> 914c44e (update on 05/12/2025)
     def run(self) -> None:
         try:
             rclpy.spin(self)

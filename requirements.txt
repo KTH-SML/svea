@@ -8,14 +8,7 @@
 # You can read more here: https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format
 
 numpy
-<<<<<<< HEAD
-<<<<<<< HEAD
 matplotlib
-=======
->>>>>>> ecc9d3f (Migration to ROS 2 (#55))
-=======
-matplotlib
->>>>>>> 28b1ce8 (encoder and imu high level calibrater)
 
 # This is for MPC
 casadi==3.6.7
@@ -26,20 +19,3 @@ pyubx2
 geopy
 utm
 nats-py
-<<<<<<< HEAD
-
-empy
-numpy
-lark --prefer-binary
-catkin_pkg
-plotly
-<<<<<<< HEAD
-
-=======
-scipy
-matplotlib
->>>>>>> 6567c2c (marker placer complete)
-# This is for NMPC
-casadi==3.6.7
-=======
->>>>>>> 2aad9f5 (Clean up requirements.txt by removing unused packages and ensuring necessary dependencies are listed.)
