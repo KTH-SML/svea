@@ -30,7 +30,11 @@ class PurePursuitController:
     Lfc = 0.6  # look-ahead distance
     K_p = 0.15  # speed control propotional gain
     K_i = 0.01  # speed control integral gain
-
+    
+    # Anti-windup parameters
+    max_velocity = 1.0  # [m/s] maximum velocity output
+    min_velocity = -1.0  # [m/s] minimum velocity output (for reverse)
+    integral_limit = 10.0  # maximum integral error accumulation
 
     L = 0.324  # [m] wheel base of vehicle
 
@@ -76,13 +80,28 @@ class PurePursuitController:
 
         x, y, yaw, vel = state
 
-        # speed control
+        # speed control with anti-windup
         error = self.target_velocity - vel
-        self.error_sum += error * self.dt
+        
+        # Compute proposed velocity before saturation
         P = error * self.K_p
         I = self.error_sum * self.K_i
         correction = P + I
-        return self.target_velocity + correction
+        proposed_velocity = self.target_velocity + correction
+        
+        # Apply velocity limits (saturation)
+        saturated_velocity = max(self.min_velocity, min(self.max_velocity, proposed_velocity))
+        
+        # Anti-windup: only integrate if not saturated or if error would reduce saturation
+        if (proposed_velocity == saturated_velocity or 
+            (proposed_velocity > self.max_velocity and error < 0) or 
+            (proposed_velocity < self.min_velocity and error > 0)):
+            # Update integral term
+            self.error_sum += error * self.dt
+            # Clamp integral term to prevent excessive accumulation
+            self.error_sum = max(-self.integral_limit, min(self.integral_limit, self.error_sum))
+        
+        return saturated_velocity
 
     def find_target(self, state):
         ind = self._calc_target_index(state)

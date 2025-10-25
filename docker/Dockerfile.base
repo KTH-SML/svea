@@ -6,6 +6,25 @@ ARG BUILD_TAG
 ARG ROSDISTRO
 ARG WORKSPACE
 
+
+####################
+## MICROROS IMAGE ##
+####################
+
+FROM ros:${ROSDISTRO}-ros-base AS micro-ros-agent-builder
+
+ARG ROSDISTRO
+ARG DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /svea_ws
+
+RUN . /opt/ros/$ROSDISTRO/setup.sh \
+    &&  git clone -b $ROSDISTRO https://github.com/micro-ROS/micro_ros_msgs src/micro_ros_msgs \
+    &&  git clone -b $ROSDISTRO https://github.com/micro-ROS/micro-ROS-Agent src/micro-ROS-Agent \
+    &&  colcon build \
+    &&  rm -rf log/ build/ src/
+
+
 #####################
 ## SVEA BASE IMAGE ##
 #####################
@@ -16,6 +35,8 @@ ARG ROSDISTRO
 ARG WORKSPACE
 ARG DEBIAN_FRONTEND=noninteractive
 
+COPY --from=micro-ros-agent-builder /svea_ws /svea_ws
+
 ## Install dependencies from apt-get
 
 RUN apt-get update -y && \
@@ -23,18 +44,43 @@ RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
         apt-utils lsb-release \
         build-essential cmake \
+        openssh-server ca-certificates \
         git vim nano curl iputils-ping \
-        python3-tk \
         python3-pip \
-        python3-numpy \
-        python3-matplotlib \
+        python3-rosdep \
+        python3-vcstool \
         python3-colcon-common-extensions \
+        ## Move these to rosdep?
+        ros-$ROSDISTRO-ament-cmake-python \
+        ros-$ROSDISTRO-ros-base=0.11.0-1* \
+        # ros-$ROSDISTRO-rmw-zenoh-cpp \
+        ros-$ROSDISTRO-teleop-twist-keyboard \
+        ros-$ROSDISTRO-nav2-* \
         && \
     rm -rf /var/lib/apt/lists/*
+
+## Set up SSH
+
+RUN mkdir -p /var/run/sshd
+
+# --- Root password login (default: admin) ---
+RUN echo "root:admin" | chpasswd
+
+# SSH config: allow root + password login (keep pubkey auth on too)
+RUN sed -ri 's/^#?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -ri 's/^#?PubkeyAuthentication .*/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -ri 's/^#?UsePAM .*/UsePAM yes/' /etc/ssh/sshd_config
+
+# Expose SSH
+EXPOSE 22
 
 ## Create svea workspace
 
 WORKDIR $WORKSPACE
+
+# Bootstrap rosdep and setup colcon mixin and metadata
+RUN rosdep update --rosdistro $ROSDISTRO
 
 # Need to copy src and util separately because docker COPY rules are iffy.
 # https://docs.docker.com/engine/reference/builder/#copy
@@ -42,8 +88,14 @@ COPY src ./src
 COPY util ./util
 COPY entrypoint requirements.txt ./
 
-RUN cp -f entrypoint /ros_entrypoint.sh && \
-    apt-get update -y && \
+# Automatically import extra dependencies if dependency_repos.repos exists
+# in src, git clone --recursive https://github.com/MOCAP4ROS2-Project/mocap4ros2_qualisys.git
+RUN if [ -f src/mocap4ros2_qualisys/dependency_repos.repos ]; then \
+      vcs import src < src/mocap4ros2_qualisys/dependency_repos.repos; \
+    fi
+
+# Install dependencies via rosdep and pip
+RUN apt-get update -y && \
     rosdep update \
         --rosdistro $ROSDISTRO \
         && \
@@ -53,21 +105,35 @@ RUN cp -f entrypoint /ros_entrypoint.sh && \
         --ignore-src \
         -qry \
         && \
-    pip install -r requirements.txt && \
+    pip install \
+        --break-system-packages \
+        -r requirements.txt \
+        && \
     rm -rf /var/lib/apt/lists/*
 
-# Run catkin build on workspace (improves build speeds later on).
-RUN catkin config \
-        --init \
-        --mkdirs \
-        --extend /opt/ros/$ROSDISTRO \
-        > /dev/null \
-        && \
-    catkin build
+# Ensure proper environment setup before build
+ENV CMAKE_PREFIX_PATH="/opt/ros/$ROSDISTRO"
 
-##  Container entrypoint (executes util/entrypoint)
+# Build the ROS 2 workspace
+RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
+    colcon build --symlink-install"
 
-ENTRYPOINT ["/ros_entrypoint.sh"]
+COPY firmware/disable_fastdds_shm.xml \
+     firmware/disable_fastdds_shm_localhost_only.xml \
+     /tmp/
+ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+ENV MICROROS_DISABLE_SHM=1
 
-# bash is run by default when user starts
+# Source the setup file in the .bashrc for convenience
+RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \
+    echo "source /svea_ws/install/setup.bash" >> ~/.bashrc && \
+    echo "source /svea_ws/install/local_setup.bash" >> ~/.bashrc
+
+##  Container entrypoint and default command
+
+# For fixing WSL error. TODO: investigate further
+RUN chmod +x ./entrypoint
+
+ENTRYPOINT ["./entrypoint"]
+
 CMD ["bash"]

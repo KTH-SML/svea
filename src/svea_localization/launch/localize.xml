@@ -20,7 +20,7 @@
     <arg name="map_file"                default="/svea_ws/src/svea_core/maps/sml.yaml"/>
 
     <!-- Lidar  -->
-    <arg name="lidar_ip"                default="192.168.3.11" />
+    <arg name="lidar_ip"                default="192.168.0.10" />
 
     <!-- GPS -->
     <arg name="start_rtk"               default="false"/>
@@ -63,14 +63,20 @@
     </node> -->
 
         <!-- start all sensors if this is not a simulation -->
-    <group unless="$(eval '\'$(var is_sim)\' == \'true\'')">
+    <group unless="$(var is_sim)">
         <let name="use_sim_time" value="false"/>
         <!-- <let name="use_sim_time" value="$(eval '\'$(var use_sim_time)\' == \'true\'')"/> -->
-        <group if="$(eval '\'$(var is_indoors)\' == \'true\'')">
+        <group if="$(var is_indoors)">
             <!-- Start Lidar -->
             <include file="$(find-pkg-share svea_localization)/launch/lidar.xml">
                 <arg name="lidar_ip"                    value="$(var lidar_ip)"/>
             </include>
+
+	    <include file="$(find-pkg-share svea_localization)/launch/localization.py">
+		    <arg name="intial_pose_x" value="$(var initial_pose_x)"/>
+		    <arg name="intial_pose_y" value="$(var initial_pose_y)"/>
+		    <arg name="intial_pose_a" value="$(var initial_pose_a)"/>
+	    </include>
 
             <!-- Lifecycle Manager for Map Server -->
             <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
@@ -79,13 +85,13 @@
             </node> -->
 
             <!-- Start AMCL -->
-            <!-- <node pkg="nav2_amcl" exec="amcl" name="amcl_localization" output="screen">
+            <node pkg="nav2_amcl" exec="amcl" name="amcl_localization" output="screen">
                 <param from="$(find-pkg-share svea_localization)/params/localize.yaml"/>
                 <param name="scan"              value="/scan"/>
                 <param name="initial_pose_x"    value="$(var initial_pose_x)" />
                 <param name="initial_pose_y"    value="$(var initial_pose_y)" />
                 <param name="initial_pose_a"    value="$(var initial_pose_a)" />
-            </node> -->
+            </node>
 
             <!-- Lifecycle Manager for AMCL -->
            <!-- <node pkg="nav2_lifecycle_manager" exec="lifecycle_manager" name="lifecycle_manager_loc" output="screen">
@@ -121,8 +127,8 @@
     <!-- Robot localization (Local EKF)-->
     <node pkg="robot_localization" exec="ekf_node" name="ekf_local" output="screen">
         <param from="$(find-pkg-share svea_localization)/params/local_ekf.yaml" />
-        <param name="imu0"                  value="/lli/sensor/imu"/>
-        <param name="twist0"                value="/lli/sensor/encoders"/>
+        <param name="imu0"                  value="/imu/filtered"/>
+        <param name="twist0"                value="/encoder/filtered"/>
         <remap from="/odometry/filtered"    to="/odometry/local"/>
         <!-- TODO: <remap from="/set_pose"             to="/global/set_pose"/>  -->
     </node>

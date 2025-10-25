@@ -3,7 +3,7 @@
 <launch>
 
     <!-- Launch file arguments -->
-    <arg name="use_sim_time"  default="True"/>
+    <arg name="use_sim_time"  default="true"/>
 
     <!-- Launch Low-Level Micro-Ros -->
     <executable cmd="$(find-pkg-share svea_core)/util/start_micro_ros.sh" output="screen"/>

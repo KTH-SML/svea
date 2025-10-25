@@ -19,29 +19,22 @@ fi
 # Other docker arguments
 append ARGS \
     -it \
+    -p 2222:22 \
+    -p "8765:8765" \
     -v "$SHARED_VOLUME" \
     -e "TERM=xterm-256color" \
-    --rm \
+    --rm
 
-if istrue DEV; then
+# Enable device access for non-dev / non-macOS hosts
+if ! (istrue DEV || is_darwin); then
     append ARGS \
-        -p "8765:8765"
-else
-    # On macOS, reduce privileges to avoid Docker Desktop issues
-    if is_darwin; then
-        append ARGS \
-            --privileged \
-            --network host
-    else
-        append ARGS \
-            -v "/dev:/dev" \
-            --network host \
-            --privileged
-    fi
+        -v "/dev:/dev" \
+        --privileged
 fi
 
+# Image to run
 append ARGS \
     "$IMAGE_TAG"
 
-# Can be debugged with DEBUG=1 env var
+# Debug command with DEBUG=1
 call $CMD $ARGS

@@ -8,6 +8,7 @@
 # You can read more here: https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format
 
 numpy
+matplotlib
 
 # This is for MPC
 casadi==3.6.7

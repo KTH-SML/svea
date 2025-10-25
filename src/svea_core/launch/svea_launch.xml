@@ -38,6 +38,11 @@
             <arg name="initial_pose_y" value="$(var initial_pose_y)" />
             <arg name="initial_pose_a" value="$(var initial_pose_a)" />
         </include>
+
+        <!--LLI fixers-->
+        <node pkg="svea_core" exec="encoder_filter.py" name="encoder_filter" output="screen"/>
+        <node pkg="svea_core" exec="imu_bias_remover.py" name="imu_bias_remover" output="screen"/>
+        <!-- <node pkg="svea_core" exec="lidar_timer.py" name="lidar_timer" output="screen"/> -->
     </group>
 
 

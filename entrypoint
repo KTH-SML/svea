@@ -6,6 +6,9 @@
 
 set -e
 
+# Start SSH
+service ssh start
+
 # Get project information
 source util/config.sh
 
