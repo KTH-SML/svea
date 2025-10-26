@@ -1,10 +1,22 @@
-__pycache__/
-**/__pycache__/
-*.py[cod]
-*$py.class
-log/
-**/teleopsvea/
-test.ipynb
-**/motion_capture_system/
+# Linux
+*~
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# VS Code
 .vscode/
-el2425/
+
+# Python
+__pycache__/
+*.pyc
+
+# mkdocs
+venv/
+site/
+

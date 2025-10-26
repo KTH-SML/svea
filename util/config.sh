@@ -12,27 +12,27 @@
 
 main() {
 
-    if isempty BUILD_CONFIG && is_darwin; then
-        BUILD_CONFIG="arm64"
-    fi
-
-
     withdefault DEBUG "0"
+    withdefault BUILD_CONFIG "host"
 
     withdefault ROSDISTRO       "jazzy"
     withdefault WORKSPACE       "/svea_ws"
     withdefault REPOSITORY_PATH "$(climb entrypoint)"
     withdefault REPOSITORY_NAME "$(basename "$REPOSITORY_PATH")"
 
-    if is_arm64; then
-        withdefault BUILD_CONFIG    "arm64"
-    else
-        withdefault BUILD_CONFIG    "host"
-    fi
+    ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
 
-    if [ "$BUILD_CONFIG" = "host" ]; then
-        # building for host platform
-        withdefault BUILD_PLATFORM  "$(uname -m)"
+    # If host or base-host, then update to host's platform
+    _host="$(is_arm64 && echo "arm64" || echo "amd64";)"
+    BUILD_CONFIG="$(                        \
+        switch "$BUILD_CONFIG"              \
+            "host"          "$_host"        \
+            "base-host"     "base-$_host"   \
+                            "$BUILD_CONFIG" \
+    )"
+
+    if [ "$BUILD_CONFIG" = "amd64" ]; then
+        withdefault BUILD_PLATFORM  "linux/amd64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
         withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ghcr.io/kth-sml/svea:latest"
@@ -207,8 +207,9 @@ ifelse() {
 }
 
 # If VALUE equals COND then echo RET, otherwise shift
-# and continue with following arguments
-# > switch VALUE [[COND RET]...]
+# and continue with following arguments. If no case is
+# matched, echo DEFAULT or "".
+# > switch VALUE [[COND RET]...] [DEFAULT]
 switch() {
     VALUE="$1"
     shift
