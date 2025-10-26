@@ -191,6 +191,12 @@ echovar() {
     eval "echo \"$1=\$$1\""
 }
 
+# Echo to stderr
+# > echoerr STR...
+echoerr() {
+    echo "$@" 1>&2
+}
+
 # Set shell variable with default
 # > withdefault NAME DEFAULT
 withdefault() {
@@ -213,11 +219,13 @@ ifelse() {
 switch() {
     VALUE="$1"
     shift
-    if [ "$VALUE" = "$1" ]; then 
-        echo "$2"
-    elif [ "$#" -ge 2 ]; then
-        shift 2
-        switch "$VALUE" "$@"
+    if [ "$#" -ge 2 ]; then
+        if [ "$VALUE" = "$1" ]; then 
+            echo "$2"
+        else
+            shift 2
+            switch "$VALUE" "$@"
+        fi
     else
         echo "$@" # echo nothing or remaining arg
     fi
