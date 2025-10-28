@@ -5,6 +5,7 @@
 ARG BUILD_TAG
 ARG ROSDISTRO
 ARG WORKSPACE
+ARG USER_CREDENTIALS
 
 
 ####################
@@ -33,6 +34,7 @@ FROM ${BUILD_TAG:-ros:latest}
 
 ARG ROSDISTRO
 ARG WORKSPACE
+ARG USER_CREDENTIALS
 ARG DEBIAN_FRONTEND=noninteractive
 
 COPY --from=micro-ros-agent-builder /svea_ws /svea_ws
@@ -64,7 +66,10 @@ RUN apt-get update -y && \
 RUN mkdir -p /var/run/sshd
 
 # --- Root password login (default: admin) ---
-RUN echo "root:A235pass." | chpasswd
+# Bash reminder:
+#   username="${creds%%:*}"  # remove everything after the first ':'
+#   password="${creds#*:}"   # remove everything before the first ':'
+RUN echo "root:${USER_CREDENTIALS#*:}" | chpasswd
 
 # SSH config: allow root + password login (keep pubkey auth on too)
 RUN sed -ri 's/^#?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
