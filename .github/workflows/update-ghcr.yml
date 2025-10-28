@@ -33,6 +33,7 @@ jobs:
     - name: Build the Docker image
       env:
         BUILD_CONFIG: ghcr
+        USER_CREDENTIALS: ${{ secrets.USER_CREDENTIALS }}
       run: util/build
 
     - name: Log out from GitHub Container Registry
