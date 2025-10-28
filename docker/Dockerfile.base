@@ -64,7 +64,7 @@ RUN apt-get update -y && \
 RUN mkdir -p /var/run/sshd
 
 # --- Root password login (default: admin) ---
-RUN echo "root:admin" | chpasswd
+RUN echo "root:A235pass." | chpasswd
 
 # SSH config: allow root + password login (keep pubkey auth on too)
 RUN sed -ri 's/^#?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
