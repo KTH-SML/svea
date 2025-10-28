@@ -21,9 +21,11 @@ append ARGS \
     --platform "$BUILD_PLATFORM" \
     --build-arg "BUILD_TAG=$BUILD_TAG" \
     --build-arg "ROSDISTRO=$ROSDISTRO" \
-    --build-arg "WORKSPACE=$WORKSPACE" \
-    --build-arg "USER_CREDENTIALS=$USER_CREDENTIALS"
-    
+    --build-arg "WORKSPACE=$WORKSPACE"
+
+if [ "$BUILD_FILE" = "docker/Dockerfile.base" ]; then 
+    append ARGS --build-arg "USER_CREDENTIALS=$USER_CREDENTIALS"
+fi  
 
 # Special case for TX2s that have old version of docker
 if [ "$(jetson_release)" = "R32" ]; then
