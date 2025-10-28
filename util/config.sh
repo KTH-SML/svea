@@ -74,12 +74,16 @@ main() {
         withdefault BUILD_PLATFORM  "linux/arm64,linux/amd64"
         withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
         withdefault BUILD_FILE      "docker/Dockerfile.base"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO"
+        withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
         withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "1"
     else
         echo "Error: Unknown BUILD_CONFIG \"$BUILD_CONFIG\""
         exit 1
+    fi
+
+    if [ "$BUILD_FILE" = "docker/Dockerfile.base" ]; then
+        withdefault USER_CREDENTIALS "svea:SVEA-Pass!" # TODO: Setup regular user instead of root
     fi
 
     withdefault CONTAINER_NAME "$REPOSITORY_NAME"
