@@ -32,6 +32,17 @@
     world_frame: map           # Defaults to the value of odom_frame if unspecified
 
     ##########################################
+    # Initial State ##########################
+
+    initial_state: [
+        0.0, 0.0, 0.0,    #         x,         y,         z,
+        0.0, 0.0, 0.0,    #      roll,     pitch,       yaw,
+        0.0, 0.0, 0.0,    #     x_dot,     y_dot,     z_dot,
+        0.0, 0.0, 0.0,    #  roll_dot, pitch_dot,   yaw_dot,
+        0.0, 0.0, 0.0     # x_dot_dot, y_dot_dot, z_dot_dot,
+    ]
+
+    ##########################################
     # GPS Odometry ###########################
     odom0: odometry/gps
 

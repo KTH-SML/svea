@@ -15,6 +15,8 @@ Desktop.ini
 # Python
 __pycache__/
 *.pyc
+**/__pycache__/
+**/*.pyc
 
 # mkdocs
 venv/

@@ -36,10 +36,13 @@ class LocalizationInterface(rx.Field):
     as state information is available.
     """
 
-    class _InterfaceParameters(rx.NamedField):
-        odom_top = rx.Parameter('odometry/local')
+    localization = rx.namespace(
+        map_frame = rx.Parameter('map'),
+        odom_frame = rx.Parameter('self/odom'),
+        base_frame = rx.Parameter('self/base_link'),
+        odom_top = rx.Parameter('odometry/local'),
+    )
 
-    _params = _InterfaceParameters(name='localization')
     _odom_msg = Odometry()
 
     def __init__(self) -> None:
@@ -57,7 +60,7 @@ class LocalizationInterface(rx.Field):
         self.node.get_logger().info("Localization interface is ready.")
         return self._is_started
         
-    @rx.Subscriber(Odometry, _params.odom_top, qos_profile=qos_profile)
+    @rx.Subscriber(Odometry, localization.odom_top, qos_profile=qos_profile)
     def _odom_cb(self, msg: Odometry) -> None:
         if not self._is_started():
             return
@@ -72,8 +75,8 @@ class LocalizationInterface(rx.Field):
     def transform_odom(
         self,
         odom: Odometry,
-        pose_target: str = "map",
-        twist_target: str = "base_link",
+        pose_target: str | None = None,
+        twist_target: str | None = None,
         timeout_s: float = 0.2,
     ) -> Odometry:
         """
@@ -87,6 +90,11 @@ class LocalizationInterface(rx.Field):
         """
 
         assert self._is_started(), 'Localization interface not started yet'
+
+        if pose_target is None:
+            pose_target = self.localization.map_frame
+        if twist_target is None:
+            twist_target = self.localization.base_frame
 
         # ---- Source frames from the incoming message ----
         pose_source  = odom.header.frame_id or ""

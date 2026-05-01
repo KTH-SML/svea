@@ -76,12 +76,13 @@ class sim_lidar(rx.Node):
 
     ## Parameters ##
     odometry_top = rx.Parameter('odometry/local')
+    laser_frame = rx.Parameter('laser')
     _viz_points_topic = 'viz_lidar_points'
     _viz_rays_topic = 'viz_lidar_rays'
     _viz_edges_topic = 'viz_edges'
 
     ## Publishers ##
-    _scan_pub = rx.Publisher(LaserScan, '/scan', qos_pubber)
+    _scan_pub = rx.Publisher(LaserScan, 'scan', qos_pubber)
     _viz_points_pub = rx.Publisher(PointCloud, _viz_points_topic, qos_pubber)
     _viz_rays_pub = rx.Publisher(Marker, _viz_rays_topic, qos_pubber)
     _viz_edges_pub = rx.Publisher(Marker, _viz_edges_topic, qos_pubber)
@@ -129,7 +130,7 @@ class sim_lidar(rx.Node):
 
         self._scan_msg = LaserScan()
         self._scan_msg.header.stamp = rclpy.clock.Clock().now().to_msg()
-        self._scan_msg.header.frame_id = 'laser'
+        self._scan_msg.header.frame_id = self.laser_frame
         self._scan_msg.angle_min = self.ANGLE_MIN
         self._scan_msg.angle_max = self.ANGLE_MAX
         self._scan_msg.angle_increment = self.INCREMENT

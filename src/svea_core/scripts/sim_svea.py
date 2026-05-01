@@ -5,7 +5,10 @@ Simulation module for the SVEA platform. Creates fake ROS
 subscriptions and publications that match the real car platform.
 Intended for debugging code BEFORE running on a real car.
 
-Author: Frank Jiang
+Contributors:
+- Frank Jiang
+- Kaj Munhoz Arfvidsson
+- Li Chen
 """
 
 import math
@@ -29,7 +32,6 @@ qos_pubber = QoSProfile(
     history=QoSHistoryPolicy.KEEP_LAST,
     depth=1,
 )
-
 
 qos_subber = QoSProfile(
     reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
@@ -68,20 +70,24 @@ class sim_svea(rx.Node):
     ## Parameters ##
 
     time_step = 0.025
-    publish_tf = rx.Parameter(True)
 
+    initial_pose_x = rx.Parameter(0.0)
+    initial_pose_y = rx.Parameter(0.0)
+    initial_pose_a = rx.Parameter(0.0)
+
+    odometry_top = rx.Parameter('odometry/local')
+
+    # In simulation, we want lli to be namespaced
     steering_request_top = rx.Parameter('lli/ctrl/steering')
     throttle_request_top = rx.Parameter('lli/ctrl/throttle')
     highgear_request_top = rx.Parameter('lli/ctrl/highgear')
     diff_request_top = rx.Parameter('lli/ctrl/diff')
 
-    odometry_top = rx.Parameter('odometry/local')
-
     map_frame = rx.Parameter('map')
     odom_frame = rx.Parameter('odom')
-    self_frame = rx.Parameter('base_link')
-    
-    state = rx.Parameter([0.0, 0.0, 0.0, 0.0])  # x, y, yaw, velocity
+    base_frame = rx.Parameter('base_link')
+
+    publish_tf = rx.Parameter(True)
 
     ## Publishers ##
     odometry_pub = rx.Publisher(Odometry, odometry_top, qos_pubber)
@@ -92,12 +98,12 @@ class sim_svea(rx.Node):
     def steering_request_cb(self, steering_request_msg):
         self.steering_req = steering_request_msg.data * -1
         self.last_ctrl_time = self.clock.now().to_msg()
-    
+
     @rx.Subscriber(Int8, throttle_request_top, qos_subber)
     def throttle_request_cb(self, throttle_request_msg):
         self.velocity_req = throttle_request_msg.data
         self.last_ctrl_time = self.clock.now().to_msg()
-    
+
     @rx.Subscriber(Bool, highgear_request_top, qos_subber)
     def highgear_request_cb(self, highgear_request_msg):
         self.highgear = highgear_request_msg.data
@@ -116,15 +122,16 @@ class sim_svea(rx.Node):
         self.last_ctrl_time = self.clock.now().to_msg()
         self.last_pub_time = self.clock.now().to_msg()
 
-        self.model = Bicycle4DWithESC(initial_state=self.state)
+        self.model = Bicycle4DWithESC(initial_state=[
+            self.initial_pose_x,
+            self.initial_pose_y,
+            self.initial_pose_a,
+            0.0,
+        ])
         self.steering_req = 0.0
         self.velocity_req = 0.0
         self.highgear = False
         self.diff = False
-
-        namespace = self.get_namespace()
-        self.odom_frame = namespace + '/' + self.odom_frame if namespace != '/' else self.odom_frame
-        self.self_frame = namespace + '/' + self.self_frame if namespace != '/' else self.self_frame
 
         if self.publish_tf:
             # for broadcasting fake tf tree
@@ -154,7 +161,7 @@ class sim_svea(rx.Node):
         odom_msg = Odometry()
         odom_msg.header.stamp = curr_time
         odom_msg.header.frame_id = self.map_frame
-        odom_msg.child_frame_id = self.self_frame
+        odom_msg.child_frame_id = self.base_frame
         odom_msg.header.stamp = curr_time
         odom_msg.pose.pose.position.x = x
         odom_msg.pose.pose.position.y = y
@@ -202,7 +209,7 @@ class sim_svea(rx.Node):
         odom2base = TransformStamped()
         odom2base.header.stamp = odom_msg.header.stamp
         odom2base.header.frame_id = self.odom_frame
-        odom2base.child_frame_id = self.self_frame
+        odom2base.child_frame_id = self.base_frame
         odom2base.transform.translation.x = odom_msg.pose.pose.position.x
         odom2base.transform.translation.y = odom_msg.pose.pose.position.y
         odom2base.transform.translation.z = odom_msg.pose.pose.position.z

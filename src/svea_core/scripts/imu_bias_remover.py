@@ -30,8 +30,10 @@ class imu_bias_remove(rx.Node):
     sample_count = 100
     sample_counter = 0
 
+    frame_id = rx.Parameter('imu')
+
     ## Publishers ##
-    imu_re_pub = rx.Publisher(Imu, '/imu/filtered', qos_pubber)
+    imu_re_pub = rx.Publisher(Imu, '/lli/filtered/imu', qos_pubber)
 
     ## Subscribers ##
     @rx.Subscriber(Imu, '/lli/sensor/imu', qos_subber)
@@ -53,6 +55,7 @@ class imu_bias_remove(rx.Node):
                 self.get_logger().info(f"IMU bias sampled: angular_z: {self.bias_angular_z}, linear_x: {self.bias_linear_x}, linear_y: {self.bias_linear_y}")
         
         else:
+            imu_msg.header.frame_id = self.frame_id
             imu_msg.angular_velocity.z -= self.bias_angular_z
             imu_msg.angular_velocity.z = imu_msg.angular_velocity.z / 4.0
             imu_msg.linear_acceleration.x -= self.bias_linear_x

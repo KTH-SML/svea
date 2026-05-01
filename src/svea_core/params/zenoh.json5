@@ -1,0 +1,52 @@
+{
+  plugins: {
+    ros2dds: {
+
+      ////
+      //// allow / deny: Specify the lists of ROS 2 interfaces that are allowed or denied to be routed over Zenoh.
+      ////               Each element of the lists is a regular expression that must match the full interface name.
+      ////               You cannot set both 'allow' and 'deny' in the same configuration.
+      ////               If neither 'allow' nor 'deny' are set, all interfaces are allowed.
+      ////               Use 'allow' to allow only the specified interfaces. If an interface type is set to an empty list
+      ////               or is not specified at all, it means that NO such interface is allowed.
+      ////               Use 'deny' to allow all except the specified interfaces. If an interface type is set to an empty list
+      ////               or is not specified at all, it means that ALL such interface are allowed.
+      allow: {
+        publishers: ["/fleet/.+"],
+        subscribers: ["/fleet/.+"],
+        service_servers: ["/fleet/.+"],
+        service_clients: ["/fleet/.+"],
+        action_servers: ["/fleet/.+"],
+        action_clients: ["/fleet/.+"],
+      },
+
+      "timestamp_check": {
+        "enabled": false
+      }
+
+    },
+
+  },
+
+  ////
+  //// Which endpoints to connect to. E.g. tcp/localhost:7447.
+  //// By configuring the endpoints, it is possible to tell zenoh which remote router or other zenoh-bridge-ros2dds to connect to at startup.
+  ////
+  connect: {
+    endpoints: [
+      "tcp/labs.itrl.kth.se:7447"
+    ]
+  },
+
+  ////
+  //// Configure the scouting mechanisms and their behaviours
+  ////
+  scouting: {
+    /// The UDP multicast scouting configuration.
+    multicast: {
+      /// Whether multicast scouting is enabled or not
+      enabled: false,
+    },
+  },
+
+}

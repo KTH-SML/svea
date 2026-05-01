@@ -236,7 +236,9 @@ class Resource:
 
         Args:
             owner (Resource): The parent resource that owns this one.
-            name (str | None): Optional name override for this resource.
+            name (str | Callable[[], str] | None):
+                Optional name override for this resource. Can be lazy-evaluated
+                via a callable returning a string.
             ns (str | None): Optional namespace override for this resource.
 
         Raises:
@@ -252,11 +254,13 @@ class Resource:
 
         if owner is self:
             assert self.__rosonic_name__ is not None, f"Root resource '{self}' must have a name"
+            assert not callable(self.__rosonic_name__), f"Root resource '{self}' name cannot be lazy-evaluated"
         else:
             assert owner._is_registered(), f"Resource '{owner}' owning '{self}' is not registered"
 
             # The following check only makes sense for non-root, named resources
-            if self.__rosonic_name__ is not None:
+            # NOTE: Does this make sense at all? Some resources may want the same name, e.g. pub/sub pairs.
+            if self.__rosonic_name__ is not None and not callable(self.__rosonic_name__):
                 fullname = f"{owner.__rosonic_fullname__}/{self.__rosonic_name__}"
                 assert fullname not in self.__rosonic_lookup__, \
                     f"Resource '{fullname}' already registered"
@@ -286,6 +290,9 @@ class Resource:
         name = self.__rosonic_name__
         owner = self.__rosonic_owner__
 
+        if callable(name):
+            name = '?'
+
         if name is None:
             return owner.__rosonic_fullname__
         elif self._is_root() or self._is_absolute_name(name):
@@ -311,6 +318,9 @@ class Resource:
         
         name = self.__rosonic_name__
         owner = self.__rosonic_owner__
+
+        if callable(name):
+            name = '?'
 
         if name is None:
             return owner.__rosonic_relname__
@@ -361,6 +371,16 @@ class Resource:
             resource.__rosonic_startup__(node)
 
         self.__rosonic_node__ = node
+
+        # resolve lazy name if any
+        if callable(self.__rosonic_name__):
+            self.__rosonic_name__ = self.__rosonic_name__()
+
+        if isinstance(self.__rosonic_name__, str):
+            self.__rosonic_name__ = self.__rosonic_name__.format(
+                parent=self.__rosonic_owner__.__rosonic_relname__,
+                parent_fullname=self.__rosonic_owner__.__rosonic_fullname__,
+            )
 
         self.on_startup()
 
@@ -430,6 +450,23 @@ class Resource:
         return (self if self._is_root() else
                 self._get_root())
 
+    def start(self, node: Node):
+        """
+        Starts this resource manually.
+
+        This method can be used to start a resource outside of the normal node
+        startup sequence. It invokes `__rosonic_startup__()` with the provided
+        node.
+
+        Args:
+            node (Node): The ROS 2 node instance to associate with this
+            resource.
+
+        Raises:
+            AssertionError: If the resource is already started.
+        """
+        assert not self._is_started(), f"Resource '{self}' is already started"
+        self.__rosonic_startup__(node)
 
 # Only for typing
 class _RegisteredResource(Resource):
@@ -442,6 +479,8 @@ class _StartedResource(_RegisteredResource):
 
     __rosonic_node__: NodeBase
 
+
+### Base Resource Types
 
 class Node(Resource, NodeBase):
     """
@@ -587,6 +626,14 @@ class NamedField(Field):
 
         owner.__rosonic_preregistered__ += (self,)
 
+
+def namespace(name=None, /, **resources):
+    ns = type('Namespace', (NamedField,), resources)
+    return ns(name=name)
+
+
+###  Resource Types
+
 class Parameter(NamedField):
     """
     Declarative Parameter resource.
@@ -611,6 +658,7 @@ class Parameter(NamedField):
     ### Notes:
     - The parameter is not resolved (no value) until node startup is complete.
     - Until then, accessing the field will return the Parameter object itself.
+    - TODO: Dynamically updatable parameters?
     """
 
     def __init__(self, *args, name: str | None = None):
@@ -640,8 +688,10 @@ class Parameter(NamedField):
         node = self.__rosonic_node__
         name = self.__rosonic_relname__
         
-        if self.value is ...:
+        if not node.has_parameter(name):
             node.declare_parameter(name, *self.args)
+
+        if self.value is ...:
             self.value = node.get_parameter(name).value
     
 class Publisher(NamedField):
@@ -691,13 +741,20 @@ class Publisher(NamedField):
 
         Args:
             msg_type (type): The message type (e.g., `std_msgs.msg.String`).
-            topic (str | Parameter): Topic name as string or Parameter
-            reference.
+            topic (None | str | Parameter): Topic name as string or Parameter
+            reference, None to use the default resource name.
             qos_profile: Optional QoSProfile for the publisher.
         """
-        super().__init__(name=topic if topic is str else None)
+
+        # If topic is Parameter, we cannot assign the topic name as a rosonic resource name.
+        # In that case, we leave it '?' and let the publisher lazily evaluate the name.
+        def lazy_name():
+            assert isinstance(topic, Parameter), "lazy_name should only be used with Parameter topics"
+            assert topic._is_started(), f"Resource '{self}' depend on '{topic}' which has not started yet"
+            return topic.value
+
+        super().__init__(name=lazy_name if isinstance(topic, Parameter) else topic)
         self.msg_type = msg_type
-        self.topic = topic
         self.qos_profile = qos_profile
         self.publisher = None
 
@@ -719,13 +776,8 @@ class Publisher(NamedField):
         """
         node = self.__rosonic_node__
         msg_type = self.msg_type
-        topic = (self.topic if self.topic is not None else 
-                 self.__rosonic_fullname__)
+        topic = self.__rosonic_relname__
         qos_profile = self.qos_profile or rclpy.qos.qos_profile_default
-
-        if isinstance(topic, Parameter):
-            assert topic._is_started(), f"Resource '{self}' depend on '{topic}' which has not started yet"
-            topic = topic.value
 
         if not isinstance(msg_type, type):
             raise RuntimeError(f"Message type must be a class, not {type(msg_type)}")
@@ -779,15 +831,22 @@ class Subscriber(NamedField):
 
         Args:
             msg_type (type): The message type (e.g., `std_msgs.msg.String`).
-            name (str | Parameter): Topic name as string or Parameter
-            reference.
+            name (None | str | Parameter):
+                Topic name as string or Parameter reference. None to use the default
+                resource name.
             qos_profile: Optional QoSProfile for the subscriber.
         """
 
-        super().__init__(name=topic if topic is str else None)
+        # If topic is Parameter, we cannot assign the topic name as a rosonic resource name.
+        # In that case, we leave it '?' and let the publisher lazily evaluate the name.
+        def lazy_name():
+            assert isinstance(topic, Parameter), "lazy_name should only be used with Parameter topics"
+            assert topic._is_started(), f"Resource '{self}' depend on '{topic}' which has not started yet"
+            return topic.value
+
+        super().__init__(name=lazy_name if isinstance(topic, Parameter) else topic)
         self.subscriber = None
         self.msg_type = msg_type
-        self.topic = topic
         self.qos_profile = qos_profile
         self.subscriber = None
         self.callback = None
@@ -812,13 +871,8 @@ class Subscriber(NamedField):
 
         node = self.__rosonic_node__
         msg_type = self.msg_type
-        topic = (self.topic if self.topic is not None else 
-                 self.__rosonic_fullname__)
+        topic = self.__rosonic_relname__
         qos_profile = self.qos_profile or rclpy.qos.qos_profile_default
-
-        if isinstance(topic, Parameter):
-            assert topic._is_started(), f"Resource '{self}' depend on '{topic}' which has not started yet"
-            topic = topic.value
 
         if not isinstance(msg_type, type):
             raise RuntimeError(f"Message type must be a class, not {type(msg_type)}")
@@ -915,7 +969,7 @@ class Timer(NamedField):
         owner = self.__rosonic_owner__
         period = self.period
         if isinstance(period, Parameter):
-            assert _is_started(period), f"Resource '{self}' depend on '{period}' which has not started yet"
+            assert self._is_started(period), f"Resource '{self}' depend on '{period}' which has not started yet"
             period = period.value
         wrapped_callback = lambda: self.callback(owner)
         self.tmr = node.create_timer(period, wrapped_callback, **self.kwds)

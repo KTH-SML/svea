@@ -69,7 +69,7 @@ RUN mkdir -p /var/run/sshd
 # Bash reminder:
 #   username="${creds%%:*}"  # remove everything after the first ':'
 #   password="${creds#*:}"   # remove everything before the first ':'
-RUN echo "root:${USER_CREDENTIALS#*:}" | chpasswd
+RUN echo "${USER_CREDENTIALS%%:*}:${USER_CREDENTIALS#*:}" | chpasswd
 
 # SSH config: allow root + password login (keep pubkey auth on too)
 RUN sed -ri 's/^#?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
@@ -98,6 +98,12 @@ COPY entrypoint requirements.txt ./
 RUN if [ -f src/mocap4ros2_qualisys/dependency_repos.repos ]; then \
       vcs import src < src/mocap4ros2_qualisys/dependency_repos.repos; \
     fi
+
+# Zenoh
+RUN echo "deb [trusted=yes] https://download.eclipse.org/zenoh/debian-repo/ /" | tee -a /etc/apt/sources.list > /dev/null && \
+    apt update -y && \
+    apt install --no-install-recommends -y zenoh-bridge-ros2dds && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install dependencies via rosdep and pip
 RUN apt-get update -y && \

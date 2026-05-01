@@ -20,7 +20,8 @@ fi
 append ARGS \
     -it \
     -p 2222:22 \
-    -p "8765:8765" \
+    -p 7447:7447 \
+    -p 8765:8765 \
     -v "$SHARED_VOLUME" \
     -e "TERM=xterm-256color" \
     --rm

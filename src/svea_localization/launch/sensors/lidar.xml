@@ -5,8 +5,8 @@
 
 <launch>
     <!-- Launch file arguments -->
-    <arg name="lidar_ip"                    default="192.168.3.11" />
-    <arg name="lidar_frame_id"              default="laser"/>
+    <arg name="lidar_ip"                    default="192.168.0.10" />
+    <arg name="lidar_frame"                 default="laser"/>
     <arg name="lidar_calibrate_time"        default="false"/>
     <arg name="lidar_publish_intensity"     default="true"/>
     <arg name="lidar_publish_multiecho"     default="false"/>
@@ -15,7 +15,7 @@
 
     <node pkg="urg_node" exec="urg_node_driver" name="Hokyoulidar">
         <param name="ip_address"        value="$(var lidar_ip)" />
-        <param name="frame_id"          value="$(var lidar_frame_id)"/>
+        <param name="laser_frame_id"          value="$(var lidar_frame)"/>
         <param name="calibrate_time"    value="$(var lidar_calibrate_time)"/>
         <param name="publish_intensity" value="$(var lidar_publish_intensity)"/>
         <param name="publish_multiecho" value="$(var lidar_publish_multiecho)"/>

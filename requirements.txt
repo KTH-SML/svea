@@ -8,7 +8,8 @@
 # You can read more here: https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format
 
 numpy
-matplotlib
+matplotlib # For plotting the localization results and map
+pillow # for coloring the markers
 
 # This is for MPC
 casadi==3.6.7

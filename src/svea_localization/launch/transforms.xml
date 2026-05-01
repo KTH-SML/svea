@@ -1,22 +1,50 @@
 <launch>
-  <!-- Launch file arguments -->
-  <arg name="is_indoors" default="true" description="Whether the robot is operating indoors"/>
-  
-  <!-- Static transforms -->
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="odommap_broadcaster"
-      args="--x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id map --child-frame-id odom"/>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="baselinkodom_broadcaster"
-      args="--x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id odom --child-frame-id base_link" />
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="imulink_broadcaster" 
-      args="--x 0.10 --y -0.047 --z 0.17 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id imu"/>
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="gpslink_broadcaster" 
-      args="--x 0.04 --y 0.103 --z 0.140 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id gps"/>
-  
-  <!-- Conditional lidar transform (ROS2 doesn't have <group> but supports if/unless on nodes) -->
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="lidarlink_broadcaster" 
-        args="--x 0.385 --y 0 --z 0.15 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id laser"
-        if="$(var is_indoors)"/>
+    <!-- Arguments BEGIN -->
 
-  <node pkg="tf2_ros" exec="static_transform_publisher" name="wheelencoderlink_broadcaster" 
-        args="--x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id base_link --child-frame-id wheel_encoder"/>
+    <arg name="is_indoor"   default="true"/>
+    <arg name="map_frame"   default="map"/>
+    <arg name="odom_frame"  default="odom"/>
+    <arg name="base_frame"  default="base_link"/>
+
+    <!-- Arguments END -->
+
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="odom_map_broadcaster"
+        args="
+            --x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0
+            --frame-id $(var map_frame)
+            --child-frame-id $(var odom_frame)"/>
+    
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="base_link_odom_broadcaster"
+        args="
+            --x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0
+            --frame-id $(var odom_frame)
+            --child-frame-id $(var base_frame)" />
+    
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="imu_link_broadcaster" 
+        args="
+            --x 0.10 --y -0.047 --z 0.17 --yaw 0 --pitch 0 --roll 0
+            --frame-id $(var base_frame)
+            --child-frame-id $(var name)/imu"/>
+    
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="gps_link_broadcaster" 
+        args="
+            --x 0.04 --y 0.103 --z 0.140 --yaw 0 --pitch 0 --roll 0
+            --frame-id $(var base_frame)
+            --child-frame-id $(var name)/gps"/>
+
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="wheel_encoder_link_broadcaster" 
+        args="
+            --x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0
+            --frame-id $(var base_frame)
+            --child-frame-id $(var name)/wheel_encoder"/>
+
+    <group if="$(var is_indoor)">
+        <!-- LiDAR-->
+        <node pkg="tf2_ros" exec="static_transform_publisher" name="lidar_link_broadcaster" 
+            args="
+                --x 0.385 --y 0 --z 0.15 --yaw 0 --pitch 0 --roll 0
+                --frame-id $(var base_frame)
+                --child-frame-id $(var name)/laser"/>
+    </group>
+
 </launch>

@@ -15,7 +15,7 @@ setup(
         (f'share/{name}', ['package.xml']),
         (f'share/{name}/launch', glob('launch/*.xml')),
         (os.path.join('share', name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
-        (f'share/{name}/params', glob('params/*.yaml')),
+        (f'share/{name}/params', glob('params/*') + glob('params/**/*')),
         (f'share/{name}/maps', glob('maps/*')),
         (f'lib/{name}', glob('scripts/*.py')),
         (f'share/{name}/urdf', glob('urdf/*')),

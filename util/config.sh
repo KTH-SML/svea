@@ -9,6 +9,12 @@
 # BUILD_CONFIG="base-amd64"
 # BUILD_CONFIG="base-arm64"
 
+# # EL2425 - build base image
+# IMAGE_TAG="ghcr.io/kth-sml/svea:el2425-base"
+# BUILD_CONFIG="ghcr"
+
+# EL2425 - normal build
+BUILD_TAG="ghcr.io/kth-sml/svea:el2425-base"
 
 main() {
 
@@ -27,6 +33,7 @@ main() {
     BUILD_CONFIG="$(                        \
         switch "$BUILD_CONFIG"              \
             "host"          "$_host"        \
+            "base"          "base-$_host"   \
             "base-host"     "base-$_host"   \
                             "$BUILD_CONFIG" \
     )"
@@ -44,14 +51,6 @@ main() {
         withdefault BUILD_FILE      "docker/Dockerfile"
         withdefault BUILD_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_TAG       "$REPOSITORY_NAME"
-        withdefault IMAGE_PUSH      "0"
-    elif [ "$BUILD_CONFIG" = "base-host" ]; then
-        # building for host platform
-        withdefault BUILD_PLATFORM  "$(uname -m)"
-        withdefault BUILD_CONTEXT   "$REPOSITORY_PATH"
-        withdefault BUILD_FILE      "docker/Dockerfile.base"
-        withdefault BUILD_TAG       "ros:$ROSDISTRO-ros-base"
-        withdefault IMAGE_TAG       "ghcr.io/kth-sml/svea:latest"
         withdefault IMAGE_PUSH      "0"
     elif [ "$BUILD_CONFIG" = "base-amd64" ]; then
         # building for x86_64
@@ -83,7 +82,7 @@ main() {
     fi
 
     if [ "$BUILD_FILE" = "docker/Dockerfile.base" ]; then
-        withdefault USER_CREDENTIALS "svea:SVEA-Pass!" # TODO: Setup regular user instead of root
+        withdefault USER_CREDENTIALS "root:SVEA-Pass!" # TODO: Setup regular user instead of root
     fi
 
     withdefault CONTAINER_NAME "$REPOSITORY_NAME"

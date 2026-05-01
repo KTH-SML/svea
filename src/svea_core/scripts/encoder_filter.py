@@ -32,8 +32,10 @@ class encoder_filter(rx.Node):
     override = None
     encoder_time = None
 
+    frame_id = rx.Parameter('wheel_encoder')
+
     ## Publishers ##
-    encoder_re_pub = rx.Publisher(TwistWithCovarianceStamped, '/encoder/filtered', qos_pubber)
+    encoder_re_pub = rx.Publisher(TwistWithCovarianceStamped, '/lli/filtered/encoders', qos_pubber)
 
     ## Subscribers ##
     @rx.Subscriber(Bool, '/lli/remote/override', qos_subber)
@@ -56,6 +58,7 @@ class encoder_filter(rx.Node):
 
     @rx.Subscriber(TwistWithCovarianceStamped, '/lli/sensor/encoders', qos_subber)
     def encoder_sub(self, encoder_msg):
+        encoder_msg.header.frame_id = self.frame_id
         current_time = encoder_msg.header.stamp.sec + encoder_msg.header.stamp.nanosec * 1e-9
 
         # 如果是第一次回调，直接记录时间，不计算dt

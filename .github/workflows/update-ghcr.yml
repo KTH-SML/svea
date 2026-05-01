@@ -12,6 +12,7 @@ permissions:
 jobs:
 
   build-and-push:
+    if: ${{ github.repository == 'KTH-SML/svea' }}
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code

@@ -1,16 +1,38 @@
 <launch>
+    <!-- Arguments BEGIN -->
+
+    <arg name="name"            default="self"/>
     <arg name="map"             default="floor2"/>
     <arg name="obstacle_map"    default="$(var map)_obstacles"/>
-    <arg name="state" default="[-7.4, -15.3, 0.9, 0.0]" />
-    <arg name="is_sim" default="true"/>
+    <arg name="initial_pose_x"  default="0.0" />
+    <arg name="initial_pose_y"  default="0.0" />
+    <arg name="initial_pose_a"  default="0.0" />
 
+    <!-- Frames -->
+    <arg name="map_frame"   default="map"/>
+    <arg name="odom_frame"  default="$(var name)/odom"/>
+    <arg name="base_frame"  default="$(var name)/base_link"/>
 
-    <node name="sim_svea" pkg="svea_core" exec="sim_svea.py" output="screen">
-        <param name="state" value="$(var state)" />
-    </node>
+    <!-- Arguments END -->
 
-    <node name="sim_lidar" pkg="svea_core" exec="sim_lidar.py" output="screen">
-        <param from="$(find-pkg-share svea_core)/params/$(var obstacle_map).yaml"/>
-    </node>
-    
+    <group>
+
+        <push-ros-namespace namespace="$(var name)"/>
+
+        <node name="sim_svea" pkg="svea_core" exec="sim_svea.py" output="screen">
+            <param name="initial_pose_x" value="$(var initial_pose_x)"/>
+            <param name="initial_pose_y" value="$(var initial_pose_y)"/>
+            <param name="initial_pose_a" value="$(var initial_pose_a)"/>
+            <param name="map_frame" value="$(var map_frame)"/>
+            <param name="odom_frame" value="$(var odom_frame)"/>
+            <param name="base_frame" value="$(var base_frame)"/>
+        </node>
+
+        <node name="sim_lidar" pkg="svea_core" exec="sim_lidar.py" output="screen">
+            <param from="$(find-pkg-share svea_core)/params/$(var obstacle_map).yaml"/>
+            <param name="laser_frame" value="$(var name)/laser" />
+        </node>
+
+    </group>
+
 </launch>
