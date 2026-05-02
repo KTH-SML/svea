@@ -5,26 +5,6 @@
 ARG BUILD_TAG
 ARG ROSDISTRO
 ARG WORKSPACE
-ARG USER_CREDENTIALS
-
-
-####################
-## MICROROS IMAGE ##
-####################
-
-FROM ros:${ROSDISTRO}-ros-base AS micro-ros-agent-builder
-
-ARG ROSDISTRO
-ARG DEBIAN_FRONTEND=noninteractive
-
-WORKDIR /svea_ws
-
-RUN . /opt/ros/$ROSDISTRO/setup.sh \
-    &&  git clone -b $ROSDISTRO https://github.com/micro-ROS/micro_ros_msgs src/micro_ros_msgs \
-    &&  git clone -b $ROSDISTRO https://github.com/micro-ROS/micro-ROS-Agent src/micro-ROS-Agent \
-    &&  colcon build \
-    &&  rm -rf log/ build/ src/
-
 
 #####################
 ## SVEA BASE IMAGE ##
@@ -34,10 +14,7 @@ FROM ${BUILD_TAG:-ros:latest}
 
 ARG ROSDISTRO
 ARG WORKSPACE
-ARG USER_CREDENTIALS
 ARG DEBIAN_FRONTEND=noninteractive
-
-COPY --from=micro-ros-agent-builder /svea_ws /svea_ws
 
 ## Install dependencies from apt-get
 
@@ -46,39 +23,18 @@ RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
         apt-utils lsb-release \
         build-essential cmake \
-        openssh-server ca-certificates \
         git vim nano curl iputils-ping \
         python3-pip \
         python3-rosdep \
         python3-vcstool \
         python3-colcon-common-extensions \
-        ## Move these to rosdep?
-        ros-$ROSDISTRO-ament-cmake-python \
-        ros-$ROSDISTRO-ros-base=0.11.0-1* \
-        # ros-$ROSDISTRO-rmw-zenoh-cpp \
-        ros-$ROSDISTRO-teleop-twist-keyboard \
-        ros-$ROSDISTRO-nav2-* \
+        ros-$ROSDISTRO-mavros \
         && \
     rm -rf /var/lib/apt/lists/*
 
-## Set up SSH
-
-RUN mkdir -p /var/run/sshd
-
-# --- Root password login (default: admin) ---
-# Bash reminder:
-#   username="${creds%%:*}"  # remove everything after the first ':'
-#   password="${creds#*:}"   # remove everything before the first ':'
-RUN echo "${USER_CREDENTIALS%%:*}:${USER_CREDENTIALS#*:}" | chpasswd
-
-# SSH config: allow root + password login (keep pubkey auth on too)
-RUN sed -ri 's/^#?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-    sed -ri 's/^#?PubkeyAuthentication .*/PubkeyAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -ri 's/^#?UsePAM .*/UsePAM yes/' /etc/ssh/sshd_config
-
-# Expose SSH
-EXPOSE 22
+# ros-$ROSDISTRO-ament-cmake-python \
+# ros-$ROSDISTRO-teleop-twist-keyboard \
+# ros-$ROSDISTRO-nav2-* \
 
 ## Create svea workspace
 
@@ -127,13 +83,8 @@ ENV CMAKE_PREFIX_PATH="/opt/ros/$ROSDISTRO"
 
 # Build the ROS 2 workspace
 RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
+    ros2 run mavros install_geographiclib_datasets.sh && \
     colcon build --symlink-install"
-
-COPY firmware/disable_fastdds_shm.xml \
-     firmware/disable_fastdds_shm_localhost_only.xml \
-     /tmp/
-ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
-ENV MICROROS_DISABLE_SHM=1
 
 # Source the setup file in the .bashrc for convenience
 RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \

@@ -17,6 +17,9 @@
     <arg name="map"             default="floor2"/>
     <arg name="map_file"        default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
 
+    <arg name="lli_serial_device" default="/dev/serial/by-id/usb-SVEA_PX4_AUTOPILOT_0-if00"/>
+    <arg name="lli_baud_rate"     default="57600"/>
+
     <!-- Arguments END -->
 
     <!-- Localization -->
@@ -42,23 +45,27 @@
     </group>
     <group unless="$(var is_sim)">
         <!-- Low-Level Interface -->
-        <executable cmd="$(find-pkg-share svea_core)/util/start_micro_ros.sh" output="screen"/>
+        <!-- <executable cmd="$(find-pkg-share svea_core)/util/start_micro_ros.sh" output="screen"/> -->
 
         <!--LLI Fixers-->
-        <node pkg="svea_core" exec="encoder_filter.py" name="encoder_filter" output="screen">
+        <!-- <node pkg="svea_core" exec="encoder_filter.py" name="encoder_filter" output="screen">
             <param name="frame_id"    value="$(var name)/wheel_encoder"/>
         </node>
 
         <node pkg="svea_core" exec="imu_bias_remover.py" name="imu_bias_remover" output="screen">
             <param name="frame_id"    value="$(var name)/imu"/>
+        </node> -->
+
+        <node pkg="mavros" exec="mavros_node" name="mavros" output="screen">
+            <param name="fcu_url" value="serial://$(var lli_serial_device):$(var lli_baud_rate)"/>
         </node>
 
-        <node pkg="svea_core" exec="lidar_timer.py" name="lidar_timer" output="screen">
+        <!-- <node pkg="svea_core" exec="lidar_timer.py" name="lidar_timer" output="screen">
             <param name="target_frame" value="$(var name)/base_link"/>
             <param name="source_frame" value="$(var name)/odom"/>
             <param name="from_topic"   value="$(var name)/scan"/>
             <param name="to_topic"     value="$(var name)/scan/filtered"/>
-        </node>
+        </node> -->
     </group>
 
     <!-- Load Visualization Model -->

@@ -4,9 +4,9 @@ from tf_transformations import quaternion_from_euler
 
 from svea_core.interfaces import LocalizationInterface
 from svea_core.interfaces import ActuationInterface
-from svea_core.utils import ShowPath
+# from svea_core.utils import ShowPath
 from svea_core import rosonic as rx
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import TwistStamped
 from rclpy.qos import QoSProfile
 
 
@@ -68,17 +68,18 @@ class teleop_control(rx.Node):  # Inherit from rx.Node
     DELTA_TIME = 0.1
 
     target_velocity = rx.Parameter(1.0)
+    cmd_vel_top = rx.Parameter('/cmd_vel')
 
     actuation = ActuationInterface()
 
     # Path Visualization
-    path = ShowPath()
+    # path = ShowPath()
 
     ## Subscribers ##
-    @rx.Subscriber(Twist, 'cmd_vel', qos_subber)
-    def ctrl_request_twist(self, twist_msg):
-        self.velocity = twist_msg.linear.x
-        self.steering = twist_msg.angular.z
+    @rx.Subscriber(TwistStamped, cmd_vel_top, qos_subber)
+    def ctrl_request_twist(self, msg):
+        self.velocity = - msg.twist.linear.x
+        self.steering = msg.twist.angular.z
 
     def on_startup(self):
         self.velocity = 0.0
