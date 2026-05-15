@@ -35,6 +35,6 @@ else
 fi
 
 # Extra arguments are forwarded to docker build before the default image target.
-append ARGS "$@" --tag "$IMAGE_TAG" --file "$BUILD_FILE" "$BUILD_CONTEXT"
+append ARGS --tag "$IMAGE_TAG" --file "$BUILD_FILE" "$@" "$BUILD_CONTEXT"
 
 call $CMD $ARGS
