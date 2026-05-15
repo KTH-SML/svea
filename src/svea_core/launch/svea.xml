@@ -18,7 +18,7 @@
     <arg name="map_file"        default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
 
     <arg name="lli_serial_device" default="/dev/serial/by-id/usb-SVEA_PX4_AUTOPILOT_0-if00"/>
-    <arg name="lli_baud_rate"     default="926000"/>
+    <arg name="lli_baud_rate"     default="921600"/>
 
     <arg name="use_mavproxy"      default="true"/>
     <arg name="mavproxy_qgc"      default="true"/>
