@@ -59,6 +59,11 @@ RUN if [ ! -d src/motion_capture_system ]; then \
       vcs import src < src/motion_capture_system/dependency_repos.repos; \
     fi
 
+# PX4 message definitions
+RUN if [ ! -d src/px4_msgs ]; then \
+      git clone --branch v1.16.1 --depth 1 https://github.com/PX4/px4_msgs.git src/px4_msgs; \
+    fi
+
 # Zenoh
 RUN echo "deb [trusted=yes] https://download.eclipse.org/zenoh/debian-repo/ /" | tee -a /etc/apt/sources.list > /dev/null && \
     apt update -y && \
