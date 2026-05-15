@@ -19,6 +19,7 @@
   <depend>foxglove_bridge</depend>
   <depend>tf_transformations</depend>
   <depend>mavros_msgs</depend>
+  <depend>rosidl_runtime_py</depend>
 
   <depend>svea_localization</depend>
 
