@@ -51,10 +51,12 @@ COPY src ./src
 COPY util ./util
 COPY entrypoint requirements.txt ./
 
-# Automatically import extra dependencies if dependency_repos.repos exists
-# in src, git clone --recursive https://github.com/MOCAP4ROS2-Project/mocap4ros2_qualisys.git
-RUN if [ -f src/mocap4ros2_qualisys/dependency_repos.repos ]; then \
-      vcs import src < src/mocap4ros2_qualisys/dependency_repos.repos; \
+# Motion capture driver
+RUN if [ ! -d src/motion_capture_system ]; then \
+      git clone --recursive https://github.com/DISCOWER/motion_capture_system.git src/motion_capture_system; \
+    fi && \
+    if [ -f src/motion_capture_system/dependency_repos.repos ]; then \
+      vcs import src < src/motion_capture_system/dependency_repos.repos; \
     fi
 
 # Zenoh
