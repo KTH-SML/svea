@@ -18,6 +18,7 @@
   <depend>std_msgs</depend>
   <depend>foxglove_bridge</depend>
   <depend>tf_transformations</depend>
+  <depend>mavros_msgs</depend>
 
   <depend>svea_localization</depend>
 
