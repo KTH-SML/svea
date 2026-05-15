@@ -18,7 +18,14 @@
     <arg name="map_file"        default="$(find-pkg-share svea_core)/maps/$(var map).yaml"/>
 
     <arg name="lli_serial_device" default="/dev/serial/by-id/usb-SVEA_PX4_AUTOPILOT_0-if00"/>
-    <arg name="lli_baud_rate"     default="57600"/>
+    <arg name="lli_baud_rate"     default="926000"/>
+
+    <arg name="use_mavproxy"      default="true"/>
+    <arg name="mavproxy_qgc"      default="true"/>
+    <arg name="qgc_host"          default="127.0.0.1"/>
+    <arg name="mavros_log_level"     default="warn"/>
+    <arg name="mavros_sys_log_level" default="fatal"/>
+    <arg name="mavros_cmd_log_level" default="error"/>
 
     <!-- Arguments END -->
 
@@ -56,8 +63,38 @@
             <param name="frame_id"    value="$(var name)/imu"/>
         </node> -->
 
-        <node pkg="mavros" exec="mavros_node" name="mavros" output="screen">
+        <executable if="$(eval &quot;'$(var use_mavproxy)' == 'true' and '$(var mavproxy_qgc)' != 'true'&quot;)"
+            cmd="mavproxy.py --daemon --no-state --master=$(var lli_serial_device),$(var lli_baud_rate) --out=udpin:127.0.0.1:14551"
+            output="log"/>
+
+        <executable if="$(eval &quot;'$(var use_mavproxy)' == 'true' and '$(var mavproxy_qgc)' == 'true'&quot;)"
+            cmd="mavproxy.py --daemon --no-state --master=$(var lli_serial_device),$(var lli_baud_rate) --out=udpin:127.0.0.1:14551 --out=udp:$(var qgc_host):14550"
+            output="log"/>
+
+        <node unless="$(var use_mavproxy)" pkg="mavros" exec="mavros_node" namespace="mavros" output="screen"
+              args="--ros-args --log-level $(var mavros_log_level) --log-level mavros.sys:=$(var mavros_sys_log_level) --log-level mavros.cmd:=$(var mavros_cmd_log_level)
+                    -r imu/diff_pressure:=_unused/imu/diff_pressure
+                    -r imu/mag:=_unused/imu/mag
+                    -r imu/static_pressure:=_unused/imu/static_pressure
+                    -r imu/temperature_baro:=_unused/imu/temperature_baro
+                    -r imu/temperature_imu:=_unused/imu/temperature_imu">
             <param name="fcu_url" value="serial://$(var lli_serial_device):$(var lli_baud_rate)"/>
+            <param from="$(find-pkg-share svea_core)/params/mavros_pluginlists.yaml"/>
+        </node>
+
+        <node if="$(var use_mavproxy)" pkg="mavros" exec="mavros_node" namespace="mavros" output="screen"
+              args="--ros-args --log-level $(var mavros_log_level) --log-level mavros.sys:=$(var mavros_sys_log_level) --log-level mavros.cmd:=$(var mavros_cmd_log_level)
+                    -r imu/diff_pressure:=_unused/imu/diff_pressure
+                    -r imu/mag:=_unused/imu/mag
+                    -r imu/static_pressure:=_unused/imu/static_pressure
+                    -r imu/temperature_baro:=_unused/imu/temperature_baro
+                    -r imu/temperature_imu:=_unused/imu/temperature_imu">
+            <param name="fcu_url" value="udp://@127.0.0.1:14551"/>
+            <param from="$(find-pkg-share svea_core)/params/mavros_pluginlists.yaml"/>
+        </node>
+
+        <node pkg="svea_core" exec="px4_uorb_tunnel.py" name="px4_uorb_tunnel" output="screen">
+            <param name="mavlink_topic" value="/mavros/tunnel/out"/>
         </node>
 
         <!-- <node pkg="svea_core" exec="lidar_timer.py" name="lidar_timer" output="screen">
