@@ -93,7 +93,7 @@ ENV CMAKE_PREFIX_PATH="/opt/ros/$ROSDISTRO"
 # Build the ROS 2 workspace
 RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
     ros2 run mavros install_geographiclib_datasets.sh && \
-    colcon build --symlink-install"
+    colcon build"
 
 # Source the setup file in the .bashrc for convenience
 RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \

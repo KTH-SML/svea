@@ -33,4 +33,4 @@ RUN rosdep install \
 
 # Build the ROS 2 workspace (improves build speeds later on).
 RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
-    colcon build --symlink-install"
+    colcon build"
