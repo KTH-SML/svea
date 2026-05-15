@@ -22,10 +22,7 @@
 
     <arg name="use_mavproxy"      default="true"/>
     <arg name="mavproxy_qgc"      default="true"/>
-    <arg name="qgc_host"          default="127.0.0.1"/>
-    <arg name="mavros_log_level"     default="warn"/>
-    <arg name="mavros_sys_log_level" default="fatal"/>
-    <arg name="mavros_cmd_log_level" default="error"/>
+    <arg name="qgc_host"          default="host.docker.internal"/>
 
     <!-- Arguments END -->
 
