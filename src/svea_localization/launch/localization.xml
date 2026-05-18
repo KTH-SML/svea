@@ -21,6 +21,7 @@
 
     <!-- Lidar -->
     <arg name="lidar_ip" default="192.168.0.10"/>
+    <arg name="use_lidar" default="true"/>
 
     <!-- Arguments END -->
 
@@ -58,7 +59,7 @@
 
             <!-- If-Else Group -->
             <group if="$(var is_indoor)">
-                <group>
+                <group if="$(var use_lidar)">
                     <push-ros-namespace namespace="$(var name)"/>
                     
                     <!-- Start LiDAR -->

@@ -22,6 +22,7 @@ nav:
     - Docker: setup/docker.md
     - More Docker: setup/more_docker.md
     - Lidar: setup/lidar_setup.md
+    - MoCap Localization: mocap_localization.md
   - Tutorial:
     - 0. Introduction: tutorials/0_intro.md
     - 1. Floor 2 and Pure-Pursuit: tutorials/1_floor2.md
@@ -32,6 +33,7 @@ nav:
     - Pure Pursuit: examples/pure_pursuit.md
   - Development:
     - Documentation: development/documentation.md
+    - PX4 uORB Tunnel: development/px4_uorb_tunnel.md
   - Reference:
     - Models: reference/models.md
     - Interfaces: reference/interfaces.md

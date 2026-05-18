@@ -29,6 +29,8 @@ RUN apt-get update -y && \
         python3-vcstool \
         python3-colcon-common-extensions \
         ros-$ROSDISTRO-mavros \
+        ros-$ROSDISTRO-mavros-extras \
+        ros-$ROSDISTRO-navigation2 \
         && \
     rm -rf /var/lib/apt/lists/*
 
@@ -49,10 +51,17 @@ COPY src ./src
 COPY util ./util
 COPY entrypoint requirements.txt ./
 
-# Automatically import extra dependencies if dependency_repos.repos exists
-# in src, git clone --recursive https://github.com/MOCAP4ROS2-Project/mocap4ros2_qualisys.git
-RUN if [ -f src/mocap4ros2_qualisys/dependency_repos.repos ]; then \
-      vcs import src < src/mocap4ros2_qualisys/dependency_repos.repos; \
+# Motion capture driver
+RUN if [ ! -d src/motion_capture_system ]; then \
+      git clone --recursive https://github.com/DISCOWER/motion_capture_system.git src/motion_capture_system; \
+    fi && \
+    if [ -f src/motion_capture_system/dependency_repos.repos ]; then \
+      vcs import src < src/motion_capture_system/dependency_repos.repos; \
+    fi
+
+# PX4 message definitions
+RUN if [ ! -d src/px4_msgs ]; then \
+      git clone --branch v1.16.1 --depth 1 https://github.com/PX4/px4_msgs.git src/px4_msgs; \
     fi
 
 # Zenoh
@@ -84,7 +93,7 @@ ENV CMAKE_PREFIX_PATH="/opt/ros/$ROSDISTRO"
 # Build the ROS 2 workspace
 RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
     ros2 run mavros install_geographiclib_datasets.sh && \
-    colcon build --symlink-install"
+    colcon build"
 
 # Source the setup file in the .bashrc for convenience
 RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \

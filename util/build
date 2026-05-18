@@ -34,10 +34,7 @@ else
     append ARGS "$(ifelse IMAGE_PUSH --push --load)"
 fi
 
-# These args are replaced if util/build is called with arguments
-if [ -z "$*" ]
-then append ARGS --tag "$IMAGE_TAG" --file "$BUILD_FILE" "$BUILD_CONTEXT"
-else append ARGS "$@"
-fi
+# Extra arguments are forwarded to docker build before the default image target.
+append ARGS --tag "$IMAGE_TAG" --file "$BUILD_FILE" "$@" "$BUILD_CONTEXT"
 
 call $CMD $ARGS

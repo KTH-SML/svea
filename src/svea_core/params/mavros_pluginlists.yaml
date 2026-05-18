@@ -1,0 +1,16 @@
+/**:
+  ros__parameters:
+    plugin_allowlist:
+      - command
+      - imu
+      - manual_control
+      - rc_io
+      - sys_status
+      - sys_time
+      - tunnel
+      - wheel_odometry
+
+/mavros/wheel_odometry:
+  ros__parameters:
+    send_raw: true
+    use_rpm: false
