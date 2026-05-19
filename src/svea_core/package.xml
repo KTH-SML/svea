@@ -12,8 +12,6 @@
   <depend>visualization_msgs</depend>
   <depend>robot_localization</depend>
   <depend>rclpy</depend>
-  <!-- <depend>rosserial_msgs</depend> -->
-  <!-- <depend>rosserial_python</depend> -->
   <depend>python3-yaml</depend>
   <depend>std_msgs</depend>
   <depend>foxglove_bridge</depend>

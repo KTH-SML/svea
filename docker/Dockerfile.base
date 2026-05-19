@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7
+
 # Dockerfile for base SVEA image
 #
 # Author: Kaj Munhoz Arfvidsson
@@ -19,88 +21,88 @@ ARG DEBIAN_FRONTEND=noninteractive
 ## Install dependencies from apt-get
 
 RUN apt-get update -y && \
-    apt-get upgrade -y && \
     apt-get install --no-install-recommends -y \
         apt-utils lsb-release \
         build-essential cmake \
         git vim nano curl iputils-ping \
         python3-pip \
         python3-rosdep \
-        python3-vcstool \
         python3-colcon-common-extensions \
         ros-$ROSDISTRO-mavros \
         ros-$ROSDISTRO-mavros-extras \
-        ros-$ROSDISTRO-navigation2 \
         && \
     rm -rf /var/lib/apt/lists/*
 
-# ros-$ROSDISTRO-ament-cmake-python \
-# ros-$ROSDISTRO-teleop-twist-keyboard \
-# ros-$ROSDISTRO-nav2-* \
+## Dependencies and SVEA Base Workspace
 
-## Create svea workspace
-
-WORKDIR $WORKSPACE
-
-# Bootstrap rosdep and setup colcon mixin and metadata
-RUN rosdep update --rosdistro $ROSDISTRO
-
-# Need to copy src and util separately because docker COPY rules are iffy.
-# https://docs.docker.com/engine/reference/builder/#copy
-COPY src ./src
-COPY util ./util
-COPY entrypoint requirements.txt ./
-
-# Motion capture driver
-RUN if [ ! -d src/motion_capture_system ]; then \
-      git clone --recursive https://github.com/DISCOWER/motion_capture_system.git src/motion_capture_system; \
-    fi && \
-    if [ -f src/motion_capture_system/dependency_repos.repos ]; then \
-      vcs import src < src/motion_capture_system/dependency_repos.repos; \
-    fi
-
-# PX4 message definitions
-RUN if [ ! -d src/px4_msgs ]; then \
-      git clone --branch v1.16.1 --depth 1 https://github.com/PX4/px4_msgs.git src/px4_msgs; \
-    fi
-
-# Zenoh
-RUN echo "deb [trusted=yes] https://download.eclipse.org/zenoh/debian-repo/ /" | tee -a /etc/apt/sources.list > /dev/null && \
-    apt update -y && \
-    apt install --no-install-recommends -y zenoh-bridge-ros2dds && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install dependencies via rosdep and pip
-RUN apt-get update -y && \
+# Install SVEA dependencies, but not SVEA packages themselves
+# SVEA packages are deferred to the final build stage.
+RUN --mount=type=bind,source=./src,target=/tmp/src,readonly \
+    apt-get update -y && \
     rosdep update \
         --rosdistro $ROSDISTRO \
         && \
     rosdep install \
         --rosdistro $ROSDISTRO \
-        --from-paths src \
+        --from-paths /tmp/src \
         --ignore-src \
         -qry \
         && \
-    pip install \
-        --break-system-packages \
-        -r requirements.txt \
-        && \
     rm -rf /var/lib/apt/lists/*
 
-# Ensure proper environment setup before build
-ENV CMAKE_PREFIX_PATH="/opt/ros/$ROSDISTRO"
+# Install pip packages specified in requirements.txt
+RUN --mount=type=bind,source=./requirements.txt,target=/tmp/requirements.txt,readonly \
+    pip install \
+        --break-system-packages \
+        -r /tmp/requirements.txt
 
-# Build the ROS 2 workspace
-RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
-    ros2 run mavros install_geographiclib_datasets.sh && \
-    colcon build"
+# Build /opt/svea workspace
+# Contains misc. dependencies.
+RUN /bin/bash <<EOF
+set -e
+apt-get update -y
 
-# Source the setup file in the .bashrc for convenience
-RUN echo "source /opt/ros/$ROSDISTRO/setup.bash" >> ~/.bashrc && \
-    echo "source /svea_ws/install/setup.bash" >> ~/.bashrc && \
-    echo "source /svea_ws/install/local_setup.bash" >> ~/.bashrc
+# Make a temporary workspace
+pushd $(mktemp -d)
+mkdir src
 
-##  Container entrypoint and default command
+source /opt/ros/$ROSDISTRO/setup.bash
+
+# Zenoh (system-wide installation)
+echo "deb [trusted=yes] https://download.eclipse.org/zenoh/debian-repo/ /" | tee -a /etc/apt/sources.list > /dev/null
+apt-get update -y
+apt-get install --no-install-recommends -y zenoh-bridge-ros2dds
+
+# MAVROS dependency
+ros2 run mavros install_geographiclib_datasets.sh
+
+# PX4 message definitions
+git clone --branch v1.16.1 --depth 1 https://github.com/PX4/px4_msgs.git src/px4_msgs
+
+# Motion capture driver
+git clone --depth 1 --recursive https://github.com/DISCOWER/motion_capture_system.git src/motion_capture_system
+
+colcon build --merge-install --install-base /opt/svea/$ROSDISTRO
+
+rm -rf $(pwd) && popd
+rm -rf /var/lib/apt/lists/*
+EOF
+
+## Initialize Workspace
+
+WORKDIR $WORKSPACE
+
+COPY entrypoint ./
+
+RUN /bin/bash <<EOF
+set -e
+mkdir src
+source /opt/svea/$ROSDISTRO/setup.bash
+colcon build --symlink-install
+echo "source $WORKSPACE/install/setup.bash" >> /etc/bash.bashrc
+EOF
+
+## Container Entrypoint and Default Command
 
 # For fixing WSL error. TODO: investigate further
 RUN chmod +x ./entrypoint
