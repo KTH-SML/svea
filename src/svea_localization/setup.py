@@ -14,8 +14,8 @@ setup(
         ('share/ament_index/resource_index/packages', [f'resource/{name}']),
         (f'share/{name}', ['package.xml']),
         (f'share/{name}/launch', glob('launch/*.xml') + glob('launch/**/*.xml')),
-        (f'share/{name}/launch', glob('launch/*.py')),
-        (f'share/{name}/params', glob('params/*.yaml') + glob('params/**/*.yaml')),
+        (f'share/{name}/launch', glob('launch/*.py') + glob('launch/**/*.py')),
+        (f'share/{name}/params', glob('params/*') + glob('params/**/*')),
         (f'lib/{name}', glob('scripts/*.py')),
     ],
     install_requires=['setuptools'],
@@ -24,6 +24,5 @@ setup(
     maintainer_email=package.find('maintainer').get('email'),
     description=package.find('description').text,
     license=package.find('license').text,
-    tests_require=['pytest'],
 )
 
