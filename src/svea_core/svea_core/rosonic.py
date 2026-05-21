@@ -152,6 +152,11 @@ from typing import TypeGuard
 
 import rclpy                            # pyright: ignore[reportMissingImports]
 from rclpy.node import Node as NodeBase # pyright: ignore[reportMissingImports]
+from rosidl_runtime_py.utilities import (
+    get_message,
+    get_service,
+    get_action,
+)
 
 __all__ = [
     'Resource',
@@ -661,7 +666,7 @@ class Parameter(NamedField):
     - TODO: Dynamically updatable parameters?
     """
 
-    def __init__(self, *args, name: str | None = None):
+    def __init__(self, *args, name: str | None = None, evaluate: callable | None = None):
         """
         Initializes the Parameter resource.
 
@@ -670,10 +675,13 @@ class Parameter(NamedField):
             passed to `declare_parameter()`. 
             name (str | None): Optional name override. Defaults to attribute
             name if omitted.
+            evaluate (callable | None): Optional post processing of parameter
+            values.
         """
         super().__init__(name=name)
         self.args = args
         self.value = ... # Ellipsis used to detect when value hasn't been set yet
+        self.evaluate = evaluate
     
     def __get__(self, instance, owner):
         if instance is None:
@@ -693,6 +701,9 @@ class Parameter(NamedField):
 
         if self.value is ...:
             self.value = node.get_parameter(name).value
+
+        if self.evaluate is not None:
+            self.value = self.evaluate(self.value)
     
 class Publisher(NamedField):
     """
@@ -732,6 +743,7 @@ class Publisher(NamedField):
 
     ### Notes:
     - Topic names can be dynamic if specified via a `Parameter`.
+    - Message type can be dynamic if specified via `str` or `Parameter`.
     - The publisher is created at startup and is unavailable before that.
     """
 
@@ -779,6 +791,13 @@ class Publisher(NamedField):
         topic = self.__rosonic_relname__
         qos_profile = self.qos_profile or rclpy.qos.qos_profile_default
 
+        # Dynamically load msg_type. Order (Parameter -> str) is important.
+        if isinstance(msg_type, Parameter):
+            assert msg_type._is_started(), f"Resource '{self}' depend on '{msg_type}' which has not started yet"
+            msg_type = msg_type.value
+        if isinstance(msg_type, str):
+            msg_type = get_message(msg_type)
+
         if not isinstance(msg_type, type):
             raise RuntimeError(f"Message type must be a class, not {type(msg_type)}")
         if not isinstance(topic, str):
@@ -821,6 +840,7 @@ class Subscriber(NamedField):
 
     ### Notes:
     - Topic names can be dynamic if specified via a `Parameter`.
+    - Message type can be dynamic if specified via `str` or `Parameter`.
     - The subscription is created at startup and unavailable before that.
     - If no callback is assigned via decorator, startup will raise an error.
     """
@@ -873,6 +893,13 @@ class Subscriber(NamedField):
         msg_type = self.msg_type
         topic = self.__rosonic_relname__
         qos_profile = self.qos_profile or rclpy.qos.qos_profile_default
+
+        # Dynamically load msg_type. Order (Parameter -> str) is important.
+        if isinstance(msg_type, Parameter):
+            assert msg_type._is_started(), f"Resource '{self}' depend on '{msg_type}' which has not started yet"
+            msg_type = msg_type.value
+        if isinstance(msg_type, str):
+            msg_type = get_message(msg_type)
 
         if not isinstance(msg_type, type):
             raise RuntimeError(f"Message type must be a class, not {type(msg_type)}")

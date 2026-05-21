@@ -15,7 +15,7 @@ setup(
         (f'share/{name}', ['package.xml']),
         (f'share/{name}/launch', glob('launch/*.xml') + glob('launch/**/*.xml')),
         (f'share/{name}/launch', glob('launch/*.py') + glob('launch/**/*.py')),
-        (f'share/{name}/params', glob('params/*') + glob('params/**/*')),
+        (f'share/{name}/params', glob('params/*.yaml') + glob('params/**/*.yaml')),
         (f'share/{name}/meshes', glob('meshes/*')),
         (f'share/{name}/maps', glob('maps/*')),
         (f'share/{name}/urdf', glob('urdf/*')),
