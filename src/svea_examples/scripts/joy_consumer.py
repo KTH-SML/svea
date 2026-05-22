@@ -22,9 +22,6 @@ class Joystick:
                 if T is bool]
 
     @classmethod
-    def CLS(cls): return cls
-
-    @classmethod
     def from_msg(cls, msg):
         NAXES = len(cls.AXES())
         NBTNS = len(cls.BUTTONS())
@@ -56,6 +53,69 @@ class Xbox360Controller(Joystick):
     DPADL: bool = False
     DPADR: bool = False
 
+@dataclass
+class LogitechG27(Joystick):
+    # Axes
+    WHEEL: float = 0.
+    LEFT_PEDAL: float = 0.
+    RIGHT_PEDAL: float = 0.
+    MIDDLE_PEDAL: float = 0.
+    # Buttons - Bunch of unknowns so we add manually
+    LS: bool = False
+    RS: bool = False
+    LB1: bool = False
+    LB2: bool = False
+    LB3: bool = False
+    RB1: bool = False
+    RB2: bool = False
+    RB3: bool = False
+
+    @classmethod
+    def from_msg(cls, msg):
+        return cls(
+            msg.axes[:4],
+            **dict(zip(['RS', 'LS'], msg.buttons[4:6])),
+            **dict(zip(['RB1', 'LB1'], msg.buttons[6:8])),
+            **dict(zip(['RB2', 'LB2'], msg.buttons[19:21])),
+            **dict(zip(['RB3', 'LB3'], msg.buttons[21:23])),
+        )
+
+@dataclass
+class LogitechG29(Joystick):
+    ## Axes
+    WHEEL: float = 0.
+    LEFT_PEDAL: float = 0.
+    RIGHT_PEDAL: float = 0.
+    MIDDLE_PEDAL: float = 0.
+    DPAD_X: float = 0.
+    DPAD_Y: float = 0.
+    ## Buttons
+    CROSS: bool = False
+    SQUARE: bool = False
+    CIRCLE: bool = False
+    TRIANGLE: bool = False
+    SHIFT_UP: bool = False
+    SHIFT_DOWN: bool = False
+    R2: bool = False
+    L2: bool = False
+    SHARE: bool = False
+    OPTION: bool = False
+    R3: bool = False
+    L3: bool = False
+    STICK1: bool = False
+    STICK2: bool = False
+    STICK3: bool = False
+    STICK4: bool = False
+    STICK5: bool = False
+    STICK6: bool = False
+    STICK7: bool = False
+    PLUS: bool = False
+    MINUS: bool = False
+    RING_CW: bool = False
+    RING_CCW: bool = False
+    ENTER: bool = False
+    HOME: bool = False
+
 
 class joy_consumer(rx.Node):
     """Teleoperation control node for SVEA."""
@@ -74,53 +134,97 @@ class joy_consumer(rx.Node):
 
     def on_startup(self):
         logger = self.get_logger()
-        if self.joy_kind == 'xbox':
-            self._previous = Xbox360Controller()
-            unused_btns = set(Xbox360Controller.BUTTONS()) - set('LB B X Y'.split())
-        else:
-            raise NotImplementedError(f'Not Implemented: Joy kind: {self.joy_kind}')
+
+        self._previous = None
+        self._unused_btns = None
+
+        init_method = getattr(self, f'init_{self.joy_kind}')
+        init_method()
+
         self._btns = {}
         if self.joy_btns:
             for pair in self.joy_btns.split(','):
                 assert ':' in pair, f'Invalid pair mapping: {pair}'
                 btn, name = pair.split(':')
-                if btn in unused_btns:
+                if btn in self._unused_btns:
                     self._btns[btn] = self.create_client(Empty, name)
                     while not self._btns[btn].wait_for_service(timeout_sec=1.0):
                         logger.info(f'Service "{name}" not available, keep waiting...')
                     logger.debug(f'Button {btn} bound to service "{name}"')
 
+    @rx.Timer(0.1)
+    def loop(self):
+        self.actuation.send_control(self._steering, self._velocity)
+
     @rx.Subscriber(Joy, joy_top)
     def joy_cb(self, msg):
-        if self.joy_kind == 'xbox':
-            joy = Xbox360Controller.from_msg(msg)
-            ## Velocity: Right Trigger (RT) + Left Button (LB)
-            self._velocity = (1 - joy.RT)/2 * self.MAX_VELOCITY
-            if msg.buttons[4]:
-                self._velocity*= -1
-            ## Steering: Left Stick
-            self._steering = joy.LSX * self.MAX_STEERING
-            ## Gear: Right Bumper (B) + Left Bumper (X)
-            # at release
-            if self._previous.B and not joy.B:
-                self.actuation.enable_highgear()
-            if self._previous.X and not joy.X:
-                self.actuation.disable_highgear()
-            ## Diff: Top Bumper (Y)
-            # at release
-            if self._previous.Y and not joy.Y:
-                self.actuation.toggle_difflock()
+        ## Interpret Message
+        read_method = getattr(self, f'read_{self.joy_kind}')
+        joy = read_method(msg)
+
         ## Button Services
         for btn, cli in self._btns.items():
             if getattr(self._previous, btn) and not getattr(joy, btn):
                 self.get_logger().warn(f'Button Press Event: {btn}')
                 cli.call_async(Empty.Request())
+
         ## Update history
         self._previous = joy
 
-    @rx.Timer(0.1)
-    def loop(self):
-        self.actuation.send_control(self._steering, self._velocity)
+    def release_event(self, joy, name):
+        return (getattr(self._previous, name)
+                and not getattr(joy, name))
+
+    def init_xbox(self):
+        self._previous = Xbox360Controller()
+        self._unused_btns = set(Xbox360Controller.BUTTONS())
+        self._unused_btns -= set('LB B X Y'.split())
+
+    def read_xbox(self, msg):
+        joy = Xbox360Controller.from_msg(msg)
+
+        ## Velocity: Right Trigger (RT) + Left Button (LB)
+        self._velocity = (1 - joy.RT)/2 * self.MAX_VELOCITY
+        if msg.buttons[4]:
+            self._velocity*= -1
+
+        ## Steering: Left Stick
+        self._steering = joy.LSX * self.MAX_STEERING
+
+        ## Gear: Right Bumper (B) + Left Bumper (X)
+        # at release
+        if self.release_event(joy, 'B'):
+            self.actuation.enable_highgear()
+        if self.release_event(joy, 'X'):
+            self.actuation.disable_highgear()
+
+        ## Diff: Top Bumper (Y)
+        # at release
+        if self.release_event(joy, 'Y'):
+            self.actuation.toggle_difflock()
+
+    def init_g29(self):
+        self._previous = LogitechG29()
+        self._unused_btns = set(LogitechG29.BUTTONS())
+        self._unused_btns -= set(''.split())
+
+    def read_g29(self, msg):
+        joy = LogitechG29.from_msg(msg)
+
+        ## Velocity: Right Pedal
+        self._velocity = (1 - joy.RIGHT_PEDAL)/2 * self.MAX_VELOCITY
+
+        ## Steering: Wheel
+        self._steering = joy.WHEEL * self.MAX_STEERING
+
+        ## Gear: SHIFT_UP + SHIFT_DOWN
+        # at release
+        if self.release_event(joy, 'SHIFT_UP'):
+            self.actuation.enable_highgear()
+        if self.release_event(joy, 'SHIFT_DOWN'):
+            self.actuation.disable_highgear()
+
 
 if __name__ == '__main__':
     joy_consumer.main()
+
