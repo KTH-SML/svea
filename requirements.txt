@@ -24,3 +24,6 @@ nats-py
 # For PX4
 mavproxy
 future
+
+# Sandbox QoD Demo
+requests

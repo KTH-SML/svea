@@ -15,7 +15,7 @@ def main(name: str):
                 params=dict(subscribeTopics="/joy"))
 
     if name == 'teleop':
-        bl.node("joy", "joy_node", name="joy_node", params=dict(device_name="xbox"))
+        bl.node("joy", "joy_node", name="joy_node")
         bl.node("ros_fmq_bridge", "bridge_node",
                 name="ros_fmq_bridge",
                 params=dict(publishTopics="/joy"))

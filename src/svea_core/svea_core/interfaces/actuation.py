@@ -52,13 +52,13 @@ class ActuationInterface(rx.Field):
     manual_control_top = rx.Parameter('/mavros/manual_control/send')
     manual_control_pub = rx.Publisher(ManualControl, manual_control_top)
 
-    def __init__(self, rate=10, use_acceleration=False, highgear=False, diff=False):
+    def __init__(self, rate=10, use_acceleration=False, highgear=False, difflock=False):
         self.acceleration = use_acceleration
         self.rate = rate
         self.steering_percent = 0.0
         self.velocity_percent = 0.0
         self.highgear = highgear
-        self.diff_enabled = diff
+        self.difflock = difflock
 
     def on_startup(self):
         self.node.get_logger().info("Starting Actuation Interface Node...")
@@ -72,16 +72,16 @@ class ActuationInterface(rx.Field):
         msg = ManualControl()
         
         # Map steering percent to y channel [-1000, 1000]
-        msg.y = float(self.steering_percent * 10)
+        msg.y = - float(self.steering_percent * 10)
         
         # Map velocity percent to z channel [0, 1000], 500 is neutral
-        msg.z = float(500 + self.velocity_percent * 5)
+        msg.z = 1000 - float(500 + self.velocity_percent * 5)
         
         # Set enabled_extensions for SVEA
         msg.enabled_extensions = 252
         
         # Differential lock: aux1 (front) and aux2 (rear, inverted)
-        if self.diff_enabled:
+        if self.difflock:
             msg.aux1 = 1000.   # front diff ON
             msg.aux2 = -1000.  # rear diff ON (inverted)
         else:
@@ -137,17 +137,17 @@ class ActuationInterface(rx.Field):
         """Disable high gear."""
         self.highgear = False
 
-    def toggle_diff(self):
+    def toggle_difflock(self):
         """Toggle the differential lock state."""
-        self.diff_enabled = not self.diff_enabled
+        self.difflock = not self.difflock
 
-    def enable_diff(self): 
+    def enable_difflock(self): 
         """Enable the differential lock."""
-        self.diff_enabled = True
+        self.difflock = True
 
-    def disable_diff(self):
+    def disable_difflock(self):
         """Disable the differential lock."""
-        self.diff_enabled = False
+        self.difflock = False
 
     def _steer_to_percent_and_clip(self, steering):
         """Convert radians to percent of max steering actuation"""
