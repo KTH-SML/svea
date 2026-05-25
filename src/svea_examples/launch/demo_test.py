@@ -11,7 +11,8 @@ def main():
             name="joy_consumer",
             params=dict(joy_top="/joy",
                         joy_btns=','.join([
-                            "START:/load",
+                            "START:/qod",
+                            "BACK:/load",
                         ])))
 
     bl.node("svea_examples", "demo.py", name="demo")

@@ -24,6 +24,8 @@
     <arg name="mavproxy_qgc"      default="true"/>
     <arg name="qgc_host"          default="host.docker.internal"/>
 
+    <arg name="use_lidar"         default="true"/>
+
     <!-- Arguments END -->
 
     <!-- Localization -->
@@ -34,6 +36,7 @@
         <arg name="initial_pose_x" value="$(var initial_pose_x)" />
         <arg name="initial_pose_y" value="$(var initial_pose_y)" />
         <arg name="initial_pose_a" value="$(var initial_pose_a)" />
+	<arg name="use_lidar"      value="$(var use_lidar)" />
     </include>
     
     <!-- If-Else Group -->

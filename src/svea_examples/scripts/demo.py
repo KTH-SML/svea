@@ -12,16 +12,21 @@ class demo(rx.Node):
     """Call Ericsson APIs for demo."""
 
     DRYCALLS = True
+    SESSION_DURATION = rx.Parameter(60)  # seconds
+    UE_IP = rx.Parameter("10.47.75.52")
+    QOS_PROFILE = rx.Parameter("er_kip_4_10")
 
     def on_startup(self):
         self.create_service(Empty, '/qod', self.qod_cb)
         self.create_service(Empty, '/load', self.load_cb)
 
     def qod_cb(self, req, rep):
+        self.do_request()
         self.get_logger().info('QoD Call!')
         return rep
 
     def load_cb(self, req, rep):
+        self.do_request()
         self.get_logger().info('Start Load Call!')
         return rep
 
@@ -32,39 +37,31 @@ class demo(rx.Node):
         Example:
             return {"Authorization": f"Bearer {token}"}
         """
+        return {}
         raise NotImplementedError("Implement get_auth_header()")
 
-    def do_request(
-        self,
-        path: str,
-        body: dict | None,
-        *,
-        cces_ip: str,
-        cces_hostname: str,
-        ca_cert: str | None = None,
-        proxy: str | None = None,
-    ) -> None:
-        url = f"https://{cces_ip}:443/hub/qod/v0/sessions{path}"
+    def do_request(self) -> None:
+        url = f"http://10.13.22.21:31396/qod-proxy/sessions"
 
         call = dict(
             method="POST",
             url=url,
             headers={
-                **get_auth_header(),
+                **self.get_auth_header(),
                 "Content-Type": "application/json",
-                "Host": cces_hostname,
+                "Host": "er-k3s-husky.live.ericsson.net",
             },
             json={
-                "duration": SESSION_DURATION,
-                "ueId": {"ipv4addr": UE_IP},
+                "duration": self.SESSION_DURATION,
+                "ueId": {"ipv4addr": self.UE_IP},
                 "asId": {"ipv4addr": "0.0.0.0/0"},
                 "uePorts": {"ranges": [{"from": 1, "to": 65535}]},
                 "asPorts": {"ranges": [{"from": 1, "to": 65535}]},
-                "qos": QOS_PROFILE,
-                "notificationUri": NOTIFICATION_URL,
+                "qos": self.QOS_PROFILE,
+                "notificationUri": "http://10.4.128.10/echo-server/",
             },
             verify=False,
-            proxies=proxy and {'http': proxy, 'https': proxy},
+            # proxies=proxy and {'http': proxy, 'https': proxy},
             timeout=30,
         )
 

@@ -164,7 +164,7 @@ class joy_consumer(rx.Node):
 
         ## Button Services
         for btn, cli in self._btns.items():
-            if getattr(self._previous, btn) and not getattr(joy, btn):
+            if self.release_event(joy, btn):
                 self.get_logger().warn(f'Button Press Event: {btn}')
                 cli.call_async(Empty.Request())
 
@@ -172,8 +172,12 @@ class joy_consumer(rx.Node):
         self._previous = joy
 
     def release_event(self, joy, name):
-        return (getattr(self._previous, name)
-                and not getattr(joy, name))
+        if self._previous is not None:
+            self.get_logger().warn(str(ret := getattr(self._previous, name) 
+                    and not getattr(joy, name)))
+            return ret
+        return False
+
 
     def init_xbox(self):
         self._previous = Xbox360Controller()

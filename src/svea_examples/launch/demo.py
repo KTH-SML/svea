@@ -6,10 +6,19 @@ def main(name: str):
     bl = BetterLaunch()
 
     if name == 'svea':
-        # bl.include("svea_core", "svea.xml")
+        bl.include("svea_core", "svea.xml",
+                   is_sim=False, use_lidar=False,
+                   # qgc_host="10.0.0.28"
+                   use_mavproxy=False,
+                   )
         bl.node("svea_examples", "joy_consumer.py",
                 name="joy_consumer",
-                params=dict(joy_top="/joy"))
+                params=dict(joy_top="/joy",
+                            joy_btns=','.join([
+                                "START:/qod",
+                                "BACK:/load",
+                            ])))
+        bl.node("svea_examples", "demo.py", name="demo")
         bl.node("ros_fmq_bridge", "bridge_node",
                 name="ros_fmq_bridge",
                 params=dict(subscribeTopics="/joy"))
@@ -19,5 +28,3 @@ def main(name: str):
         bl.node("ros_fmq_bridge", "bridge_node",
                 name="ros_fmq_bridge",
                 params=dict(publishTopics="/joy"))
-
-

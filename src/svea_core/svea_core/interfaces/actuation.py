@@ -52,9 +52,10 @@ class ActuationInterface(rx.Field):
     manual_control_top = rx.Parameter('/mavros/manual_control/send')
     manual_control_pub = rx.Publisher(ManualControl, manual_control_top)
 
-    def __init__(self, rate=10, use_acceleration=False, highgear=False, difflock=False):
-        self.acceleration = use_acceleration
+    def __init__(self, rate=20, use_acceleration=False, highgear=False, difflock=False):
+        assert 2 <= rate <= 25, 'Actuation Interface: Publish rate outside of admissible bounds.'
         self.rate = rate
+        self.acceleration = use_acceleration
         self.steering_percent = 0.0
         self.velocity_percent = 0.0
         self.highgear = highgear
@@ -77,7 +78,7 @@ class ActuationInterface(rx.Field):
         # Map velocity percent to z channel [0, 1000], 500 is neutral
         msg.z = 1000 - float(500 + self.velocity_percent * 5)
         
-        # Set enabled_extensions for SVEA
+        # Set enabled_extensions for SVEA (Enables aux1 and aux2 channels)
         msg.enabled_extensions = 252
         
         # Differential lock: aux1 (front) and aux2 (rear, inverted)
