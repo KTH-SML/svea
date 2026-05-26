@@ -48,10 +48,10 @@ class Xbox360Controller(Joystick):
     XBOX: bool = False
     LSB: bool = False
     RSB: bool = False
-    DPADU: bool = False
-    DPADD: bool = False
     DPADL: bool = False
     DPADR: bool = False
+    DPADU: bool = False
+    DPADD: bool = False
 
 @dataclass
 class LogitechG27(Joystick):
@@ -172,12 +172,8 @@ class joy_consumer(rx.Node):
         self._previous = joy
 
     def release_event(self, joy, name):
-        if self._previous is not None:
-            self.get_logger().warn(str(ret := getattr(self._previous, name) 
-                    and not getattr(joy, name)))
-            return ret
-        return False
-
+        return (False if self._previous is None else
+                getattr(self._previous, name) and not getattr(joy, name))
 
     def init_xbox(self):
         self._previous = Xbox360Controller()
@@ -187,10 +183,11 @@ class joy_consumer(rx.Node):
     def read_xbox(self, msg):
         joy = Xbox360Controller.from_msg(msg)
 
-        ## Velocity: Right Trigger (RT) + Left Button (LB)
-        self._velocity = (1 - joy.RT)/2 * self.MAX_VELOCITY
-        if msg.buttons[4]:
-            self._velocity*= -1
+        ## Velocity: Right Trigger (RT) + Left Trigger (LT)
+        if joy.LT:
+            self._velocity = - (1 - joy.LT)/2 * self.MAX_VELOCITY
+        else:
+            self._velocity = (1 - joy.RT)/2 * self.MAX_VELOCITY
 
         ## Steering: Left Stick
         self._steering = joy.LSX * self.MAX_STEERING
@@ -206,6 +203,8 @@ class joy_consumer(rx.Node):
         # at release
         if self.release_event(joy, 'Y'):
             self.actuation.toggle_difflock()
+        
+        return joy
 
     def init_g29(self):
         self._previous = LogitechG29()
@@ -217,6 +216,11 @@ class joy_consumer(rx.Node):
 
         ## Velocity: Right Pedal
         self._velocity = (1 - joy.RIGHT_PEDAL)/2 * self.MAX_VELOCITY
+        if 0. < joy.LEFT_PEDAL < .75:
+            self.get_logger().warn('Logitech G29: Unclear intent, LEFT_PEDAL pressed but not all the way for enabling reverse direction.')
+            self._velocity = 0.
+        elif .75 <= joy.LEFT_PEDAL:
+            self._velocity *= -1
 
         ## Steering: Wheel
         self._steering = joy.WHEEL * self.MAX_STEERING
@@ -228,6 +232,7 @@ class joy_consumer(rx.Node):
         if self.release_event(joy, 'SHIFT_DOWN'):
             self.actuation.disable_highgear()
 
+        return joy
 
 if __name__ == '__main__':
     joy_consumer.main()
