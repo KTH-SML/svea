@@ -2,7 +2,7 @@
 from better_launch import BetterLaunch, launch_this
 
 @launch_this
-def main(name: str):
+def main(name: str, joy_kind: str = 'xbox', drycalls: bool = False):
     bl = BetterLaunch()
 
     if name == 'svea':
@@ -14,17 +14,30 @@ def main(name: str):
         bl.node("svea_examples", "joy_consumer.py",
                 name="joy_consumer",
                 params=dict(joy_top="/joy",
+                            joy_kind=joy_kind,
                             joy_btns=','.join([
                                 "START:/qod",
-                                "BACK:/load",
-                            ])))
-        bl.node("svea_examples", "demo.py", name="demo")
+                                "BACK:/load_status",
+                                "DPADU:/load_on",
+                                "DPADD:/load_off",
+                            ] if joy_kind == 'xbox' else [
+                                "ENTER:/qod",
+                                "SHARE:/load_status",
+                                "PLUS:/load_on",
+                                "MINUS:/load_off",
+                            ] if joy_kind == 'g29' else [])))
+        bl.node("svea_examples", "demo.py", 
+                name="demo",
+                params=dict(DRYCALLS=drycalls))
         bl.node("ros_fmq_bridge", "bridge_node",
                 name="ros_fmq_bridge",
-                params=dict(subscribeTopics="/joy"))
+                params=dict(subscribeTopics="/joy",
+                            publishTopics="/load/status"))
 
     if name == 'teleop':
         bl.node("joy", "joy_node", name="joy_node")
         bl.node("ros_fmq_bridge", "bridge_node",
                 name="ros_fmq_bridge",
-                params=dict(publishTopics="/joy"))
+                params=dict(publishTopics="/joy",
+                            subscribeTopics="/load/status"))
+
