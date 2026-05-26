@@ -1,16 +1,29 @@
 #!/usr/bin/env python3
 from better_launch import BetterLaunch, launch_this
+from typing import Literal
 
 @launch_this
-def main(name: str, joy_kind: str = 'xbox', drycalls: bool = False):
+def main(
+    name: Literal['svea'] | Literal['teleop'],
+    joy_kind: str = 'xbox',
+    drycalls: bool = False,
+    use_fmq: bool = True,
+    start_joy: bool | Literal[...] = ...,
+):
     bl = BetterLaunch()
 
+    if start_joy is ...:
+        start_joy = name == 'teleop'
+
     if name == 'svea':
+
+        # Start SVEA system
         bl.include("svea_core", "svea.xml",
                    is_sim=False, use_lidar=False,
                    # qgc_host="10.0.0.28"
-                   use_mavproxy=False,
-                   )
+                   use_mavproxy=False)
+
+        # Start Joy->SVEA translator
         bl.node("svea_examples", "joy_consumer.py",
                 name="joy_consumer",
                 params=dict(joy_top="/joy",
@@ -26,18 +39,27 @@ def main(name: str, joy_kind: str = 'xbox', drycalls: bool = False):
                                 "PLUS:/load_on",
                                 "MINUS:/load_off",
                             ] if joy_kind == 'g29' else [])))
+        
+        # Start Ericsson API caller
         bl.node("svea_examples", "demo.py", 
                 name="demo",
                 params=dict(DRYCALLS=drycalls))
-        bl.node("ros_fmq_bridge", "bridge_node",
-                name="ros_fmq_bridge",
-                params=dict(subscribeTopics="/joy",
-                            publishTopics="/load/status"))
+
+        if use_fmq:
+            bl.node("ros_fmq_bridge", "bridge_node",
+                    name="ros_fmq_bridge",
+                    params=dict(subscribeTopics="/joy",
+                                publishTopics="/load/status"))
 
     if name == 'teleop':
+
+        if use_fmq:
+            bl.node("ros_fmq_bridge", "bridge_node",
+                    name="ros_fmq_bridge",
+                    params=dict(publishTopics="/joy",
+                                subscribeTopics="/load/status"))
+
+    if start_joy:
+        # Start Joystick reader
         bl.node("joy", "joy_node", name="joy_node")
-        bl.node("ros_fmq_bridge", "bridge_node",
-                name="ros_fmq_bridge",
-                params=dict(publishTopics="/joy",
-                            subscribeTopics="/load/status"))
 
