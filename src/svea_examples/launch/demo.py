@@ -8,6 +8,7 @@ def main(
     joy_kind: str = 'xbox',
     drycalls: bool = False,
     use_fmq: bool = True,
+    use_joy: bool = True,
     start_joy: bool | Literal[...] = ...,
 ):
     bl = BetterLaunch()
@@ -24,32 +25,44 @@ def main(
                    use_mavproxy=False)
 
         # Start Joy->SVEA translator
-        bl.node("svea_examples", "joy_consumer.py",
-                name="joy_consumer",
-                params=dict(joy_top="/joy",
-                            joy_kind=joy_kind,
-                            joy_btns=','.join([
-                                "START:/qod",
-                                "BACK:/load_status",
-                                "DPADU:/load_on",
-                                "DPADD:/load_off",
-                            ] if joy_kind == 'xbox' else [
-                                "ENTER:/qod",
-                                "SHARE:/load_status",
-                                "PLUS:/load_on",
-                                "MINUS:/load_off",
-                            ] if joy_kind == 'g29' else [])))
-        
+        if use_joy:
+            bl.node("svea_examples", "joy_consumer.py",
+                    name="joy_consumer",
+                    params=dict(joy_top="/joy",
+                                joy_kind=joy_kind,
+                                joy_btns=','.join([
+                                    "START:/qod",
+                                    "BACK:/load_status",
+                                    "DPADU:/load_on",
+                                    "DPADD:/load_off",
+                                ] if joy_kind == 'xbox' else [
+                                    "ENTER:/qod",
+                                    "SHARE:/load_status",
+                                    "PLUS:/load_on",
+                                    "MINUS:/load_off",
+                                ] if joy_kind == 'g29' else [])))
+        else:
+            bl.node("svea_examples", "twist_consumer.py",
+                    name="twist_consumer",
+                    params=dict(twist_top="fmq/remote_control",
+                                twist_type="geometry_msgs/msg/TwistStamped"))
+
         # Start Ericsson API caller
         bl.node("svea_examples", "demo.py", 
                 name="demo",
                 params=dict(DRYCALLS=drycalls))
 
         if use_fmq:
-            bl.node("ros_fmq_bridge", "bridge_node",
-                    name="ros_fmq_bridge",
-                    params=dict(subscribeTopics="/joy",
-                                publishTopics="/load/status"))
+            if use_joy:
+                bl.node("ros_fmq_bridge", "bridge_node",
+                        name="ros_fmq_bridge",
+                        params=dict(subscribeTopics="/joy,",
+                                    publishTopics="/load/status"))
+            else:
+                bl.node("ros_fmq_bridge", "bridge_node",
+                        name="ros_fmq_bridge",
+                        params=dict(subscribeTopics="fmq/remote_control",
+                                    publishTopics="/load/status"))
 
     if name == 'teleop':
 

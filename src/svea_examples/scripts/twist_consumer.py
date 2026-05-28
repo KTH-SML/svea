@@ -17,7 +17,7 @@ class twist_consumer(rx.Node):
 
     def on_startup(self):
         if self.twist_type not in (Twist, TwistStamped):
-            raise TyperError(f'Invalid message type for {self.twist_top}: {self.twist_type}')
+            raise TypeError(f'Invalid message type for {self.twist_top}: {self.twist_type}')
 
     @rx.Subscriber(twist_type, twist_top)
     def twist_cb(self, msg):
