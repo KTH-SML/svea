@@ -8,7 +8,7 @@ def main(
     joy_kind: str = 'xbox',
     drycalls: bool = False,
     use_fmq: bool = True,
-    use_joy: bool = True,
+    use_joy: bool = False,
     start_joy: bool | Literal[...] = ...,
 ):
     bl = BetterLaunch()
@@ -41,7 +41,7 @@ def main(
                                     "PLUS:/load_on",
                                     "MINUS:/load_off",
                                 ] if joy_kind == 'g29' else [])))
-        else:
+        if not use_joy:
             bl.node("svea_examples", "twist_consumer.py",
                     name="twist_consumer",
                     params=dict(twist_top="fmq/remote_control",
@@ -58,7 +58,7 @@ def main(
                         name="ros_fmq_bridge",
                         params=dict(subscribeTopics="/joy,",
                                     publishTopics="/load/status"))
-            else:
+            if not use_joy:
                 bl.node("ros_fmq_bridge", "bridge_node",
                         name="ros_fmq_bridge",
                         params=dict(subscribeTopics="fmq/remote_control",
