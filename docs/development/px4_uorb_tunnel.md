@@ -4,7 +4,7 @@
 The `px4_uorb_tunnel` bridge allows forwarding of internal PX4 `uORB` topics directly to ROS 2 over MAVLink. This is typically used for custom or high-bandwidth telemetry that does not map cleanly to standard MAVLink messages. In the SVEA architecture, this is specifically used to retrieve detailed rail-level telemetry from the custom SVEA power board (`power_monitor` topics).
 
 ## Architecture
-1. **PX4 firmware (Sender):** The `PX4_UORB_TUNNEL` stream captures selected local uORB topics, serializes them (handling fragmentation if necessary), and sends them over MAVLink using the `TUNNEL` message (ID 128, payload type `0xE001`).
+1. **PX4 firmware (Sender):** The `PX4_UORB_TUNNEL` stream captures selected local uORB topics, serializes them (handling fragmentation if necessary), and sends them over MAVLink using the `TUNNEL` message (ID 385, payload type `0xE001`).
 2. **MAVROS (Transport):** The standard `mavros_node` relays the raw MAVLink `TUNNEL` payload to ROS 2.
 3. **SVEA Core Bridge (Receiver):** The `svea_core` package provides a `px4_uorb_tunnel` node. It subscribes to the tunnel stream, decodes the custom binary payload, reconstructs fragmented messages, and republishes them as native ROS 2 topics under the `/px4/uorb/*` namespace.
 
@@ -29,9 +29,9 @@ The PX4 SVEA firmware guarantees deterministic ordering for the power monitor in
 ## Quick Start
 
 ### 1. Check PX4 Configuration
-The board's startup script (`rc.board_extras`) usually configures this automatically. If you need to manually enable the `PX4_UORB_TUNNEL` stream from the PX4 NSH console:
+The board's startup script (`rc.board_extras`) usually configures this automatically. If you need to manually adjust the `PX4_UORB_TUNNEL` stream from the PX4 NSH console, use the serial device for the active MAVLink instance:
 ```bash
-mavlink stream -u 0 -s PX4_UORB_TUNNEL -r 20
+mavlink stream -d /dev/ttyACM0 -s PX4_UORB_TUNNEL -r 4
 ```
 
 ### 2. Run the ROS 2 Bridge

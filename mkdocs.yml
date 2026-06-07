@@ -33,6 +33,7 @@ nav:
     - Pure Pursuit: examples/pure_pursuit.md
   - Development:
     - Documentation: development/documentation.md
+    - MAVLink Routing: development/mavlink_routing.md
     - PX4 uORB Tunnel: development/px4_uorb_tunnel.md
   - Reference:
     - Models: reference/models.md

@@ -21,6 +21,7 @@
     <arg name="lli_baud_rate"     default="921600"/>
 
     <arg name="use_mavproxy"      default="true"/>
+    <arg name="start_mavproxy"    default="true"/>
     <arg name="mavproxy_qgc"      default="true"/>
     <arg name="qgc_host"          default="host.docker.internal"/>
 
@@ -63,11 +64,11 @@
             <param name="frame_id"    value="$(var name)/imu"/>
         </node> -->
 
-        <executable if="$(eval &quot;'$(var use_mavproxy)' == 'true' and '$(var mavproxy_qgc)' != 'true'&quot;)"
+        <executable if="$(eval &quot;'$(var use_mavproxy)' == 'true' and '$(var start_mavproxy)' == 'true' and '$(var mavproxy_qgc)' != 'true'&quot;)"
             cmd="mavproxy.py --show-errors --master=$(var lli_serial_device),$(var lli_baud_rate) --out=udp:127.0.0.1:14551"
             output="screen"/>
 
-        <executable if="$(eval &quot;'$(var use_mavproxy)' == 'true' and '$(var mavproxy_qgc)' == 'true'&quot;)"
+        <executable if="$(eval &quot;'$(var use_mavproxy)' == 'true' and '$(var start_mavproxy)' == 'true' and '$(var mavproxy_qgc)' == 'true'&quot;)"
             cmd="mavproxy.py --show-errors --master=$(var lli_serial_device),$(var lli_baud_rate) --out=udp:127.0.0.1:14551 --out=udp:$(var qgc_host):14550"
             output="screen"/>
 

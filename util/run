@@ -32,9 +32,11 @@ if ! (istrue DEV || is_darwin); then
 else
     # :7447 (Zenoh) 
     # :8765 (Foxglove)
+    # :14551/udp (MAVProxy on macOS host -> MAVROS in container)
     append ARGS \
         -p 7447:7447 \
-        -p 8765:8765
+        -p 8765:8765 \
+        -p 14551:14551/udp
 fi
 
 # Image to run
