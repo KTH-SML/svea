@@ -19,11 +19,3 @@ pyserial
 pyubx2
 geopy
 utm
-nats-py
-
-# For PX4
-mavproxy
-future
-
-# Sandbox QoD Demo
-requests
