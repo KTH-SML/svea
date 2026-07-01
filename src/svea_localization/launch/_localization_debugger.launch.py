@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+from better_launch import BetterLaunch, launch_this
+
+@launch_this
+def main(
+):
+    assert False, "This launch file is not yet implemented in better_launch."
+
+
+"""
 <?xml version="1.0"?>
 
 <launch>
@@ -114,4 +124,4 @@
     <!-- Rosbag -->
     <node if="$(var record)" name="rosbag" pkg="rosbag" exec="record" output="screen" args="-a -o $(var rosbag_prefix)"/>
 </launch>
- 
+"""

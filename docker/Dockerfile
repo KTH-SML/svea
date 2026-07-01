@@ -22,9 +22,6 @@ RUN apt-get update -y
 # RUN apt-get install --no-install-recommends -y \
 #         tmux htop
 
-RUN curl -fsSL https://ros-bridge.s3.eu-north-1.amazonaws.com/install.sh | bash
-RUN apt-get -y install ros-jazzy-joy
-
 # Install pip packages specified in requirements.txt
 RUN --mount=type=bind,source=./requirements.txt,target=/tmp/requirements.txt,readonly \
     pip install \

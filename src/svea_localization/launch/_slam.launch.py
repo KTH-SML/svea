@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+from better_launch import BetterLaunch, launch_this
+
+@launch_this
+def main(
+):
+    assert False, "This launch file is not yet implemented in better_launch."
+
+"""
 <!--TODO-->
 
 <launch>
@@ -45,3 +54,4 @@
     
 
 </launch>
+"""
