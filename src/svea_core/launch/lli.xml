@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Arguments BEGIN -->
+    <arg name="name"            default="self"/>
+    <arg name="serial_device"   default="/dev/serial/by-id/usb-SVEA_PX4_AUTOPILOT_0-if00"/>
+    <arg name="baud_rate"       default="921600"/>
+    <arg name="base_frame"      default="$(var name)/base_link"/>
+    <arg name="odom_frame"      default="$(var name)/odom"/>
+    <arg name="map_frame"       default="map"/>
+    <arg name="wheel_base"      default="0.15"/>
+    <arg name="wheel_radius"    default="0.32"/>
+    <!-- Arguments END -->
+
+    <group>
+
+        <push_ros_namespace namespace="$(var name)"/>
+
+        <!-- Low-Level Interface -->
+
+        <node pkg="mavros" exec="mavros_node" namespace="mavros" ros_args="--log-level warn --log-level mavros.sys:=fatal --log-level mavros.cmd:=error">
+            <!-- Parameters -->
+            <param name="fcu_url" value="serial://$(var serial_device):$(var baud_rate)"/>
+            <param name="gcs_url" value="tcp-l://0.0.0.0:5760"/>
+	    <param name="base_link_frame_id" value="$(var base_frame)"/>
+            <param name="odom_frame_id" value="$(var odom_frame)"/>
+            <param name="map_frame_id" value="$(var map_frame)"/>
+            <param from="$(find-pkg-share svea_core)/params/mavros.yaml" allow_substs="true"/>
+            <!-- Remappings -->
+            <remap from="imu/diff_pressure" to="_unused/imu/diff_pressure"/>
+            <remap from="imu/mag" to="_unused/imu/mag"/>
+            <remap from="imu/static_pressure" to="_unused/imu/static_pressure"/>
+            <remap from="imu/temperature_baro" to="_unused/imu/temperature_baro"/>
+            <remap from="imu/temperature_imu" to="_unused/imu/temperature_imu"/>
+            <remap from="manual_control/control" to="_unused/manual_control/control"/>
+            <remap from="rc/out" to="_unused/rc/out"/>
+            <remap from="rc/override" to="_unused/rc/override"/>
+            <remap from="statustext/recv" to="_unused/statustext/recv"/>
+            <remap from="statustext/send" to="_unused/statustext/send"/>
+            <remap from="status_event" to="_unused/status_event"/>
+            <remap from="sys_status" to="_unused/sys_status"/>
+            <remap from="extended_state" to="_unused/extended_state"/>
+            <remap from="estimator_status" to="_unused/estimator_status"/>
+            <remap from="time_reference" to="_unused/time_reference"/>
+            <remap from="timesync_status" to="_unused/timesync_status"/>
+        </node>
+
+        <node pkg="svea_core" exec="px4_uorb_tunnel.py" name="px4_uorb_tunnel">
+            <param name="mavlink_topic" value="mavros/tunnel/out"/>
+        </node>
+
+        <!--LLI Fixers-->
+
+        <!-- <node pkg="svea_core" exec="encoder_filter.py" name="encoder_filter" output="screen">
+            <param name="frame_id"    value="$(var name)/wheel_encoder"/>
+        </node>
+
+        <node pkg="svea_core" exec="imu_bias_remover.py" name="imu_bias_remover" output="screen">
+            <param name="frame_id"    value="$(var name)/imu"/>
+        </node> -->
+
+    </group>
+
+</launch>

@@ -6,24 +6,24 @@
 
 set -e
 
-# Start SSH
-service ssh start
+# If you want something to start or run when the container spins up,
+# this is the place to put it!
 
-# Get project information
-source util/config.sh
+section() {
+    local msg="== $1 "
+    local cols=${COLUMNS:-$(tput cols)}
+    local fill=$(( cols - ${#msg} ))
 
-source "/opt/ros/$ROS_DISTRO/setup.bash" --
+    (( fill < 0 )) && fill=0
 
-# Micro-ROS Agent environment variables
-if [ "$MICROROS_DISABLE_SHM" = "1" ] ; then
-    if [ "$ROS_LOCALHOST_ONLY" = "1" ] ; then
-        export FASTRTPS_DEFAULT_PROFILES_FILE=/tmp/disable_fastdds_shm_localhost_only.xml
-    else
-        export FASTRTPS_DEFAULT_PROFILES_FILE=/tmp/disable_fastdds_shm.xml
-    fi
-fi
+    local gray=$(tput setaf 8)
+    local bold=$(tput bold)
+    local reset=$(tput sgr0)
 
-# To build anything that has been added by volume...
-colcon build --symlink-install
+    printf "%s%s%s" "$bold" "$gray" "$msg"
+    printf '%*s' "$fill" '' | tr ' ' '='
+    printf "%s\n" "$reset"
+}
+section "Entering SVEA Container"
 
 exec "$@"

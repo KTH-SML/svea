@@ -1,0 +1,32 @@
+/**:
+  ros__parameters:
+    plugin_allowlist:
+      - command
+      - imu
+      - manual_control
+      - rc_io
+      - sys_status
+      - sys_time
+      - tunnel
+      - wheel_odometry
+
+/**/imu:
+  ros__parameters:
+    frame_id: "$(var name)/imu"
+
+/**/wheel_odometry:
+  ros__parameters:
+    use_rpm: false
+    send_raw: false
+    send_twist: true
+    frame_id: "$(var odom_frame)"
+    child_frame_id: "$(var base_frame)"
+    wheel0:
+      x: 0.0
+      y: 0.16
+      radius: 0.055
+    wheel1:
+      x: 0.0
+      y: -0.16
+      radius: 0.055
+

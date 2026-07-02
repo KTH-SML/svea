@@ -16,31 +16,14 @@ import numpy as np
 
 import rclpy
 import rclpy.clock
-from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 import tf2_ros
 from tf_transformations import quaternion_from_euler
 from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
-from std_msgs.msg import Bool, Int8
+from mavros_msgs.msg import ManualControl
 
 from svea_core import rosonic as rx
 from svea_core.models.bicycle import Bicycle4DWithESC
-
-qos_pubber = QoSProfile(
-    reliability=QoSReliabilityPolicy.RELIABLE,
-    durability=QoSDurabilityPolicy.VOLATILE,
-    history=QoSHistoryPolicy.KEEP_LAST,
-    depth=1,
-)
-
-qos_subber = QoSProfile(
-    reliability=QoSReliabilityPolicy.RELIABLE,  # Reliable
-    history=QoSHistoryPolicy.KEEP_LAST,         # Keep the last N messages
-    durability=QoSDurabilityPolicy.VOLATILE,    # Volatile
-    depth=10,                                   # Size of the queue
-)
-
-qos = QoSProfile(depth=10)
 
 class sim_svea(rx.Node):
     """
@@ -76,12 +59,7 @@ class sim_svea(rx.Node):
     initial_pose_a = rx.Parameter(0.0)
 
     odometry_top = rx.Parameter('odometry/local')
-
-    # In simulation, we want lli to be namespaced
-    steering_request_top = rx.Parameter('lli/ctrl/steering')
-    throttle_request_top = rx.Parameter('lli/ctrl/throttle')
-    highgear_request_top = rx.Parameter('lli/ctrl/highgear')
-    diff_request_top = rx.Parameter('lli/ctrl/diff')
+    control_top = rx.Parameter('mavros/manual_control/send')
 
     map_frame = rx.Parameter('map')
     odom_frame = rx.Parameter('odom')
@@ -90,28 +68,17 @@ class sim_svea(rx.Node):
     publish_tf = rx.Parameter(True)
 
     ## Publishers ##
-    odometry_pub = rx.Publisher(Odometry, odometry_top, qos_pubber)
+    odometry_pub = rx.Publisher(Odometry, odometry_top)
 
     ## Subscribers ##
 
-    @rx.Subscriber(Int8, steering_request_top, qos_subber)
-    def steering_request_cb(self, steering_request_msg):
-        self.steering_req = steering_request_msg.data * -1
-        self.last_ctrl_time = self.clock.now().to_msg()
-
-    @rx.Subscriber(Int8, throttle_request_top, qos_subber)
-    def throttle_request_cb(self, throttle_request_msg):
-        self.velocity_req = throttle_request_msg.data
-        self.last_ctrl_time = self.clock.now().to_msg()
-
-    @rx.Subscriber(Bool, highgear_request_top, qos_subber)
-    def highgear_request_cb(self, highgear_request_msg):
-        self.highgear = highgear_request_msg.data
-        self.last_ctrl_time = self.clock.now().to_msg()
-
-    @rx.Subscriber(Bool, diff_request_top, qos_subber)
-    def diff_request_cb(self, diff_request_msg):
-        self.diff = diff_request_msg.data
+    @rx.Subscriber(ManualControl, control_top)
+    def recv_control(self, msg: ManualControl):
+        """Receive control inputs from the low-level interface."""
+        self.steering_req = - msg.y / 10.0
+        self.velocity_req = (1000 - msg.z) / 5.0
+        self.highgear = msg.aux3 < 0
+        self.diff = msg.aux1 > 0 and msg.aux2 < 0
         self.last_ctrl_time = self.clock.now().to_msg()
 
     ## Main Methods ##

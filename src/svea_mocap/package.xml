@@ -1,14 +1,12 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>svea_examples</name>
+  <name>svea_mocap</name>
   <version>0.0.0</version>
-  <description>Examples for SVEA</description>
+  <description>A convenience package for integration motion capture with SVEA</description>
   <maintainer email="kajarf@kth.se">Kaj Munhoz Arfvidsson</maintainer>
   <license>TODO: License declaration</license>
 
-  <depend>rclpy</depend>
-  <depend>joy</depend>
   <depend>svea_core</depend>
 
   <export>

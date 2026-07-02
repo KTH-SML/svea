@@ -1,24 +1,14 @@
 """
 Author: Frank Jiang, Tobias Bolin
 """
-from threading import Event
-from collections import deque
 from math import pi, isnan
-from typing import Optional, Self
+from typing import Optional
 
-from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
-from rclpy.node import Node
-
+from rclpy.qos import QoSProfile
 from enum import IntEnum
 from .. import rosonic as rx
-from std_msgs.msg import Bool, Int8
+from mavros_msgs.msg import ManualControl
 
-QoS_DEFAULT = QoSProfile(depth = 10)
-QoS_RELIABLE = QoSProfile(
-    reliability=QoSReliabilityPolicy.RELIABLE,
-    durability=QoSDurabilityPolicy.VOLATILE,
-    depth=1,
-)
 
 class Controls(IntEnum):
     """Enum for control codes sent to the low-level interface."""
@@ -54,50 +44,55 @@ class ActuationInterface(rx.Field):
     # The max velocity in Gear 2 is around 3.6 m/s.
     MAX_SPEED_0 = 1.7               # [m/s]
     MAX_SPEED_1 = 3.6               # [m/s]
-    BIAS_STEERING = -9
 
-    is_sim = rx.Parameter(False)
+    actuation = rx.namespace(
+        control_top = rx.Parameter('mavros/manual_control/send'),
+    )
 
-    steering_top = rx.Parameter('/lli/ctrl/steering')
-    steering_pub = rx.Publisher(Int8, steering_top, qos_profile=QoS_DEFAULT)
+    control_pub = rx.Publisher(ManualControl, actuation.control_top)
 
-    throttle_top = rx.Parameter('/lli/ctrl/throttle')
-    throttle_pub = rx.Publisher(Int8, throttle_top, qos_profile=QoS_DEFAULT)
-
-    highgear_top = rx.Parameter('/lli/ctrl/highgear')
-    highgear_pub = rx.Publisher(Bool, highgear_top, qos_profile=QoS_RELIABLE)
-
-    diff_top = rx.Parameter('/lli/ctrl/diff')
-    diff_pub = rx.Publisher(Bool, diff_top, qos_profile=QoS_RELIABLE)
-
-    def __init__(self, rate=20, use_acceleration=False, highgear=False, diff=False):
-        self.acceleration = use_acceleration
+    def __init__(self, rate=20, use_acceleration=False, highgear=False, difflock=False):
+        assert 2 <= rate <= 25, 'Actuation Interface: Publish rate outside of admissible bounds.'
         self.rate = rate
-        self.latest_controls = [0., 0.] # [steering, velocity]
-        self.highgear_msg = Bool()
-        self.highgear_msg.data = highgear
-        self.diff_msg = Bool()
-        self.diff_msg.data = diff
-        self.steering_msg = Int8()
-        self.steering_msg.data = 0
-        self.velocity_msg = Int8()
-        self.velocity_msg.data = 0
+        self.acceleration = use_acceleration
+        self.steering_percent = 0.0
+        self.velocity_percent = 0.0
+        self.highgear = highgear
+        self.difflock = difflock
 
     def on_startup(self):
         self.node.get_logger().info("Starting Actuation Interface Node...")
         self.node.create_timer(1/self.rate, self.loop)
-        self.highgear_pub.publish(self.highgear_msg)
-        self.diff_pub.publish(self.diff_msg)
         self.node.get_logger().info("Actuation Interface is ready.")
-        if self.is_sim:
-            self.BIAS_STEERING = 0
 
     def loop(self):
-        """Main loop to publish control messages."""
-        self.steering_msg.data = int(self.latest_controls[Controls.STEERING] * - 1.27 - self.BIAS_STEERING)  # 1.27 is a factor to convert from percent to the range of -127 to 127
-        self.velocity_msg.data = int(self.latest_controls[Controls.VELOCITY] * 1.27) # 1.27 is a factor to convert from percent to the range of -127 to 127
-        self.steering_pub.publish(self.steering_msg)
-        self.throttle_pub.publish(self.velocity_msg)
+        """Main loop to publish ManualControl messages."""
+        msg = ManualControl()
+        
+        # Map steering percent to y channel [-1000, 1000]
+        msg.y = - float(self.steering_percent * 10)
+        
+        # Map velocity percent to z channel [0, 1000], 500 is neutral
+        msg.z = 1000 - float(500 + self.velocity_percent * 5)
+        
+        # Set enabled_extensions for SVEA (Enables aux1 and aux2 channels)
+        msg.enabled_extensions = 252
+        
+        # Differential lock: aux1 (front) and aux2 (rear, inverted)
+        if self.difflock:
+            msg.aux1 = 1000.   # front diff ON
+            msg.aux2 = -1000.  # rear diff ON (inverted)
+        else:
+            msg.aux1 = -1000.
+            msg.aux2 = 1000.
+        
+        # High gear: aux3
+        if self.highgear:
+            msg.aux3 = -1000.
+        else:
+            msg.aux3 = 1000.
+
+        self.control_pub.publish(msg)
 
     def send_control(self,
                      steering:Optional[float] = None,
@@ -108,61 +103,49 @@ class ActuationInterface(rx.Field):
             steer_percent = self._steer_to_percent_and_clip(steering) 
             self.__send_steering(steer_percent)
         
-        if vel_or_acc is not None or not isnan(vel_or_acc):
+        if vel_or_acc is not None and not isnan(vel_or_acc):
             if self.acceleration:
                 self.__send_acceleration(vel_or_acc)                            
             else:
                 vel_percent = self._speed_to_percent(vel_or_acc) 
                 vel_percent = self._speed_clip(vel_percent)
                 self.__send_velocity(vel_percent)
-            
-            
-            
+    
     def __send_steering(self, steering):
-        self.latest_controls[Controls.STEERING] = steering
+        self.steering_percent = steering
 
     def __send_velocity(self, velocity):
-        self.latest_controls[Controls.VELOCITY] = velocity
+        self.velocity_percent = velocity
 
     def __send_acceleration(self, acceleration):        
         acc_percent = self._speed_to_percent(acceleration) 
-        vel_percent = self._speed_clip(self.latest_controls[Controls.VELOCITY] + acc_percent)
+        vel_percent = self._speed_clip(self.velocity_percent + acc_percent)
         self.__send_velocity(vel_percent)
 
 
     def toggle_highgear(self):
         """Toggle the high gear state."""
-        if self.highgear_msg.data:
-            self.disable_highgear()
-        else:
-            self.enable_highgear()
+        self.highgear = not self.highgear
 
     def enable_highgear(self):
         """Enable high gear."""
-        self.highgear_msg.data = True
-        self.highgear_pub.publish(self.highgear_msg)
+        self.highgear = True
 
     def disable_highgear(self):
         """Disable high gear."""
-        self.highgear_msg.data = False
-        self.highgear_pub.publish(self.highgear_msg)
+        self.highgear = False
 
-    def toggle_diff(self):
+    def toggle_difflock(self):
         """Toggle the differential lock state."""
-        if self.diff_msg.data:
-            self.disable_diff()
-        else:
-            self.enable_diff()
+        self.difflock = not self.difflock
 
-    def enable_diff(self): 
+    def enable_difflock(self): 
         """Enable the differential lock."""
-        self.diff_msg.data = True
-        self.diff_pub.publish(self.diff_msg)
+        self.difflock = True
 
-    def disable_diff(self):
+    def disable_difflock(self):
         """Disable the differential lock."""
-        self.diff_msg.data = False
-        self.diff_pub.publish(self.diff_msg)
+        self.difflock = False
 
     def _steer_to_percent_and_clip(self, steering):
         """Convert radians to percent of max steering actuation"""
@@ -189,4 +172,4 @@ class ActuationInterface(rx.Field):
         Returns:
             The maximum speed, independent of direction
         """
-        return self.MAX_SPEED_1 if self.highgear_msg.data else self.MAX_SPEED_0
+        return self.MAX_SPEED_1 if self.highgear else self.MAX_SPEED_0

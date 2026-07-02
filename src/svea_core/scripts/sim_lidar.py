@@ -44,6 +44,21 @@ qos_subber = QoSProfile(
 )
 
 
+def prepare_obstacles(obstacles):
+    """Obstacles are defined as a list of edges, where each edge is a list of 
+    two points. Each point is a list of two coordinates (x, y). This function
+    adds the first point to the end of each edge to close the polygon.
+
+    Expected type: list[str], where each element is a string representation of
+    a list of points.
+    """
+    obstacles = ast.literal_eval(obstacles)
+    # add last segment to close polygon
+    for edges in obstacles:
+        edges.append(edges[0])
+    return obstacles
+
+
 class sim_lidar(rx.Node):
     """Simulated 1-band lidar. It works by taking a list of obstacles,
     and simulates the detected points. Parameters are based on the
@@ -54,9 +69,6 @@ class sim_lidar(rx.Node):
     is to ensure it can be directly used within the SimSVEA class.
 
     #TODO: add updating list of visible edges
-
-
-    TODO: Update for rosonic.
     """
 
      ## Constants ##
@@ -77,15 +89,13 @@ class sim_lidar(rx.Node):
     ## Parameters ##
     odometry_top = rx.Parameter('odometry/local')
     laser_frame = rx.Parameter('laser')
-    _viz_points_topic = 'viz_lidar_points'
-    _viz_rays_topic = 'viz_lidar_rays'
-    _viz_edges_topic = 'viz_edges'
-
+    obstacles = rx.Parameter('', evaluate=prepare_obstacles)
+    
     ## Publishers ##
     _scan_pub = rx.Publisher(LaserScan, 'scan', qos_pubber)
-    _viz_points_pub = rx.Publisher(PointCloud, _viz_points_topic, qos_pubber)
-    _viz_rays_pub = rx.Publisher(Marker, _viz_rays_topic, qos_pubber)
-    _viz_edges_pub = rx.Publisher(Marker, _viz_edges_topic, qos_pubber)
+    _viz_points_pub = rx.Publisher(PointCloud, 'viz_lidar_points', qos_pubber)
+    _viz_rays_pub = rx.Publisher(Marker, 'viz_lidar_rays', qos_pubber)
+    _viz_edges_pub = rx.Publisher(Marker, 'viz_edges', qos_pubber)
     
     ## Subscribers ##
     @rx.Subscriber(Odometry, odometry_top, qos_subber)
@@ -120,7 +130,6 @@ class sim_lidar(rx.Node):
 
         self._lidar_position = None # [x, y, yaw] -> [m, m, rad]
         self._last_visibility_pos = None # [x, y, yaw] -> [m, m, rad]
-        self._obstacles = None
         self._visible_edges = []
 
         self.ranges = []
@@ -139,24 +148,12 @@ class sim_lidar(rx.Node):
         self._scan_msg.range_min = self.RANGE_MIN
         self._scan_msg.range_max = self.RANGE_MAX
 
-        self._obstacles = self.load_param('obstacles', '')
-        self._obstacles = ast.literal_eval(self._obstacles) 
-
         self.tf_broadcaster = TransformBroadcaster(self)
 
         self.create_timer(self.SCAN_TIME, self.sim_loop)
-
-    def load_param(self, name, value=None):
-        try:
-            self.declare_parameter(name, value)
-        except Exception as e:
-            None
-        if value is None:
-            assert self.has_parameter(name), f'Missing parameter "{name}"'
-        return self.get_parameter(name).value
     
     def sim_loop(self):
-        if self._lidar_position is None or self.obstacles is None:
+        if self._lidar_position is None or not self.obstacles:
             pass
         else:
             self._update_visible_edges()
@@ -164,26 +161,6 @@ class sim_lidar(rx.Node):
             self.publish_scan()
             self.publish_viz_points()
             self.publish_viz_rays()
-
-    @property
-    def obstacles(self):
-        """Grabs simulated obstacles simulated Lidar is using"""
-        if self._obstacles is not None:
-            return self._obstacles
-        
-        obstacles_from_param = self.get_parameter('obstacles')
-        obstacles_from_param = ast.literal_eval(obstacles_from_param) 
-
-        if type(obstacles_from_param) == type([]):
-            self._obstacles = obstacles_from_param
-            for obstacle_edges in self._obstacles:
-                # add last segment to close polygon
-                obstacle_edges += [obstacle_edges[0]]
-        else:
-            self._obstacles = []
-
-        self.get_logger.info(self._obstacles)
-        return self._obstacles
 
     def _update_visible_edges(self):
         if self._last_visibility_pos is None:
@@ -193,9 +170,9 @@ class sim_lidar(rx.Node):
             return
 
         self._visible_edges = []
-        for obstacle_edges in self._obstacles:
-            for ind in range(len(obstacle_edges) - 1):
-                edge = [obstacle_edges[ind], obstacle_edges[ind + 1]]
+        for edges in self.obstacles:
+            for ind in range(len(edges) - 1):
+                edge = [edges[ind], edges[ind + 1]]
                 self._visible_edges.append(edge)
 
         self._last_visibility_pos = deepcopy(self._lidar_position)

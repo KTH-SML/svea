@@ -1,0 +1,65 @@
+/**:
+  ros__parameters:
+
+    # --- Timing & TF ---
+    transform_tolerance: 0.2
+
+    # --- Motion update thresholds (lower thresholds -> update more often) ---
+    update_min_a: 0.05
+    update_min_d: 0.05
+
+    # --- Adaptive sampling (KLD) ---
+    min_particles: 100
+    max_particles: 800
+    pf_err: 0.01
+    #pf_z: 0.99
+
+    # --- Beam skipping for dynamics/glass --
+    do_beamskip: true
+    beam_skip_distance: 0.5
+    beam_skip_error_threshold: 0.9
+    beam_skip_threshold: 0.3
+
+    # --- Noise / odom model ---
+    alpha1: 0.1                 # rot noise on rot
+    alpha2: 0.6                 # rot noise on trans
+    alpha3: 1.6                 # trans noise on trans (was 1.6, very high)
+    alpha4: 0.1                 # trans noise on rot
+    # alpha5: 0.05                # (keep low unless you have strafe)
+
+    # --- Measurement mixture weights ---
+    z_hit: 0.85
+    z_rand: 0.15                # was 0.15
+    z_short: 0.05               # was 0.05
+    z_max: 0.05                # was 0.05; often unnecessary with real max range
+    sigma_hit: 0.1              # was 0.1; slightly wider for real sensors
+
+
+    # -- Rest --
+    base_frame_id: "base_link"
+    global_frame_id: "map"
+    odom_frame_id: "odom"
+    robot_model_type: "nav2_amcl::DifferentialMotionModel"
+    resample_interval: 1
+    tf_broadcast: true
+    map_topic: /map
+    scan_topic: scan
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
+    always_reset_initial_pose: false
+    first_map_only: false
+
+    introspection_mode: "disabled"
+    lambda_short: 0.2
+    laser_likelihood_max_dist: 2.0
+    laser_max_range: 20.0
+    laser_min_range: -1.0
+    laser_model_type: "likelihood_field_prob"
+    max_beams: 50
+    recovery_alpha_fast: 0.1
+    recovery_alpha_slow: 0.001
+    #save_pose_rate: 0.5

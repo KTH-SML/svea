@@ -19,9 +19,6 @@ fi
 # Other docker arguments
 append ARGS \
     -it \
-    -p 2222:22 \
-    -p 7447:7447 \
-    -p 8765:8765 \
     -v "$SHARED_VOLUME" \
     -e "TERM=xterm-256color" \
     --rm
@@ -30,7 +27,14 @@ append ARGS \
 if ! (istrue DEV || is_darwin); then
     append ARGS \
         -v "/dev:/dev" \
-        --privileged
+        --privileged \
+        --network host
+else
+    # :7447 (Zenoh) 
+    # :8765 (Foxglove)
+    append ARGS \
+        -p 7447:7447 \
+        -p 8765:8765
 fi
 
 # Image to run

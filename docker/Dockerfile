@@ -10,27 +10,34 @@ FROM ${BUILD_TAG:-ghcr.io/kth-sml/svea:latest}
 ARG ROSDISTRO
 ARG DEBIAN_FRONTEND=noninteractive
 
-## Install dependencies using apt-get
+## Update Infrastructure (may have changed from base build)
+
+COPY entrypoint ./
+
+## Setup Development Environment
 
 RUN apt-get update -y
 
-# # You can add apt dependencies like this...
+# # You can add extra apt dependencies like this...
 # RUN apt-get install --no-install-recommends -y \
-#         git curl
+#         tmux htop
 
-# This is for any added ROS packages
-COPY src ./src
-COPY entrypoint requirements.txt ./
-RUN rosdep install \
-        --rosdistro $ROSDISTRO \
-        --from-paths src \
-        --ignore-src \
-        -qry \
-        && \
+# Install pip packages specified in requirements.txt
+RUN --mount=type=bind,source=./requirements.txt,target=/tmp/requirements.txt,readonly \
     pip install \
         --break-system-packages \
-        -r requirements.txt
+        -r /tmp/requirements.txt
 
-# Build the ROS 2 workspace (improves build speeds later on).
-RUN /bin/bash -c "source /opt/ros/$ROSDISTRO/setup.bash && \
-    colcon build --symlink-install"
+# (Pre-)Build the ROS 2 workspace 
+# This improves build speeds later on.
+RUN --mount=type=bind,source=./src,target=./src,readonly /bin/bash <<EOF
+set -e
+source /opt/svea/$ROSDISTRO/setup.bash
+rosdep install \
+    --rosdistro $ROSDISTRO \
+    --from-paths src \
+    --ignore-src \
+    -qry
+colcon build --symlink-install
+EOF
+

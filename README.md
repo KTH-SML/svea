@@ -142,6 +142,10 @@ Running the localization amounts to adding `localize.launch` to your project lau
 <include file="$(find svea_localization)/launch/localize.launch"/>
 ```
 
+### MoCap Localization (Qualisys)
+
+If you are using a motion capture system (like Qualisys) for localization, please refer to the [MoCap Localization Guide](docs/mocap_localization.md).
+
 ### Using priviliged run script
 
 Instead of using `util/run-dev`, which is intended for development environments

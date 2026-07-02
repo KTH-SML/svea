@@ -32,7 +32,7 @@ with no manual configuration at all, using as little as one command…
 
 ### *Installing Docker*
 
-See the [next page](tutorials/5_more_docker.md).
+See the [next page](more_docker.md).
 
 ### *I'm starting a new project*
 

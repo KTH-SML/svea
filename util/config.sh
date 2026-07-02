@@ -13,9 +13,6 @@
 # IMAGE_TAG="ghcr.io/kth-sml/svea:el2425-base"
 # BUILD_CONFIG="ghcr"
 
-# EL2425 - normal build
-BUILD_TAG="ghcr.io/kth-sml/svea:el2425-base"
-
 main() {
 
     withdefault DEBUG "0"
