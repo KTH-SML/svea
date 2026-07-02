@@ -20,12 +20,12 @@ def main(
     bl = BetterLaunch()
 
     bl.node("tf2_ros", "static_transform_publisher",
-            name="broadcaster_odom__map",
+            name="broadcaster_odom_map",
             cmd_args=toargs(x=0, y=0, z=0, yaw=0, pitch=0, roll=0,
                             frame_id=map_frame, child_frame_id=odom_frame))
 
     bl.node("tf2_ros", "static_transform_publisher",
-            name="broadcaster_base_link__odom",
+            name="broadcaster_base_link_odom",
             cmd_args=toargs(x=0, y=0, z=0, yaw=0, pitch=0, roll=0,
                             frame_id=odom_frame, child_frame_id=base_frame))
 

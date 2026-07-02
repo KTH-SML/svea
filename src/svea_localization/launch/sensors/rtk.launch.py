@@ -18,7 +18,7 @@ def main(
     
     bl = BetterLaunch()
 
-    with bl.group(ns="gps"):
+    with bl.group("gps"):
 
         # Start RTK Manager Node
         bl.node("svea_localization", "rtk_manager.py",

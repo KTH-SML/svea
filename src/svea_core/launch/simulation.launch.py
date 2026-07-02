@@ -19,9 +19,12 @@ def main(
     odom_frame = odom_frame.format(name=name)
     base_frame = base_frame.format(name=name)
 
-    OBSTACLE_MAP = bl.load_params(map_pkg, f"{map_name}_obstacles.yaml")
+    try:
+        OBSTACLE_MAP = bl.load_params(map_pkg, f"{map_name}.obstacles.yaml", qualifier='**')
+    except (ValueError, FileNotFoundError):
+        OBSTACLE_MAP = {}
 
-    with bl.group(ns=name):
+    with bl.group(name):
 
         # Start SVEA simulation
         bl.node("svea_core", "sim_svea.py",
@@ -33,9 +36,10 @@ def main(
                             odom_frame=odom_frame,
                             base_frame=base_frame))
 
-        # Start simulated LiDAR
-        bl.node("svea_core", "sim_lidar.py",
-                name="sim_lidar",
-                params=OBSTACLE_MAP | dict(
-                    laser_frame=f"{name}/laser",
-                ))
+        if OBSTACLE_MAP:
+            # Start simulated LiDAR
+            bl.node("svea_core", "sim_lidar.py",
+                    name="sim_lidar",
+                    params=OBSTACLE_MAP | dict(
+                        laser_frame=f"{name}/laser",
+                    ))

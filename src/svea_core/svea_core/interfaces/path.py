@@ -2,6 +2,7 @@
 
 from collections import deque
 
+import rclpy
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 from rclpy.time import Time
 from rclpy.clock import Clock
@@ -66,6 +67,9 @@ class ShowPath(rx.Field):
 
         poses = []
         for i, (x, y) in enumerate(zip(x_list, y_list)):
+
+            if not rclpy.ok():
+                break
 
             curr_pose = PoseStamped()
             curr_pose.header.frame_id = path.header.frame_id

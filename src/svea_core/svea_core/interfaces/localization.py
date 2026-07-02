@@ -1,22 +1,12 @@
-"""
-Author: Tobias Bolin, Frank Jiang
-"""
-
-from typing import Self, Optional
-
 import rclpy
-from rclpy.node import Node
 from rclpy.time import Time
-from rclpy.clock import Clock
 from rclpy.duration import Duration
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
 import tf2_ros
-from tf_transformations import quaternion_from_euler, euler_from_quaternion
+from tf_transformations import euler_from_quaternion
 from geometry_msgs.msg import PoseStamped, TwistStamped
 from nav_msgs.msg import Odometry
-
-from tf2_geometry_msgs import do_transform_pose
 
 from .. import rosonic as rx
 
@@ -38,7 +28,6 @@ class LocalizationInterface(rx.Field):
 
     localization = rx.namespace(
         map_frame = rx.Parameter('map'),
-        odom_frame = rx.Parameter('self/odom'),
         base_frame = rx.Parameter('self/base_link'),
         odom_top = rx.Parameter('odometry/local'),
     )
@@ -67,6 +56,8 @@ class LocalizationInterface(rx.Field):
 
         self._odom_msg = self.transform_odom(msg)
         for cb in self._odom_callbacks:
+            if not rclpy.ok():
+                break
             try:
                 cb(self._odom_msg)
             except Exception as e:
@@ -174,7 +165,7 @@ class LocalizationInterface(rx.Field):
             cb: A callback function that should be no longer used in response
             to the reception of state info.
         """
-        while cb in self._odom_callbacks:
+        while rclpy.ok() and cb in self._odom_callbacks:
             self._odom_callbacks.pop(self._odom_callbacks.index(cb))
 
     def get_state(self, odom=None) -> tuple[float, float, float, float]:

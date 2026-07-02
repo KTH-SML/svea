@@ -5,7 +5,6 @@ from better_launch import BetterLaunch, launch_this
 def main(
     map_pkg: str = 'svea_core',
     map_name: str = 'sml',
-    map_file: str = '{map_name}.yaml',
     use_foxglove: bool = True,
 ):
     bl = BetterLaunch()
@@ -19,7 +18,7 @@ def main(
 
     bl.node("nav2_lifecycle_manager", "lifecycle_manager",
             name="lifecycle_manager",
-            params=dict(node_names=["map_server"],
+            params=dict(node_names=str(["map_server"]),
                         autostart=True))
     
     if use_foxglove:

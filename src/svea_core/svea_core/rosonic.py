@@ -148,7 +148,7 @@ Kaj Munhoz Arfvidsson
 
 from __future__ import annotations
 
-from typing import TypeGuard
+from typing import TypeGuard, Callable
 
 import rclpy                            # pyright: ignore[reportMissingImports]
 from rclpy.node import Node as NodeBase # pyright: ignore[reportMissingImports]
@@ -212,7 +212,7 @@ class Resource:
     Note: Names starting with `/` or `~` are treated as absolute names.
     """
 
-    __rosonic_name__: str | None                    = None
+    __rosonic_name__: str | Callable | None         = None
     __rosonic_node__: 'NodeBase | None'             = None
     __rosonic_owner__: 'Resource | None'            = None
     __rosonic_resources__: tuple['Resource', ...]   = ()
@@ -221,15 +221,16 @@ class Resource:
     # Class property. For Field resources
     __rosonic_preregistered__: tuple['Resource', ...] = ()
 
-    def __init__(self, *, name: str | None = None):
+    def __init__(self, *, name: str | Callable | None = None):
         """
         Initializes a new Resource.
 
         Args:
-            name (str | None): Optional name for the resource. If omitted, the
+            name (str | Callable | None): Optional name for the resource. If omitted, the
             resource may receive a name later via attribute binding (for
             NamedFields), or remain unnamed (for structural Fields).
         """
+        assert name is None or isinstance(name, (str, Callable)), f"Resource name must be a string, callable or None, got {type(name)}"
         self.__rosonic_name__ = name
 
     def __rosonic_register__(self, owner: 'Resource', *, name: str | None = None):
@@ -666,23 +667,24 @@ class Parameter(NamedField):
     - TODO: Dynamically updatable parameters?
     """
 
-    def __init__(self, *args, name: str | None = None, evaluate: callable | None = None):
+    def __init__(self, default: object = None, name: str | None = None, evaluate: callable | None = None, **kwds):
         """
         Initializes the Parameter resource.
 
         Args:
-            *args: Default value and optional parameter descriptor arguments
-            passed to `declare_parameter()`. 
+            default (object): The default value for the parameter.
             name (str | None): Optional name override. Defaults to attribute
             name if omitted.
             evaluate (callable | None): Optional post processing of parameter
             values.
+            kwds: Additional keyword arguments for declare_parameter (e.g., descriptor).
         """
         super().__init__(name=name)
-        self.args = args
+        self.default = default
         self.value = ... # Ellipsis used to detect when value hasn't been set yet
         self.evaluate = evaluate
-    
+        self.kwds = kwds
+
     def __get__(self, instance, owner):
         if instance is None:
             return self
@@ -697,7 +699,7 @@ class Parameter(NamedField):
         name = self.__rosonic_relname__
         
         if not node.has_parameter(name):
-            node.declare_parameter(name, *self.args)
+            node.declare_parameter(name, self.default, **self.kwds)
 
         if self.value is ...:
             self.value = node.get_parameter(name).value

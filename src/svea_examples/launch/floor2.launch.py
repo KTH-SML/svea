@@ -1,6 +1,8 @@
 #! /usr/bin/env python3
 from better_launch import BetterLaunch, launch_this
 
+MAP_NAME = "floor2"
+
 @launch_this
 def main(
     is_sim: bool = True,
@@ -12,39 +14,27 @@ def main(
 ):
     bl = BetterLaunch()
 
-    MAP_NAME = "floor2"
-
-    bl.include("svea_core", "map_and_foxglove.xml",
-               map_name=MAP_NAME,
-               use_foxglove=use_foxglove)
-
     if not is_sim:
 
-        NAME = "self"
-
-        # Start SVEA system
-        bl.include("svea_core", "svea.xml",
-                   name=NAME,
-                   is_sim=is_sim,
+        # Start SVEA in real-world mode
+        bl.include("svea_core", "svea.launch.py",
+                   is_sim=is_sim, # = False
+                   map_name=MAP_NAME,
                    initial_pose_x=initial_pose_x,
                    initial_pose_y=initial_pose_y,
-                   initial_pose_a=initial_pose_a,
-                   map=MAP_NAME)
+                   initial_pose_a=initial_pose_a)
 
-        with bl.group(ns=NAME):
-
-            # Start pure_pursuit
+        # The SVEA launch system is built to be compatible with multiple SVEAs running simultaneously.
+        # Default name is "self", so to add the pure_pursuit node we need to namespace accordingly.
+        with bl.group("self"):
+        
             bl.node("svea_examples", "pure_pursuit.py",
                     name="pure_pursuit",
-                    params=dict(is_sim=is_sim,
-                                points=points,
-                                localization_base_frame=f"{NAME}/base_link")))
+                    params={'points': points})
 
     if is_sim:
         # Start two SVEAs (svea_a and svea_b) in simulation, each with its own pure_pursuit node
 
-        raise NotImplementedError("This launch file is not yet implemented for simulation mode. Please use the demo.launch.py file instead.")
-        
         INITIAL_POSES = {
             "svea_a": (initial_pose_x, initial_pose_y, initial_pose_a),
             "svea_b": (0.0, 0.0, 0.0),
@@ -52,7 +42,7 @@ def main(
 
         for name, (init_x, init_y, init_a) in INITIAL_POSES.items():
             
-            bl.include("svea_core", "svea.xml",
+            bl.include("svea_core", "svea.launch.py",
                        name=name,
                        is_sim=is_sim,
                        is_indoor=True,
@@ -61,13 +51,16 @@ def main(
                        initial_pose_y=init_y,
                        initial_pose_a=init_a)
 
-            with bl.group(ns=name):
+            # Add namespace to pure_pursuit node so that it can be run for each SVEA independently
+            with bl.group(name):
 
-                # Start pure_pursuit
                 bl.node("svea_examples", "pure_pursuit.py",
                         name="pure_pursuit",
                         params={
-                            "is_sim": is_sim,
-                            "points": points,
+                            # "points": points,
                             "localization/base_frame": f"{name}/base_link",
                         })
+
+    bl.include("svea_core", "map_and_foxglove.launch.py",
+               map_name=MAP_NAME,
+               use_foxglove=use_foxglove)

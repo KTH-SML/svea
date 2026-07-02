@@ -9,7 +9,6 @@ from enum import IntEnum
 from .. import rosonic as rx
 from mavros_msgs.msg import ManualControl
 
-QoS_DEFAULT = QoSProfile(depth = 10)
 
 class Controls(IntEnum):
     """Enum for control codes sent to the low-level interface."""
@@ -45,12 +44,12 @@ class ActuationInterface(rx.Field):
     # The max velocity in Gear 2 is around 3.6 m/s.
     MAX_SPEED_0 = 1.7               # [m/s]
     MAX_SPEED_1 = 3.6               # [m/s]
-    BIAS_STEERING = -9
 
-    is_sim = rx.Parameter(False)
+    actuation = rx.namespace(
+        control_top = rx.Parameter('mavros/manual_control/send'),
+    )
 
-    manual_control_top = rx.Parameter('/mavros/manual_control/send')
-    manual_control_pub = rx.Publisher(ManualControl, manual_control_top)
+    control_pub = rx.Publisher(ManualControl, actuation.control_top)
 
     def __init__(self, rate=20, use_acceleration=False, highgear=False, difflock=False):
         assert 2 <= rate <= 25, 'Actuation Interface: Publish rate outside of admissible bounds.'
@@ -65,8 +64,6 @@ class ActuationInterface(rx.Field):
         self.node.get_logger().info("Starting Actuation Interface Node...")
         self.node.create_timer(1/self.rate, self.loop)
         self.node.get_logger().info("Actuation Interface is ready.")
-        if self.is_sim:
-            self.BIAS_STEERING = 0
 
     def loop(self):
         """Main loop to publish ManualControl messages."""
@@ -95,7 +92,7 @@ class ActuationInterface(rx.Field):
         else:
             msg.aux3 = 1000.
 
-        self.manual_control_pub.publish(msg)
+        self.control_pub.publish(msg)
 
     def send_control(self,
                      steering:Optional[float] = None,

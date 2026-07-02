@@ -11,7 +11,7 @@ def main(
     initial_pose_a: float = 0.0, # Yaw Angle
     map_pkg: str = 'svea_core',
     map_name: str = 'sml',
-    use_urdf: bool | None = None,
+    use_urdf: bool = None,
     ## Low-Level Interface Settings
     lli_serial_device: str = '/dev/serial/by-id/usb-SVEA_PX4_AUTOPILOT_0-if00',
     lli_baud_rate: int = 921600,
@@ -65,7 +65,7 @@ def main(
 
         ## Start Low-Level Interface (LLI)
 
-        with bl.group(ns="mavros"):
+        with bl.group("mavros"):
             bl.node("mavros", "mavros_node",
                     cmd_args=["--ros-args",
                               "--log-level", "warn",
@@ -112,7 +112,7 @@ def main(
                             to_topic=f"{name}/scan/filtered"))
 
     if use_urdf:
-        bl.include("svea_core", "visualization.xml",
+        bl.include("svea_core", "visualization.launch.py",
                    name=name)
         
     if use_zenoh:

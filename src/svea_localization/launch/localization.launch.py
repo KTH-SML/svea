@@ -37,7 +37,7 @@ def main(
     odom_frame = odom_frame.format(name=name)
     base_frame = base_frame.format(name=name)
 
-    with bl.group(ns=name):
+    with bl.group(name):
 
         # Static Transforms
         bl.include("svea_localization", "transforms.launch.py",
@@ -79,7 +79,7 @@ def main(
         if is_indoor:
 
             if use_lidar:
-                with bl.group(ns=name):
+                with bl.group(name):
                     bl.include("svea_localization", "lidar.launch.py",
                                lidar_ip=lidar_ip,
                                lidar_frame=f"{name}/laser")
