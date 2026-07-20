@@ -90,11 +90,11 @@ class ActuationInterface(rx.Field):
         
         # High gear: aux3
         if self.highgear:
-            msg.aux3 = 1000.
-        else:
             msg.aux3 = -1000.
+        else:
+            msg.aux3 = 1000.
 
-        msg.aux4 = 1000 + float(self.xtr1_percent * 10)  # aux4
+        msg.aux4 = 1000.0 - self.xtr1_percent * 20.0
         msg.aux5 = 1000 + float(self.xtr2_percent * 10)  # aux5
 
         self.control_pub.publish(msg)
