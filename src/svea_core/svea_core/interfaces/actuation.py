@@ -59,6 +59,8 @@ class ActuationInterface(rx.Field):
         self.velocity_percent = 0.0
         self.highgear = highgear
         self.difflock = difflock
+        self.xtr1_percent = 0.0
+        self.xtr2_percent = 0.0
 
     def on_startup(self):
         self.node.get_logger().info("Starting Actuation Interface Node...")
@@ -92,6 +94,9 @@ class ActuationInterface(rx.Field):
         else:
             msg.aux3 = 1000.
 
+        msg.aux4 = 1000.0 - self.xtr1_percent * 20.0
+        msg.aux5 = 1000 + float(self.xtr2_percent * 10)  # aux5
+
         self.control_pub.publish(msg)
 
     def send_control(self,
@@ -122,6 +127,11 @@ class ActuationInterface(rx.Field):
         vel_percent = self._speed_clip(self.velocity_percent + acc_percent)
         self.__send_velocity(vel_percent)
 
+    def send_xtr(self, xtr1: Optional[float] = None, xtr2: Optional[float] = None):
+        if xtr1 is not None:
+            self.xtr1_percent = xtr1
+        if xtr2 is not None:
+            self.xtr2_percent = xtr2
 
     def toggle_highgear(self):
         """Toggle the high gear state."""
