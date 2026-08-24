@@ -148,7 +148,7 @@ def main(
                                 broadcast_cartesian_transform_as_parent_frame=True,
                                 broadcast_cartesian_transform=True),
                     ## TODO
-                    # remap= {'imu/data': '/imu/data',
+                    # remaps= {'imu/data': '/imu/data',
                     #         'gps/fix': '/gps/fix',
                     #         'odometry/filtered': '/odometry/filtered/global'}
                     )
@@ -172,4 +172,4 @@ def main(
                             "world_frame": map_frame,
                             "imu0": f"{name}/mavros/imu/data_raw",
                             "twist0": f"{name}/mavros/wheel_odometry/odom"},
-                    remap={"/odometry/filtered": f"{name}/odometry/global"})
+                    remaps={"/odometry/filtered": f"{name}/odometry/global"})

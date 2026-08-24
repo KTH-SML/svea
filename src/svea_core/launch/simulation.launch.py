@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import ast          # ← 新增
 import yaml
 from better_launch import BetterLaunch, launch_this
 
@@ -12,16 +13,23 @@ def load_obstacles(bl, map_pkg, map_name):
     """
     try:
         path = bl.find(map_pkg, f"{map_name}.obstacles.yaml")
-    except (ValueError, FileNotFoundError):
+    except Exception:
         return []
 
     with open(path) as f:
         data = yaml.safe_load(f) or {}
 
     if isinstance(data, dict):
+        for value in data.values():
+            if isinstance(value, dict) and 'ros__parameters' in value:
+                data = value
+                break
         if 'ros__parameters' in data:
             data = data['ros__parameters']
         data = data.get('obstacles', [])
+
+    if isinstance(data, str):
+        data = ast.literal_eval(data) if data.strip() else []
 
     return data or []
 

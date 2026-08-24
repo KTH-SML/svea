@@ -30,7 +30,8 @@ def main(
         
             bl.node("svea_examples", "pure_pursuit.py",
                     name="pure_pursuit",
-                    params={'points': points})
+                    params={'points': points, 
+                            'is_sim': is_sim})
 
     if is_sim:
         # Start two SVEAs (svea_a and svea_b) in simulation, each with its own pure_pursuit node
@@ -57,7 +58,8 @@ def main(
                 bl.node("svea_examples", "pure_pursuit.py",
                         name="pure_pursuit",
                         params={
-                            # "points": points,
+                            "points": points,
+                            "is_sim": is_sim,
                             "localization/base_frame": f"{name}/base_link",
                         })
     if use_foxglove:

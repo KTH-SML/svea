@@ -76,7 +76,7 @@ class sim_svea(rx.Node):
     def recv_control(self, msg: ManualControl):
         """Receive control inputs from the low-level interface."""
         self.steering_req = - msg.y / 10.0
-        self.velocity_req = (1000 - msg.z) / 5.0
+        self.velocity_req = (500 - msg.z) / 5.0
         self.highgear = msg.aux3 < 0
         self.diff = msg.aux1 > 0 and msg.aux2 < 0
         self.last_ctrl_time = self.clock.now().to_msg()

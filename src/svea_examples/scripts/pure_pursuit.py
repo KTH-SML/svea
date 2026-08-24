@@ -51,6 +51,7 @@ class pure_pursuit(rx.Node):
 
     points = rx.Parameter([-2.3, -7.1, 10.5, 11.7, 5.7, 15.0, -7.0, -4.0])
     target_velocity = rx.Parameter(0.6)
+    is_sim = rx.Parameter(True)
     
     # Interfaces
     
@@ -106,7 +107,10 @@ class pure_pursuit(rx.Node):
 
         steering, velocity = self.controller.compute_control(state)
         self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
-        self.actuation.send_control(steering, velocity*-1.0)
+        if self.is_sim:
+            self.actuation.send_control(steering, velocity)
+        else:
+            self.actuation.send_control(steering, -1 * velocity)  # Invert velocity for real-world operation
 
     def update_goal(self):
         """
