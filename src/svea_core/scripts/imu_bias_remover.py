@@ -31,12 +31,14 @@ class imu_bias_remove(rx.Node):
     sample_counter = 0
 
     frame_id = rx.Parameter('imu')
+    imu_topic = rx.Parameter('/self/mavros/imu/data_raw')
+    imu_repub_topic = rx.Parameter('/self/mavros/imu/data_raw/filtered')
 
     ## Publishers ##
-    imu_re_pub = rx.Publisher(Imu, '/lli/filtered/imu', qos_pubber)
+    imu_re_pub = rx.Publisher(Imu, imu_repub_topic, qos_pubber)
 
     ## Subscribers ##
-    @rx.Subscriber(Imu, '/lli/sensor/imu', qos_subber)
+    @rx.Subscriber(Imu, imu_topic, qos_subber)
     def imu_sub(self, imu_msg):
         if not self.bias_sampled:
             if self.sample_counter == 0:
@@ -57,7 +59,6 @@ class imu_bias_remove(rx.Node):
         else:
             imu_msg.header.frame_id = self.frame_id
             imu_msg.angular_velocity.z -= self.bias_angular_z
-            imu_msg.angular_velocity.z = imu_msg.angular_velocity.z / 4.0
             imu_msg.linear_acceleration.x -= self.bias_linear_x
             imu_msg.linear_acceleration.y -= self.bias_linear_y
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SLAM bringup for SVEA (better_launch port of the legacy slam.launch XML).
+SLAM bringup for SVEA.
 
 Place at: src/svea_localization/launch/slam.launch.py
 
@@ -18,7 +18,6 @@ from better_launch import BetterLaunch, launch_this
 
 
 def toargs(**kwds):
-    """Same helper as transforms.launch.py: dict -> static_transform_publisher CLI args."""
     args = []
     for k, v in kwds.items():
         args.append(f"--{k.replace('_', '-')}")
@@ -53,7 +52,6 @@ def find_params(bl, pkg, filename):
 def main(
     name: str = "self",
     ## Low-Level Interface (mavros / PX4)
-    use_lli: bool = True,
     lli_serial_device: str = "/dev/serial/by-id/usb-SVEA_PX4_AUTOPILOT_0-if00",
     lli_baud_rate: int = 921600,
     ## LiDAR
@@ -83,14 +81,10 @@ def main(
     # ------------------------------------------------------------------
     # Low-Level Interface
     # ------------------------------------------------------------------
-    # NOTE: the legacy XML started util/start_micro_ros.sh. The current stack
-    # talks to the PX4 over mavros via lli.xml, which is what publishes the IMU
-    # and wheel odometry that local_ekf.yaml consumes. Use lli.xml.
-    if use_lli:
-        bl.include("svea_core", "lli.xml",
-                   name=name,
-                   serial_device=lli_serial_device,
-                   baud_rate=lli_baud_rate)
+    bl.include("svea_core", "lli.xml",
+               name=name,
+               serial_device=lli_serial_device,
+               baud_rate=lli_baud_rate)
 
     with bl.group(name):
 
