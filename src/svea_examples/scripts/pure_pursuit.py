@@ -106,7 +106,7 @@ class pure_pursuit(rx.Node):
             self.update_traj(x, y)
 
         steering, velocity = self.controller.compute_control(state)
-        self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
+        # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
         if self.is_sim:
             self.actuation.send_control(steering, velocity)
         else:
