@@ -161,6 +161,7 @@ class sim_lidar(rx.Node):
             self.publish_scan()
             self.publish_viz_points()
             self.publish_viz_rays()
+            self.publish_viz_edges()
 
     def _update_visible_edges(self):
         if self._last_visibility_pos is None:
@@ -215,6 +216,9 @@ class sim_lidar(rx.Node):
 
     def publish_viz_rays(self):
         publish_lidar_rays(self._viz_rays_pub, self._lidar_position, self.viz_points)
+
+    def publish_viz_edges(self):
+        publish_edges(self._viz_edges_pub, self._visible_edges)
 
 
 def beam_intersection(beam_and_edges):
