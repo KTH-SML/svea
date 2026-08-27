@@ -82,7 +82,7 @@ def main(
                             "base_link_frame": base_frame,
                             "world_frame": odom_frame,
                             "imu0": f"/{name}/mavros/imu/data_raw",
-                            "twist0": f"/{name}/mavros/wheel_odometry/odom"}
+                            "twist0": f"/{name}/mavros/wheel_odometry/velocity"}
 
         if not use_two_encoders:
             LOCAL_EKF_PARAMS["twist0"] = f"/{name}/wheel_odometry/twist/filtered"
