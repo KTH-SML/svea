@@ -1,6 +1,7 @@
 """
 Author: Frank Jiang, Tobias Bolin
 """
+import time
 from math import pi, isnan
 from typing import Optional
 
@@ -59,6 +60,7 @@ class ActuationInterface(rx.Field):
         self.velocity_percent = 0.0
         self.highgear = highgear
         self.difflock = difflock
+        self._last_accel_time = None
         self.xtr1_percent = 0.0
         self.xtr2_percent = 0.0
 
@@ -122,8 +124,18 @@ class ActuationInterface(rx.Field):
     def __send_velocity(self, velocity):
         self.velocity_percent = velocity
 
-    def __send_acceleration(self, acceleration):        
-        acc_percent = self._speed_to_percent(acceleration) 
+    def __send_acceleration(self, acceleration):
+        # Get time dt elapsed since last acceleration command
+        now = time.monotonic()
+        if self._last_accel_time is None:
+            dt = 0.0 
+        else:
+            dt = now - self._last_accel_time
+        self._last_accel_time = now
+
+        # acceleration gives slope of speed so velocity change (acc_percent) 
+        # is acceleration * (elapsed time)
+        acc_percent = self._speed_to_percent(acceleration) * dt
         vel_percent = self._speed_clip(self.velocity_percent + acc_percent)
         self.__send_velocity(vel_percent)
 
