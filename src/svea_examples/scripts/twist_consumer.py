@@ -46,7 +46,7 @@ class twist_consumer(rx.Node):
         """Ackermann inverse kinematics: delta = atan(L * omega / v)."""
         if abs(v) < self.min_speed_for_steering:
             return 0.0
-        delta = math.atan(self.wheelbase * w / v)
+        delta = math.atan(self.wheelbase * w / abs(v))
         return max(-self.max_steering, min(self.max_steering, delta))
 
     @rx.Subscriber(twist_type, twist_top)
