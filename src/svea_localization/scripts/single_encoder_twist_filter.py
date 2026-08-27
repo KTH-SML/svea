@@ -258,7 +258,7 @@ class single_encoder_twist_filter(rx.Node):
             return
 
         # Unsigned wheel speed, used to gate the sign flip.
-        speed = abs(0.5 * (d_l + d_r)) / dt
+        speed = 0.5 * (d_l + d_r) / dt
 
         # Restore the sign.
         sign = float(self._resolve_direction(speed))
