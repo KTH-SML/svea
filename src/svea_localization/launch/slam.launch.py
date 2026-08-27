@@ -116,20 +116,21 @@ def main(
         # --------------------------------------------------------------
         # Local EKF:  <name>/odom -> <name>/base_link
         # --------------------------------------------------------------
-        if use_two_encoders:
-            ekf_input = {"twist0": f"/{name}/mavros/wheel_odometry/odom"}
-        else:
-            ekf_input = {"twist0": f"/{name}/wheel_odometry/twist/filtered"}
-            bl.node("svea_localization", "single_encoder_twist_filter.py",
-                        name="wheel_twist",
-                        params={"base_frame":       base_frame,
-                                "distance_topic":   f"/{name}/mavros/wheel_odometry/distance",
-                                "twist_topic":      ekf_input["twist0"],
-                                "imu_topic":        f"/{name}/mavros/imu/data_raw",
-                                "rc_topic":         f"/{name}/mavros/rc/in",
-                                "control_topic":    f"/{name}/mavros/manual_control/send"})
-
         if use_ekf:
+
+            if use_two_encoders:
+                ekf_input = {"twist0": f"/{name}/mavros/wheel_odometry/odom"}
+            else:
+                ekf_input = {"twist0": f"/{name}/wheel_odometry/twist/filtered"}
+                bl.node("svea_localization", "single_encoder_twist_filter.py",
+                            name="wheel_twist",
+                            params={"base_frame":       base_frame,
+                                    "distance_topic":   f"/{name}/mavros/wheel_odometry/distance",
+                                    "twist_topic":      ekf_input["twist0"],
+                                    "imu_topic":        f"/{name}/mavros/imu/data_raw",
+                                    "rc_topic":         f"/{name}/mavros/rc/in",
+                                    "control_topic":    f"/{name}/mavros/manual_control/send"})
+            
             EKF_PARAMS_FILE = find_params(bl, "svea_localization", ekf_params)
             bl.node("robot_localization", "ekf_node",
                     name="ekf_local",
