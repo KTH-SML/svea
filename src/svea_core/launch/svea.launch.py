@@ -21,7 +21,7 @@ def main(
     ## LiDAR Settings
     use_lidar: bool = True,
     # Encoder Settings
-    use_two_encoders: bool = False,
+    use_two_encoders: bool = True,
     ## RTK-GPS Settings
     use_rtk: bool = True,
     rtk_device: str = '/dev/ttyACM1',
