@@ -1,87 +1,5 @@
 {
   "configById": {
-    "SourceInfo!2kz9i49": {},
-    "TopicGraph!2usnx4p": {},
-    "Plot!1jyvlsb": {
-      "paths": [
-        {
-          "value": "/state.yaw",
-          "enabled": true,
-          "timestampMethod": "receiveTime",
-          "label": "Yaw [Rad]"
-        }
-      ],
-      "minYValue": -3.14,
-      "maxYValue": 3.14,
-      "showXAxisLabels": false,
-      "showYAxisLabels": true,
-      "showLegend": true,
-      "legendDisplay": "top",
-      "showPlotValuesInLegend": true,
-      "isSynced": true,
-      "xAxisVal": "timestamp",
-      "sidebarDimension": 42,
-      "followingViewWidth": 10,
-      "foxglovePanelTitle": "Heading"
-    },
-    "Gauge!23o7zrm": {
-      "path": "/state.v",
-      "minValue": 0,
-      "maxValue": 3.6,
-      "colorMap": "turbo",
-      "colorMode": "colormap",
-      "gradient": [
-        "#0000ff",
-        "#ff00ff"
-      ],
-      "reverse": false,
-      "foxglovePanelTitle": "Velocity"
-    },
-    "RawMessages!4duq1l5": {
-      "diffEnabled": false,
-      "diffMethod": "custom",
-      "diffTopicPath": "",
-      "showFullMessageForDiff": false,
-      "topicPath": "/lli/ctrl_request"
-    },
-    "RawMessages!3o6h2qk": {
-      "diffEnabled": false,
-      "diffMethod": "custom",
-      "diffTopicPath": "",
-      "showFullMessageForDiff": false,
-      "topicPath": "/lli/ctrl_actuated"
-    },
-    "Tab!1tsoyyt": {
-      "activeTabIdx": 0,
-      "tabs": [
-        {
-          "title": "Topic Info",
-          "layout": {
-            "first": "SourceInfo!2kz9i49",
-            "second": "TopicGraph!2usnx4p",
-            "direction": "column",
-            "splitPercentage": 70.07150153217569
-          }
-        },
-        {
-          "title": "Car Data",
-          "layout": {
-            "first": "Plot!1jyvlsb",
-            "second": {
-              "first": "Gauge!23o7zrm",
-              "second": {
-                "first": "RawMessages!4duq1l5",
-                "second": "RawMessages!3o6h2qk",
-                "direction": "column"
-              },
-              "direction": "row"
-            },
-            "direction": "column",
-            "splitPercentage": 68.23289070480082
-          }
-        }
-      ]
-    },
     "3D!18i6zy7": {
       "layers": {
         "845139cb-26bc-40b3-8161-8ab60af4baf5": {
@@ -108,14 +26,14 @@
         }
       },
       "cameraState": {
-        "perspective": true,
-        "distance": 15.475618749997148,
-        "phi": 59.99999999999909,
-        "thetaOffset": 44.99999999999991,
+        "perspective": false,
+        "distance": 37.01235612441644,
+        "phi": 59.99999999999918,
+        "thetaOffset": 1.341932480354058e-11,
         "targetOffset": [
-          -1.3389763497157556,
-          -0.9583011194752876,
-          1.4108814098981802e-16
+          -0.8116511346085475,
+          -2.7632826707839118,
+          3.556281705408252e-17
         ],
         "target": [
           0,
@@ -138,7 +56,8 @@
         "enableStats": false,
         "meshUpAxis": "y_up",
         "transforms": {
-          "lineWidth": 0
+          "lineWidth": 0,
+          "visible": true
         }
       },
       "transforms": {
@@ -191,24 +110,76 @@
           ]
         },
         "/path_plan": {
-          "visible": true,
+          "visible": false,
           "gradient": [
             "#66ff8880",
             "#66ff88ff"
           ],
-          "lineWidth": 0.1
+          "lineWidth": 0.1,
+          "axisScale": 1.5,
+          "type": "axis"
+        },
+        "/move_base_simple/goal": {
+          "visible": false
+        },
+        "/svea_a/past_path": {
+          "visible": false
+        },
+        "/svea_a/path_plan": {
+          "visible": false
+        },
+        "/svea_a/viz_lidar_rays": {
+          "visible": false,
+          "color": "#786dc1ff"
+        },
+        "/svea_b/viz_edges": {
+          "visible": false,
+          "color": "#1abc74ff"
+        },
+        "/svea_b/viz_lidar_rays": {
+          "visible": false
+        },
+        "/svea_a/viz_edges": {
+          "visible": false,
+          "color": "#4a4181ff",
+          "showOutlines": true
+        },
+        "/svea_a/scan": {
+          "visible": false,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/svea_a/pure_pursuit/goal_marker": {
+          "visible": false
+        },
+        "/svea_b/scan": {
+          "visible": false,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/predicted_path": {
+          "visible": true
+        },
+        "/light_a/visualization": {
+          "visible": true
+        },
+        "/light_b/visualization": {
+          "visible": true
         }
       },
       "publish": {
         "type": "point",
         "poseTopic": "/move_base_simple/goal",
         "pointTopic": "/clicked_point",
-        "poseEstimateTopic": "/initialpose",
+        "poseEstimateTopic": "/self/initialpose",
         "poseEstimateXDeviation": 0.5,
         "poseEstimateYDeviation": 0.5,
         "poseEstimateThetaDeviation": 0.26179939
       },
-      "imageMode": {}
+      "imageMode": {},
+      "synchronize": false
     }
   },
   "globalVariables": {},
@@ -216,10 +187,5 @@
   "playbackConfig": {
     "speed": 1
   },
-  "layout": {
-    "direction": "row",
-    "first": "Tab!1tsoyyt",
-    "second": "3D!18i6zy7",
-    "splitPercentage": 39.427083333333336
-  }
+  "layout": "3D!18i6zy7"
 }
