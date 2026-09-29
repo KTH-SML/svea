@@ -2,7 +2,7 @@
 from better_launch import BetterLaunch, launch_this
 
 MAP_NAME = "floor2"
-POINTS: list = [-2.3, -7.1, 10.5, 11.7, 5.7, 15.0, -8.0, -5.4]
+POINTS: list = [-2.3, -7.1, 10.5, 11.7, 5.7, 15.0, -7.3, -4.3]
 
 @launch_this
 def main(
@@ -11,7 +11,7 @@ def main(
     initial_pose_x: float = -7.4,
     initial_pose_y: float = -15.4,
     initial_pose_a: float = +0.9,
-    target_velocity: float = 0.6,
+    target_velocity: float = 0.4,
 ):
     bl = BetterLaunch()
 
