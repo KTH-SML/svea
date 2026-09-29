@@ -8,7 +8,8 @@ from svea_core.interfaces import ActuationInterface, ShowMarker, ShowPath
 from svea_core import rosonic as rx
 
 
-class pure_pursuit(rx.Node):
+
+class static_path_follower(rx.Node):
 
     r"""Pure Pursuit example script for SVEA.
 
@@ -49,8 +50,8 @@ class pure_pursuit(rx.Node):
     DELTA_TIME = 0.1
     TRAJ_LEN = 20
 
-    points = rx.Parameter([-2.3, -7.1, 10.5, 11.7, 5.7, 15.0, -7.0, -4.0])
-    target_velocity = rx.Parameter(0.6)
+    points = rx.Parameter([1.0, 0.0, 0.62, 0.78, -0.22, 0.98, -0.9, 0.44, -0.9, -0.43, -0.22, -0.97, 0.62, -0.78, 1.0, -0.0])
+    target_velocity = rx.Parameter(0.4)
     is_sim = rx.Parameter(True)
     
     # Interfaces
@@ -77,17 +78,23 @@ class pure_pursuit(rx.Node):
 
         self.controller = PurePursuitController()
         self.controller.target_velocity = self.target_velocity
+        self.controller.termination_distance = 0.5
 
         state = self.localizer.get_state()
         x, y, yaw, vel = state
 
         self.curr = 0
         self.goal = self._points[self.curr]
-        self.goal_marker.place([*self.goal, 0.5], color='blue')
         self.update_traj(x, y)
         self.actuation.enable_difflock() 
 
         self.create_timer(self.DELTA_TIME, self.loop)
+        
+        def logger():
+            self.goal_marker.place([*self.goal, 0.5], color='blue')
+            self.path.publish_path(self.controller.traj_x,
+                                   self.controller.traj_y)
+        self.create_timer(1, logger)
 
     def loop(self):
         """
@@ -122,8 +129,6 @@ class pure_pursuit(rx.Node):
         self.curr %= len(self._points)
         self.goal = self._points[self.curr]
         self.controller.is_finished = False
-        # Mark the goal
-        self.goal_marker.place([*self.goal, 0.5], color='blue')
 
     def update_traj(self, x, y):
         """
@@ -136,7 +141,6 @@ class pure_pursuit(rx.Node):
         ys = np.linspace(y, self.goal[1], self.TRAJ_LEN)
         self.controller.traj_x = xs
         self.controller.traj_y = ys
-        self.path.publish_path(xs,ys)
 
 if __name__ == '__main__':
-    pure_pursuit.main()
+    static_path_follower.main()
