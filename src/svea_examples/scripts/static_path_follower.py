@@ -114,10 +114,7 @@ class static_path_follower(rx.Node):
 
         steering, velocity = self.controller.compute_control(state)
         # self.get_logger().info(f"Steering: {steering}, Velocity: {velocity}")
-        if self.is_sim:
-            self.actuation.send_control(steering, velocity)
-        else:
-            self.actuation.send_control(steering, -1 * velocity)  # Invert velocity for real-world operation
+        self.actuation.send_control(steering, velocity)
 
     def update_goal(self):
         """
