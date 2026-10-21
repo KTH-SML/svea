@@ -7,7 +7,7 @@
 #
 # You can read more here: https://pip.pypa.io/en/stable/reference/requirements-file-format/#requirements-file-format
 
-numpy
+numpy<2
 matplotlib # For plotting the localization results and map
 pillow # for coloring the markers
 

@@ -18,7 +18,7 @@
 
         <!-- Low-Level Interface -->
 
-        <node pkg="mavros" exec="mavros_node" namespace="mavros" ros_args="--log-level warn --log-level mavros.sys:=fatal --log-level mavros.cmd:=error">
+        <node pkg="mavros" exec="mavros_node" ros_args="--log-level warn --log-level mavros.sys:=fatal --log-level mavros.cmd:=error">
             <!-- Parameters -->
             <param name="fcu_url" value="serial://$(var serial_device):$(var baud_rate)"/>
             <param name="gcs_url" value="tcp-l://0.0.0.0:5760"/>
