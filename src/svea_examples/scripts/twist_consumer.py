@@ -69,7 +69,7 @@ class twist_consumer(rx.Node):
             self._steering = 0.0
 
         self.actuation.send_control(self._steering * self.steering_sign,
-                                    -1 * self._velocity * self.velocity_sign)
+                                    self._velocity * self.velocity_sign)
 
 
 if __name__ == '__main__':
