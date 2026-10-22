@@ -72,9 +72,9 @@ mkdir src
 source /opt/ros/$ROSDISTRO/setup.bash
 
 # Zenoh (system-wide installation)
-echo "deb [trusted=yes] https://download.eclipse.org/zenoh/debian-repo/ /" | tee -a /etc/apt/sources.list > /dev/null
-apt-get update -y
-apt-get install --no-install-recommends -y zenoh-bridge-ros2dds
+# echo "deb [trusted=yes] https://download.eclipse.org/zenoh/debian-repo/ /" | tee -a /etc/apt/sources.list > /dev/null
+# apt-get update -y
+# apt-get install --no-install-recommends -y zenoh-bridge-ros2dds
 
 # MAVROS dependency
 ros2 run mavros install_geographiclib_datasets.sh
