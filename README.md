@@ -52,3 +52,7 @@ controller.
 
 - [svea_parts](https://github.com/KTH-SML/svea_parts): CAD files, printable parts and assembly manuals.
 - [SVEA-PX4-Autopilot documentation](https://github.com/nilskiefer/SVEA-PX4-Autopilot/blob/8e17861fa85809fecdbdddea035b0fa49264517a/docs/en/svea/index.md): firmware setup, flashing, troubleshooting and PMB3 reference.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for commit and pull-request conventions.
