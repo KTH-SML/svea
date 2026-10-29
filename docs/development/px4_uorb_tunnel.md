@@ -1,60 +1,59 @@
 # PX4 uORB Tunnel Bridge
 
-## Overview
-The `px4_uorb_tunnel` bridge allows forwarding of internal PX4 `uORB` topics directly to ROS 2 over MAVLink. This is typically used for custom or high-bandwidth telemetry that does not map cleanly to standard MAVLink messages. In the SVEA architecture, this is specifically used to retrieve detailed rail-level telemetry from the custom SVEA power board (`power_monitor` topics).
+The custom PX4 `PX4_UORB_TUNNEL` stream carries selected uORB telemetry in
+MAVLink `TUNNEL` messages using payload type `0xE001`. MAVROS delivers these to
+ROS 2; `svea_core/scripts/px4_uorb_tunnel.py` decodes the stream and publishes
+available message types. This feature depends on the deployed SVEA firmware;
+it is not a stream supplied by every stock PX4 build.
 
-## Architecture
-1. **PX4 firmware (Sender):** The `PX4_UORB_TUNNEL` stream captures selected local uORB topics, serializes them (handling fragmentation if necessary), and sends them over MAVLink using the `TUNNEL` message (ID 128, payload type `0xE001`).
-2. **MAVROS (Transport):** The standard `mavros_node` relays the raw MAVLink `TUNNEL` payload to ROS 2.
-3. **SVEA Core Bridge (Receiver):** The `svea_core` package provides a `px4_uorb_tunnel` node. It subscribes to the tunnel stream, decodes the custom binary payload, reconstructs fragmented messages, and republishes them as native ROS 2 topics under the `/px4/uorb/*` namespace.
+## Normal bringup
 
-## Exposed ROS 2 Topics
+`svea_core/launch/lli.xml` starts MAVROS and the tunnel bridge together under
+the vehicle namespace (`self` by default). It configures the bridge's
+`mavlink_topic` as relative `mavros/tunnel/out`. Do not start another bridge
+against the same stream if vehicle bringup already supplies it.
 
-When the tunnel bridge is active, you will see topics dynamically populate based on what the PX4 board is forwarding:
-
-### Raw Tunnel Interface
-- `/px4/uorb_tunnel/frame`: Raw extracted uORB frames decoded from the MAVLink tunnel (primarily for debugging).
-
-### Power Monitor Telemetry
-The SVEA power board exposes multiple voltage and current sensors (INA226 and INA3221). These are surfaced in ROS 2 as:
-
-- `/px4/uorb/power_monitor`: Contains all power monitor updates multiplexed.
-- `/px4/uorb/power_monitor/instance_X`: Dedicated topics for each physical sensor/channel instance, guaranteeing isolation between rails.
-
-#### Instance Determinism
-The PX4 SVEA firmware guarantees deterministic ordering for the power monitor instances. For example, on the STM32F7 Clicker4:
-- `instance_0` & `instance_1`: INA226 devices (e.g., ESC current shunt, Servo buck shunt).
-- `instance_2` through `instance_7`: INA3221 channels (e.g., 5V/12V rails, auxiliary inputs).
-
-## Quick Start
-
-### 1. Check PX4 Configuration
-The board's startup script (`rc.board_extras`) usually configures this automatically. If you need to manually enable the `PX4_UORB_TUNNEL` stream from the PX4 NSH console:
-```bash
-mavlink stream -u 0 -s PX4_UORB_TUNNEL -r 20
-```
-
-### 2. Run the ROS 2 Bridge
-Assuming your MAVROS connection is already established (e.g., via the SVEA Docker compose setup):
+For a separately established MAVROS connection, the installed executable is:
 
 ```bash
-ros2 run svea_core px4_uorb_tunnel
+ros2 run svea_core px4_uorb_tunnel.py --ros-args -r __ns:=/self
 ```
 
-*(Note: The SVEA Docker compose environment may already start this automatically in the background).*
+The workspace has no Docker Compose bringup to rely on. Source the workspace
+and check the actual running node and topic names.
 
-### 3. Verify Data
-Use standard ROS 2 commands to verify that the tunnel is correctly decoding the uORB topics:
+## Topics and message definitions
 
-List the active topics:
+Outputs are **relative** to the bridge's namespace. With `/self`:
+
+| Topic | Meaning |
+| --- | --- |
+| `/self/px4/uorb_tunnel/frame` | Decoded frame metadata as `std_msgs/msg/String` JSON, useful for debugging. |
+| `/self/px4/uorb/power_monitor` | Available power-monitor messages multiplexed across instances. |
+| `/self/px4/uorb/power_monitor/instance_0` | One instance; additional instance topics appear as the firmware sends them. |
+
+A root-namespace standalone bridge instead publishes under `/px4/...`.
+The bridge needs matching ROS message definitions; it searches the packages
+selected by `ros_msg_packages` (default `px4_msgs,svea_msgs`) and can accept an
+`override_msg_dir`. Match definitions to the actual firmware and custom uORB
+types. Do not assume upstream PX4 definitions include all SVEA custom messages.
+
+Instance numbers are assigned by the firmware and board configuration. Check
+the deployed board's sensor inventory before interpreting an instance as a
+particular voltage rail; this ROS package does not guarantee that mapping.
+
+## Verification
+
 ```bash
-ros2 topic list | grep px4
+ros2 node list
+ros2 topic list -t
+ros2 topic info /self/mavros/tunnel/out
+ros2 topic echo /self/px4/uorb_tunnel/frame --once
+ros2 topic hz /self/px4/uorb/power_monitor/instance_0
 ```
 
-Echo a specific power rail instance:
-```bash
-ros2 topic echo /px4/uorb/power_monitor/instance_0
-```
-```bash
-ros2 topic hz /px4/uorb/power_monitor/instance_0
-```
+If no data arrives, verify MAVROS `state.connected`, the tunnel plugin, the
+custom stream configuration on the correct MAVLink link, schema compatibility,
+and bridge diagnostics. Use the deployed firmware's startup instructions and
+NSH `mavlink help` rather than assuming a UDP port or serial device. Debugging
+telemetry does not establish that motion control is armed or safe.
