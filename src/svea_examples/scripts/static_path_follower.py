@@ -24,20 +24,17 @@ class static_path_follower(rx.Node):
 
     #**Preparation**
 
-    TODO: Add instructions for setting up the teleoperation environment.
+    Follow docs/setup/docker.md to build and start the simulation container.
 
     #**Simulation**
 
     To run the Pure Pursuit example in simulation, you can use the following command:
     ```bash
-    ros2 launch svea_examples floor2.xml is_sim:=true
+    ros2 launch svea_examples floor2.launch.py
     ```
-    This launch file includes the following components, with example parameters:
-
-        # Initial state of the robot (x, y, yaw, velocity)
-        state:=[-7.4, -15.3, 0.9, 0.0] 
-        # Points defining the path to follow. Each point is a string representation of a list.
-        points:=['[-2.3,-7.1]','[10.5,11.7]','[5.7,15.0]','[-7.0,-4.0]'] 
+    The launch starts two simulated vehicles, each running this follower.
+    The points parameter is a flat list of XY coordinates. See
+    docs/tutorials/1_floor2.md for controller exercises.
 
     Attributes:
         points: List of points defining the path to follow.

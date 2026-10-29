@@ -1,26 +1,45 @@
-# Listening to ROS on another computer
+# Listening to ROS 2 on Another Computer
 
-Since you will not be able to drive the SVEA cars with a display plugged in, it
-can be useful to link a computer that does have a display to the SVEA car's ROS
-network. This will let you use [RVIZ](http://wiki.ros.org/rviz) and
-[PlotJuggler](http://wiki.ros.org/plotjuggler) on the computer with a display
-while accessing the data streams on the SVEA car. This amounts to telling the
-computer with a display where the ROS master it should be listening to (in this
-case, it should listen to the ROS master running on the SVEA car) is located on
-the network. We do this with a the SVEA's hostname, e.g. `svea3`. On the SVEA
-car and the computer with a display, run:
+Use Foxglove for visualization, or DDS discovery to connect ROS 2 nodes
+across computers.
+
+## Foxglove over a WebSocket
+
+For visualization without a ROS installation on the laptop, start a Foxglove
+bridge on the SVEA and connect the host app/browser to `ws://SVEA_IP:8765`.
+`floor2.launch.py` starts this bridge by default for simulation. The
+hardware/simulation stack in `svea.launch.py` can include it with
+`use_foxglove:=True`. Development containers publish port 8765; hardware
+containers on native Linux use host networking.
+
+## Direct DDS communication
+
+Both computers need compatible ROS 2 installations and message definitions.
+For the default DDS middleware, set the same agreed domain in every terminal
+that starts nodes on either computer:
 
 ```bash
-# on SVEA
-. <svea_root>/util/remote_ros.sh
-
-# on computer
-. <svea_root>/util/remote_ros.sh <hostname>
+export ROS_DOMAIN_ID=42
+export ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET
 ```
 
-You can test if this worked by launching something on the SVEA car in the same terminal where the export commands were run and then calling ```rostopic list``` on the computer with a display in the same terminal where the export commands were run. You should see the topics you expect to be on the SVEA car also available on the computer with a display. If this worked, you have some options for how you want to use it. You can either:
-1. call this script everytime you want to link the SVEA car and the computer with a display togther (the script only links the terminal window you run it in),
-2. add an [alias](https://mijingo.com/blog/creating-bash-aliases) to the end of the SVEA car and the computer's ```~/.bashrc``` to create a new bash command,
-3. you can add the contents of ```remote_ros.sh``` directly to the end of your ```~/.bashrc```,
+42 is an example; use the domain assigned to your experiment. The base Docker
+image sets discovery to `LOCALHOST`, so override it **inside** the container
+before launching nodes. Exporting variables only on the host does not pass
+them through `util/run` automatically. Restart nodes and the ROS CLI daemon
+after changing discovery settings:
 
-or some other preferred approach.
+```bash
+ros2 daemon stop
+ros2 topic list
+ros2 node list
+```
+
+The hosts must permit DDS traffic and multicast, or have explicit middleware
+peer configuration. Host networking on native Linux avoids Docker bridge NAT;
+macOS/Windows virtualization and WiFi policy can limit discovery. Publishing
+only the Foxglove port does not enable DDS discovery across hosts.
+
+See the ROS 2 Jazzy [discovery documentation](https://docs.ros.org/en/jazzy/Tutorials/Advanced/Improved-Dynamic-Discovery.html)
+for `ROS_STATIC_PEERS` and middleware-specific limitations. The discovery
+variables above do not configure `rmw_zenoh`.
