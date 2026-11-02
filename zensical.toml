@@ -55,6 +55,7 @@ nav = [
     { "Lidar" = "setup/lidar_setup.md" },
     { "MoCap Localization" = "mocap_localization.md" },
   ] },
+  { "Troubleshooting" = "troubleshooting.md" },
   { "Tutorial" = [
     { "0. Software Overview" = "tutorials/0_intro.md" },
     { "1. Floor 2 and Pure-Pursuit" = "tutorials/1_floor2.md" },
