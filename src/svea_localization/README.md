@@ -12,7 +12,7 @@ For installation, use the [Docker workflow](../../docs/setup/docker.md) or
 | `transforms.launch.py` | Static transforms for vehicle and sensor frames. |
 | `slam.launch.py` | MAVROS, wheel/IMU odometry, LiDAR and SLAM Toolbox. |
 | `lidar.launch.py` | Hokuyo driver. See [LiDAR setup](../../docs/setup/lidar_setup.md). |
-| `rtk.launch.py` | RTK receiver and NTRIP client. See [outdoor localization status](../../docs/development/outdoor_localization.md). |
+| `rtk.launch.py` | RTK receiver and NTRIP client. |
 | `_localization_debugger.launch.py` | Unimplemented; raises an assertion. |
 
 Sensor launches are installed alongside the other launch files. Run them by
@@ -51,6 +51,3 @@ The standalone localization launch needs a running PX4 connection on hardware.
 Rebuild after adding or changing installed configuration, then source the
 workspace. See [MoCap localization](../../docs/mocap_localization.md) for
 DISCOWER tracking and controller integration.
-
-The outdoor pipeline has unresolved remappings and datum setup; its status
-and blockers are documented in the [outdoor guide](../../docs/development/outdoor_localization.md).
