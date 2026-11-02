@@ -69,7 +69,6 @@ nav = [
     { "Native Installation" = "development/native_build.md" },
     { "Remote ROS 2 Access" = "development/remote_ros.md" },
     { "Docker Images" = "development/docker.md" },
-    { "Outdoor Localization Status" = "development/outdoor_localization.md" },
     { "PX4 uORB Tunnel" = "development/px4_uorb_tunnel.md" },
   ] },
   { "Reference" = [
